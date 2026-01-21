@@ -1,2 +1,5 @@
-
 context_prompt.txt
+.claude/
+.kiro/
+*.DS_Store
+target/
