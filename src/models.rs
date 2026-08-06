@@ -285,7 +285,7 @@ impl StrongsIndex {
 }
 
 /// Extended Bible with original language support
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExtendedBible {
     /// Hebrew OT interlinear data (verse ref -> interlinear verse)
     pub interlinear_ot: HashMap<VerseRef, InterlinearVerse>,

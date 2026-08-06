@@ -1,4 +1,4 @@
-KJV-Interlinear
+# KJV-Interlinear
 
 A KJV Bible study app with Hebrew and Greek interlinear support, built in Rust with [egui](https://github.com/emilk/egui).
 
@@ -10,6 +10,7 @@ KJV-Interlinear extends a fast KJV reader with original language texts, Strong's
 - **Hebrew & Greek Interlinear** — Word-by-word original language text aligned with the KJV, parsed from STEP Bible data (TAHOT, TAGNT)
 - **Strong's Concordance** — Every Hebrew and Greek word linked to its Strong's number with occurrence counts and cross-references
 - **Lexicon** — Built-in Hebrew (TBESH) and Greek (TBESG) dictionary entries with definitions, transliterations, and morphology
+- **Red Letter** — Words of Christ highlighted from a verse-accurate quote map (Gospels, Acts, Revelation)
 - **Display Modes** — KJV only, parallel, interlinear, or original-language-only views
 - **Search** — Full-text search with scope filtering (all, current book, Old Testament, New Testament)
 - **Bookmarks & History** — Save verses and track your reading with persistent storage
@@ -19,51 +20,58 @@ KJV-Interlinear extends a fast KJV reader with original language texts, Strong's
 ## Building
 
 Requires [Rust](https://rustup.rs/) (edition 2024).
+
 ```sh
 cargo build --release
 ```
 
-Run from the project root:
-```sh
-cargo run
-```
+Run from the project root (so `old_testament/`, `new_testament/`, and `data/` are found):
 
-The app expects these directories in the working directory:
+```sh
+cargo run --release
+```
 
 | Directory | Contents |
 |---|---|
 | `old_testament/` | KJV Old Testament text files (one per book) |
 | `new_testament/` | KJV New Testament text files (one per book) |
-| `data/` | STEP Bible original language files (optional — the app runs without them) |
+| `data/` | STEP Bible original language files and red-letter map (optional for core reading — interlinear features need STEP files) |
 
-## Data Sources
+Parsed original-language data is cached under your OS cache directory after the first load.
 
-- **KJV text**: [Project Gutenberg](https://www.gutenberg.org/) — plain text, `chapter:verse text` format
-- **Hebrew OT**: TAHOT files from the [STEP Bible project](https://www.stepbible.org/) (Translators Amalgamated Hebrew OT)
-- **Greek NT**: TAGNT files from the STEP Bible project (Translators Amalgamated Greek NT)
-- **Lexicons**: TBESH (Hebrew) and TBESG (Greek) from the STEP Bible project
+## Data Sources & Attribution
+
+See [NOTICE](NOTICE) for full attribution text.
+
+- **KJV text**: [Project Gutenberg](https://www.gutenberg.org/) eBook #10 — see [licenses/PROJECT_GUTENBERG.txt](licenses/PROJECT_GUTENBERG.txt)
+- **Hebrew OT / Greek NT / lexicons**: [STEP Bible](https://www.STEPBible.org/) (TAHOT, TAGNT, TBESH, TBESG), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — [STEPBible-Data](https://github.com/STEPBible/STEPBible-Data)
+- **Red-letter words of Christ**: [kjvstudy.org](https://github.com/kennethreitz/kjvstudy.org) by Kenneth Reitz (ISC License)
 
 ## Project Structure
+
 ```
 src/
 ├── main.rs                  # App entry point
+├── lib.rs                   # Library root
 ├── models.rs                # Bible, Verse, ExtendedBible, Strong's types
 ├── parsing.rs               # KJV text file parser
+├── paths.rs                 # Asset path resolution
+├── red_letter.rs            # Words-of-Christ index
 ├── settings.rs              # Persistent settings, bookmarks, history
 ├── theme.rs                 # Semantic dark/light theme system
+├── fonts.rs                 # Bundled Noto Hebrew/Greek fonts
 ├── original_languages/
-│   ├── mod.rs               # Module declarations
-│   └── loader.rs            # STEP Bible TSV parser (Hebrew, Greek, lexicons)
+│   ├── mod.rs
+│   ├── loader.rs            # STEP Bible TSV parser
+│   └── cache.rs             # Binary cache for ExtendedBible
 └── ui/
-    ├── mod.rs               # Module declarations
+    ├── mod.rs
     ├── app.rs               # Main app state and update loop
     └── components.rs        # Reusable UI components
 ```
 
-## See Also
-
-For a minimal KJV-only reader without the original language features, see [Berean Lite](https://github.com/Divhanthelion/Bible-App).
-
 ## License
 
-See [license.txt](license.txt).
+Application source code is licensed under the [MIT License](LICENSE).
+
+Bundled data remains under its own terms (Project Gutenberg, STEP Bible CC BY 4.0, and ISC for the red-letter map) as described in [NOTICE](NOTICE).

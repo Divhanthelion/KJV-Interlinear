@@ -1,7 +1,11 @@
 [package]
-name = "biblapp"
+name = "kjv-interlinear"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+description = "KJV Bible study app with Hebrew and Greek interlinear support"
+repository = "https://github.com/Divhanthelion/KJV-Interlinear"
+readme = "README.md"
 
 [dependencies]
 eframe = { version = "0.31.1", default-features = false, features = ["default_fonts", "glow", "wayland", "x11"] }
@@ -9,19 +13,16 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 arboard = "3.4"
 directories = "5.0"
-
-# Original language support
-csv = "1.3"
-unicode-normalization = "0.1"
 bincode = "1.3"
 
 [package.metadata.bundle]
-name = "Bible App"
-identifier = "com.github.Divhanthelion/Bible-App"
+name = "KJV Interlinear"
+identifier = "com.divhanthelion.kjv-interlinear"
 icon = ["icon.png"]
-resources = ["new_testament", "old_testament", "icon.png"]
-short_description = "Project Gutenberg KJV"
+resources = ["new_testament", "old_testament", "data", "icon.png", "NOTICE", "LICENSE", "licenses"]
+short_description = "KJV Bible reader with Hebrew/Greek interlinear"
 long_description = """
-Displays each the bible one chapter at a time. 
-Featuring a blazing fast search feature which doubles as a word count.
+A native KJV Bible study app with Hebrew and Greek interlinear text,
+Strong's concordance, lexicon lookups, bookmarks, and themes.
+KJV text from Project Gutenberg; original-language data from STEP Bible.
 """

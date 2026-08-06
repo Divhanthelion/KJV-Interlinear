@@ -3,69 +3,22 @@ use eframe::egui::{self, Color32, CornerRadius, RichText, Stroke, Ui, Vec2};
 use crate::models::{
     Bookmark, HistoryEntry, InterlinearVerse, LexiconEntry, OriginalLanguage, OriginalWord, Verse,
 };
+use crate::red_letter::{red_letter_segments, RedLetterIndex};
 use crate::settings::{DisplayMode, FontSize, Settings};
 use crate::theme::Theme;
 
-/// Render a verse with proper formatting
-pub fn render_verse(ui: &mut Ui, verse: &Verse, settings: &Settings, highlight_terms: &[String]) {
-    let font_size = settings.font_size.pixels();
-
-    ui.horizontal_wrapped(|ui: &mut Ui| {
-        // Verse number (bold, colored)
-        if settings.show_verse_numbers {
-            let number_color = if settings.dark_mode {
-                Color32::from_rgb(130, 160, 220)
-            } else {
-                Color32::from_rgb(70, 100, 180)
-            };
-
-            ui.label(
-                RichText::new(format!("{} ", verse.verse_number))
-                    .size(font_size)
-                    .strong()
-                    .color(number_color),
-            );
-        }
-
-        // Verse text with optional highlighting
-        if highlight_terms.is_empty() {
-            // Check for red letter (words of Jesus)
-            let text_color = if settings.red_letter && is_words_of_jesus(&verse.book, verse.chapter)
-            {
-                if settings.dark_mode {
-                    Color32::from_rgb(255, 120, 120)
-                } else {
-                    Color32::from_rgb(180, 30, 30)
-                }
-            } else if settings.dark_mode {
-                Color32::from_rgb(230, 230, 235)
-            } else {
-                Color32::from_rgb(30, 30, 35)
-            };
-
-            ui.label(RichText::new(&verse.text).size(font_size).color(text_color));
-        } else {
-            // Render with highlighted terms
-            render_highlighted_text(ui, &verse.text, highlight_terms, font_size, settings);
-        }
-    });
-
-    ui.add_space(10.0);
-}
-
-/// Render a verse with theme support (improved typography)
-#[allow(dead_code)]
-pub fn render_verse_themed(
+/// Render a verse with theme colors and accurate red-letter spans.
+pub fn render_verse(
     ui: &mut Ui,
     verse: &Verse,
     settings: &Settings,
     highlight_terms: &[String],
     theme: &Theme,
+    red_letter: Option<&RedLetterIndex>,
 ) {
     let font_size = settings.font_size.pixels();
 
     ui.horizontal_wrapped(|ui: &mut Ui| {
-        // Verse number with theme color
         if settings.show_verse_numbers {
             ui.label(
                 RichText::new(format!("{} ", verse.verse_number))
@@ -75,29 +28,44 @@ pub fn render_verse_themed(
             );
         }
 
-        // Verse text with optional highlighting
-        if highlight_terms.is_empty() {
-            // Check for red letter (words of Jesus)
-            let text_color = if settings.red_letter && is_words_of_jesus(&verse.book, verse.chapter)
-            {
-                theme.red_letter
+        if !highlight_terms.is_empty() {
+            render_highlighted_text(ui, &verse.text, highlight_terms, font_size, theme);
+        } else if settings.red_letter {
+            if let Some(spec) = red_letter.and_then(|idx| {
+                idx.get(&verse.book, verse.chapter, verse.verse_number)
+            }) {
+                for (segment, is_red) in red_letter_segments(&verse.text, spec) {
+                    if segment.is_empty() {
+                        continue;
+                    }
+                    let color = if is_red {
+                        theme.red_letter
+                    } else {
+                        theme.text_primary
+                    };
+                    ui.label(RichText::new(segment).size(font_size).color(color));
+                }
             } else {
-                theme.text_primary
-            };
-
-            ui.label(RichText::new(&verse.text).size(font_size).color(text_color));
+                ui.label(
+                    RichText::new(&verse.text)
+                        .size(font_size)
+                        .color(theme.text_primary),
+                );
+            }
         } else {
-            // Render with highlighted terms using theme
-            render_highlighted_text_themed(ui, &verse.text, highlight_terms, font_size, theme);
+            ui.label(
+                RichText::new(&verse.text)
+                    .size(font_size)
+                    .color(theme.text_primary),
+            );
         }
     });
 
     ui.add_space(10.0);
 }
 
-/// Render text with search term highlighting (themed version)
-#[allow(dead_code)]
-fn render_highlighted_text_themed(
+/// Render text with search term highlighting
+fn render_highlighted_text(
     ui: &mut Ui,
     text: &str,
     terms: &[String],
@@ -106,7 +74,6 @@ fn render_highlighted_text_themed(
 ) {
     let text_lower = text.to_lowercase();
 
-    // Find all match positions
     let mut highlights: Vec<(usize, usize)> = Vec::new();
     for term in terms {
         let term_lower = term.to_lowercase();
@@ -118,7 +85,6 @@ fn render_highlighted_text_themed(
         }
     }
 
-    // Sort and merge overlapping highlights
     highlights.sort_by_key(|h| h.0);
 
     if highlights.is_empty() {
@@ -130,7 +96,6 @@ fn render_highlighted_text_themed(
         return;
     }
 
-    // Render segments
     let mut last_end = 0;
     for (start, end) in highlights {
         if start > last_end {
@@ -158,89 +123,9 @@ fn render_highlighted_text_themed(
     }
 }
 
-/// Render text with search term highlighting
-fn render_highlighted_text(
-    ui: &mut Ui,
-    text: &str,
-    terms: &[String],
-    font_size: f32,
-    settings: &Settings,
-) {
-    let text_lower = text.to_lowercase();
-    let highlight_bg = if settings.dark_mode {
-        Color32::from_rgb(100, 100, 0)
-    } else {
-        Color32::from_rgb(255, 255, 150)
-    };
-    let normal_color = if settings.dark_mode {
-        Color32::from_rgb(220, 220, 220)
-    } else {
-        Color32::from_rgb(30, 30, 30)
-    };
-
-    // Find all match positions
-    let mut highlights: Vec<(usize, usize)> = Vec::new();
-    for term in terms {
-        let term_lower = term.to_lowercase();
-        let mut start = 0;
-        while let Some(pos) = text_lower[start..].find(&term_lower) {
-            let abs_pos = start + pos;
-            highlights.push((abs_pos, abs_pos + term.len()));
-            start = abs_pos + 1;
-        }
-    }
-
-    // Sort and merge overlapping highlights
-    highlights.sort_by_key(|h| h.0);
-
-    if highlights.is_empty() {
-        ui.label(RichText::new(text).size(font_size).color(normal_color));
-        return;
-    }
-
-    // Render segments
-    let mut last_end = 0;
-    for (start, end) in highlights {
-        if start > last_end {
-            ui.label(
-                RichText::new(&text[last_end..start])
-                    .size(font_size)
-                    .color(normal_color),
-            );
-        }
-        if start >= last_end {
-            ui.label(
-                RichText::new(&text[start..end])
-                    .size(font_size)
-                    .background_color(highlight_bg),
-            );
-            last_end = end;
-        }
-    }
-    if last_end < text.len() {
-        ui.label(
-            RichText::new(&text[last_end..])
-                .size(font_size)
-                .color(normal_color),
-        );
-    }
-}
-
-/// Check if the given book/chapter contains words of Jesus (simplified heuristic)
-fn is_words_of_jesus(book: &str, _chapter: u32) -> bool {
-    // For now, only apply to Gospels - a more sophisticated approach would
-    // require marking specific verse ranges
-    matches!(book, "Matthew" | "Mark" | "Luke" | "John")
-}
-
 /// Render a bookmark item - returns (clicked, delete)
-pub fn render_bookmark(ui: &mut Ui, bookmark: &Bookmark, settings: &Settings) -> (bool, bool) {
+pub fn render_bookmark(ui: &mut Ui, bookmark: &Bookmark, settings: &Settings, theme: &Theme) -> (bool, bool) {
     let font_size = settings.font_size.pixels() - 2.0;
-    let ref_color = if settings.dark_mode {
-        Color32::from_rgb(150, 180, 255)
-    } else {
-        Color32::from_rgb(70, 100, 180)
-    };
 
     let reference = format!("{} {}:{}", bookmark.book, bookmark.chapter, bookmark.verse);
 
@@ -251,7 +136,9 @@ pub fn render_bookmark(ui: &mut Ui, bookmark: &Bookmark, settings: &Settings) ->
         if ui
             .selectable_label(
                 false,
-                RichText::new(&reference).size(font_size).color(ref_color),
+                RichText::new(&reference)
+                    .size(font_size)
+                    .color(theme.text_accent),
             )
             .clicked()
         {
@@ -272,13 +159,13 @@ pub fn render_bookmark(ui: &mut Ui, bookmark: &Bookmark, settings: &Settings) ->
 }
 
 /// Render a history entry - returns true if clicked
-pub fn render_history_entry(ui: &mut Ui, entry: &HistoryEntry, settings: &Settings) -> bool {
+pub fn render_history_entry(
+    ui: &mut Ui,
+    entry: &HistoryEntry,
+    settings: &Settings,
+    theme: &Theme,
+) -> bool {
     let font_size = settings.font_size.pixels() - 2.0;
-    let text_color = if settings.dark_mode {
-        Color32::from_rgb(180, 180, 180)
-    } else {
-        Color32::from_rgb(80, 80, 80)
-    };
 
     let reference = format!("{} {}", entry.book, entry.chapter);
     let time_ago = format_time_ago(entry.timestamp);
@@ -295,7 +182,7 @@ pub fn render_history_entry(ui: &mut Ui, entry: &HistoryEntry, settings: &Settin
         ui.label(
             RichText::new(&time_ago)
                 .size(font_size - 2.0)
-                .color(text_color),
+                .color(theme.text_muted),
         );
     });
 
@@ -441,7 +328,7 @@ pub fn settings_panel(ui: &mut Ui, settings: &mut Settings) -> bool {
 
     // Red letter mode
     ui.horizontal(|ui: &mut Ui| {
-        ui.label("Red Letter (Gospels):");
+        ui.label("Red Letter (words of Christ):");
         if ui.checkbox(&mut settings.red_letter, "").changed() {
             changed = true;
         }
@@ -476,6 +363,19 @@ pub fn settings_panel(ui: &mut Ui, settings: &mut Settings) -> bool {
         }
     });
 
+    ui.add_space(16.0);
+    ui.separator();
+    ui.label(RichText::new("About & Attribution").strong());
+    ui.add_space(6.0);
+    ui.label(
+        RichText::new(
+            "KJV text: Project Gutenberg. Original languages: STEP Bible (CC BY 4.0). \
+Red-letter map: Kenneth Reitz / kjvstudy.org (ISC). App code: MIT. See NOTICE.",
+        )
+        .size(11.0)
+        .color(Color32::GRAY),
+    );
+
     changed
 }
 
@@ -490,6 +390,8 @@ pub fn render_verse_parallel(
     interlinear: Option<&InterlinearVerse>,
     settings: &Settings,
     highlight_terms: &[String],
+    theme: &Theme,
+    red_letter: Option<&RedLetterIndex>,
 ) {
     let font_size = settings.font_size.pixels();
 
@@ -497,7 +399,7 @@ pub fn render_verse_parallel(
         // Left column: KJV
         ui.vertical(|ui| {
             ui.set_min_width(ui.available_width() * 0.45);
-            render_verse(ui, verse, settings, highlight_terms);
+            render_verse(ui, verse, settings, highlight_terms, theme, red_letter);
         });
 
         ui.separator();
@@ -505,63 +407,32 @@ pub fn render_verse_parallel(
         // Right column: Original language
         ui.vertical(|ui| {
             if let Some(orig) = interlinear {
-                let orig_font_size = font_size
-                    + if orig.language == OriginalLanguage::Hebrew {
-                        settings.hebrew_font_size_offset
-                    } else {
-                        settings.greek_font_size_offset
-                    };
-
-                let text_color = if settings.dark_mode {
-                    Color32::from_rgb(180, 150, 220)
+                let orig_color = if matches!(orig.language, OriginalLanguage::Hebrew | OriginalLanguage::Aramaic)
+                {
+                    theme.hebrew_text
                 } else {
-                    Color32::from_rgb(100, 50, 150)
+                    theme.greek_text
                 };
-
-                // Combine all original words into one line
                 let original_text: String = orig
                     .original_words
                     .iter()
                     .map(|w| w.original_text.as_str())
                     .collect::<Vec<&str>>()
                     .join(" ");
-
-                ui.horizontal_wrapped(|ui| {
-                    if settings.show_verse_numbers {
-                        let number_color = if settings.dark_mode {
-                            Color32::from_rgb(150, 180, 255)
-                        } else {
-                            Color32::from_rgb(70, 100, 180)
-                        };
-                        ui.label(
-                            RichText::new(format!("{} ", orig.verse_number))
-                                .size(font_size)
-                                .strong()
-                                .color(number_color),
-                        );
-                    }
-                    ui.label(
-                        RichText::new(&original_text)
-                            .size(orig_font_size)
-                            .color(text_color),
-                    );
-                });
-            } else {
-                let gray = if settings.dark_mode {
-                    Color32::from_rgb(100, 100, 100)
-                } else {
-                    Color32::from_rgb(150, 150, 150)
-                };
                 ui.label(
-                    RichText::new("(Original not available)")
-                        .size(font_size - 2.0)
-                        .color(gray),
+                    RichText::new(original_text)
+                        .size(font_size + settings.hebrew_font_size_offset)
+                        .color(orig_color),
+                );
+            } else {
+                ui.label(
+                    RichText::new("(no original language data)")
+                        .italics()
+                        .color(theme.text_muted),
                 );
             }
         });
     });
-
-    ui.add_space(8.0);
 }
 
 /// Render a verse in interlinear view (word-by-word alignment)

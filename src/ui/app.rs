@@ -3,7 +3,8 @@ use eframe::egui::{self, Color32, ComboBox, Context, Key, RichText, ScrollArea, 
 use crate::models::{
     Bible, ExtendedBible, InterlinearVerse, SearchScope, Testament, Verse, VerseRef,
 };
-use crate::settings::{DisplayMode, Settings};
+use crate::red_letter::RedLetterIndex;
+use crate::settings::{DisplayMode, SettingsStore};
 use crate::theme::{Theme, get_theme};
 use crate::ui::components;
 
@@ -19,7 +20,8 @@ enum SidebarTab {
 pub struct BibleApp {
     bible: Bible,
     extended_bible: Option<ExtendedBible>,
-    settings: Settings,
+    red_letter: Option<RedLetterIndex>,
+    settings: SettingsStore,
 
     // Navigation state
     selected_book: String,
@@ -56,8 +58,12 @@ pub struct BibleApp {
 }
 
 impl BibleApp {
-    pub fn new(bible: Bible, extended_bible: Option<ExtendedBible>) -> Self {
-        let settings = Settings::load();
+    pub fn new(
+        bible: Bible,
+        extended_bible: Option<ExtendedBible>,
+        red_letter: Option<RedLetterIndex>,
+    ) -> Self {
+        let settings = SettingsStore::load();
 
         let selected_book = if bible.books.iter().any(|b| b.name == settings.last_book) {
             settings.last_book.clone()
@@ -74,6 +80,7 @@ impl BibleApp {
         let mut app = Self {
             bible,
             extended_bible,
+            red_letter,
             settings,
             selected_book,
             selected_chapter,
@@ -162,7 +169,7 @@ impl BibleApp {
             self.chapter_text = "Chapter not found".to_string();
         }
 
-        // Update settings with current position
+        // Update settings with current position (defer disk write)
         self.settings.update_position(
             &self.selected_book,
             self.selected_chapter,
@@ -170,7 +177,7 @@ impl BibleApp {
         );
         self.settings
             .add_history(self.selected_book.clone(), self.selected_chapter);
-        let _ = self.settings.save();
+        self.settings.mark_dirty();
     }
 
     fn perform_search(&mut self) {
@@ -288,7 +295,7 @@ impl BibleApp {
         } else {
             self.settings.add_bookmark(book, chapter, verse, None);
         }
-        let _ = self.settings.save();
+        self.settings.mark_dirty();
     }
 
     fn apply_theme(&self, ctx: &Context) -> Theme {
@@ -626,6 +633,7 @@ impl eframe::App for BibleApp {
                                             ui,
                                             bookmark,
                                             &self.settings,
+                                            &theme,
                                         );
                                         if clicked {
                                             self.navigate_to = Some((
@@ -645,7 +653,7 @@ impl eframe::App for BibleApp {
 
                                     if let Some((book, chapter, verse)) = to_remove {
                                         self.settings.remove_bookmark(&book, chapter, verse);
-                                        let _ = self.settings.save();
+                                        self.settings.mark_dirty();
                                     }
                                 }
                             });
@@ -661,6 +669,7 @@ impl eframe::App for BibleApp {
                                             ui,
                                             entry,
                                             &self.settings,
+                                            &theme,
                                         ) {
                                             self.navigate_to =
                                                 Some((entry.book.clone(), entry.chapter, None));
@@ -670,14 +679,14 @@ impl eframe::App for BibleApp {
                                     ui.separator();
                                     if ui.button("Clear History").clicked() {
                                         self.settings.clear_history();
-                                        let _ = self.settings.save();
+                                        self.settings.mark_dirty();
                                     }
                                 }
                             });
                         }
                         SidebarTab::Settings => {
-                            if components::settings_panel(ui, &mut self.settings) {
-                                let _ = self.settings.save();
+                            if components::settings_panel(ui, &mut self.settings.settings) {
+                                self.settings.mark_dirty();
                             }
                         }
                     }
@@ -725,7 +734,7 @@ impl eframe::App for BibleApp {
                                 .clicked()
                             {
                                 self.settings.display_mode = *mode;
-                                let _ = self.settings.save();
+                                self.settings.mark_dirty();
                             }
                         }
                     });
@@ -759,15 +768,18 @@ impl eframe::App for BibleApp {
                             vec![]
                         };
 
-                        let verses = self.current_chapter_verses.clone();
-                        for verse in &verses {
+                        let verse_count = self.current_chapter_verses.len();
+                        for i in 0..verse_count {
+                            let verse = self.current_chapter_verses[i].clone();
                             match self.settings.display_mode {
                                 DisplayMode::KjvOnly => {
                                     components::render_verse(
                                         ui,
-                                        verse,
+                                        &verse,
                                         &self.settings,
                                         &highlight_terms,
+                                        &theme,
+                                        self.red_letter.as_ref(),
                                     );
                                 }
                                 DisplayMode::Parallel => {
@@ -775,10 +787,12 @@ impl eframe::App for BibleApp {
                                         self.get_current_interlinear(verse.verse_number);
                                     components::render_verse_parallel(
                                         ui,
-                                        verse,
+                                        &verse,
                                         interlinear,
                                         &self.settings,
                                         &highlight_terms,
+                                        &theme,
+                                        self.red_letter.as_ref(),
                                     );
                                 }
                                 DisplayMode::Interlinear => {
@@ -786,7 +800,7 @@ impl eframe::App for BibleApp {
                                         self.get_current_interlinear(verse.verse_number);
                                     if let Some(strongs) = components::render_verse_interlinear(
                                         ui,
-                                        verse,
+                                        &verse,
                                         interlinear,
                                         &self.settings,
                                     ) {
@@ -798,10 +812,11 @@ impl eframe::App for BibleApp {
                                         self.get_current_interlinear(verse.verse_number);
                                     if let Some(orig) = interlinear {
                                         let font_size = self.settings.font_size.pixels();
-                                        let orig_color = if self.settings.dark_mode {
-                                            Color32::from_rgb(180, 150, 220)
-                                        } else {
-                                            Color32::from_rgb(100, 50, 150)
+                                        let orig_color = match orig.language {
+                                            crate::models::OriginalLanguage::Greek => {
+                                                theme.greek_text
+                                            }
+                                            _ => theme.hebrew_text,
                                         };
                                         let original_text: String = orig
                                             .original_words
@@ -812,11 +827,6 @@ impl eframe::App for BibleApp {
 
                                         ui.horizontal_wrapped(|ui| {
                                             if self.settings.show_verse_numbers {
-                                                let number_color = if self.settings.dark_mode {
-                                                    Color32::from_rgb(150, 180, 255)
-                                                } else {
-                                                    Color32::from_rgb(70, 100, 180)
-                                                };
                                                 ui.label(
                                                     RichText::new(format!(
                                                         "{} ",
@@ -824,7 +834,7 @@ impl eframe::App for BibleApp {
                                                     ))
                                                     .size(font_size)
                                                     .strong()
-                                                    .color(number_color),
+                                                    .color(theme.verse_number),
                                                 );
                                             }
                                             ui.label(
@@ -838,12 +848,13 @@ impl eframe::App for BibleApp {
                                         });
                                         ui.add_space(8.0);
                                     } else {
-                                        // Fallback to KJV if no original available
                                         components::render_verse(
                                             ui,
-                                            verse,
+                                            &verse,
                                             &self.settings,
                                             &highlight_terms,
+                                            &theme,
+                                            self.red_letter.as_ref(),
                                         );
                                     }
                                 }
@@ -863,7 +874,7 @@ impl eframe::App for BibleApp {
                     let toggle_icon = if self.settings.show_search_panel { "\u{25BC}" } else { "\u{25B6}" };
                     if ui.button(RichText::new(toggle_icon).size(12.0)).on_hover_text("Toggle search panel").clicked() {
                         self.settings.show_search_panel = !self.settings.show_search_panel;
-                        let _ = self.settings.save();
+                        self.settings.mark_dirty();
                     }
                     ui.heading("Search");
 
@@ -872,11 +883,11 @@ impl eframe::App for BibleApp {
                         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                             if ui.small_button("+").on_hover_text("Increase panel height").clicked() {
                                 self.settings.search_panel_height = (self.settings.search_panel_height + 30.0).min(400.0);
-                                let _ = self.settings.save();
+                                self.settings.mark_dirty();
                             }
                             if ui.small_button("-").on_hover_text("Decrease panel height").clicked() {
                                 self.settings.search_panel_height = (self.settings.search_panel_height - 30.0).max(60.0);
-                                let _ = self.settings.save();
+                                self.settings.mark_dirty();
                             }
                             if !self.search_results.is_empty() {
                                 ui.label(RichText::new(format!("{} results", self.search_results.len())).size(12.0).color(theme.text_muted));
@@ -986,7 +997,7 @@ impl eframe::App for BibleApp {
                         let toggle_icon = if self.settings.show_strongs_panel { "\u{25BC}" } else { "\u{25B6}" };
                         if ui.button(RichText::new(toggle_icon).size(12.0)).on_hover_text("Toggle Strong's panel").clicked() {
                             self.settings.show_strongs_panel = !self.settings.show_strongs_panel;
-                            let _ = self.settings.save();
+                            self.settings.mark_dirty();
                         }
                         ui.heading("Strong's Search");
 
@@ -995,11 +1006,11 @@ impl eframe::App for BibleApp {
                             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                                 if ui.small_button("+").on_hover_text("Increase panel height").clicked() {
                                     self.settings.strongs_panel_height = (self.settings.strongs_panel_height + 30.0).min(400.0);
-                                    let _ = self.settings.save();
+                                    self.settings.mark_dirty();
                                 }
                                 if ui.small_button("-").on_hover_text("Decrease panel height").clicked() {
                                     self.settings.strongs_panel_height = (self.settings.strongs_panel_height - 30.0).max(60.0);
-                                    let _ = self.settings.save();
+                                    self.settings.mark_dirty();
                                 }
                                 if self.strongs_count > 0 {
                                     ui.label(RichText::new(format!("{} occurrences", self.strongs_count)).size(12.0).color(theme.text_muted));
@@ -1095,7 +1106,7 @@ impl eframe::App for BibleApp {
                 .show(ctx, |ui| {
                     egui::ScrollArea::vertical().show(ui, |ui| {
                         if components::settings_panel(ui, &mut self.settings) {
-                            let _ = self.settings.save();
+                            self.settings.mark_dirty();
                         }
 
                         // Original language settings (only if available)
@@ -1103,7 +1114,7 @@ impl eframe::App for BibleApp {
                             ui.add_space(10.0);
                             if components::original_language_settings_panel(ui, &mut self.settings)
                             {
-                                let _ = self.settings.save();
+                                self.settings.mark_dirty();
                             }
                         }
 
@@ -1112,17 +1123,35 @@ impl eframe::App for BibleApp {
 
                         // Attribution
                         ui.collapsing("About", |ui| {
-                            ui.label("Bible Reader - KJV Edition");
+                            ui.label("KJV Interlinear");
+                            ui.label("Application code: MIT License");
+                            ui.add_space(5.0);
+                            ui.label(RichText::new("KJV text:").strong());
+                            ui.label("Project Gutenberg eBook #10");
+                            ui.add_space(5.0);
                             if self.has_original_languages() {
-                                ui.add_space(5.0);
-                                ui.label(RichText::new("Original Language Data:").strong());
-                                ui.label("Hebrew and Greek texts from STEP Bible");
-                                ui.label("(Tyndale House), licensed under CC BY 4.0.");
+                                ui.label(RichText::new("Original language data:").strong());
+                                ui.label(
+                                    "TAHOT, TAGNT, TBESH, TBESG from STEP Bible (CC BY 4.0).",
+                                );
+                                ui.hyperlink_to(
+                                    "STEPBible.org",
+                                    "https://www.STEPBible.org/",
+                                );
                                 ui.hyperlink_to(
                                     "STEPBible-Data",
                                     "https://github.com/STEPBible/STEPBible-Data",
                                 );
+                                ui.add_space(5.0);
                             }
+                            ui.label(RichText::new("Red-letter words of Christ:").strong());
+                            ui.label("Kenneth Reitz / kjvstudy.org (ISC License)");
+                            ui.hyperlink_to(
+                                "kjvstudy.org",
+                                "https://github.com/kennethreitz/kjvstudy.org",
+                            );
+                            ui.add_space(5.0);
+                            ui.label("See NOTICE in the project root for full attribution.");
                         });
 
                         ui.add_space(10.0);
@@ -1132,5 +1161,11 @@ impl eframe::App for BibleApp {
                     });
                 });
         }
+
+        self.settings.save_if_dirty();
+    }
+
+    fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
+        self.settings.force_save();
     }
 }

@@ -1,0 +1,58 @@
+KJV-Interlinear
+Copyright (c) 2025-2026 Divhanthelion
+
+This product includes software licensed under the MIT License (see LICENSE).
+Third-party data included with this product remains under its own terms:
+
+---------------------------------------------------------------------------
+1. King James Version text (Project Gutenberg)
+---------------------------------------------------------------------------
+Source: Project Gutenberg eBook #10 — The King James Version of the Bible
+https://www.gutenberg.org/
+
+The KJV text files under old_testament/ and new_testament/ are distributed
+under the Project Gutenberg License. See licenses/PROJECT_GUTENBERG.txt.
+
+Project Gutenberg is a registered trademark. This app is not affiliated with
+or endorsed by the Project Gutenberg Literary Archive Foundation.
+
+---------------------------------------------------------------------------
+2. Original language texts and lexicons (STEP Bible)
+---------------------------------------------------------------------------
+Datasets: TAHOT, TAGNT, TBESH, TBESG
+Source: STEP Bible (https://www.STEPBible.org/)
+Repository: https://github.com/STEPBible/STEPBible-Data
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/
+
+Credit: STEP Bible (www.STEPBible.org). Data created initially by Tyndale
+House Cambridge, now curated by STEP Bible.
+
+These files are included under data/ (TAHOT_*.txt, TAGNT_*.txt, TBESH.txt,
+TBESG.txt). They have not been modified from the upstream STEP Bible texts
+beyond filename normalization for packaging.
+
+---------------------------------------------------------------------------
+3. Red-letter words of Christ (kjvstudy.org)
+---------------------------------------------------------------------------
+File: data/red_letter_verses.json
+Source: https://github.com/kennethreitz/kjvstudy.org
+Author: Kenneth Reitz
+License: ISC License
+
+ISC License
+
+Copyright (c) 2025, Kenneth Reitz
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+---------------------------------------------------------------------------
+4. Fonts (Noto Sans / Noto Sans Hebrew)
+---------------------------------------------------------------------------
+Files: assets/fonts/NotoSans-Regular.ttf, assets/fonts/NotoSansHebrew-Regular.ttf
+Copyright 2015–2022 Google Inc.
+License: SIL Open Font License 1.1
+https://scripts.sil.org/OFL
+Source: https://github.com/googlefonts/noto-fonts

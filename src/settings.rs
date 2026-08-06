@@ -203,13 +203,10 @@ impl Default for Settings {
 impl Settings {
     /// Get the settings file path
     fn settings_path() -> Option<PathBuf> {
-        if let Some(proj_dirs) = directories::ProjectDirs::from("com", "BibleApp", "BibleApp") {
-            let config_dir = proj_dirs.config_dir();
-            fs::create_dir_all(config_dir).ok()?;
-            Some(config_dir.join("settings.json"))
-        } else {
-            None
-        }
+        let proj_dirs = crate::paths::project_dirs()?;
+        let config_dir = proj_dirs.config_dir();
+        fs::create_dir_all(config_dir).ok()?;
+        Some(config_dir.join("settings.json"))
     }
 
     /// Load settings from disk, or return defaults if not found
@@ -309,5 +306,52 @@ impl Settings {
         self.last_book = book.to_string();
         self.last_chapter = chapter;
         self.last_verse = verse;
+    }
+}
+
+/// Tracks unsaved settings changes and persists them when dirty.
+#[derive(Debug, Clone)]
+pub struct SettingsStore {
+    pub settings: Settings,
+    dirty: bool,
+}
+
+impl std::ops::Deref for SettingsStore {
+    type Target = Settings;
+    fn deref(&self) -> &Self::Target {
+        &self.settings
+    }
+}
+
+impl std::ops::DerefMut for SettingsStore {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.settings
+    }
+}
+
+impl SettingsStore {
+    pub fn load() -> Self {
+        Self {
+            settings: Settings::load(),
+            dirty: false,
+        }
+    }
+
+    pub fn mark_dirty(&mut self) {
+        self.dirty = true;
+    }
+
+    pub fn save_if_dirty(&mut self) {
+        if self.dirty {
+            if self.settings.save().is_ok() {
+                self.dirty = false;
+            }
+        }
+    }
+
+    pub fn force_save(&mut self) {
+        if self.settings.save().is_ok() {
+            self.dirty = false;
+        }
     }
 }
