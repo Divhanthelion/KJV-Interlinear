@@ -43,18 +43,16 @@ fn read_testament_books(
         let file_path = entry.path();
 
         // Skip .DS_Store files and Zone.Identifier files (Windows metadata)
-        if let Some(file_name) = file_path.file_name().and_then(|n| n.to_str()) {
-            if file_name == ".DS_Store" || file_name.contains("Zone.Identifier") {
+        if let Some(file_name) = file_path.file_name().and_then(|n| n.to_str())
+            && (file_name == ".DS_Store" || file_name.contains("Zone.Identifier")) {
                 continue;
             }
-        }
 
-        if file_path.is_file() {
-            if let Some(book_name) = file_path.file_stem().and_then(|s| s.to_str()) {
+        if file_path.is_file()
+            && let Some(book_name) = file_path.file_stem().and_then(|s| s.to_str()) {
                 let book = parse_book_file(&file_path, book_name.to_string(), testament.clone())?;
                 bible.books.push(book);
             }
-        }
     }
 
     Ok(())
@@ -83,12 +81,12 @@ fn parse_book_file(file_path: &Path, book_name: String, testament: Testament) ->
         }
 
         // Parse format: "chapter:verse_number verse_text"
-        if let Some((reference, text)) = line.split_once(' ') {
-            if let Some((chapter_str, verse_str)) = reference.split_once(':') {
+        if let Some((reference, text)) = line.split_once(' ')
+            && let Some((chapter_str, verse_str)) = reference.split_once(':') {
                 let chapter_num = chapter_str.parse::<u32>().unwrap_or(0);
                 let verse_num = verse_str.parse::<u32>().unwrap_or(0);
 
-                if chapter_num == 0 || verse_num == 0 {
+                if chapter_num == 0 || chapter_num > 200 || verse_num == 0 || verse_num > 200 {
                     continue;
                 }
 
@@ -111,7 +109,6 @@ fn parse_book_file(file_path: &Path, book_name: String, testament: Testament) ->
                     });
                 }
             }
-        }
     }
 
     Ok(book)

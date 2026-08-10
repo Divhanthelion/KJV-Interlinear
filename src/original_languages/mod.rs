@@ -14,11 +14,10 @@ pub use loader::load_extended_bible;
 
 /// Load ExtendedBible from cache when valid, otherwise parse TSV and refresh cache.
 pub fn load_extended_bible_cached(data_dir: &Path) -> Result<ExtendedBible, String> {
-    if let Some(cached) = cache::try_load_cached(data_dir) {
-        if cached.is_loaded() {
+    if let Some(cached) = cache::try_load_cached(data_dir)
+        && cached.is_loaded() {
             return Ok(cached);
         }
-    }
 
     let extended = load_extended_bible(data_dir)?;
     if extended.is_loaded() {

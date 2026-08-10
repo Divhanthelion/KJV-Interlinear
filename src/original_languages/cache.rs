@@ -5,16 +5,20 @@ use std::io::{BufReader, BufWriter, Write};
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 
+use bincode::Options;
 use serde::{Deserialize, Serialize};
 
 use crate::models::ExtendedBible;
 use crate::paths;
 
 /// Bump when ExtendedBible layout or parser semantics change.
-pub const CACHE_VERSION: u32 = 1;
+pub const CACHE_VERSION: u32 = 3;
 
 const CACHE_FILE: &str = "extended_bible_v1.bin";
 const META_FILE: &str = "extended_bible_v1.meta.json";
+
+/// Cap deserialization size so a tampered length prefix cannot OOM the process.
+const MAX_CACHE_BYTES: u64 = 512 * 1024 * 1024;
 
 /// Fingerprint of source TSV/lexicon files used to invalidate the cache.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -96,7 +100,10 @@ pub fn try_load_cached(data_dir: &Path) -> Option<ExtendedBible> {
     }
 
     let file = File::open(&cache_path).ok()?;
-    match bincode::deserialize_from(BufReader::new(file)) {
+    match bincode::options()
+        .with_limit(MAX_CACHE_BYTES)
+        .deserialize_from(BufReader::new(file))
+    {
         Ok(bible) => {
             eprintln!("Loaded original language data from cache");
             Some(bible)
@@ -139,9 +146,8 @@ pub fn save_cache(data_dir: &Path, bible: &ExtendedBible) {
         return;
     }
 
-    if let Ok(file) = File::create(&meta_path) {
-        if let Err(e) = serde_json::to_writer_pretty(file, &meta) {
+    if let Ok(file) = File::create(&meta_path)
+        && let Err(e) = serde_json::to_writer_pretty(file, &meta) {
             eprintln!("Warning: failed to write language cache meta: {}", e);
         }
-    }
 }

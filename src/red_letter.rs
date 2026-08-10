@@ -136,32 +136,31 @@ fn find_folded(haystack: &str, needle: &str) -> Option<(usize, usize)> {
     let (hay_folded, hay_map) = fold_with_map(haystack);
     let needle_folded = fold_string(needle);
 
-    if !needle_folded.is_empty() {
-        if let Some(pos) = hay_folded.find(&needle_folded) {
-            let start = hay_map[pos].0;
-            let end = hay_map[pos + needle_folded.chars().count() - 1].1;
+    if !needle_folded.is_empty()
+        && let Some(byte_pos) = hay_folded.find(&needle_folded) {
+            let char_pos = hay_folded[..byte_pos].chars().count();
+            let needle_chars = needle_folded.chars().count();
+            let start = hay_map[char_pos].0;
+            let end = hay_map[char_pos + needle_chars - 1].1;
             return Some((start, end));
         }
-    }
 
     // Trailing punctuation drift (e.g. "cumi." vs "cumi;")
     let trimmed = needle.trim_end_matches(|c: char| {
         matches!(c, '.' | ';' | ',' | ':' | '!' | '?' | '"' | '\'')
     });
-    if trimmed.len() < needle.len() && !trimmed.is_empty() {
-        if let Some(r) = find_folded(haystack, trimmed) {
+    if trimmed.len() < needle.len() && !trimmed.is_empty()
+        && let Some(r) = find_folded(haystack, trimmed) {
             return Some(r);
         }
-    }
 
     // Hyphen optional: "Bar-jona" vs "Barjona"
     if needle.contains('-') {
         let dehyphen: String = needle.chars().filter(|&c| c != '-').collect();
-        if dehyphen != needle {
-            if let Some(r) = find_folded(haystack, &dehyphen) {
+        if dehyphen != needle
+            && let Some(r) = find_folded(haystack, &dehyphen) {
                 return Some(r);
             }
-        }
     }
 
     // Truncated quotes in source JSON: shorten from the end by words until it matches
@@ -178,17 +177,21 @@ fn find_folded(haystack: &str, needle: &str) -> Option<(usize, usize)> {
             if needle_folded.is_empty() {
                 continue;
             }
-            if let Some(pos) = hay_folded.find(&needle_folded) {
-                let start = hay_map[pos].0;
-                let end = hay_map[pos + needle_folded.chars().count() - 1].1;
+            if let Some(byte_pos) = hay_folded.find(&needle_folded) {
+                let char_pos = hay_folded[..byte_pos].chars().count();
+                let needle_chars = needle_folded.chars().count();
+                let start = hay_map[char_pos].0;
+                let end = hay_map[char_pos + needle_chars - 1].1;
                 return Some((start, end));
             }
             if candidate.contains('-') {
                 let dehyphen: String = candidate.chars().filter(|&c| c != '-').collect();
                 let needle_folded = fold_string(&dehyphen);
-                if let Some(pos) = hay_folded.find(&needle_folded) {
-                    let start = hay_map[pos].0;
-                    let end = hay_map[pos + needle_folded.chars().count() - 1].1;
+                if let Some(byte_pos) = hay_folded.find(&needle_folded) {
+                    let char_pos = hay_folded[..byte_pos].chars().count();
+                    let needle_chars = needle_folded.chars().count();
+                    let start = hay_map[char_pos].0;
+                    let end = hay_map[char_pos + needle_chars - 1].1;
                     return Some((start, end));
                 }
             }
@@ -263,7 +266,7 @@ mod tests {
         let segs = red_letter_segments(text, &RedLetterSpec::Quote(quote.to_string()));
         assert_eq!(segs.len(), 2);
         assert_eq!(segs[0], ("But he answered and said, ", false));
-        assert_eq!(segs[1].1, true);
+        assert!(segs[1].1);
         assert!(segs[1].0.starts_with("It is written"));
     }
 
@@ -301,6 +304,19 @@ mod tests {
             &RedLetterSpec::Quote("not in the verse".to_string()),
         );
         assert_eq!(segs, vec![("Actual verse text", false)]);
+    }
+
+    #[test]
+    fn find_folded_multibyte_before_match() {
+        // Non-ASCII prefix makes folded byte offset ≠ char index; must not panic.
+        let text = "And he said, °It is written, Man shall not live by bread alone.";
+        let quote = "it is written, man shall not live by bread alone.";
+        let segs = red_letter_segments(text, &RedLetterSpec::Quote(quote.to_string()));
+        assert_eq!(segs.len(), 2);
+        assert!(!segs[0].1);
+        assert!(segs[1].1);
+        assert!(segs[1].0.starts_with("It is written") || segs[1].0.contains("It is written"));
+        assert!(segs[0].0.contains('°'));
     }
 
     #[test]

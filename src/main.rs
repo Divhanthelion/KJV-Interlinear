@@ -12,14 +12,20 @@ fn main() -> eframe::Result<()> {
         Some(p) => p,
         None => {
             eprintln!("Error: old_testament/ directory not found. Run from the project root.");
-            return Ok(());
+            return Err(eframe::Error::AppCreation(Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                "old_testament/ directory not found",
+            ))));
         }
     };
     let new_testament_path = match paths::new_testament_dir() {
         Some(p) => p,
         None => {
             eprintln!("Error: new_testament/ directory not found. Run from the project root.");
-            return Ok(());
+            return Err(eframe::Error::AppCreation(Box::new(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                "new_testament/ directory not found",
+            ))));
         }
     };
 
@@ -27,7 +33,9 @@ fn main() -> eframe::Result<()> {
         Ok(bible) => bible,
         Err(e) => {
             eprintln!("Error loading Bible: {}", e);
-            return Ok(());
+            return Err(eframe::Error::AppCreation(Box::new(std::io::Error::other(
+                e,
+            ))));
         }
     };
 

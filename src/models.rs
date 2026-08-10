@@ -150,17 +150,23 @@ pub struct HistoryEntry {
 }
 
 /// Search scope options
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Default, Serialize, Deserialize)]
 pub enum SearchScope {
+    #[default]
     All,
     CurrentBook,
     OldTestament,
     NewTestament,
 }
 
-impl Default for SearchScope {
-    fn default() -> Self {
-        SearchScope::All
+impl SearchScope {
+    pub fn label(&self) -> &'static str {
+        match self {
+            SearchScope::All => "All",
+            SearchScope::CurrentBook => "Current Book",
+            SearchScope::OldTestament => "Old Testament",
+            SearchScope::NewTestament => "New Testament",
+        }
     }
 }
 
@@ -169,6 +175,30 @@ impl Default for SearchScope {
 // ============================================================================
 
 use std::collections::HashMap;
+
+/// Generate common Strong's key spellings (padded / unpadded).
+fn strongs_key_variants(strongs: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let Some(letter) = strongs.chars().next() else {
+        return out;
+    };
+    if letter != 'H' && letter != 'G' {
+        return out;
+    }
+    let digits: String = strongs.chars().skip(1).filter(|c| c.is_ascii_digit()).collect();
+    if digits.is_empty() {
+        return out;
+    }
+    let trimmed = digits.trim_start_matches('0');
+    let trimmed = if trimmed.is_empty() { "0" } else { trimmed };
+    out.push(format!("{}{}", letter, trimmed));
+    out.push(format!("{}{:0>4}", letter, trimmed));
+    out.push(format!("{}{:0>5}", letter, trimmed));
+    out.sort();
+    out.dedup();
+    out.retain(|v| v != strongs);
+    out
+}
 
 /// Language of the original text
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -337,11 +367,23 @@ impl ExtendedBible {
 
     /// Get lexicon entry for a Strong's number
     pub fn get_lexicon_entry(&self, strongs: &str) -> Option<&LexiconEntry> {
-        if strongs.starts_with('H') {
-            self.hebrew_lexicon.get(strongs)
+        let map = if strongs.starts_with('H') {
+            &self.hebrew_lexicon
         } else {
-            self.greek_lexicon.get(strongs)
+            &self.greek_lexicon
+        };
+
+        if let Some(entry) = map.get(strongs) {
+            return Some(entry);
         }
+
+        // Try zero-padded / unpadded variants (G27 ↔ G0027)
+        for variant in strongs_key_variants(strongs) {
+            if let Some(entry) = map.get(&variant) {
+                return Some(entry);
+            }
+        }
+        None
     }
 
     /// Search by Strong's number
@@ -496,16 +538,5 @@ mod tests {
         assert_eq!(names.len(), 2);
         assert!(names.contains(&"Genesis"));
         assert!(names.contains(&"John"));
-    }
-}
-
-impl SearchScope {
-    pub fn label(&self) -> &'static str {
-        match self {
-            SearchScope::All => "All",
-            SearchScope::CurrentBook => "Current Book",
-            SearchScope::OldTestament => "Old Testament",
-            SearchScope::NewTestament => "New Testament",
-        }
     }
 }

@@ -6,15 +6,16 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
+use std::sync::LazyLock;
 
 use crate::models::{
     ExtendedBible, InterlinearVerse, LexiconEntry, OriginalLanguage, OriginalWord, StrongsIndex,
     VerseRef,
 };
 
-/// Book name mapping from STEP Bible abbreviations to standard names
-/// These must match the book names used in the KJV text files
-fn get_book_name_mapping() -> HashMap<&'static str, &'static str> {
+/// Book name mapping from STEP Bible abbreviations to standard names.
+/// These must match the book names used in the KJV text files.
+static BOOK_NAME_MAPPING: LazyLock<HashMap<&'static str, &'static str>> = LazyLock::new(|| {
     let mut map = HashMap::new();
     // Old Testament
     map.insert("Gen", "Genesis");
@@ -86,12 +87,12 @@ fn get_book_name_mapping() -> HashMap<&'static str, &'static str> {
     map.insert("Jud", "Jude");
     map.insert("Rev", "Revelation");
     map
-}
+});
 
 /// Parse a STEP Bible reference like "Gen.1.1#01=L" or "Mat.1.1#01=NKO"
 fn parse_reference(reference: &str) -> Option<(String, u32, u32, u32)> {
     // Format: Book.Chapter.Verse#WordNum=Type
-    let book_mapping = get_book_name_mapping();
+    let book_mapping = &*BOOK_NAME_MAPPING;
 
     // Split on # to separate reference from word number
     let parts: Vec<&str> = reference.split('#').collect();
@@ -124,7 +125,7 @@ fn extract_strongs_number(dstrongs: &str) -> Option<String> {
     // Look for patterns like H1234, G1234, possibly with letter suffix
     let mut result = String::new();
 
-    let cleaned = dstrongs.replace('{', "").replace('}', "").replace('/', " ");
+    let cleaned = dstrongs.replace(['{', '}'], "").replace('/', " ");
 
     for part in cleaned.split_whitespace() {
         // Skip prefix markers like H9003 (preposition markers)
@@ -133,7 +134,7 @@ fn extract_strongs_number(dstrongs: &str) -> Option<String> {
         }
 
         // Find H or G followed by numbers
-        if let Some(pos) = part.find(|c| c == 'H' || c == 'G') {
+        if let Some(pos) = part.find(['H', 'G']) {
             let substr = &part[pos..];
             let mut num = String::new();
             num.push(substr.chars().next()?);
@@ -162,7 +163,7 @@ fn extract_strongs_number(dstrongs: &str) -> Option<String> {
 
 /// Clean Hebrew text (remove forward slashes used for prefix/suffix markers)
 fn clean_hebrew_text(text: &str) -> String {
-    text.replace('/', "").replace('\\', "")
+    text.replace(['/', '\\'], "")
 }
 
 /// Clean Greek text (remove parenthetical transliteration)
@@ -176,11 +177,10 @@ fn clean_greek_text(text: &str) -> String {
 
 /// Extract transliteration from Greek field like "Βίβλος (Biblos)"
 fn extract_greek_transliteration(text: &str) -> String {
-    if let Some(start) = text.find('(') {
-        if let Some(end) = text.find(')') {
-            return text[start + 1..end].to_string();
+    if let Some(start) = text.find('(')
+        && let Some(rel_end) = text[start + 1..].find(')') {
+            return text[start + 1..start + 1 + rel_end].to_string();
         }
-    }
     String::new()
 }
 
@@ -363,6 +363,80 @@ pub fn load_greek_nt(
     Ok(word_count)
 }
 
+/// Convert STEP Bible lexicon markup into readable plain text.
+///
+/// Handles `<b>`, `<i>`, `<BR />`, `<ref='…'>…</ref>`, `<lb>`, and `__N.` section markers.
+pub fn clean_lexicon_markup(input: &str) -> String {
+    let mut out = String::with_capacity(input.len());
+    let chars: Vec<char> = input.chars().collect();
+    let mut i = 0;
+
+    while i < chars.len() {
+        if chars[i] == '<' {
+            // Find end of tag
+            if let Some(rel_end) = chars[i..].iter().position(|&c| c == '>') {
+                let tag: String = chars[i + 1..i + rel_end].iter().collect();
+                let tag_lower = tag.to_ascii_lowercase();
+                let tag_name = tag_lower
+                    .trim_start_matches('/')
+                    .split([' ', '=', '\''])
+                    .next()
+                    .unwrap_or("");
+
+                match tag_name {
+                    "br" | "lb" => {
+                        if !out.ends_with('\n') {
+                            out.push('\n');
+                        }
+                    }
+                    // Keep inner text for b/i/ref; skip the tags themselves
+                    "b" | "i" | "ref" => {}
+                    _ => {
+                        // Unknown tag — drop it
+                    }
+                }
+                i += rel_end + 1;
+                continue;
+            }
+        }
+
+        // Section markers like "__1." or "__(1)"
+        if chars[i] == '_' && i + 1 < chars.len() && chars[i + 1] == '_' {
+            if !out.ends_with('\n') && !out.is_empty() {
+                out.push('\n');
+            }
+            i += 2;
+            continue;
+        }
+
+        out.push(chars[i]);
+        i += 1;
+    }
+
+    // Collapse runs of blank lines and trim
+    let mut cleaned = String::new();
+    let mut blank = false;
+    for line in out.lines() {
+        let trimmed = line.trim();
+        if trimmed.is_empty() {
+            if !blank && !cleaned.is_empty() {
+                cleaned.push('\n');
+                blank = true;
+            }
+        } else {
+            if !cleaned.is_empty() && !cleaned.ends_with('\n') {
+                cleaned.push('\n');
+            } else if cleaned.ends_with('\n') && blank {
+                // already have one blank
+            }
+            cleaned.push_str(trimmed);
+            blank = false;
+        }
+    }
+
+    cleaned.trim().to_string()
+}
+
 /// Load lexicon data from TBESH or TBESG TSV file
 pub fn load_lexicon(path: &Path) -> Result<HashMap<String, LexiconEntry>, String> {
     let file = File::open(path).map_err(|e| format!("Failed to open {}: {}", path.display(), e))?;
@@ -395,7 +469,7 @@ pub fn load_lexicon(path: &Path) -> Result<HashMap<String, LexiconEntry>, String
 
         let strongs_raw = fields[0];
         // Extract just the number part (e.g., "H0001" from various formats)
-        let strongs_number = if let Some(pos) = strongs_raw.find(|c| c == 'H' || c == 'G') {
+        let strongs_number = if let Some(pos) = strongs_raw.find(['H', 'G']) {
             let mut num = String::new();
             for c in strongs_raw[pos..].chars() {
                 if c == 'H' || c == 'G' || c.is_ascii_digit() {
@@ -419,7 +493,7 @@ pub fn load_lexicon(path: &Path) -> Result<HashMap<String, LexiconEntry>, String
             transliteration: fields[4].to_string(),
             morph: fields[5].to_string(),
             gloss: fields[6].to_string(),
-            definition: fields[7].replace("<br>", "\n").replace("<BR>", "\n"),
+            definition: clean_lexicon_markup(fields[7]),
         };
 
         // Only insert if not already present (first entry wins)
@@ -496,6 +570,15 @@ pub fn load_extended_bible(data_dir: &Path) -> Result<ExtendedBible, String> {
         }
     }
 
+    // Ensure word order is stable for rendering
+    for verse in extended
+        .interlinear_ot
+        .values_mut()
+        .chain(extended.interlinear_nt.values_mut())
+    {
+        verse.original_words.sort_by_key(|w| w.position);
+    }
+
     Ok(extended)
 }
 
@@ -570,5 +653,28 @@ mod tests {
             extract_greek_transliteration("γενέσεως (geneseōs)"),
             "geneseōs"
         );
+        // Closing paren before opening must not panic or slice incorrectly
+        assert_eq!(extract_greek_transliteration("foo) bar (baz"), "");
+        assert_eq!(extract_greek_transliteration("foo) bar (baz)"), "baz");
+    }
+
+    #[test]
+    fn test_clean_lexicon_markup_strips_tags() {
+        let raw = " <b>σύ</b>, <BR /> <i>pron.</i> of 2nd of person(s), <BR /><b>thou, you</b>, \
+            <ref='Mat.25.39'>Mat.25:39</ref> __1. Emphatic";
+        let cleaned = clean_lexicon_markup(raw);
+        assert!(!cleaned.contains('<'), "left over tags: {}", cleaned);
+        assert!(!cleaned.contains('>'), "left over tags: {}", cleaned);
+        assert!(cleaned.contains("σύ"));
+        assert!(cleaned.contains("pron."));
+        assert!(cleaned.contains("thou, you"));
+        assert!(cleaned.contains("Mat.25:39"));
+        assert!(cleaned.contains("1. Emphatic"));
+    }
+
+    #[test]
+    fn test_clean_lexicon_markup_newlines_from_br() {
+        let cleaned = clean_lexicon_markup("a<BR />b<br>c");
+        assert_eq!(cleaned, "a\nb\nc");
     }
 }

@@ -5,18 +5,20 @@ use std::path::PathBuf;
 use crate::models::{Bookmark, HistoryEntry, SearchScope};
 
 /// Font size options
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Default, Serialize, Deserialize)]
 pub enum FontSize {
     Small,
+    #[default]
     Medium,
     Large,
     ExtraLarge,
 }
 
 /// Display mode for original language texts
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Default, Serialize, Deserialize)]
 pub enum DisplayMode {
     /// KJV text only (default)
+    #[default]
     KjvOnly,
     /// KJV and Hebrew/Greek side by side
     Parallel,
@@ -24,12 +26,6 @@ pub enum DisplayMode {
     Interlinear,
     /// Original language text only
     OriginalOnly,
-}
-
-impl Default for DisplayMode {
-    fn default() -> Self {
-        DisplayMode::KjvOnly
-    }
 }
 
 impl DisplayMode {
@@ -49,40 +45,6 @@ impl DisplayMode {
             DisplayMode::Interlinear,
             DisplayMode::OriginalOnly,
         ]
-    }
-}
-
-/// Lexicon view preference
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
-pub enum LexiconView {
-    /// Show definition on hover tooltip
-    Tooltip,
-    /// Show in sidebar panel
-    Sidebar,
-    /// Show in popup window
-    Popup,
-}
-
-impl Default for LexiconView {
-    fn default() -> Self {
-        LexiconView::Tooltip
-    }
-}
-
-#[allow(dead_code)]
-impl LexiconView {
-    pub fn label(&self) -> &'static str {
-        match self {
-            LexiconView::Tooltip => "Tooltip",
-            LexiconView::Sidebar => "Sidebar",
-            LexiconView::Popup => "Popup",
-        }
-    }
-}
-
-impl Default for FontSize {
-    fn default() -> Self {
-        FontSize::Medium
     }
 }
 
@@ -138,14 +100,10 @@ pub struct Settings {
     pub show_strongs_inline: bool,
     #[serde(default)]
     pub show_morphology: bool,
-    #[serde(default)]
+    #[serde(default = "default_hebrew_offset")]
     pub hebrew_font_size_offset: f32,
-    #[serde(default)]
+    #[serde(default = "default_greek_offset")]
     pub greek_font_size_offset: f32,
-    #[serde(default)]
-    pub lexicon_view: LexiconView,
-    #[serde(default)]
-    pub auto_load_original: bool,
     // Search panel visibility and sizing
     #[serde(default = "default_true")]
     pub show_search_panel: bool,
@@ -169,6 +127,14 @@ fn default_true() -> bool {
     true
 }
 
+fn default_hebrew_offset() -> f32 {
+    4.0
+}
+
+fn default_greek_offset() -> f32 {
+    2.0
+}
+
 impl Default for Settings {
     fn default() -> Self {
         Self {
@@ -188,14 +154,12 @@ impl Default for Settings {
             show_transliteration: true,
             show_strongs_inline: true,
             show_morphology: false,
-            hebrew_font_size_offset: 4.0,
-            greek_font_size_offset: 2.0,
-            lexicon_view: LexiconView::Tooltip,
-            auto_load_original: false,
+            hebrew_font_size_offset: default_hebrew_offset(),
+            greek_font_size_offset: default_greek_offset(),
             show_search_panel: true,
             show_strongs_panel: true,
-            search_panel_height: 150.0,
-            strongs_panel_height: 120.0,
+            search_panel_height: default_search_height(),
+            strongs_panel_height: default_strongs_height(),
         }
     }
 }
@@ -211,13 +175,19 @@ impl Settings {
 
     /// Load settings from disk, or return defaults if not found
     pub fn load() -> Self {
-        if let Some(path) = Self::settings_path() {
-            if let Ok(contents) = fs::read_to_string(&path) {
-                if let Ok(settings) = serde_json::from_str(&contents) {
-                    return settings;
+        if let Some(path) = Self::settings_path()
+            && let Ok(contents) = fs::read_to_string(&path) {
+                match serde_json::from_str(&contents) {
+                    Ok(settings) => return settings,
+                    Err(e) => {
+                        eprintln!(
+                            "Warning: corrupt settings.json ({}), backing up and resetting",
+                            e
+                        );
+                        let _ = fs::rename(&path, path.with_extension("json.bak"));
+                    }
                 }
             }
-        }
         Self::default()
     }
 
@@ -226,7 +196,11 @@ impl Settings {
         if let Some(path) = Self::settings_path() {
             let contents = serde_json::to_string_pretty(self)
                 .map_err(|e| format!("Failed to serialize settings: {}", e))?;
-            fs::write(&path, contents).map_err(|e| format!("Failed to write settings: {}", e))?;
+            let tmp_path = path.with_extension("json.tmp");
+            fs::write(&tmp_path, contents)
+                .map_err(|e| format!("Failed to write settings: {}", e))?;
+            fs::rename(&tmp_path, &path)
+                .map_err(|e| format!("Failed to replace settings: {}", e))?;
             Ok(())
         } else {
             Err("Could not determine settings path".to_string())
@@ -342,11 +316,10 @@ impl SettingsStore {
     }
 
     pub fn save_if_dirty(&mut self) {
-        if self.dirty {
-            if self.settings.save().is_ok() {
+        if self.dirty
+            && self.settings.save().is_ok() {
                 self.dirty = false;
             }
-        }
     }
 
     pub fn force_save(&mut self) {

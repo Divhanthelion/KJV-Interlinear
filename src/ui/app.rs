@@ -1,4 +1,4 @@
-use eframe::egui::{self, Color32, ComboBox, Context, Key, RichText, ScrollArea, TextEdit};
+use eframe::egui::{self, Color32, ComboBox, Context, Key, RichText, ScrollArea, TextEdit, Ui};
 
 use crate::models::{
     Bible, ExtendedBible, InterlinearVerse, SearchScope, Testament, Verse, VerseRef,
@@ -30,7 +30,6 @@ pub struct BibleApp {
     verse_input: String,
 
     // Display state
-    chapter_text: String,
     current_chapter_verses: Vec<Verse>,
 
     // Search state
@@ -77,6 +76,14 @@ impl BibleApp {
         let selected_chapter = settings.last_chapter.max(1);
         let selected_verse = settings.last_verse.max(1);
 
+        // Clamp chapter to the selected book's actual chapter count
+        let selected_chapter = bible
+            .books
+            .iter()
+            .find(|b| b.name == selected_book)
+            .map(|b| selected_chapter.min(b.chapters.len() as u32).max(1))
+            .unwrap_or(1);
+
         let mut app = Self {
             bible,
             extended_bible,
@@ -86,7 +93,6 @@ impl BibleApp {
             selected_chapter,
             selected_verse,
             verse_input: String::new(),
-            chapter_text: String::new(),
             current_chapter_verses: Vec::new(),
             search_query: String::new(),
             search_results: Vec::new(),
@@ -111,7 +117,7 @@ impl BibleApp {
     fn has_original_languages(&self) -> bool {
         self.extended_bible
             .as_ref()
-            .map_or(false, |e| e.is_loaded())
+            .is_some_and(|e| e.is_loaded())
     }
 
     /// Get interlinear data for current verse
@@ -152,22 +158,16 @@ impl BibleApp {
     }
 
     fn update_chapter_display(&mut self) {
-        self.chapter_text.clear();
         self.current_chapter_verses.clear();
 
-        if let Some(chapter) = self
+        let Some(chapter) = self
             .bible
             .get_chapter(&self.selected_book, self.selected_chapter)
-        {
-            self.current_chapter_verses = chapter.verses.clone();
+        else {
+            return; // do NOT update position or history for a failed load
+        };
 
-            for verse in &chapter.verses {
-                self.chapter_text
-                    .push_str(&format!("{} {}\n\n", verse.verse_number, verse.text));
-            }
-        } else {
-            self.chapter_text = "Chapter not found".to_string();
-        }
+        self.current_chapter_verses = chapter.verses.clone();
 
         // Update settings with current position (defer disk write)
         self.settings.update_position(
@@ -181,6 +181,7 @@ impl BibleApp {
     }
 
     fn perform_search(&mut self) {
+        self.last_search_query = self.search_query.clone();
         if self.search_query.is_empty() {
             self.search_results.clear();
             return;
@@ -200,7 +201,6 @@ impl BibleApp {
         };
 
         self.search_results = results.into_iter().cloned().collect();
-        self.last_search_query = self.search_query.clone();
     }
 
     fn go_to_previous_chapter(&mut self) {
@@ -215,15 +215,14 @@ impl BibleApp {
                 .books
                 .iter()
                 .position(|b| b.name == self.selected_book);
-            if let Some(idx) = current_idx {
-                if idx > 0 {
+            if let Some(idx) = current_idx
+                && idx > 0 {
                     let prev_book = &self.bible.books[idx - 1];
                     self.selected_book = prev_book.name.clone();
                     self.selected_chapter = prev_book.chapters.len() as u32;
                     self.selected_verse = 1;
                     self.update_chapter_display();
                 }
-            }
         }
     }
 
@@ -241,23 +240,21 @@ impl BibleApp {
                 .books
                 .iter()
                 .position(|b| b.name == self.selected_book);
-            if let Some(idx) = current_idx {
-                if idx < self.bible.books.len() - 1 {
+            if let Some(idx) = current_idx
+                && idx < self.bible.books.len() - 1 {
                     self.selected_book = self.bible.books[idx + 1].name.clone();
                     self.selected_chapter = 1;
                     self.selected_verse = 1;
                     self.update_chapter_display();
                 }
-            }
         }
     }
 
     fn copy_to_clipboard(&mut self, text: &str) {
-        if let Some(ref mut clipboard) = self.clipboard {
-            if clipboard.set_text(text.to_string()).is_ok() {
+        if let Some(ref mut clipboard) = self.clipboard
+            && clipboard.set_text(text.to_string()).is_ok() {
                 self.copy_feedback = Some(("Copied!".to_string(), 2.0));
             }
-        }
     }
 
     fn copy_current_verse(&mut self) {
@@ -305,6 +302,9 @@ impl BibleApp {
     }
 
     fn handle_keyboard(&mut self, ctx: &Context) {
+        if ctx.wants_keyboard_input() {
+            return;
+        }
         ctx.input(|i| {
             // Left arrow: previous chapter
             if i.key_pressed(Key::ArrowLeft) && !i.modifiers.any() {
@@ -339,44 +339,8 @@ impl BibleApp {
             }
         });
     }
-}
 
-impl eframe::App for BibleApp {
-    fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-        let theme = self.apply_theme(ctx);
-        self.handle_keyboard(ctx);
-
-        // Handle navigation queue
-        if let Some((book, chapter, verse)) = self.navigate_to.take() {
-            self.selected_book = book;
-            self.selected_chapter = chapter;
-            if let Some(v) = verse {
-                self.selected_verse = v;
-            }
-            self.update_chapter_display();
-        }
-
-        // Update copy feedback timer
-        if let Some((_, ref mut time)) = self.copy_feedback {
-            *time -= ctx.input(|i| i.predicted_dt as f64);
-            if *time <= 0.0 {
-                self.copy_feedback = None;
-            }
-        }
-
-        // Live search debounce
-        if self.search_query != self.last_search_query {
-            self.search_debounce_timer = 0.3;
-        }
-        if self.search_debounce_timer > 0.0 {
-            self.search_debounce_timer -= ctx.input(|i| i.predicted_dt as f64);
-            if self.search_debounce_timer <= 0.0 {
-                self.perform_search();
-            }
-            ctx.request_repaint();
-        }
-
-        // Top panel with refined styling
+    fn render_top_panel(&mut self, ctx: &Context, theme: &Theme) {
         egui::TopBottomPanel::top("top_panel")
             .frame(
                 egui::Frame::new()
@@ -416,7 +380,7 @@ impl eframe::App for BibleApp {
 
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         // Settings button with icon
-                        if components::styled_icon_button(ui, "\u{2699}", "Settings", &theme) {
+                        if components::styled_icon_button(ui, "\u{2699}", "Settings", theme) {
                             self.show_settings_window = !self.show_settings_window;
                         }
 
@@ -444,6 +408,7 @@ impl eframe::App for BibleApp {
                     ui.spacing_mut().item_spacing.x = 8.0;
 
                     // Book selector with custom width
+                    let prev_book = self.selected_book.clone();
                     ComboBox::from_id_salt("book_select")
                         .selected_text(RichText::new(&self.selected_book).color(theme.text_primary))
                         .width(160.0)
@@ -462,6 +427,11 @@ impl eframe::App for BibleApp {
                                 );
                             }
                         });
+                    if self.selected_book != prev_book {
+                        self.selected_chapter = 1;
+                        self.selected_verse = 1;
+                        self.update_chapter_display();
+                    }
 
                     // Chapter selector
                     if let Some(book) = self
@@ -472,6 +442,7 @@ impl eframe::App for BibleApp {
                     {
                         let chapter_count = book.chapters.len() as u32;
 
+                        let prev_chapter = self.selected_chapter;
                         ComboBox::from_id_salt("chapter_select")
                             .selected_text(
                                 RichText::new(format!("Chapter {}", self.selected_chapter))
@@ -487,6 +458,12 @@ impl eframe::App for BibleApp {
                                     );
                                 }
                             });
+                        if self.selected_chapter != prev_chapter {
+                            self.selected_chapter =
+                                self.selected_chapter.clamp(1, chapter_count.max(1));
+                            self.selected_verse = 1;
+                            self.update_chapter_display();
+                        }
                     }
 
                     // Navigation buttons
@@ -494,11 +471,11 @@ impl eframe::App for BibleApp {
                         ui,
                         "\u{25C0}",
                         "Previous Chapter (Left Arrow)",
-                        &theme,
+                        theme,
                     ) {
                         self.go_to_previous_chapter();
                     }
-                    if components::nav_button(ui, "\u{25B6}", "Next Chapter (Right Arrow)", &theme)
+                    if components::nav_button(ui, "\u{25B6}", "Next Chapter (Right Arrow)", theme)
                     {
                         self.go_to_next_chapter();
                     }
@@ -529,7 +506,12 @@ impl eframe::App for BibleApp {
                     );
                     if verse_response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
                         if let Ok(v) = self.verse_input.parse::<u32>() {
-                            self.selected_verse = v;
+                            let max_verse = self.current_chapter_verses.len() as u32;
+                            self.selected_verse = if max_verse == 0 {
+                                1
+                            } else {
+                                v.clamp(1, max_verse)
+                            };
                             self.update_chapter_display();
                         }
                         self.verse_input.clear();
@@ -553,7 +535,7 @@ impl eframe::App for BibleApp {
                         bookmark_icon,
                         "Toggle Bookmark (Ctrl+B)",
                         is_bookmarked,
-                        &theme,
+                        theme,
                     ) {
                         self.toggle_bookmark();
                     }
@@ -563,7 +545,7 @@ impl eframe::App for BibleApp {
                         "\u{1F4CB}",
                         "Copy Verse (Ctrl+C)",
                         false,
-                        &theme,
+                        theme,
                     ) {
                         self.copy_current_verse();
                     }
@@ -572,149 +554,44 @@ impl eframe::App for BibleApp {
                         "\u{1F4C4}",
                         "Copy Chapter (Ctrl+Shift+C)",
                         false,
-                        &theme,
+                        theme,
                     ) {
                         self.copy_current_chapter();
                     }
                 });
             });
+    }
 
-        // Sidebar with refined styling
-        if self.settings.show_sidebar {
-            egui::SidePanel::left("sidebar")
-                .default_width(220.0)
-                .frame(
-                    egui::Frame::new()
-                        .fill(theme.bg_panel)
-                        .inner_margin(egui::Margin::same(12))
-                        .stroke(egui::Stroke::new(1.0, theme.border)),
-                )
-                .show(ctx, |ui| {
-                    // Tab bar with styled buttons
-                    ui.horizontal(|ui| {
-                        ui.spacing_mut().item_spacing.x = 4.0;
-                        for (tab, label) in [
-                            (SidebarTab::Bookmarks, "Bookmarks"),
-                            (SidebarTab::History, "History"),
-                            (SidebarTab::Settings, "Settings"),
-                        ] {
-                            let is_selected = self.sidebar_tab == tab;
-                            let text = RichText::new(label).size(12.0).color(if is_selected {
-                                theme.primary
-                            } else {
-                                theme.text_muted
-                            });
-                            if ui.selectable_label(is_selected, text).clicked() {
-                                self.sidebar_tab = tab;
-                            }
-                        }
-                    });
-
-                    ui.add_space(8.0);
-                    let rect = ui.available_rect_before_wrap();
-                    ui.painter().hline(
-                        rect.x_range(),
-                        rect.top(),
-                        egui::Stroke::new(1.0, theme.divider),
-                    );
-                    ui.add_space(8.0);
-
-                    match self.sidebar_tab {
-                        SidebarTab::Bookmarks => {
-                            ScrollArea::vertical().show(ui, |ui| {
-                                if self.settings.bookmarks.is_empty() {
-                                    ui.label("No bookmarks yet");
-                                } else {
-                                    let mut to_remove: Option<(String, u32, u32)> = None;
-                                    let bookmarks = self.settings.bookmarks.clone();
-
-                                    for bookmark in &bookmarks {
-                                        let (clicked, delete) = components::render_bookmark(
-                                            ui,
-                                            bookmark,
-                                            &self.settings,
-                                            &theme,
-                                        );
-                                        if clicked {
-                                            self.navigate_to = Some((
-                                                bookmark.book.clone(),
-                                                bookmark.chapter,
-                                                Some(bookmark.verse),
-                                            ));
-                                        }
-                                        if delete {
-                                            to_remove = Some((
-                                                bookmark.book.clone(),
-                                                bookmark.chapter,
-                                                bookmark.verse,
-                                            ));
-                                        }
-                                    }
-
-                                    if let Some((book, chapter, verse)) = to_remove {
-                                        self.settings.remove_bookmark(&book, chapter, verse);
-                                        self.settings.mark_dirty();
-                                    }
-                                }
-                            });
-                        }
-                        SidebarTab::History => {
-                            ScrollArea::vertical().show(ui, |ui| {
-                                if self.settings.history.is_empty() {
-                                    ui.label("No history yet");
-                                } else {
-                                    let history = self.settings.history.clone();
-                                    for entry in &history {
-                                        if components::render_history_entry(
-                                            ui,
-                                            entry,
-                                            &self.settings,
-                                            &theme,
-                                        ) {
-                                            self.navigate_to =
-                                                Some((entry.book.clone(), entry.chapter, None));
-                                        }
-                                    }
-
-                                    ui.separator();
-                                    if ui.button("Clear History").clicked() {
-                                        self.settings.clear_history();
-                                        self.settings.mark_dirty();
-                                    }
-                                }
-                            });
-                        }
-                        SidebarTab::Settings => {
-                            if components::settings_panel(ui, &mut self.settings.settings) {
-                                self.settings.mark_dirty();
-                            }
+    fn render_sidebar(&mut self, ctx: &Context, theme: &Theme) {
+        egui::SidePanel::left("sidebar")
+            .default_width(220.0)
+            .frame(
+                egui::Frame::new()
+                    .fill(theme.bg_panel)
+                    .inner_margin(egui::Margin::same(12))
+                    .stroke(egui::Stroke::new(1.0, theme.border)),
+            )
+            .show(ctx, |ui| {
+                // Tab bar with styled buttons
+                ui.horizontal(|ui| {
+                    ui.spacing_mut().item_spacing.x = 4.0;
+                    for (tab, label) in [
+                        (SidebarTab::Bookmarks, "Bookmarks"),
+                        (SidebarTab::History, "History"),
+                        (SidebarTab::Settings, "Settings"),
+                    ] {
+                        let is_selected = self.sidebar_tab == tab;
+                        let text = RichText::new(label).size(12.0).color(if is_selected {
+                            theme.primary
+                        } else {
+                            theme.text_muted
+                        });
+                        if ui.selectable_label(is_selected, text).clicked() {
+                            self.sidebar_tab = tab;
                         }
                     }
                 });
-        }
 
-        // Main content with refined styling
-        egui::CentralPanel::default()
-            .frame(
-                egui::Frame::new()
-                    .fill(theme.bg_base)
-                    .inner_margin(egui::Margin::symmetric(24, 16)),
-            )
-            .show(ctx, |ui| {
-                // Chapter heading with improved typography
-                ui.horizontal(|ui| {
-                    ui.label(
-                        RichText::new(&self.selected_book)
-                            .size(26.0)
-                            .strong()
-                            .color(theme.text_primary),
-                    );
-                    ui.label(
-                        RichText::new(format!("Chapter {}", self.selected_chapter))
-                            .size(26.0)
-                            .color(theme.text_secondary),
-                    );
-                });
                 ui.add_space(8.0);
                 let rect = ui.available_rect_before_wrap();
                 ui.painter().hline(
@@ -722,372 +599,519 @@ impl eframe::App for BibleApp {
                     rect.top(),
                     egui::Stroke::new(1.0, theme.divider),
                 );
-                ui.add_space(12.0);
+                ui.add_space(8.0);
 
-                // Display mode selector (only show if original languages available)
-                if self.has_original_languages() {
-                    ui.horizontal(|ui| {
-                        ui.label("View:");
-                        for mode in DisplayMode::all() {
-                            if ui
-                                .selectable_label(self.settings.display_mode == *mode, mode.label())
-                                .clicked()
-                            {
-                                self.settings.display_mode = *mode;
-                                self.settings.mark_dirty();
-                            }
-                        }
-                    });
-                    ui.add_space(4.0);
-                }
+                match self.sidebar_tab {
+                    SidebarTab::Bookmarks => {
+                        ScrollArea::vertical().show(ui, |ui| {
+                            if self.settings.bookmarks.is_empty() {
+                                ui.label("No bookmarks yet");
+                            } else {
+                                let mut to_remove: Option<(String, u32, u32)> = None;
 
-                // Calculate reserved height for search panels
-                let search_reserved = if self.settings.show_search_panel {
-                    self.settings.search_panel_height + 60.0  // panel + header
-                } else {
-                    0.0
-                };
-                let strongs_reserved = if self.settings.show_strongs_panel && self.has_original_languages() {
-                    self.settings.strongs_panel_height + 60.0  // panel + header
-                } else {
-                    0.0
-                };
-                let total_reserved = search_reserved + strongs_reserved + 20.0;  // extra padding
-
-                // Chapter content
-                let available_height = ui.available_height() - total_reserved;
-                let mut clicked_strongs: Option<String> = None;
-
-                ScrollArea::vertical()
-                    .max_height(available_height.max(200.0))
-                    .id_salt("chapter_scroll")
-                    .show(ui, |ui| {
-                        let highlight_terms: Vec<String> = if !self.search_query.is_empty() {
-                            vec![self.search_query.clone()]
-                        } else {
-                            vec![]
-                        };
-
-                        let verse_count = self.current_chapter_verses.len();
-                        for i in 0..verse_count {
-                            let verse = self.current_chapter_verses[i].clone();
-                            match self.settings.display_mode {
-                                DisplayMode::KjvOnly => {
-                                    components::render_verse(
+                                for i in 0..self.settings.bookmarks.len() {
+                                    let bookmark = &self.settings.bookmarks[i];
+                                    let (clicked, delete) = components::render_bookmark(
                                         ui,
-                                        &verse,
+                                        bookmark,
                                         &self.settings,
-                                        &highlight_terms,
-                                        &theme,
-                                        self.red_letter.as_ref(),
+                                        theme,
                                     );
-                                }
-                                DisplayMode::Parallel => {
-                                    let interlinear =
-                                        self.get_current_interlinear(verse.verse_number);
-                                    components::render_verse_parallel(
-                                        ui,
-                                        &verse,
-                                        interlinear,
-                                        &self.settings,
-                                        &highlight_terms,
-                                        &theme,
-                                        self.red_letter.as_ref(),
-                                    );
-                                }
-                                DisplayMode::Interlinear => {
-                                    let interlinear =
-                                        self.get_current_interlinear(verse.verse_number);
-                                    if let Some(strongs) = components::render_verse_interlinear(
-                                        ui,
-                                        &verse,
-                                        interlinear,
-                                        &self.settings,
-                                    ) {
-                                        clicked_strongs = Some(strongs);
-                                    }
-                                }
-                                DisplayMode::OriginalOnly => {
-                                    let interlinear =
-                                        self.get_current_interlinear(verse.verse_number);
-                                    if let Some(orig) = interlinear {
-                                        let font_size = self.settings.font_size.pixels();
-                                        let orig_color = match orig.language {
-                                            crate::models::OriginalLanguage::Greek => {
-                                                theme.greek_text
-                                            }
-                                            _ => theme.hebrew_text,
-                                        };
-                                        let original_text: String = orig
-                                            .original_words
-                                            .iter()
-                                            .map(|w| w.original_text.as_str())
-                                            .collect::<Vec<&str>>()
-                                            .join(" ");
-
-                                        ui.horizontal_wrapped(|ui| {
-                                            if self.settings.show_verse_numbers {
-                                                ui.label(
-                                                    RichText::new(format!(
-                                                        "{} ",
-                                                        verse.verse_number
-                                                    ))
-                                                    .size(font_size)
-                                                    .strong()
-                                                    .color(theme.verse_number),
-                                                );
-                                            }
-                                            ui.label(
-                                                RichText::new(&original_text)
-                                                    .size(
-                                                        font_size
-                                                            + self.settings.hebrew_font_size_offset,
-                                                    )
-                                                    .color(orig_color),
-                                            );
-                                        });
-                                        ui.add_space(8.0);
-                                    } else {
-                                        components::render_verse(
-                                            ui,
-                                            &verse,
-                                            &self.settings,
-                                            &highlight_terms,
-                                            &theme,
-                                            self.red_letter.as_ref(),
-                                        );
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                // Handle Strong's number clicks
-                if let Some(strongs) = clicked_strongs {
-                    self.show_lexicon_popup = Some(strongs);
-                }
-
-                ui.separator();
-
-                // Search section header with toggle
-                ui.horizontal(|ui| {
-                    let toggle_icon = if self.settings.show_search_panel { "\u{25BC}" } else { "\u{25B6}" };
-                    if ui.button(RichText::new(toggle_icon).size(12.0)).on_hover_text("Toggle search panel").clicked() {
-                        self.settings.show_search_panel = !self.settings.show_search_panel;
-                        self.settings.mark_dirty();
-                    }
-                    ui.heading("Search");
-
-                    if self.settings.show_search_panel {
-                        // Height adjustment buttons
-                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                            if ui.small_button("+").on_hover_text("Increase panel height").clicked() {
-                                self.settings.search_panel_height = (self.settings.search_panel_height + 30.0).min(400.0);
-                                self.settings.mark_dirty();
-                            }
-                            if ui.small_button("-").on_hover_text("Decrease panel height").clicked() {
-                                self.settings.search_panel_height = (self.settings.search_panel_height - 30.0).max(60.0);
-                                self.settings.mark_dirty();
-                            }
-                            if !self.search_results.is_empty() {
-                                ui.label(RichText::new(format!("{} results", self.search_results.len())).size(12.0).color(theme.text_muted));
-                            }
-                        });
-                    }
-                });
-
-                if self.settings.show_search_panel {
-                    ui.horizontal(|ui| {
-                        let search_response = ui.add(
-                            TextEdit::singleline(&mut self.search_query)
-                                .hint_text("Search for text...")
-                                .desired_width(250.0),
-                        );
-
-                        // Focus search on Ctrl+F
-                        if ui.input(|i| i.modifiers.command && i.key_pressed(Key::F)) {
-                            search_response.request_focus();
-                        }
-
-                        // Scope selector
-                        ComboBox::from_id_salt("search_scope")
-                            .selected_text(self.settings.search_scope.label())
-                            .width(120.0)
-                            .show_ui(ui, |ui| {
-                                ui.selectable_value(
-                                    &mut self.settings.search_scope,
-                                    SearchScope::All,
-                                    "All",
-                                );
-                                ui.selectable_value(
-                                    &mut self.settings.search_scope,
-                                    SearchScope::CurrentBook,
-                                    "Current Book",
-                                );
-                                ui.selectable_value(
-                                    &mut self.settings.search_scope,
-                                    SearchScope::OldTestament,
-                                    "Old Testament",
-                                );
-                                ui.selectable_value(
-                                    &mut self.settings.search_scope,
-                                    SearchScope::NewTestament,
-                                    "New Testament",
-                                );
-                            });
-
-                        // Clear button
-                        if !self.search_query.is_empty() {
-                            if ui
-                                .button("X")
-                                .on_hover_text("Clear Search (Escape)")
-                                .clicked()
-                            {
-                                self.search_query.clear();
-                                self.search_results.clear();
-                            }
-                        }
-
-                        // Manual search button
-                        if ui.button("Search").clicked() {
-                            self.perform_search();
-                        }
-                    });
-
-                    // Search results
-                    if !self.search_results.is_empty() {
-                        ui.add_space(5.0);
-
-                        ScrollArea::vertical()
-                            .max_height(self.settings.search_panel_height)
-                            .id_salt("search_results_scroll")
-                            .show(ui, |ui| {
-                                for result in &self.search_results.clone() {
-                                    let reference = format!(
-                                        "{} {}:{} - {}",
-                                        result.book,
-                                        result.chapter,
-                                        result.verse_number,
-                                        if result.text.len() > 60 {
-                                            format!("{}...", &result.text[..60])
-                                        } else {
-                                            result.text.clone()
-                                        }
-                                    );
-
-                                    if ui.selectable_label(false, &reference).clicked() {
+                                    if clicked {
                                         self.navigate_to = Some((
-                                            result.book.clone(),
-                                            result.chapter,
-                                            Some(result.verse_number),
+                                            bookmark.book.clone(),
+                                            bookmark.chapter,
+                                            Some(bookmark.verse),
+                                        ));
+                                    }
+                                    if delete {
+                                        to_remove = Some((
+                                            bookmark.book.clone(),
+                                            bookmark.chapter,
+                                            bookmark.verse,
                                         ));
                                     }
                                 }
-                            });
-                    }
-                }
 
-                // Strong's search section (only if original languages available)
-                if self.has_original_languages() {
-                    ui.add_space(10.0);
-                    ui.separator();
-
-                    // Strong's search header with toggle
-                    ui.horizontal(|ui| {
-                        let toggle_icon = if self.settings.show_strongs_panel { "\u{25BC}" } else { "\u{25B6}" };
-                        if ui.button(RichText::new(toggle_icon).size(12.0)).on_hover_text("Toggle Strong's panel").clicked() {
-                            self.settings.show_strongs_panel = !self.settings.show_strongs_panel;
-                            self.settings.mark_dirty();
-                        }
-                        ui.heading("Strong's Search");
-
-                        if self.settings.show_strongs_panel {
-                            // Height adjustment buttons
-                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                                if ui.small_button("+").on_hover_text("Increase panel height").clicked() {
-                                    self.settings.strongs_panel_height = (self.settings.strongs_panel_height + 30.0).min(400.0);
+                                if let Some((book, chapter, verse)) = to_remove {
+                                    self.settings.remove_bookmark(&book, chapter, verse);
                                     self.settings.mark_dirty();
-                                }
-                                if ui.small_button("-").on_hover_text("Decrease panel height").clicked() {
-                                    self.settings.strongs_panel_height = (self.settings.strongs_panel_height - 30.0).max(60.0);
-                                    self.settings.mark_dirty();
-                                }
-                                if self.strongs_count > 0 {
-                                    ui.label(RichText::new(format!("{} occurrences", self.strongs_count)).size(12.0).color(theme.text_muted));
-                                }
-                            });
-                        }
-                    });
-
-                    if self.settings.show_strongs_panel {
-                        ui.horizontal(|ui| {
-                            ui.label("Strong's #:");
-                            let strongs_response = ui.add(
-                                TextEdit::singleline(&mut self.strongs_query)
-                                    .hint_text("e.g., H430, G2316")
-                                    .desired_width(120.0),
-                            );
-
-                            if strongs_response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter))
-                            {
-                                self.perform_strongs_search();
-                            }
-
-                            if ui.button("Search").clicked() {
-                                self.perform_strongs_search();
-                            }
-
-                            if !self.strongs_query.is_empty() {
-                                if ui.button("X").on_hover_text("Clear").clicked() {
-                                    self.strongs_query.clear();
-                                    self.strongs_results.clear();
-                                    self.strongs_count = 0;
                                 }
                             }
                         });
-
-                        // Strong's search results
-                        if !self.strongs_results.is_empty() {
-                            ui.add_space(5.0);
-                            ui.label(format!(
-                                "Showing {} of {} results:",
-                                self.strongs_results.len(),
-                                self.strongs_count
-                            ));
-
-                            ScrollArea::vertical()
-                                .max_height(self.settings.strongs_panel_height)
-                                .id_salt("strongs_results_scroll")
-                                .show(ui, |ui| {
-                                    for verse_ref in &self.strongs_results.clone() {
-                                        let reference = format!(
-                                            "{} {}:{}",
-                                            verse_ref.book, verse_ref.chapter, verse_ref.verse
-                                        );
-                                        if ui.selectable_label(false, &reference).clicked() {
-                                            self.navigate_to = Some((
-                                                verse_ref.book.clone(),
-                                                verse_ref.chapter,
-                                                Some(verse_ref.verse),
-                                            ));
-                                        }
+                    }
+                    SidebarTab::History => {
+                        ScrollArea::vertical().show(ui, |ui| {
+                            if self.settings.history.is_empty() {
+                                ui.label("No history yet");
+                            } else {
+                                for i in 0..self.settings.history.len() {
+                                    let entry = &self.settings.history[i];
+                                    if components::render_history_entry(
+                                        ui,
+                                        entry,
+                                        &self.settings,
+                                        theme,
+                                    ) {
+                                        self.navigate_to =
+                                            Some((entry.book.clone(), entry.chapter, None));
                                     }
+                                }
+
+                                ui.separator();
+                                if ui.button("Clear History").clicked() {
+                                    self.settings.clear_history();
+                                    self.settings.mark_dirty();
+                                }
+                            }
+                        });
+                    }
+                    SidebarTab::Settings => {
+                        if components::settings_panel(ui, &mut self.settings, "sidebar") {
+                            self.settings.mark_dirty();
+                        }
+                    }
+                }
+            });
+    }
+
+    fn render_chapter_view(&mut self, ui: &mut Ui, theme: &Theme) {
+        // Chapter heading with improved typography
+        ui.horizontal(|ui| {
+            ui.label(
+                RichText::new(&self.selected_book)
+                    .size(26.0)
+                    .strong()
+                    .color(theme.text_primary),
+            );
+            ui.label(
+                RichText::new(format!("Chapter {}", self.selected_chapter))
+                    .size(26.0)
+                    .color(theme.text_secondary),
+            );
+        });
+        ui.add_space(8.0);
+        let rect = ui.available_rect_before_wrap();
+        ui.painter().hline(
+            rect.x_range(),
+            rect.top(),
+            egui::Stroke::new(1.0, theme.divider),
+        );
+        ui.add_space(12.0);
+
+        // Display mode selector (only show if original languages available)
+        if self.has_original_languages() {
+            ui.horizontal(|ui| {
+                ui.label("View:");
+                for mode in DisplayMode::all() {
+                    if ui
+                        .selectable_label(self.settings.display_mode == *mode, mode.label())
+                        .clicked()
+                    {
+                        self.settings.display_mode = *mode;
+                        self.settings.mark_dirty();
+                    }
+                }
+            });
+            ui.add_space(4.0);
+        }
+
+        // Calculate reserved height for search panels
+        let search_reserved = if self.settings.show_search_panel {
+            self.settings.search_panel_height + 60.0 // panel + header
+        } else {
+            0.0
+        };
+        let strongs_reserved = if self.settings.show_strongs_panel && self.has_original_languages()
+        {
+            self.settings.strongs_panel_height + 60.0 // panel + header
+        } else {
+            0.0
+        };
+        let total_reserved = search_reserved + strongs_reserved + 20.0; // extra padding
+
+        // Chapter content
+        let available_height = ui.available_height() - total_reserved;
+        let mut clicked_strongs: Option<String> = None;
+
+        ScrollArea::vertical()
+            .max_height(available_height.max(200.0))
+            .id_salt("chapter_scroll")
+            .show(ui, |ui| {
+                let highlight_terms: Vec<String> = if !self.search_query.is_empty() {
+                    vec![self.search_query.clone()]
+                } else {
+                    vec![]
+                };
+
+                let verse_count = self.current_chapter_verses.len();
+                for i in 0..verse_count {
+                    let verse = self.current_chapter_verses[i].clone();
+                    match self.settings.display_mode {
+                        DisplayMode::KjvOnly => {
+                            components::render_verse(
+                                ui,
+                                &verse,
+                                &self.settings,
+                                &highlight_terms,
+                                theme,
+                                self.red_letter.as_ref(),
+                            );
+                        }
+                        DisplayMode::Parallel => {
+                            let interlinear = self.get_current_interlinear(verse.verse_number);
+                            components::render_verse_parallel(
+                                ui,
+                                &verse,
+                                interlinear,
+                                &self.settings,
+                                &highlight_terms,
+                                theme,
+                                self.red_letter.as_ref(),
+                            );
+                        }
+                        DisplayMode::Interlinear => {
+                            let interlinear = self.get_current_interlinear(verse.verse_number);
+                            if let Some(strongs) = components::render_verse_interlinear(
+                                ui,
+                                &verse,
+                                interlinear,
+                                &self.settings,
+                                theme,
+                                self.red_letter.as_ref(),
+                            ) {
+                                clicked_strongs = Some(strongs);
+                            }
+                        }
+                        DisplayMode::OriginalOnly => {
+                            let interlinear = self.get_current_interlinear(verse.verse_number);
+                            if let Some(orig) = interlinear {
+                                let font_size = self.settings.font_size.pixels();
+                                let orig_color = match orig.language {
+                                    crate::models::OriginalLanguage::Greek => theme.greek_text,
+                                    _ => theme.hebrew_text,
+                                };
+                                let font_offset = match orig.language {
+                                    crate::models::OriginalLanguage::Greek => {
+                                        self.settings.greek_font_size_offset
+                                    }
+                                    _ => self.settings.hebrew_font_size_offset,
+                                };
+                                let original_text: String = orig
+                                    .original_words
+                                    .iter()
+                                    .map(|w| w.original_text.as_str())
+                                    .collect::<Vec<&str>>()
+                                    .join(" ");
+
+                                ui.horizontal_wrapped(|ui| {
+                                    if self.settings.show_verse_numbers {
+                                        ui.label(
+                                            RichText::new(format!("{} ", verse.verse_number))
+                                                .size(font_size)
+                                                .strong()
+                                                .color(theme.verse_number),
+                                        );
+                                    }
+                                    ui.label(
+                                        RichText::new(&original_text)
+                                            .size(font_size + font_offset)
+                                            .color(orig_color),
+                                    );
                                 });
+                                ui.add_space(8.0);
+                            } else {
+                                components::render_verse(
+                                    ui,
+                                    &verse,
+                                    &self.settings,
+                                    &highlight_terms,
+                                    theme,
+                                    self.red_letter.as_ref(),
+                                );
+                            }
                         }
                     }
                 }
             });
 
-        // Lexicon popup
-        if let Some(ref strongs_number) = self.show_lexicon_popup.clone() {
+        // Handle Strong's number clicks
+        if let Some(strongs) = clicked_strongs {
+            self.show_lexicon_popup = Some(strongs);
+        }
+
+        ui.separator();
+    }
+
+    fn render_search_panels(&mut self, ui: &mut Ui, theme: &Theme) {
+        // Search section header with toggle
+        ui.horizontal(|ui| {
+            let toggle_icon = if self.settings.show_search_panel {
+                "\u{25BC}"
+            } else {
+                "\u{25B6}"
+            };
+            if ui
+                .button(RichText::new(toggle_icon).size(12.0))
+                .on_hover_text("Toggle search panel")
+                .clicked()
+            {
+                self.settings.show_search_panel = !self.settings.show_search_panel;
+                self.settings.mark_dirty();
+            }
+            ui.heading("Search");
+
+            if self.settings.show_search_panel {
+                // Height adjustment buttons
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    if ui
+                        .small_button("+")
+                        .on_hover_text("Increase panel height")
+                        .clicked()
+                    {
+                        self.settings.search_panel_height =
+                            (self.settings.search_panel_height + 30.0).min(400.0);
+                        self.settings.mark_dirty();
+                    }
+                    if ui
+                        .small_button("-")
+                        .on_hover_text("Decrease panel height")
+                        .clicked()
+                    {
+                        self.settings.search_panel_height =
+                            (self.settings.search_panel_height - 30.0).max(60.0);
+                        self.settings.mark_dirty();
+                    }
+                    if !self.search_results.is_empty() {
+                        ui.label(
+                            RichText::new(format!("{} results", self.search_results.len()))
+                                .size(12.0)
+                                .color(theme.text_muted),
+                        );
+                    }
+                });
+            }
+        });
+
+        if self.settings.show_search_panel {
+            ui.horizontal(|ui| {
+                let search_response = ui.add(
+                    TextEdit::singleline(&mut self.search_query)
+                        .hint_text("Search for text...")
+                        .desired_width(250.0),
+                );
+
+                // Focus search on Ctrl+F
+                if ui.input(|i| i.modifiers.command && i.key_pressed(Key::F)) {
+                    search_response.request_focus();
+                }
+
+                // Scope selector
+                let prev_scope = self.settings.search_scope;
+                ComboBox::from_id_salt("search_scope")
+                    .selected_text(self.settings.search_scope.label())
+                    .width(120.0)
+                    .show_ui(ui, |ui| {
+                        ui.selectable_value(
+                            &mut self.settings.search_scope,
+                            SearchScope::All,
+                            "All",
+                        );
+                        ui.selectable_value(
+                            &mut self.settings.search_scope,
+                            SearchScope::CurrentBook,
+                            "Current Book",
+                        );
+                        ui.selectable_value(
+                            &mut self.settings.search_scope,
+                            SearchScope::OldTestament,
+                            "Old Testament",
+                        );
+                        ui.selectable_value(
+                            &mut self.settings.search_scope,
+                            SearchScope::NewTestament,
+                            "New Testament",
+                        );
+                    });
+                if self.settings.search_scope != prev_scope {
+                    self.settings.mark_dirty();
+                    self.perform_search();
+                }
+
+                // Clear button
+                if !self.search_query.is_empty()
+                    && ui
+                        .button("X")
+                        .on_hover_text("Clear Search (Escape)")
+                        .clicked()
+                    {
+                        self.search_query.clear();
+                        self.search_results.clear();
+                    }
+
+                // Manual search button
+                if ui.button("Search").clicked() {
+                    self.perform_search();
+                }
+            });
+
+            // Search results
+            if !self.search_results.is_empty() {
+                ui.add_space(5.0);
+
+                ScrollArea::vertical()
+                    .max_height(self.settings.search_panel_height)
+                    .id_salt("search_results_scroll")
+                    .show(ui, |ui| {
+                        for i in 0..self.search_results.len() {
+                            let result = &self.search_results[i];
+                            let preview: String = result.text.chars().take(60).collect();
+                            let reference = format!(
+                                "{} {}:{} - {}",
+                                result.book,
+                                result.chapter,
+                                result.verse_number,
+                                if result.text.chars().count() > 60 {
+                                    format!("{}...", preview)
+                                } else {
+                                    result.text.clone()
+                                }
+                            );
+
+                            if ui.selectable_label(false, &reference).clicked() {
+                                self.navigate_to = Some((
+                                    result.book.clone(),
+                                    result.chapter,
+                                    Some(result.verse_number),
+                                ));
+                            }
+                        }
+                    });
+            }
+        }
+
+        // Strong's search section (only if original languages available)
+        if self.has_original_languages() {
+            ui.add_space(10.0);
+            ui.separator();
+
+            // Strong's search header with toggle
+            ui.horizontal(|ui| {
+                let toggle_icon = if self.settings.show_strongs_panel {
+                    "\u{25BC}"
+                } else {
+                    "\u{25B6}"
+                };
+                if ui
+                    .button(RichText::new(toggle_icon).size(12.0))
+                    .on_hover_text("Toggle Strong's panel")
+                    .clicked()
+                {
+                    self.settings.show_strongs_panel = !self.settings.show_strongs_panel;
+                    self.settings.mark_dirty();
+                }
+                ui.heading("Strong's Search");
+
+                if self.settings.show_strongs_panel {
+                    // Height adjustment buttons
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        if ui
+                            .small_button("+")
+                            .on_hover_text("Increase panel height")
+                            .clicked()
+                        {
+                            self.settings.strongs_panel_height =
+                                (self.settings.strongs_panel_height + 30.0).min(400.0);
+                            self.settings.mark_dirty();
+                        }
+                        if ui
+                            .small_button("-")
+                            .on_hover_text("Decrease panel height")
+                            .clicked()
+                        {
+                            self.settings.strongs_panel_height =
+                                (self.settings.strongs_panel_height - 30.0).max(60.0);
+                            self.settings.mark_dirty();
+                        }
+                        if self.strongs_count > 0 {
+                            ui.label(
+                                RichText::new(format!("{} occurrences", self.strongs_count))
+                                    .size(12.0)
+                                    .color(theme.text_muted),
+                            );
+                        }
+                    });
+                }
+            });
+
+            if self.settings.show_strongs_panel {
+                ui.horizontal(|ui| {
+                    ui.label("Strong's #:");
+                    let strongs_response = ui.add(
+                        TextEdit::singleline(&mut self.strongs_query)
+                            .hint_text("e.g., H430, G2316")
+                            .desired_width(120.0),
+                    );
+
+                    if strongs_response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
+                        self.perform_strongs_search();
+                    }
+
+                    if ui.button("Search").clicked() {
+                        self.perform_strongs_search();
+                    }
+
+                    if !self.strongs_query.is_empty()
+                        && ui.button("X").on_hover_text("Clear").clicked() {
+                            self.strongs_query.clear();
+                            self.strongs_results.clear();
+                            self.strongs_count = 0;
+                        }
+                });
+
+                // Strong's search results
+                if !self.strongs_results.is_empty() {
+                    ui.add_space(5.0);
+                    ui.label(format!(
+                        "Showing {} of {} results:",
+                        self.strongs_results.len(),
+                        self.strongs_count
+                    ));
+
+                    ScrollArea::vertical()
+                        .max_height(self.settings.strongs_panel_height)
+                        .id_salt("strongs_results_scroll")
+                        .show(ui, |ui| {
+                            for i in 0..self.strongs_results.len() {
+                                let verse_ref = &self.strongs_results[i];
+                                let reference = format!(
+                                    "{} {}:{}",
+                                    verse_ref.book, verse_ref.chapter, verse_ref.verse
+                                );
+                                if ui.selectable_label(false, &reference).clicked() {
+                                    self.navigate_to = Some((
+                                        verse_ref.book.clone(),
+                                        verse_ref.chapter,
+                                        Some(verse_ref.verse),
+                                    ));
+                                }
+                            }
+                        });
+                }
+            }
+        }
+    }
+
+    fn render_lexicon_popup(&mut self, ctx: &Context) {
+        if let Some(ref strongs_number) = self.show_lexicon_popup {
             let entry = self
                 .extended_bible
                 .as_ref()
-                .and_then(|ext| ext.get_lexicon_entry(&strongs_number));
+                .and_then(|ext| ext.get_lexicon_entry(strongs_number));
             let mut open = true;
             components::render_lexicon_popup(
                 ctx,
-                &strongs_number,
+                strongs_number,
                 entry,
                 &mut open,
                 &self.settings,
@@ -1096,8 +1120,9 @@ impl eframe::App for BibleApp {
                 self.show_lexicon_popup = None;
             }
         }
+    }
 
-        // Settings window
+    fn render_settings_window(&mut self, ctx: &Context) {
         if self.show_settings_window {
             egui::Window::new("Settings")
                 .collapsible(false)
@@ -1105,7 +1130,7 @@ impl eframe::App for BibleApp {
                 .default_size([350.0, 400.0])
                 .show(ctx, |ui| {
                     egui::ScrollArea::vertical().show(ui, |ui| {
-                        if components::settings_panel(ui, &mut self.settings) {
+                        if components::settings_panel(ui, &mut self.settings, "window") {
                             self.settings.mark_dirty();
                         }
 
@@ -1161,7 +1186,62 @@ impl eframe::App for BibleApp {
                     });
                 });
         }
+    }
+}
 
+impl eframe::App for BibleApp {
+    fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
+        let theme = self.apply_theme(ctx);
+        self.handle_keyboard(ctx);
+
+        // Handle navigation queue
+        if let Some((book, chapter, verse)) = self.navigate_to.take() {
+            self.selected_book = book;
+            self.selected_chapter = chapter;
+            if let Some(v) = verse {
+                self.selected_verse = v;
+            }
+            self.update_chapter_display();
+        }
+
+        // Update copy feedback timer
+        if let Some((_, ref mut time)) = self.copy_feedback {
+            *time -= ctx.input(|i| i.predicted_dt as f64);
+            if *time <= 0.0 {
+                self.copy_feedback = None;
+            }
+        }
+
+        // Live search debounce
+        if self.search_query != self.last_search_query {
+            self.search_debounce_timer = 0.3;
+        }
+        if self.search_debounce_timer > 0.0 {
+            self.search_debounce_timer -= ctx.input(|i| i.predicted_dt as f64);
+            if self.search_debounce_timer <= 0.0 {
+                self.perform_search();
+            }
+            ctx.request_repaint();
+        }
+
+        self.render_top_panel(ctx, &theme);
+        if self.settings.show_sidebar {
+            self.render_sidebar(ctx, &theme);
+        }
+
+        egui::CentralPanel::default()
+            .frame(
+                egui::Frame::new()
+                    .fill(theme.bg_base)
+                    .inner_margin(egui::Margin::symmetric(24, 16)),
+            )
+            .show(ctx, |ui| {
+                self.render_chapter_view(ui, &theme);
+                self.render_search_panels(ui, &theme);
+            });
+
+        self.render_lexicon_popup(ctx);
+        self.render_settings_window(ctx);
         self.settings.save_if_dirty();
     }
 

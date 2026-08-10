@@ -7,6 +7,50 @@ use crate::red_letter::{red_letter_segments, RedLetterIndex};
 use crate::settings::{DisplayMode, FontSize, Settings};
 use crate::theme::Theme;
 
+/// Render KJV verse text with optional search highlight and red-letter spans.
+fn render_kjv_text(
+    ui: &mut Ui,
+    verse: &Verse,
+    highlight_terms: &[String],
+    theme: &Theme,
+    settings: &Settings,
+    red_letter: Option<&RedLetterIndex>,
+) {
+    let font_size = settings.font_size.pixels();
+
+    if !highlight_terms.is_empty() {
+        render_highlighted_text(ui, &verse.text, highlight_terms, font_size, theme);
+    } else if settings.red_letter {
+        if let Some(spec) =
+            red_letter.and_then(|idx| idx.get(&verse.book, verse.chapter, verse.verse_number))
+        {
+            for (segment, is_red) in red_letter_segments(&verse.text, spec) {
+                if segment.is_empty() {
+                    continue;
+                }
+                let color = if is_red {
+                    theme.red_letter
+                } else {
+                    theme.text_primary
+                };
+                ui.label(RichText::new(segment).size(font_size).color(color));
+            }
+        } else {
+            ui.label(
+                RichText::new(&verse.text)
+                    .size(font_size)
+                    .color(theme.text_primary),
+            );
+        }
+    } else {
+        ui.label(
+            RichText::new(&verse.text)
+                .size(font_size)
+                .color(theme.text_primary),
+        );
+    }
+}
+
 /// Render a verse with theme colors and accurate red-letter spans.
 pub fn render_verse(
     ui: &mut Ui,
@@ -28,37 +72,7 @@ pub fn render_verse(
             );
         }
 
-        if !highlight_terms.is_empty() {
-            render_highlighted_text(ui, &verse.text, highlight_terms, font_size, theme);
-        } else if settings.red_letter {
-            if let Some(spec) = red_letter.and_then(|idx| {
-                idx.get(&verse.book, verse.chapter, verse.verse_number)
-            }) {
-                for (segment, is_red) in red_letter_segments(&verse.text, spec) {
-                    if segment.is_empty() {
-                        continue;
-                    }
-                    let color = if is_red {
-                        theme.red_letter
-                    } else {
-                        theme.text_primary
-                    };
-                    ui.label(RichText::new(segment).size(font_size).color(color));
-                }
-            } else {
-                ui.label(
-                    RichText::new(&verse.text)
-                        .size(font_size)
-                        .color(theme.text_primary),
-                );
-            }
-        } else {
-            ui.label(
-                RichText::new(&verse.text)
-                    .size(font_size)
-                    .color(theme.text_primary),
-            );
-        }
+        render_kjv_text(ui, verse, highlight_terms, theme, settings, red_letter);
     });
 
     ui.add_space(10.0);
@@ -72,6 +86,16 @@ fn render_highlighted_text(
     font_size: f32,
     theme: &Theme,
 ) {
+    // Offsets from to_lowercase() are only safe to use on the original when ASCII.
+    if !text.is_ascii() || !terms.iter().all(|t| t.is_ascii()) {
+        ui.label(
+            RichText::new(text)
+                .size(font_size)
+                .color(theme.text_primary),
+        );
+        return;
+    }
+
     let text_lower = text.to_lowercase();
 
     let mut highlights: Vec<(usize, usize)> = Vec::new();
@@ -210,13 +234,6 @@ fn format_time_ago(timestamp: u64) -> String {
 }
 
 /// Icon button helper
-#[allow(dead_code)]
-pub fn icon_button(ui: &mut Ui, icon: &str, tooltip: &str) -> bool {
-    ui.add(egui::Button::new(icon).min_size(Vec2::new(28.0, 28.0)))
-        .on_hover_text(tooltip)
-        .clicked()
-}
-
 /// Styled icon button with theme support
 pub fn styled_icon_button(ui: &mut Ui, icon: &str, tooltip: &str, theme: &Theme) -> bool {
     let button = egui::Button::new(RichText::new(icon).size(18.0).color(theme.text_secondary))
@@ -286,8 +303,9 @@ pub fn action_button(ui: &mut Ui, icon: &str, tooltip: &str, active: bool, theme
     ui.add(button).on_hover_text(tooltip).clicked()
 }
 
-/// Settings panel - returns true if any setting changed
-pub fn settings_panel(ui: &mut Ui, settings: &mut Settings) -> bool {
+/// Settings panel - returns true if any setting changed.
+/// `id_source` salts egui widget IDs so sidebar and window instances don't clash.
+pub fn settings_panel(ui: &mut Ui, settings: &mut Settings, id_source: &str) -> bool {
     let mut changed = false;
 
     ui.heading("Settings");
@@ -304,7 +322,7 @@ pub fn settings_panel(ui: &mut Ui, settings: &mut Settings) -> bool {
     // Font size
     ui.horizontal(|ui: &mut Ui| {
         ui.label("Font Size:");
-        egui::ComboBox::from_id_salt("font_size_setting")
+        egui::ComboBox::from_id_salt(format!("font_size_setting_{}", id_source))
             .selected_text(settings.font_size.label())
             .show_ui(ui, |ui: &mut Ui| {
                 for size in FontSize::all() {
@@ -383,7 +401,7 @@ Red-letter map: Kenneth Reitz / kjvstudy.org (ISC). App code: MIT. See NOTICE.",
 // Original Language Components
 // ============================================================================
 
-/// Render a verse in parallel view (KJV left, original language right)
+/// Render a verse in parallel view: equal columns, KJV | original language.
 pub fn render_verse_parallel(
     ui: &mut Ui,
     verse: &Verse,
@@ -395,188 +413,319 @@ pub fn render_verse_parallel(
 ) {
     let font_size = settings.font_size.pixels();
 
-    ui.horizontal(|ui| {
-        // Left column: KJV
-        ui.vertical(|ui| {
-            ui.set_min_width(ui.available_width() * 0.45);
-            render_verse(ui, verse, settings, highlight_terms, theme, red_letter);
-        });
+    // Shared verse number above both columns keeps rows aligned
+    if settings.show_verse_numbers {
+        ui.label(
+            RichText::new(format!("{}", verse.verse_number))
+                .size(font_size)
+                .strong()
+                .color(theme.verse_number),
+        );
+        ui.add_space(2.0);
+    }
 
-        ui.separator();
+    ui.columns(2, |cols| {
+        // —— Left: KJV ——
+        {
+            let ui = &mut cols[0];
+            ui.set_min_width(ui.available_width());
+            ui.horizontal_wrapped(|ui| {
+                render_kjv_text(ui, verse, highlight_terms, theme, settings, red_letter);
+            });
+        }
 
-        // Right column: Original language
-        ui.vertical(|ui| {
+        // —— Right: original language as a single wrapping paragraph ——
+        {
+            let ui = &mut cols[1];
+            ui.set_min_width(ui.available_width());
+
             if let Some(orig) = interlinear {
-                let orig_color = if matches!(orig.language, OriginalLanguage::Hebrew | OriginalLanguage::Aramaic)
-                {
+                let mut words: Vec<&OriginalWord> = orig.original_words.iter().collect();
+                words.sort_by_key(|w| w.position);
+
+                let is_hebrew = matches!(
+                    orig.language,
+                    OriginalLanguage::Hebrew | OriginalLanguage::Aramaic
+                );
+                let orig_color = if is_hebrew {
                     theme.hebrew_text
                 } else {
                     theme.greek_text
                 };
-                let original_text: String = orig
-                    .original_words
+                let offset = if is_hebrew {
+                    settings.hebrew_font_size_offset
+                } else {
+                    settings.greek_font_size_offset
+                };
+
+                let paragraph: String = words
                     .iter()
-                    .map(|w| w.original_text.as_str())
-                    .collect::<Vec<&str>>()
+                    .map(|w| w.original_text.trim())
+                    .filter(|t| !t.is_empty())
+                    .collect::<Vec<_>>()
                     .join(" ");
-                ui.label(
-                    RichText::new(original_text)
-                        .size(font_size + settings.hebrew_font_size_offset)
-                        .color(orig_color),
-                );
+
+                if paragraph.is_empty() {
+                    ui.label(
+                        RichText::new("(empty)")
+                            .italics()
+                            .color(theme.text_muted),
+                    );
+                } else if is_hebrew {
+                    ui.with_layout(
+                        egui::Layout::right_to_left(egui::Align::TOP).with_main_wrap(true),
+                        |ui| {
+                            ui.label(
+                                RichText::new(&paragraph)
+                                    .size(font_size + offset)
+                                    .color(orig_color),
+                            );
+                        },
+                    );
+                } else {
+                    ui.label(
+                        RichText::new(&paragraph)
+                            .size(font_size + offset)
+                            .color(orig_color),
+                    );
+                }
             } else {
                 ui.label(
                     RichText::new("(no original language data)")
                         .italics()
+                        .size(font_size - 2.0)
                         .color(theme.text_muted),
                 );
             }
-        });
+        }
     });
+
+    ui.add_space(6.0);
+    let rect = ui.available_rect_before_wrap();
+    ui.painter()
+        .hline(rect.x_range(), rect.top(), Stroke::new(1.0, theme.divider));
+    ui.add_space(10.0);
 }
 
-/// Render a verse in interlinear view (word-by-word alignment)
+/// Render a verse in interlinear view (KJV line + aligned word columns).
 pub fn render_verse_interlinear(
     ui: &mut Ui,
     verse: &Verse,
     interlinear: Option<&InterlinearVerse>,
     settings: &Settings,
+    theme: &Theme,
+    red_letter: Option<&RedLetterIndex>,
 ) -> Option<String> {
     let font_size = settings.font_size.pixels();
     let mut clicked_strongs: Option<String> = None;
 
+    // Verse number + KJV English line (context for the stacks below)
     ui.horizontal_wrapped(|ui| {
-        // Verse number
         if settings.show_verse_numbers {
-            let number_color = if settings.dark_mode {
-                Color32::from_rgb(150, 180, 255)
-            } else {
-                Color32::from_rgb(70, 100, 180)
-            };
             ui.label(
                 RichText::new(format!("{} ", verse.verse_number))
                     .size(font_size)
                     .strong()
-                    .color(number_color),
+                    .color(theme.verse_number),
             );
         }
 
-        if let Some(orig) = interlinear {
-            for word in &orig.original_words {
-                if let Some(strongs) = render_interlinear_word_block(ui, word, settings) {
+        render_kjv_text(ui, verse, &[], theme, settings, red_letter);
+    });
+
+    ui.add_space(6.0);
+
+    if let Some(orig) = interlinear {
+        let mut words: Vec<&OriginalWord> = orig.original_words.iter().collect();
+        words.sort_by_key(|w| w.position);
+
+        let is_hebrew = matches!(
+            orig.language,
+            OriginalLanguage::Hebrew | OriginalLanguage::Aramaic
+        );
+
+        let layout = if is_hebrew {
+            egui::Layout::right_to_left(egui::Align::Min).with_main_wrap(true)
+        } else {
+            egui::Layout::left_to_right(egui::Align::Min).with_main_wrap(true)
+        };
+
+        ui.with_layout(layout, |ui| {
+            ui.spacing_mut().item_spacing = egui::vec2(8.0, 10.0);
+
+            for word in words {
+                if let Some(strongs) =
+                    render_interlinear_word_block(ui, word, settings, theme, is_hebrew)
+                {
                     clicked_strongs = Some(strongs);
                 }
             }
-        } else {
-            // Fallback to KJV only
-            let text_color = if settings.dark_mode {
-                Color32::from_rgb(220, 220, 220)
-            } else {
-                Color32::from_rgb(30, 30, 30)
-            };
-            ui.label(RichText::new(&verse.text).size(font_size).color(text_color));
-        }
-    });
+        });
+    } else {
+        ui.label(
+            RichText::new("No original-language data for this verse.")
+                .italics()
+                .size(font_size - 2.0)
+                .color(theme.text_muted),
+        );
+    }
 
-    ui.add_space(12.0);
+    ui.add_space(4.0);
+    let rect = ui.available_rect_before_wrap();
+    ui.painter().hline(
+        rect.x_range(),
+        rect.top(),
+        Stroke::new(1.0, theme.divider),
+    );
+    ui.add_space(10.0);
+
     clicked_strongs
 }
 
-/// Render a single word block in interlinear view
-/// Returns Some(strongs_number) if clicked
+fn format_gloss(gloss: &str) -> String {
+    let trimmed = gloss.trim();
+    if trimmed.starts_with('<') && trimmed.ends_with('>') && trimmed.len() > 2 {
+        format!("({})", &trimmed[1..trimmed.len() - 1])
+    } else {
+        trimmed.to_string()
+    }
+}
+
+fn format_strongs_display(strongs: &str) -> String {
+    // G0027 → G27 for display (keep leading letter)
+    if let Some(letter) = strongs.chars().next()
+        && (letter == 'H' || letter == 'G') {
+            let digits: String = strongs
+                .chars()
+                .skip(1)
+                .skip_while(|c| *c == '0')
+                .collect();
+            if digits.is_empty() {
+                return format!("{}0", letter);
+            }
+            return format!("{}{}", letter, digits);
+        }
+    strongs.to_string()
+}
+
+/// Render a single word column: original / translit / Strong's / gloss.
 fn render_interlinear_word_block(
     ui: &mut Ui,
     word: &OriginalWord,
     settings: &Settings,
+    theme: &Theme,
+    is_hebrew: bool,
 ) -> Option<String> {
     let base_size = settings.font_size.pixels();
     let mut clicked_strongs: Option<String> = None;
 
-    let orig_color = if settings.dark_mode {
-        Color32::from_rgb(180, 150, 220)
+    let orig_color = if is_hebrew {
+        theme.hebrew_text
     } else {
-        Color32::from_rgb(100, 50, 150)
+        theme.greek_text
     };
 
-    let translit_color = if settings.dark_mode {
-        Color32::from_rgb(150, 150, 150)
-    } else {
-        Color32::GRAY
-    };
+    let gloss = format_gloss(&word.english_gloss);
+    let orig_display = word.original_text.trim();
+    if orig_display.is_empty() && gloss.is_empty() {
+        return None;
+    }
 
-    let strongs_color = if settings.dark_mode {
-        Color32::from_rgb(100, 180, 255)
-    } else {
-        Color32::from_rgb(0, 100, 200)
-    };
-
-    let gloss_color = if settings.dark_mode {
-        Color32::from_rgb(220, 220, 220)
-    } else {
-        Color32::from_rgb(30, 30, 30)
-    };
-
-    ui.vertical(|ui| {
-        ui.set_min_width(60.0);
-
-        // Original text (larger)
-        ui.label(
-            RichText::new(&word.original_text)
-                .size(base_size + 4.0)
-                .color(orig_color),
-        );
-
-        // Transliteration (if enabled)
-        if settings.show_transliteration && !word.transliteration.is_empty() {
-            ui.label(
-                RichText::new(&word.transliteration)
-                    .size(base_size - 2.0)
-                    .italics()
-                    .color(translit_color),
-            );
+    // Column width from the widest visible line
+    let mut col_width = 56.0_f32;
+    for text in [
+        orig_display,
+        word.transliteration.as_str(),
+        gloss.as_str(),
+        word.strongs_number.as_deref().unwrap_or(""),
+    ] {
+        if text.is_empty() {
+            continue;
         }
+        let size = (text.chars().count() as f32) * (base_size * 0.55);
+        col_width = col_width.max(size).min(160.0);
+    }
 
-        // Strong's number (clickable, if enabled)
-        if settings.show_strongs_inline {
-            if let Some(ref strongs) = word.strongs_number {
-                let strongs_response = ui.add(
-                    egui::Label::new(
-                        RichText::new(strongs)
-                            .size(base_size - 3.0)
-                            .color(strongs_color)
-                            .underline(),
-                    )
-                    .sense(egui::Sense::click()),
+    let frame = egui::Frame::new()
+        .fill(theme.bg_elevated)
+        .stroke(Stroke::new(1.0, theme.border))
+        .corner_radius(CornerRadius::same(6))
+        .inner_margin(egui::Margin::symmetric(8, 6));
+
+    frame.show(ui, |ui| {
+        ui.set_min_width(col_width);
+        ui.set_max_width(col_width.max(56.0));
+        ui.vertical_centered(|ui| {
+            ui.set_min_width(col_width);
+
+            // Original language
+            let orig_size = base_size
+                + if is_hebrew {
+                    settings.hebrew_font_size_offset
+                } else {
+                    settings.greek_font_size_offset
+                };
+            ui.label(
+                RichText::new(orig_display)
+                    .size(orig_size.max(base_size))
+                    .strong()
+                    .color(orig_color),
+            );
+
+            // Transliteration
+            if settings.show_transliteration && !word.transliteration.is_empty() {
+                ui.label(
+                    RichText::new(&word.transliteration)
+                        .size((base_size - 2.0).max(10.0))
+                        .italics()
+                        .color(theme.text_muted),
                 );
+            } else if settings.show_transliteration {
+                ui.add_space((base_size - 2.0).max(10.0) + 2.0);
+            }
 
-                if strongs_response.clicked() {
-                    clicked_strongs = Some(strongs.clone());
+            // Strong's number
+            if settings.show_strongs_inline {
+                if let Some(ref strongs) = word.strongs_number {
+                    let label = format_strongs_display(strongs);
+                    let strongs_response = ui.add(
+                        egui::Label::new(
+                            RichText::new(label)
+                                .size((base_size - 3.0).max(9.0))
+                                .color(theme.strongs_link)
+                                .underline(),
+                        )
+                        .sense(egui::Sense::click()),
+                    );
+
+                    if strongs_response.clicked() {
+                        clicked_strongs = Some(strongs.clone());
+                    }
+                    strongs_response.on_hover_text(format!("Look up {}", strongs));
+                } else {
+                    ui.add_space((base_size - 3.0).max(9.0) + 2.0);
+                }
+            }
+
+            // Morphology
+            if settings.show_morphology
+                && let Some(ref morph) = word.morphology {
+                    ui.label(
+                        RichText::new(morph)
+                            .size((base_size - 4.0).max(8.0))
+                            .color(theme.text_secondary),
+                    );
                 }
 
-                strongs_response.on_hover_text("Click for definition");
-            }
-        }
-
-        // Morphology (if enabled)
-        if settings.show_morphology {
-            if let Some(ref morph) = word.morphology {
-                ui.label(
-                    RichText::new(morph)
-                        .size(base_size - 4.0)
-                        .color(translit_color),
-                );
-            }
-        }
-
-        // English gloss
-        ui.label(
-            RichText::new(&word.english_gloss)
-                .size(base_size - 2.0)
-                .color(gloss_color),
-        );
+            // English gloss
+            ui.label(
+                RichText::new(&gloss)
+                    .size((base_size - 1.0).max(11.0))
+                    .color(theme.text_primary),
+            );
+        });
     });
 
-    ui.add_space(6.0);
     clicked_strongs
 }
 
@@ -619,12 +768,22 @@ pub fn render_lexicon_popup(
 
                 ui.add_space(8.0);
 
-                // Full definition
+                // Full definition (markup already stripped at load; clean again defensively)
                 ui.strong("Definition:");
                 egui::ScrollArea::vertical()
-                    .max_height(150.0)
+                    .max_height(220.0)
                     .show(ui, |ui| {
-                        ui.label(&entry.definition);
+                        let definition =
+                            crate::original_languages::loader::clean_lexicon_markup(&entry.definition);
+                        ui.label(
+                            RichText::new(definition)
+                                .size(font_size - 1.0)
+                                .color(if settings.dark_mode {
+                                    Color32::from_rgb(210, 210, 215)
+                                } else {
+                                    Color32::from_rgb(40, 40, 45)
+                                }),
+                        );
                     });
 
                 ui.add_space(8.0);
