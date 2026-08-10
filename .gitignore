@@ -3,3 +3,4 @@ context_prompt.txt
 .kiro/
 *.DS_Store
 target/
+ACTION_PLAN.md
