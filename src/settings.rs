@@ -31,10 +31,10 @@ pub enum DisplayMode {
 impl DisplayMode {
     pub fn label(&self) -> &'static str {
         match self {
-            DisplayMode::KjvOnly => "KJV Only",
+            DisplayMode::KjvOnly => "KJV",
             DisplayMode::Parallel => "Parallel",
             DisplayMode::Interlinear => "Interlinear",
-            DisplayMode::OriginalOnly => "Original Only",
+            DisplayMode::OriginalOnly => "Original",
         }
     }
 
