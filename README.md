@@ -4,6 +4,8 @@ A KJV Bible study app with Hebrew and Greek interlinear support, built in Rust w
 
 KJV-Interlinear extends a fast KJV reader with original language texts, Strong's concordance, lexicon lookups, bookmarks, reading history, and a polished theme system — all in a native desktop app.
 
+![Interlinear view of Genesis 1](assets/screenshots/interlinear-genesis-1.jpg)
+
 ## Features
 
 - **KJV Reading** — Chapter-by-chapter navigation across all 66 books

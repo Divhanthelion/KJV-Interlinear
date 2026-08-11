@@ -738,6 +738,7 @@ impl BibleApp {
             .max_height(available_height.max(200.0))
             .id_salt("chapter_scroll")
             .show(ui, |ui| {
+                ui.set_max_width(ui.available_width());
                 let highlight_terms: Vec<String> = if !self.search_query.is_empty() {
                     vec![self.search_query.clone()]
                 } else {

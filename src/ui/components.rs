@@ -544,13 +544,16 @@ pub fn render_verse_interlinear(
             OriginalLanguage::Hebrew | OriginalLanguage::Aramaic
         );
 
+        // Frame/vertical inside a wrapping layout won't wrap unless each card
+        // reports an explicit size via allocate_ui (known egui limitation).
+        let wrap_width = ui.available_width();
         let layout = if is_hebrew {
             egui::Layout::right_to_left(egui::Align::Min).with_main_wrap(true)
         } else {
             egui::Layout::left_to_right(egui::Align::Min).with_main_wrap(true)
         };
-
-        ui.with_layout(layout, |ui| {
+        ui.allocate_ui_with_layout(egui::vec2(wrap_width, 0.0), layout, |ui| {
+            ui.set_max_width(wrap_width);
             ui.spacing_mut().item_spacing = egui::vec2(8.0, 10.0);
 
             for word in words {
@@ -631,6 +634,13 @@ fn render_interlinear_word_block(
         return None;
     }
 
+    let orig_size = base_size
+        + if is_hebrew {
+            settings.hebrew_font_size_offset
+        } else {
+            settings.greek_font_size_offset
+        };
+
     // Column width from the widest visible line
     let mut col_width = 56.0_f32;
     for text in [
@@ -645,6 +655,26 @@ fn render_interlinear_word_block(
         let size = (text.chars().count() as f32) * (base_size * 0.55);
         col_width = col_width.max(size).min(160.0);
     }
+    // Never wider than the parent wrap row
+    let max_card = (ui.available_width() - 8.0).max(56.0);
+    col_width = col_width.min(max_card);
+
+    // Explicit outer size so horizontal_wrapped can measure the card.
+    // Frame/vertical alone reports unbounded width and egui won't wrap them.
+    let pad_x = 16.0;
+    let pad_y = 12.0;
+    let mut content_h = orig_size.max(base_size) + 4.0;
+    if settings.show_transliteration {
+        content_h += (base_size - 2.0).max(10.0) + 4.0;
+    }
+    if settings.show_strongs_inline {
+        content_h += (base_size - 3.0).max(9.0) + 4.0;
+    }
+    if settings.show_morphology && word.morphology.is_some() {
+        content_h += (base_size - 4.0).max(8.0) + 4.0;
+    }
+    content_h += (base_size - 1.0).max(11.0) + 4.0; // gloss
+    let outer = egui::vec2(col_width + pad_x, content_h + pad_y);
 
     let frame = egui::Frame::new()
         .fill(theme.bg_elevated)
@@ -652,64 +682,59 @@ fn render_interlinear_word_block(
         .corner_radius(CornerRadius::same(6))
         .inner_margin(egui::Margin::symmetric(8, 6));
 
-    frame.show(ui, |ui| {
-        ui.set_min_width(col_width);
-        ui.set_max_width(col_width.max(56.0));
-        ui.vertical_centered(|ui| {
+    ui.allocate_ui(outer, |ui| {
+        ui.set_min_size(outer);
+        ui.set_max_size(outer);
+        frame.show(ui, |ui| {
             ui.set_min_width(col_width);
+            ui.set_max_width(col_width);
+            ui.vertical_centered(|ui| {
+                ui.set_min_width(col_width);
+                ui.set_max_width(col_width);
 
-            // Original language
-            let orig_size = base_size
-                + if is_hebrew {
-                    settings.hebrew_font_size_offset
-                } else {
-                    settings.greek_font_size_offset
-                };
-            ui.label(
-                RichText::new(orig_display)
-                    .size(orig_size.max(base_size))
-                    .strong()
-                    .color(orig_color),
-            );
-
-            // Transliteration
-            if settings.show_transliteration && !word.transliteration.is_empty() {
                 ui.label(
-                    RichText::new(&word.transliteration)
-                        .size((base_size - 2.0).max(10.0))
-                        .italics()
-                        .color(theme.text_muted),
+                    RichText::new(orig_display)
+                        .size(orig_size.max(base_size))
+                        .strong()
+                        .color(orig_color),
                 );
-            } else if settings.show_transliteration {
-                ui.add_space((base_size - 2.0).max(10.0) + 2.0);
-            }
 
-            // Strong's number
-            if settings.show_strongs_inline {
-                if let Some(ref strongs) = word.strongs_number {
-                    let label = format_strongs_display(strongs);
-                    let strongs_response = ui.add(
-                        egui::Label::new(
-                            RichText::new(label)
-                                .size((base_size - 3.0).max(9.0))
-                                .color(theme.strongs_link)
-                                .underline(),
-                        )
-                        .sense(egui::Sense::click()),
+                if settings.show_transliteration && !word.transliteration.is_empty() {
+                    ui.label(
+                        RichText::new(&word.transliteration)
+                            .size((base_size - 2.0).max(10.0))
+                            .italics()
+                            .color(theme.text_muted),
                     );
-
-                    if strongs_response.clicked() {
-                        clicked_strongs = Some(strongs.clone());
-                    }
-                    strongs_response.on_hover_text(format!("Look up {}", strongs));
-                } else {
-                    ui.add_space((base_size - 3.0).max(9.0) + 2.0);
+                } else if settings.show_transliteration {
+                    ui.add_space((base_size - 2.0).max(10.0) + 2.0);
                 }
-            }
 
-            // Morphology
-            if settings.show_morphology
-                && let Some(ref morph) = word.morphology {
+                if settings.show_strongs_inline {
+                    if let Some(ref strongs) = word.strongs_number {
+                        let label = format_strongs_display(strongs);
+                        let strongs_response = ui.add(
+                            egui::Label::new(
+                                RichText::new(label)
+                                    .size((base_size - 3.0).max(9.0))
+                                    .color(theme.strongs_link)
+                                    .underline(),
+                            )
+                            .sense(egui::Sense::click()),
+                        );
+
+                        if strongs_response.clicked() {
+                            clicked_strongs = Some(strongs.clone());
+                        }
+                        strongs_response.on_hover_text(format!("Look up {}", strongs));
+                    } else {
+                        ui.add_space((base_size - 3.0).max(9.0) + 2.0);
+                    }
+                }
+
+                if settings.show_morphology
+                    && let Some(ref morph) = word.morphology
+                {
                     ui.label(
                         RichText::new(morph)
                             .size((base_size - 4.0).max(8.0))
@@ -717,12 +742,12 @@ fn render_interlinear_word_block(
                     );
                 }
 
-            // English gloss
-            ui.label(
-                RichText::new(&gloss)
-                    .size((base_size - 1.0).max(11.0))
-                    .color(theme.text_primary),
-            );
+                ui.label(
+                    RichText::new(&gloss)
+                        .size((base_size - 1.0).max(11.0))
+                        .color(theme.text_primary),
+                );
+            });
         });
     });
 
