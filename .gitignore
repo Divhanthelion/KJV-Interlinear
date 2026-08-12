@@ -4,3 +4,13 @@ context_prompt.txt
 *.DS_Store
 target/
 ACTION_PLAN.md
+
+# GH_Audit hygiene
+.DS_Store
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+target/
+dist/
