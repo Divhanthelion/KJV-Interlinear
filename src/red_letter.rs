@@ -54,6 +54,11 @@ impl RedLetterIndex {
         self.entries.get(&(book.to_string(), chapter, verse))
     }
 
+    /// All (book, chapter, verse) keys in the index.
+    pub fn keys(&self) -> impl Iterator<Item = (String, u32, u32)> + '_ {
+        self.entries.keys().cloned()
+    }
+
     pub fn len(&self) -> usize {
         self.entries.len()
     }
@@ -72,7 +77,7 @@ fn parse_verse_key(key: &str) -> Option<(String, u32, u32)> {
     Some((book_part.to_string(), chapter, verse))
 }
 
-/// Fold typographic variants so kjvstudy quotes match Project Gutenberg text.
+/// Fold typographic variants so kjvstudy quotes match the bundled KJV text.
 fn fold_char(c: char) -> Option<char> {
     match c {
         '\u{2018}' | '\u{2019}' | '\u{201B}' | '\u{2032}' | '\u{02BC}' => Some('\''),
@@ -80,6 +85,7 @@ fn fold_char(c: char) -> Option<char> {
         '\u{2010}' | '\u{2011}' | '\u{2012}' | '\u{2013}' | '\u{2014}' => Some('-'),
         // Collapse all whitespace to a single space sentinel handled by fold_string
         c if c.is_whitespace() => Some(' '),
+        'Æ' => Some('æ'),
         other => Some(other.to_ascii_lowercase()),
     }
 }
@@ -105,6 +111,13 @@ fn fold_with_map(s: &str) -> (String, Vec<(usize, usize)>) {
             continue;
         }
         last_was_space = false;
+        if fc == 'æ' {
+            // "Cæsar" in the KJV text matches "Caesar" in the quotes
+            folded.push_str("ae");
+            map.push((i, end));
+            map.push((i, end));
+            continue;
+        }
         folded.push(fc);
         map.push((i, end));
     }
@@ -203,7 +216,7 @@ fn find_folded(haystack: &str, needle: &str) -> Option<(usize, usize)> {
 
 /// Split verse text into (segment, is_red) runs for painting.
 ///
-/// If the quote substring is not found in the Gutenberg text, returns a single
+/// If the quote substring is not found in the verse text, returns a single
 /// non-red segment (never paint the whole verse as a fallback).
 pub fn red_letter_segments<'a>(
     verse_text: &'a str,
@@ -317,6 +330,17 @@ mod tests {
         assert!(segs[1].1);
         assert!(segs[1].0.starts_with("It is written") || segs[1].0.contains("It is written"));
         assert!(segs[0].0.contains('°'));
+    }
+
+    #[test]
+    fn segments_ae_ligature() {
+        let text = "And Jesus answering said unto them, Render to Cæsar the things that are Cæsar\u{2019}s, and to God the things that are God\u{2019}s. And they marvelled at him.";
+        let quote = "Render to Caesar the things that are Caesar's, and to God the things that are God's.";
+        let segs = red_letter_segments(text, &RedLetterSpec::Quote(quote.to_string()));
+        assert_eq!(segs.len(), 3);
+        assert!(segs[1].1);
+        assert!(segs[1].0.starts_with("Render to Cæsar"));
+        assert!(segs[1].0.ends_with("God\u{2019}s."));
     }
 
     #[test]

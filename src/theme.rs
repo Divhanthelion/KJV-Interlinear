@@ -168,17 +168,18 @@ impl Theme {
         };
 
         // Window border - subtle glass edge effect
-        visuals.window_stroke = Stroke::new(1.0, Color32::from_white_alpha(15));
+        visuals.window_stroke = Stroke::new(1.0_f32, Color32::from_white_alpha(15));
 
         // Selection
         visuals.selection.bg_fill = self.selection;
-        visuals.selection.stroke = Stroke::new(1.0, self.primary);
+        visuals.selection.stroke = Stroke::new(1.0_f32, self.primary);
 
-        // Widget styling - inactive state (ghost button style)
-        visuals.widgets.inactive.bg_fill = Color32::TRANSPARENT;
+        // Widget styling - inactive state (ghost button style). Buttons use weak_bg_fill;
+        // bg_fill draws checkbox boxes, slider rails and scrollbar handles, so it must show.
+        visuals.widgets.inactive.bg_fill = self.border;
         visuals.widgets.inactive.weak_bg_fill = Color32::TRANSPARENT;
         visuals.widgets.inactive.bg_stroke = Stroke::NONE;
-        visuals.widgets.inactive.fg_stroke = Stroke::new(1.0, self.text_secondary);
+        visuals.widgets.inactive.fg_stroke = Stroke::new(1.0_f32, self.text_secondary);
         visuals.widgets.inactive.corner_radius = CornerRadius::same(6);
 
         // Widget styling - hovered state
@@ -190,7 +191,7 @@ impl Theme {
         );
         visuals.widgets.hovered.weak_bg_fill = self.hover_overlay;
         visuals.widgets.hovered.bg_stroke = Stroke::new(
-            1.0,
+            1.0_f32,
             Color32::from_rgba_unmultiplied(
                 self.primary.r(),
                 self.primary.g(),
@@ -198,7 +199,7 @@ impl Theme {
                 80,
             ),
         );
-        visuals.widgets.hovered.fg_stroke = Stroke::new(1.0, self.text_primary);
+        visuals.widgets.hovered.fg_stroke = Stroke::new(1.0_f32, self.text_primary);
         visuals.widgets.hovered.corner_radius = CornerRadius::same(6);
         visuals.widgets.hovered.expansion = 1.0;
 
@@ -210,22 +211,22 @@ impl Theme {
             50,
         );
         visuals.widgets.active.weak_bg_fill = self.primary_active;
-        visuals.widgets.active.bg_stroke = Stroke::new(1.0, self.primary);
-        visuals.widgets.active.fg_stroke = Stroke::new(1.0, self.text_primary);
+        visuals.widgets.active.bg_stroke = Stroke::new(1.0_f32, self.primary);
+        visuals.widgets.active.fg_stroke = Stroke::new(1.0_f32, self.text_primary);
         visuals.widgets.active.corner_radius = CornerRadius::same(6);
 
         // Non-interactive widgets
         visuals.widgets.noninteractive.bg_fill = self.bg_panel;
         visuals.widgets.noninteractive.weak_bg_fill = self.bg_base;
-        visuals.widgets.noninteractive.bg_stroke = Stroke::new(1.0, self.border);
-        visuals.widgets.noninteractive.fg_stroke = Stroke::new(1.0, self.text_muted);
+        visuals.widgets.noninteractive.bg_stroke = Stroke::new(1.0_f32, self.border);
+        visuals.widgets.noninteractive.fg_stroke = Stroke::new(1.0_f32, self.text_muted);
         visuals.widgets.noninteractive.corner_radius = CornerRadius::same(6);
 
         // Open widgets (combo boxes, etc)
         visuals.widgets.open.bg_fill = self.bg_elevated;
         visuals.widgets.open.weak_bg_fill = self.bg_panel;
-        visuals.widgets.open.bg_stroke = Stroke::new(1.0, self.primary);
-        visuals.widgets.open.fg_stroke = Stroke::new(1.0, self.text_primary);
+        visuals.widgets.open.bg_stroke = Stroke::new(1.0_f32, self.primary);
+        visuals.widgets.open.fg_stroke = Stroke::new(1.0_f32, self.text_primary);
         visuals.widgets.open.corner_radius = CornerRadius::same(6);
 
         style.visuals = visuals;

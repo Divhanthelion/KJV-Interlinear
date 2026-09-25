@@ -69,49 +69,61 @@ fn parse_book_file(file_path: &Path, book_name: String, testament: Testament) ->
 
     let reader = io::BufReader::new(file);
     for line_result in reader.lines() {
-        let line = match line_result {
-            Ok(line) => line,
-            Err(_) => continue,
-        };
+        let line = line_result?;
 
         // Skip empty lines
-        let line = line.trim();
+        let line = line.trim_start_matches('\u{FEFF}').trim();
         if line.is_empty() {
             continue;
         }
 
-        // Parse format: "chapter:verse_number verse_text"
-        if let Some((reference, text)) = line.split_once(' ')
-            && let Some((chapter_str, verse_str)) = reference.split_once(':') {
-                let chapter_num = chapter_str.parse::<u32>().unwrap_or(0);
-                let verse_num = verse_str.parse::<u32>().unwrap_or(0);
+        // Format: "chapter:verse text"; verse 0 holds a Psalm superscription
+        let Some((chapter_num, verse_num, text)) = parse_line(line) else {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                format!("{}: malformed line {:?}", file_path.display(), line),
+            ));
+        };
 
-                if chapter_num == 0 || chapter_num > 200 || verse_num == 0 || verse_num > 200 {
-                    continue;
-                }
+        while book.chapters.len() < chapter_num as usize {
+            book.chapters.push(Chapter {
+                number: book.chapters.len() as u32 + 1,
+                superscription: None,
+                verses: Vec::new(),
+            });
+        }
 
-                // Ensure we have enough chapters
-                while book.chapters.len() < chapter_num as usize {
-                    book.chapters.push(Chapter {
-                        number: book.chapters.len() as u32 + 1,
-                        verses: Vec::new(),
-                    });
-                }
-
-                // Add verse to the chapter
-                let chapter_idx = chapter_num as usize - 1;
-                if chapter_idx < book.chapters.len() {
-                    book.chapters[chapter_idx].verses.push(Verse {
-                        book: book.name.clone(),
-                        chapter: chapter_num,
-                        verse_number: verse_num,
-                        text: text.to_string(),
-                    });
-                }
-            }
+        let verse = Verse {
+            book: book.name.clone(),
+            chapter: chapter_num,
+            verse_number: verse_num,
+            text,
+        };
+        let chapter = &mut book.chapters[chapter_num as usize - 1];
+        if verse_num == 0 {
+            chapter.superscription = Some(verse);
+        } else {
+            chapter.verses.push(verse);
+        }
     }
 
     Ok(book)
+}
+
+/// Parse "12:3 verse text" into (chapter, verse, text with whitespace collapsed).
+fn parse_line(line: &str) -> Option<(u32, u32, String)> {
+    let (reference, text) = line.split_once(' ')?;
+    let (chapter_str, verse_str) = reference.split_once(':')?;
+    let chapter: u32 = chapter_str.parse().ok()?;
+    let verse: u32 = verse_str.parse().ok()?;
+    if chapter == 0 || chapter > 200 || verse > 200 {
+        return None;
+    }
+    let text = text.split_whitespace().collect::<Vec<_>>().join(" ");
+    if text.is_empty() {
+        return None;
+    }
+    Some((chapter, verse, text))
 }
 
 /// Returns a mapping of book names to their canonical order
@@ -208,6 +220,21 @@ mod tests {
     fn test_genesis_is_first() {
         let order = get_standard_book_order();
         assert_eq!(order.get("Genesis"), Some(&0));
+    }
+
+    #[test]
+    fn test_parse_line() {
+        assert_eq!(
+            parse_line("3:16 For God so  loved"),
+            Some((3, 16, "For God so loved".to_string()))
+        );
+        assert_eq!(
+            parse_line("51:0 To the chief Musician"),
+            Some((51, 0, "To the chief Musician".to_string()))
+        );
+        assert_eq!(parse_line("chapter one"), None);
+        assert_eq!(parse_line("0:1 text"), None);
+        assert_eq!(parse_line("1:1 "), None);
     }
 
     #[test]

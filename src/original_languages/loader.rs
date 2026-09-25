@@ -89,75 +89,89 @@ static BOOK_NAME_MAPPING: LazyLock<HashMap<&'static str, &'static str>> = LazyLo
     map
 });
 
-/// Parse a STEP Bible reference like "Gen.1.1#01=L" or "Mat.1.1#01=NKO"
-fn parse_reference(reference: &str) -> Option<(String, u32, u32, u32)> {
-    // Format: Book.Chapter.Verse#WordNum=Type
-    let book_mapping = &*BOOK_NAME_MAPPING;
+/// A parsed STEP word reference.
+#[derive(Debug, PartialEq)]
+struct WordRef {
+    /// Book, chapter, verse in KJV versification
+    book: &'static str,
+    chapter: u32,
+    verse: u32,
+    /// Source/edition code after '=' (e.g. "L", "Q(K)", "NKO", "N(k)O")
+    word_type: String,
+}
 
-    // Split on # to separate reference from word number
-    let parts: Vec<&str> = reference.split('#').collect();
-    if parts.len() < 2 {
+/// Parse a STEP reference into the KJV verse the word belongs to.
+///
+/// Forms: `Gen.1.1#01=L`, `Gen.31.55(32.1)#01=L` (Hebrew ref in brackets),
+/// `Mat.17.15[17.14]#01=NKO` (KJV ref in square brackets),
+/// `Mrk.12.15(12.14)#03=NKO` / `Rom.16.25{14.24}#01=NKO` (NA / other editions).
+/// The leading ref is English (NRSV) versification; a `[..]` ref overrides it for the KJV.
+fn parse_reference(reference: &str) -> Option<WordRef> {
+    let (verse_part, word_part) = reference.split_once('#')?;
+    let word_type = word_part.split_once('=').map(|(_, t)| t).unwrap_or("").to_string();
+
+    let main_end = verse_part.find(['(', '[', '{']).unwrap_or(verse_part.len());
+    let mut parts = verse_part[..main_end].split('.');
+    let book = *BOOK_NAME_MAPPING.get(parts.next()?)?;
+    let mut chapter: u32 = parts.next()?.parse().ok()?;
+    let mut verse: u32 = parts.next()?.parse().ok()?;
+    if parts.next().is_some() {
         return None;
     }
 
-    // Parse book.chapter.verse
-    let ref_parts: Vec<&str> = parts[0].split('.').collect();
-    if ref_parts.len() < 3 {
-        return None;
+    if let Some(start) = verse_part.find('[') {
+        let end = verse_part[start..].find(']')? + start;
+        let (c, v) = verse_part[start + 1..end].split_once('.')?;
+        chapter = c.parse().ok()?;
+        verse = v.parse().ok()?;
     }
 
-    let book_abbrev = ref_parts[0];
-    let book_name = book_mapping.get(book_abbrev).unwrap_or(&book_abbrev);
-
-    let chapter: u32 = ref_parts[1].parse().ok()?;
-    let verse: u32 = ref_parts[2].parse().ok()?;
-
-    // Parse word number (remove =Type suffix)
-    let word_part = parts[1].split('=').next()?;
-    let word_num: u32 = word_part.parse().ok()?;
-
-    Some((book_name.to_string(), chapter, verse, word_num))
+    Some(WordRef {
+        book,
+        chapter,
+        verse,
+        word_type,
+    })
 }
 
 /// Extract the primary Strong's number from a dStrongs field
 /// Examples: "H9003/{H7225G}" -> "H7225", "{H1254A}" -> "H1254", "G0976=N-NSF" -> "G0976"
 fn extract_strongs_number(dstrongs: &str) -> Option<String> {
-    // Look for patterns like H1234, G1234, possibly with letter suffix
-    let mut result = String::new();
+    // Hebrew marks the root with {braces}; prefixes/suffixes sit outside them
+    if let Some(start) = dstrongs.find('{') {
+        let root: String = dstrongs[start + 1..]
+            .chars()
+            .take_while(|c| *c != '}')
+            .collect();
+        if let Some(s) = leading_strongs(&root) {
+            return Some(s);
+        }
+    }
 
     let cleaned = dstrongs.replace(['{', '}'], "").replace('/', " ");
-
     for part in cleaned.split_whitespace() {
         // Skip prefix markers like H9003 (preposition markers)
         if part.starts_with("H900") || part.starts_with("H901") {
             continue;
         }
-
-        // Find H or G followed by numbers
-        if let Some(pos) = part.find(['H', 'G']) {
-            let substr = &part[pos..];
-            let mut num = String::new();
-            num.push(substr.chars().next()?);
-
-            for c in substr.chars().skip(1) {
-                if c.is_ascii_digit() {
-                    num.push(c);
-                } else {
-                    break;
-                }
-            }
-
-            if num.len() > 1 {
-                result = num;
-                break;
-            }
+        if let Some(pos) = part.find(['H', 'G'])
+            && let Some(s) = leading_strongs(&part[pos..])
+        {
+            return Some(s);
         }
     }
+    None
+}
 
-    if result.is_empty() {
+/// "H7225G" -> "H7225"; None unless a letter is followed by digits.
+fn leading_strongs(s: &str) -> Option<String> {
+    let mut chars = s.chars();
+    let letter = chars.next().filter(|c| *c == 'H' || *c == 'G')?;
+    let digits: String = chars.take_while(|c| c.is_ascii_digit()).collect();
+    if digits.is_empty() {
         None
     } else {
-        Some(result)
+        Some(format!("{}{}", letter, digits))
     }
 }
 
@@ -166,13 +180,19 @@ fn clean_hebrew_text(text: &str) -> String {
     text.replace(['/', '\\'], "")
 }
 
-/// Clean Greek text (remove parenthetical transliteration)
+/// Hebrew transliteration without STEP's syllable dots and morpheme slashes ("be./re.Shit" -> "bereShit")
+fn clean_hebrew_transliteration(text: &str) -> String {
+    text.replace(['.', '/', '\\'], "")
+}
+
+/// Clean Greek text: drop the parenthetical transliteration and editorial marks
+/// (NA paragraph ¶, ¬, and the [[ ]] around passages NA considers doubtful).
 fn clean_greek_text(text: &str) -> String {
-    if let Some(paren_pos) = text.find('(') {
-        text[..paren_pos].trim().to_string()
-    } else {
-        text.to_string()
-    }
+    let word = match text.find('(') {
+        Some(paren_pos) => &text[..paren_pos],
+        None => text,
+    };
+    word.replace(['¶', '¬', '[', ']'], "").trim().to_string()
 }
 
 /// Extract transliteration from Greek field like "Βίβλος (Biblos)"
@@ -182,6 +202,159 @@ fn extract_greek_transliteration(text: &str) -> String {
             return text[start + 1..start + 1 + rel_end].to_string();
         }
     String::new()
+}
+
+/// Drop a versification note at the start of a gloss ("[13.1] And" -> "And").
+fn strip_verse_marker(gloss: &str) -> &str {
+    let gloss = gloss.trim();
+    let Some(open) = gloss.chars().next().filter(|c| matches!(c, '[' | '(' | '{')) else {
+        return gloss;
+    };
+    let close = match open {
+        '[' => ']',
+        '(' => ')',
+        _ => '}',
+    };
+    match gloss.find(close) {
+        Some(end)
+            if end > 1
+                && gloss[1..end].chars().all(|c| c.is_ascii_digit() || c == '.')
+                && gloss[1..end].contains('.') =>
+        {
+            gloss[end + 1..].trim_start()
+        }
+        _ => gloss,
+    }
+}
+
+/// How an editions list like "NA28+NA27+TR»1+Byz" includes the Textus Receptus.
+#[derive(Debug, PartialEq)]
+enum TrEdition {
+    /// "TR": same word, same place
+    InPlace,
+    /// "TR»1" / "TR«2": the TR has it at a different position (or fused with a neighbour)
+    Displaced,
+    Missing,
+}
+
+fn tr_edition(editions: &str) -> TrEdition {
+    for e in editions.split('+').map(str::trim) {
+        if e == "TR" {
+            return TrEdition::InPlace;
+        }
+        if e.starts_with("TR«") || e.starts_with("TR»") {
+            return TrEdition::Displaced;
+        }
+    }
+    TrEdition::Missing
+}
+
+/// The Textus Receptus reading from a TAGNT variants field, e.g.
+/// "βληθῇ (T=blēthēa) may be cast - G0906=V-APS-3S in: TR«3+Byz«3 ¦ …".
+fn tr_variant(variants: &str) -> Option<OriginalWord> {
+    for variant in variants.split('¦') {
+        let Some((body, editions)) = variant.trim().rsplit_once(" in: ") else {
+            continue;
+        };
+        if tr_edition(editions) == TrEdition::Missing {
+            continue;
+        }
+        let Some((words, tags)) = body.rsplit_once(" - ") else {
+            continue;
+        };
+        let Some((greek, rest)) = words.split_once(" (") else {
+            continue;
+        };
+        let Some((translit, gloss)) = rest.split_once(')') else {
+            continue;
+        };
+        let translit = translit.split_once('=').map_or(translit, |(_, t)| t);
+        let first_tag = tags.split(" + ").next().unwrap_or("");
+        let (strongs, morph) = match first_tag.split_once('=') {
+            Some((s, m)) => (extract_strongs_number(s), Some(m.trim().to_string())),
+            None => (extract_strongs_number(first_tag), None),
+        };
+        return Some(OriginalWord {
+            position: 0,
+            original_text: clean_greek_text(greek),
+            transliteration: translit.trim().to_string(),
+            english_gloss: gloss.trim().to_string(),
+            strongs_number: strongs,
+            morphology: morph,
+        });
+    }
+    None
+}
+
+/// Where a TAGNT word stands relative to the KJV's Greek text (Scrivener's TR).
+#[derive(Debug, PartialEq)]
+enum TrStatus {
+    /// Word is in the TR as given
+    Present,
+    /// TR reads differently here: use the TR reading from the variants column, or
+    /// drop the word if it has none (it is fused into a neighbouring TR word,
+    /// e.g. NA "διὰ παντός" = TR "διαπαντός").
+    Variant,
+    /// Word is not in the TR at all
+    Absent,
+}
+
+/// Classify by word type ("NKO", "N(k)O", "no", …) and editions list.
+/// Upper/lower-case K outside brackets = in TR; inside brackets = TR differs.
+fn tr_status(word_type: &str, editions: &str) -> TrStatus {
+    let mut depth = 0;
+    let (mut main_k, mut bracket_k) = (false, false);
+    for c in word_type.chars() {
+        match c {
+            '(' => depth += 1,
+            ')' => depth -= 1,
+            'K' | 'k' if depth == 0 => main_k = true,
+            'K' | 'k' => bracket_k = true,
+            _ => {}
+        }
+    }
+    let edition = tr_edition(editions);
+    if main_k || edition == TrEdition::InPlace {
+        TrStatus::Present
+    } else if bracket_k {
+        TrStatus::Variant
+    } else if edition == TrEdition::Displaced {
+        // Same word, different word order in the TR
+        TrStatus::Present
+    } else {
+        TrStatus::Absent
+    }
+}
+
+/// Append a word to its verse, numbering positions in reading order.
+fn push_word(
+    verses: &mut HashMap<VerseRef, InterlinearVerse>,
+    strongs_index: &mut StrongsIndex,
+    word_ref: &WordRef,
+    language: OriginalLanguage,
+    mut word: OriginalWord,
+) {
+    let verse_ref = VerseRef::new(word_ref.book, word_ref.chapter, word_ref.verse);
+    if let Some(ref s) = word.strongs_number {
+        strongs_index.add_occurrence(s, verse_ref.clone());
+    }
+    let interlinear = verses.entry(verse_ref).or_insert_with(|| InterlinearVerse {
+        book: word_ref.book.to_string(),
+        chapter: word_ref.chapter,
+        verse_number: word_ref.verse,
+        language,
+        original_words: Vec::new(),
+    });
+    word.position = interlinear.original_words.len() as u32 + 1;
+    interlinear.original_words.push(word);
+}
+
+/// True for word rows ("Gen.1.1#01=L…"), false for headers and summary lines.
+fn is_word_row(line: &str) -> bool {
+    let Some(first) = line.split('\t').next() else {
+        return false;
+    };
+    first.contains('#') && first.contains('.') && !line.starts_with('#')
 }
 
 /// Load Hebrew OT data from TAHOT TSV file
@@ -195,21 +368,8 @@ pub fn load_hebrew_ot(
     let mut word_count = 0;
 
     for line in reader.lines() {
-        let line = match line {
-            Ok(l) => l,
-            Err(_) => continue,
-        };
-
-        // Skip header lines, comments, and empty lines
-        if line.is_empty()
-            || line.starts_with('#')
-            || line.starts_with('=')
-            || line.starts_with('\t')
-            || line.starts_with("TAHOT")
-            || line.starts_with("Ref")
-            || line.starts_with("Word")
-            || !line.contains('.')
-        {
+        let line = line.map_err(|e| format!("Failed to read {}: {}", path.display(), e))?;
+        if !is_word_row(&line) {
             continue;
         }
 
@@ -218,57 +378,35 @@ pub fn load_hebrew_ot(
             continue;
         }
 
-        // Parse: Reference, Hebrew, Transliteration, English, dStrongs, Grammar
-        let (book, chapter, verse, word_num) = match parse_reference(fields[0]) {
-            Some(r) => r,
-            None => continue,
+        // Fields: Ref, Hebrew, Transliteration, English, dStrongs, Grammar
+        let Some(word_ref) = parse_reference(fields[0]) else {
+            continue;
         };
 
-        let hebrew_text = clean_hebrew_text(fields[1]);
-        let transliteration = fields[2].replace('.', "");
-        let english_gloss = fields[3].to_string();
-        let strongs = extract_strongs_number(fields[4]);
-        let morphology = if fields.len() > 5 && !fields[5].is_empty() {
-            Some(fields[5].to_string())
-        } else {
-            None
-        };
-
-        let verse_ref = VerseRef::new(&book, chapter, verse);
-
-        // Add to Strong's index
-        if let Some(ref s) = strongs {
-            strongs_index.add_occurrence(s, verse_ref.clone());
+        // "X" words are reconstructed from the LXX and are not in the Hebrew the KJV translated.
+        // Rows with no Hebrew mark a Ketiv word that the Qere (followed by the KJV) omits.
+        if word_ref.word_type.starts_with('X') || fields[1].trim().is_empty() {
+            continue;
         }
 
         let word = OriginalWord {
-            position: word_num,
-            original_text: hebrew_text,
-            transliteration,
-            english_gloss,
-            strongs_number: strongs,
-            morphology,
+            position: 0,
+            original_text: clean_hebrew_text(fields[1]),
+            transliteration: clean_hebrew_transliteration(fields[2]),
+            english_gloss: fields[3].trim().to_string(),
+            strongs_number: extract_strongs_number(fields[4]),
+            morphology: Some(fields[5].trim())
+                .filter(|m| !m.is_empty())
+                .map(str::to_string),
         };
-
-        // Get or create the interlinear verse
-        let interlinear = verses
-            .entry(verse_ref.clone())
-            .or_insert_with(|| InterlinearVerse {
-                book: book.clone(),
-                chapter,
-                verse_number: verse,
-                language: OriginalLanguage::Hebrew,
-                original_words: Vec::new(),
-            });
-
-        interlinear.original_words.push(word);
+        push_word(verses, strongs_index, &word_ref, OriginalLanguage::Hebrew, word);
         word_count += 1;
     }
 
     Ok(word_count)
 }
 
-/// Load Greek NT data from TAGNT TSV file
+/// Load Greek NT data from TAGNT TSV file, keeping the text behind the KJV (TR).
 pub fn load_greek_nt(
     path: &Path,
     verses: &mut HashMap<VerseRef, InterlinearVerse>,
@@ -279,22 +417,8 @@ pub fn load_greek_nt(
     let mut word_count = 0;
 
     for line in reader.lines() {
-        let line = match line {
-            Ok(l) => l,
-            Err(_) => continue,
-        };
-
-        // Skip header lines, comments, and empty lines
-        if line.is_empty()
-            || line.starts_with('#')
-            || line.starts_with('=')
-            || line.starts_with('\t')
-            || line.starts_with("TAGNT")
-            || line.starts_with("Word")
-            || line.starts_with('$')
-            || line.starts_with('*')
-            || !line.contains('.')
-        {
+        let line = line.map_err(|e| format!("Failed to read {}: {}", path.display(), e))?;
+        if !is_word_row(&line) {
             continue;
         }
 
@@ -303,60 +427,38 @@ pub fn load_greek_nt(
             continue;
         }
 
-        // Parse: Reference, Greek(translit), English, dStrongs=Grammar, DictForm=Gloss
-        let (book, chapter, verse, word_num) = match parse_reference(fields[0]) {
-            Some(r) => r,
-            None => continue,
+        // Fields: Ref, Greek(translit), English, dStrongs=Grammar, DictForm=Gloss, editions, variants
+        let Some(word_ref) = parse_reference(fields[0]) else {
+            continue;
         };
 
-        let greek_text = clean_greek_text(fields[1]);
-        let transliteration = extract_greek_transliteration(fields[1]);
-        let english_gloss = fields[2].to_string();
-
-        // Parse dStrongs=Grammar field (e.g., "G0976=N-NSF")
-        let strongs_grammar = fields[3];
-        let (strongs, morphology) = if strongs_grammar.contains('=') {
-            let parts: Vec<&str> = strongs_grammar.split('=').collect();
-            (
-                extract_strongs_number(parts[0]),
-                if parts.len() > 1 {
-                    Some(parts[1].to_string())
-                } else {
-                    None
-                },
-            )
-        } else {
-            (extract_strongs_number(strongs_grammar), None)
-        };
-
-        let verse_ref = VerseRef::new(&book, chapter, verse);
-
-        // Add to Strong's index
-        if let Some(ref s) = strongs {
-            strongs_index.add_occurrence(s, verse_ref.clone());
+        let editions = fields.get(5).copied().unwrap_or("");
+        let status = tr_status(&word_ref.word_type, editions);
+        if status == TrStatus::Absent {
+            continue;
         }
 
-        let word = OriginalWord {
-            position: word_num,
-            original_text: greek_text,
-            transliteration,
-            english_gloss,
+        let (strongs, morphology) = match fields[3].split_once('=') {
+            Some((s, m)) => (extract_strongs_number(s), Some(m.trim().to_string())),
+            None => (extract_strongs_number(fields[3]), None),
+        };
+        let mut word = OriginalWord {
+            position: 0,
+            original_text: clean_greek_text(fields[1]),
+            transliteration: extract_greek_transliteration(fields[1]),
+            english_gloss: strip_verse_marker(fields[2]).to_string(),
             strongs_number: strongs,
             morphology,
         };
 
-        // Get or create the interlinear verse
-        let interlinear = verses
-            .entry(verse_ref.clone())
-            .or_insert_with(|| InterlinearVerse {
-                book: book.clone(),
-                chapter,
-                verse_number: verse,
-                language: OriginalLanguage::Greek,
-                original_words: Vec::new(),
-            });
+        if status == TrStatus::Variant {
+            match tr_variant(fields.get(6).copied().unwrap_or("")) {
+                Some(tr_word) => word = tr_word,
+                None => continue,
+            }
+        }
 
-        interlinear.original_words.push(word);
+        push_word(verses, strongs_index, &word_ref, OriginalLanguage::Greek, word);
         word_count += 1;
     }
 
@@ -588,28 +690,91 @@ mod tests {
 
     #[test]
     fn test_parse_reference_hebrew() {
-        let (book, chapter, verse, word) = parse_reference("Gen.1.1#01=L").unwrap();
-        assert_eq!(book, "Genesis");
-        assert_eq!(chapter, 1);
-        assert_eq!(verse, 1);
-        assert_eq!(word, 1);
+        let r = parse_reference("Gen.1.1#01=L").unwrap();
+        assert_eq!((r.book, r.chapter, r.verse), ("Genesis", 1, 1));
+        assert_eq!(r.word_type, "L");
 
-        // Test numbered books map to "First/Second" names
-        let (book, _, _, _) = parse_reference("1Sa.1.1#01=L").unwrap();
-        assert_eq!(book, "First Samuel");
+        // Hebrew versification in brackets: keep the English (KJV) ref
+        let r = parse_reference("Gen.31.55(32.1)#01=L").unwrap();
+        assert_eq!((r.book, r.chapter, r.verse), ("Genesis", 31, 55));
+
+        // Psalm superscription is verse 0
+        let r = parse_reference("Psa.3.0(3.1)#01=L").unwrap();
+        assert_eq!((r.book, r.chapter, r.verse), ("Psalms", 3, 0));
+
+        let r = parse_reference("1Sa.1.1#01=Q(K)").unwrap();
+        assert_eq!(r.book, "First Samuel");
+        assert_eq!(r.word_type, "Q(K)");
     }
 
     #[test]
     fn test_parse_reference_greek() {
-        let (book, chapter, verse, word) = parse_reference("Mat.1.1#01=NKO").unwrap();
-        assert_eq!(book, "Matthew");
-        assert_eq!(chapter, 1);
-        assert_eq!(verse, 1);
-        assert_eq!(word, 1);
+        let r = parse_reference("Mat.1.1#01=NKO").unwrap();
+        assert_eq!((r.book, r.chapter, r.verse), ("Matthew", 1, 1));
 
-        // Test numbered books map to "First/Second" names
-        let (book, _, _, _) = parse_reference("1Co.1.1#01=NKO").unwrap();
-        assert_eq!(book, "First Corinthians");
+        // Square brackets carry the KJV reference
+        let r = parse_reference("Rev.12.18[13.1]#01=NKO").unwrap();
+        assert_eq!((r.book, r.chapter, r.verse), ("Revelation", 13, 1));
+        let r = parse_reference("3Jn.1.15[1.14]#02=NKO").unwrap();
+        assert_eq!((r.book, r.chapter, r.verse), ("Third John", 1, 14));
+
+        // Round (NA) and curly (other editions) brackets are not KJV refs
+        let r = parse_reference("Mrk.12.15(12.14)#03=NKO").unwrap();
+        assert_eq!((r.chapter, r.verse), (12, 15));
+        let r = parse_reference("Rom.16.25{14.24}#01=NKO").unwrap();
+        assert_eq!((r.chapter, r.verse), (16, 25));
+
+        assert!(parse_reference("Xyz.1.1#01=L").is_none());
+        assert!(parse_reference("# Mat.1.1").is_none());
+    }
+
+    #[test]
+    fn test_tr_status() {
+        assert_eq!(tr_status("NKO", ""), TrStatus::Present);
+        assert_eq!(tr_status("k", ""), TrStatus::Present);
+        assert_eq!(tr_status("NK(o)", ""), TrStatus::Present);
+        assert_eq!(tr_status("N(K)O", "NA28+NA27"), TrStatus::Variant);
+        assert_eq!(tr_status("N(k)(o)", "NA28"), TrStatus::Variant);
+        // Displaced TR on a KJV-variant word: fused into a neighbour, handled as a variant
+        assert_eq!(tr_status("N(K)O", "NA28+TR»1+Byz"), TrStatus::Variant);
+        assert_eq!(tr_status("N(k)O", "NA28+TR+Byz"), TrStatus::Present);
+        assert_eq!(tr_status("NO", "NA28+TR»1"), TrStatus::Present);
+        assert_eq!(tr_status("no", "NA28+NA27"), TrStatus::Absent);
+        assert_eq!(tr_status("NO", "NA28"), TrStatus::Absent);
+        assert_eq!(tr_status("o", ""), TrStatus::Absent);
+    }
+
+    #[test]
+    fn test_tr_variant() {
+        let v = "βληθῇ (T=blēthēa) may be cast - G0906=V-APS-3S in: TR«3+Byz«3";
+        let w = tr_variant(v).unwrap();
+        assert_eq!(w.original_text, "βληθῇ");
+        assert_eq!(w.transliteration, "blēthēa");
+        assert_eq!(w.english_gloss, "may be cast");
+        assert_eq!(w.strongs_number.as_deref(), Some("G0906"));
+        assert_eq!(w.morphology.as_deref(), Some("V-APS-3S"));
+
+        // Picks the TR alternative when several are listed
+        let v = "κατέλιπόν (t=katelipon) I left behind - G2641=V-2AAI-1S in: TR+Byz ¦ ἀπέλειπόν (o=apeleipon) I was leaving - G0620=V-IAI-1S in: Tyn+WH";
+        assert_eq!(tr_variant(v).unwrap().original_text, "κατέλιπόν");
+        let v = "ἀπέλειπόν (o=apeleipon) I was leaving - G0620=V-IAI-1S in: Tyn+WH";
+        assert!(tr_variant(v).is_none());
+    }
+
+    #[test]
+    fn test_strip_verse_marker() {
+        assert_eq!(strip_verse_marker("[13.1] And"), "And");
+        assert_eq!(strip_verse_marker("{14.24} To Him"), "To Him");
+        assert_eq!(strip_verse_marker("[the] book"), "[the] book");
+        assert_eq!(strip_verse_marker("(obj.)"), "(obj.)");
+        assert_eq!(strip_verse_marker("do cast [it]"), "do cast [it]");
+    }
+
+    #[test]
+    fn test_clean_greek_text() {
+        assert_eq!(clean_greek_text("αὐτῶν.¶ (autōn)"), "αὐτῶν.");
+        assert_eq!(clean_greek_text("[[Ἀναστὰς (Anastas)"), "Ἀναστὰς");
+        assert_eq!(clean_greek_text("ἀμήν.¶]] (amēn)"), "ἀμήν.");
     }
 
     #[test]
@@ -625,6 +790,15 @@ mod tests {
         assert_eq!(
             extract_strongs_number("{H0430G}"),
             Some("H0430".to_string())
+        );
+        // Root is a particle: take the braced tag, not the prefix or suffix
+        assert_eq!(
+            extract_strongs_number("H9002/{H9005}/H9033"),
+            Some("H9005".to_string())
+        );
+        assert_eq!(
+            extract_strongs_number(r"H9004/{H9005}\H9014"),
+            Some("H9005".to_string())
         );
     }
 

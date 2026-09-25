@@ -12,7 +12,7 @@ use crate::models::ExtendedBible;
 use crate::paths;
 
 /// Bump when ExtendedBible layout or parser semantics change.
-pub const CACHE_VERSION: u32 = 3;
+pub const CACHE_VERSION: u32 = 4;
 
 const CACHE_FILE: &str = "extended_bible_v1.bin";
 const META_FILE: &str = "extended_bible_v1.meta.json";

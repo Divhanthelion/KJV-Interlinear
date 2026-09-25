@@ -177,7 +177,8 @@ impl Settings {
     pub fn load() -> Self {
         if let Some(path) = Self::settings_path()
             && let Ok(contents) = fs::read_to_string(&path) {
-                match serde_json::from_str(&contents) {
+                // Editors such as Notepad may add a UTF-8 BOM, which serde_json rejects
+                match serde_json::from_str(contents.trim_start_matches('\u{FEFF}')) {
                     Ok(settings) => return settings,
                     Err(e) => {
                         eprintln!(

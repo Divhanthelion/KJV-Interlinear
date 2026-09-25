@@ -19,10 +19,10 @@ bincode = "1.3"
 name = "KJV Interlinear"
 identifier = "com.divhanthelion.kjv-interlinear"
 icon = ["icon.png"]
-resources = ["new_testament", "old_testament", "data", "icon.png", "NOTICE", "LICENSE", "licenses"]
+resources = ["new_testament", "old_testament", "data", "icon.png", "NOTICE", "LICENSE"]
 short_description = "KJV Bible reader with Hebrew/Greek interlinear"
 long_description = """
 A native KJV Bible study app with Hebrew and Greek interlinear text,
 Strong's concordance, lexicon lookups, bookmarks, and themes.
-KJV text from Project Gutenberg; original-language data from STEP Bible.
+KJV text: the 1769 standard text (public domain); original-language data from STEP Bible.
 """
