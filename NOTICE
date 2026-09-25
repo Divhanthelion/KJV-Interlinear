@@ -5,16 +5,17 @@ This product includes software licensed under the MIT License (see LICENSE).
 Third-party data included with this product remains under its own terms:
 
 ---------------------------------------------------------------------------
-1. King James Version text (Project Gutenberg)
+1. King James Version text (1769 standard text)
 ---------------------------------------------------------------------------
-Source: Project Gutenberg eBook #10 — The King James Version of the Bible
-https://www.gutenberg.org/
+Source: "King James Version + Apocrypha" (eng-kjv), the standardized text of
+1769, courtesy of the CrossWire Bible Society and eBible.org
+https://ebible.org/find/details.php?id=eng-kjv
+License: Public Domain (outside the United Kingdom, where the King James
+Version is subject to Crown letters patent)
 
-The KJV text files under old_testament/ and new_testament/ are distributed
-under the Project Gutenberg License. See licenses/PROJECT_GUTENBERG.txt.
-
-Project Gutenberg is a registered trademark. This app is not affiliated with
-or endorsed by the Project Gutenberg Literary Archive Foundation.
+The files under old_testament/ and new_testament/ contain the 66 canonical
+books only, one verse per line. The italic markers for supplied words and the
+paragraph marks were removed, and Psalm superscriptions are stored as verse 0.
 
 ---------------------------------------------------------------------------
 2. Original language texts and lexicons (STEP Bible)
@@ -32,6 +33,12 @@ These files are included under data/ (TAHOT_*.txt, TAGNT_*.txt, TBESH.txt,
 TBESG.txt). They have not been modified from the upstream STEP Bible texts
 beyond filename normalization for packaging.
 
+When loading, the app reads these files as follows (the files themselves are
+unchanged): words are keyed to KJV versification; Greek words follow the
+Textus Receptus behind the KJV (TR readings from the variants column replace
+differing words, and words absent from the TR are omitted); Hebrew words
+reconstructed from the LXX ("X") and empty Ketiv placeholders are omitted.
+
 ---------------------------------------------------------------------------
 3. Red-letter words of Christ (kjvstudy.org)
 ---------------------------------------------------------------------------
@@ -39,6 +46,7 @@ File: data/red_letter_verses.json
 Source: https://github.com/kennethreitz/kjvstudy.org
 Author: Kenneth Reitz
 License: ISC License
+Modified: corrected a typo in the Luke 19:42 quote ("thines eyes" -> "thine eyes").
 
 ISC License
 

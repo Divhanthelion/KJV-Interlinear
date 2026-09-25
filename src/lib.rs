@@ -5,5 +5,6 @@ pub mod parsing;
 pub mod paths;
 pub mod red_letter;
 pub mod settings;
+pub mod text;
 pub mod theme;
 pub mod ui;

@@ -13,6 +13,9 @@ pub struct Verse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Chapter {
     pub number: u32,
+    /// Psalm superscription (title printed above verse 1), stored as verse 0
+    #[serde(default)]
+    pub superscription: Option<Verse>,
     pub verses: Vec<Verse>,
 }
 
@@ -56,60 +59,38 @@ impl Bible {
             .and_then(|book| book.chapters.iter().find(|c| c.number == chapter))
     }
 
-    /// Search for text across all verses (case-insensitive)
-    pub fn search(&self, query: &str) -> Vec<&Verse> {
-        let query = query.to_lowercase();
-        let mut results = Vec::new();
-
-        for book in &self.books {
-            for chapter in &book.chapters {
-                for verse in &chapter.verses {
-                    if verse.text.to_lowercase().contains(&query) {
-                        results.push(verse);
-                    }
-                }
-            }
+    /// Search verses in the given books (case-, apostrophe- and æ-insensitive)
+    fn search_books<'a>(
+        &'a self,
+        query: &str,
+        include: impl Fn(&Book) -> bool,
+    ) -> Vec<&'a Verse> {
+        let query = fold_for_search(query);
+        if query.is_empty() {
+            return Vec::new();
         }
+        self.books
+            .iter()
+            .filter(|b| include(b))
+            .flat_map(|b| b.chapters.iter())
+            .flat_map(|c| c.superscription.iter().chain(c.verses.iter()))
+            .filter(|v| fold_for_search(&v.text).contains(&query))
+            .collect()
+    }
 
-        results
+    /// Search for text across all verses
+    pub fn search(&self, query: &str) -> Vec<&Verse> {
+        self.search_books(query, |_| true)
     }
 
     /// Search within a specific book only
     pub fn search_in_book(&self, query: &str, book_name: &str) -> Vec<&Verse> {
-        let query = query.to_lowercase();
-        let mut results = Vec::new();
-
-        if let Some(book) = self.books.iter().find(|b| b.name == book_name) {
-            for chapter in &book.chapters {
-                for verse in &chapter.verses {
-                    if verse.text.to_lowercase().contains(&query) {
-                        results.push(verse);
-                    }
-                }
-            }
-        }
-
-        results
+        self.search_books(query, |b| b.name == book_name)
     }
 
     /// Search within a specific testament only
     pub fn search_in_testament(&self, query: &str, testament: &Testament) -> Vec<&Verse> {
-        let query = query.to_lowercase();
-        let mut results = Vec::new();
-
-        for book in &self.books {
-            if &book.testament == testament {
-                for chapter in &book.chapters {
-                    for verse in &chapter.verses {
-                        if verse.text.to_lowercase().contains(&query) {
-                            results.push(verse);
-                        }
-                    }
-                }
-            }
-        }
-
-        results
+        self.search_books(query, |b| &b.testament == testament)
     }
 
     /// Get list of book names
@@ -175,6 +156,22 @@ impl SearchScope {
 // ============================================================================
 
 use std::collections::HashMap;
+
+use crate::text::fold_for_search;
+
+/// Canonical Strong's key as used in the STEP data: letter + 4 digits ("h430" -> "H0430").
+/// A bare number is treated as Hebrew.
+pub fn normalize_strongs(input: &str) -> Option<String> {
+    let s = input.trim().to_uppercase();
+    let (letter, rest) = match s.chars().next()? {
+        c @ ('H' | 'G') => (c, &s[1..]),
+        c if c.is_ascii_digit() => ('H', s.as_str()),
+        _ => return None,
+    };
+    let digits: String = rest.chars().take_while(|c| c.is_ascii_digit()).collect();
+    let n: u32 = digits.parse().ok()?;
+    Some(format!("{}{:04}", letter, n))
+}
 
 /// Generate common Strong's key spellings (padded / unpadded).
 fn strongs_key_variants(strongs: &str) -> Vec<String> {
@@ -287,28 +284,31 @@ impl StrongsIndex {
         }
     }
 
-    /// Add a Strong's number occurrence
+    /// Record that a Strong's number occurs in a verse (each verse listed once)
     pub fn add_occurrence(&mut self, strongs: &str, verse_ref: VerseRef) {
         let map = if strongs.starts_with('H') {
             &mut self.hebrew
         } else {
             &mut self.greek
         };
-        map.entry(strongs.to_string())
-            .or_insert_with(Vec::new)
-            .push(verse_ref);
-    }
-
-    /// Get all verse references for a Strong's number
-    pub fn get_occurrences(&self, strongs: &str) -> Option<&Vec<VerseRef>> {
-        if strongs.starts_with('H') {
-            self.hebrew.get(strongs)
-        } else {
-            self.greek.get(strongs)
+        let refs = map.entry(strongs.to_string()).or_default();
+        // Words arrive in text order, so a repeat within a verse is always the last entry
+        if refs.last() != Some(&verse_ref) {
+            refs.push(verse_ref);
         }
     }
 
-    /// Get the count of occurrences for a Strong's number
+    /// Get all verses containing a Strong's number ("H430", "h0430" and "H0430" are equivalent)
+    pub fn get_occurrences(&self, strongs: &str) -> Option<&Vec<VerseRef>> {
+        let key = normalize_strongs(strongs)?;
+        if key.starts_with('H') {
+            self.hebrew.get(&key)
+        } else {
+            self.greek.get(&key)
+        }
+    }
+
+    /// Number of verses containing a Strong's number
     pub fn occurrence_count(&self, strongs: &str) -> usize {
         self.get_occurrences(strongs).map(|v| v.len()).unwrap_or(0)
     }
@@ -376,6 +376,9 @@ impl ExtendedBible {
         if let Some(entry) = map.get(strongs) {
             return Some(entry);
         }
+        if let Some(entry) = normalize_strongs(strongs).and_then(|k| map.get(&k)) {
+            return Some(entry);
+        }
 
         // Try zero-padded / unpadded variants (G27 ↔ G0027)
         for variant in strongs_key_variants(strongs) {
@@ -430,6 +433,7 @@ mod tests {
                     testament: Testament::Old,
                     chapters: vec![Chapter {
                         number: 1,
+                        superscription: None,
                         verses: vec![
                             Verse {
                                 book: "Genesis".to_string(),
@@ -452,6 +456,7 @@ mod tests {
                     testament: Testament::New,
                     chapters: vec![Chapter {
                         number: 1,
+                        superscription: None,
                         verses: vec![Verse {
                             book: "John".to_string(),
                             chapter: 1,
@@ -529,6 +534,32 @@ mod tests {
         let bible = create_test_bible();
         assert_eq!(bible.chapter_count("Genesis"), Some(1));
         assert_eq!(bible.chapter_count("NotABook"), None);
+    }
+
+    #[test]
+    fn test_search_folds_apostrophes() {
+        let mut bible = create_test_bible();
+        bible.books[0].chapters[0].verses[0].text = "Moses\u{2019} seat".to_string();
+        assert_eq!(bible.search("moses' seat").len(), 1);
+    }
+
+    #[test]
+    fn test_normalize_strongs() {
+        assert_eq!(normalize_strongs("H430").as_deref(), Some("H0430"));
+        assert_eq!(normalize_strongs(" g2316 ").as_deref(), Some("G2316"));
+        assert_eq!(normalize_strongs("430").as_deref(), Some("H0430"));
+        assert_eq!(normalize_strongs("H0430G").as_deref(), Some("H0430"));
+        assert_eq!(normalize_strongs("X12"), None);
+        assert_eq!(normalize_strongs("H"), None);
+    }
+
+    #[test]
+    fn test_strongs_index_lists_each_verse_once() {
+        let mut idx = StrongsIndex::new();
+        idx.add_occurrence("H0430", VerseRef::new("Genesis", 1, 1));
+        idx.add_occurrence("H0430", VerseRef::new("Genesis", 1, 1));
+        idx.add_occurrence("H0430", VerseRef::new("Genesis", 1, 2));
+        assert_eq!(idx.occurrence_count("H430"), 2);
     }
 
     #[test]

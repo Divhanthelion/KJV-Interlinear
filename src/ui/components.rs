@@ -1,3 +1,4 @@
+use eframe::egui::text::{LayoutJob, TextFormat};
 use eframe::egui::{self, Color32, CornerRadius, RichText, Stroke, Ui, Vec2};
 
 use crate::models::{
@@ -5,9 +6,44 @@ use crate::models::{
 };
 use crate::red_letter::{red_letter_segments, RedLetterIndex};
 use crate::settings::{DisplayMode, FontSize, Settings};
+use crate::text::{find_folded_ranges, hebrew_visual, visual_bidi};
 use crate::theme::Theme;
 
-/// Render KJV verse text with optional search highlight and red-letter spans.
+/// What the user clicked while a verse was drawn.
+#[derive(Debug, Default)]
+pub struct VerseInteraction {
+    /// The verse number was clicked (select this verse)
+    pub selected: bool,
+    /// A Strong's number was clicked in interlinear view
+    pub strongs: Option<String>,
+}
+
+/// Byte ranges of the verse spoken by Christ, when red letter is on.
+fn red_ranges(
+    verse: &Verse,
+    settings: &Settings,
+    red_letter: Option<&RedLetterIndex>,
+) -> Vec<(usize, usize)> {
+    if !settings.red_letter {
+        return Vec::new();
+    }
+    let Some(spec) = red_letter.and_then(|idx| idx.get(&verse.book, verse.chapter, verse.verse_number))
+    else {
+        return Vec::new();
+    };
+    let base = verse.text.as_ptr() as usize;
+    red_letter_segments(&verse.text, spec)
+        .into_iter()
+        .filter(|(_, is_red)| *is_red)
+        .map(|(segment, _)| {
+            let start = segment.as_ptr() as usize - base;
+            (start, start + segment.len())
+        })
+        .collect()
+}
+
+/// KJV verse text as one wrapping label, coloured for red letter and search matches.
+/// Verse 0 is a Psalm superscription and is set in italics.
 fn render_kjv_text(
     ui: &mut Ui,
     verse: &Verse,
@@ -17,38 +53,60 @@ fn render_kjv_text(
     red_letter: Option<&RedLetterIndex>,
 ) {
     let font_size = settings.font_size.pixels();
+    let text = verse.text.as_str();
+    let is_title = verse.verse_number == 0;
 
-    if !highlight_terms.is_empty() {
-        render_highlighted_text(ui, &verse.text, highlight_terms, font_size, theme);
-    } else if settings.red_letter {
-        if let Some(spec) =
-            red_letter.and_then(|idx| idx.get(&verse.book, verse.chapter, verse.verse_number))
-        {
-            for (segment, is_red) in red_letter_segments(&verse.text, spec) {
-                if segment.is_empty() {
-                    continue;
-                }
-                let color = if is_red {
-                    theme.red_letter
-                } else {
-                    theme.text_primary
-                };
-                ui.label(RichText::new(segment).size(font_size).color(color));
-            }
-        } else {
-            ui.label(
-                RichText::new(&verse.text)
-                    .size(font_size)
-                    .color(theme.text_primary),
-            );
-        }
-    } else {
-        ui.label(
-            RichText::new(&verse.text)
-                .size(font_size)
-                .color(theme.text_primary),
-        );
+    let red = red_ranges(verse, settings, red_letter);
+    let highlights: Vec<(usize, usize)> = highlight_terms
+        .iter()
+        .flat_map(|term| find_folded_ranges(text, term))
+        .collect();
+
+    let mut cuts = vec![0, text.len()];
+    for &(start, end) in red.iter().chain(&highlights) {
+        cuts.push(start);
+        cuts.push(end);
     }
+    cuts.sort_unstable();
+    cuts.dedup();
+    let covers = |ranges: &[(usize, usize)], at: usize| ranges.iter().any(|&(s, e)| s <= at && at < e);
+
+    let mut job = LayoutJob::default();
+    for span in cuts.windows(2) {
+        let (start, end) = (span[0], span[1]);
+        let color = if is_title {
+            theme.text_secondary
+        } else if covers(&red, start) {
+            theme.red_letter
+        } else {
+            theme.text_primary
+        };
+        let mut format = TextFormat::simple(egui::FontId::proportional(font_size), color);
+        format.italics = is_title;
+        if covers(&highlights, start) {
+            format.background = theme.highlight_bg;
+        }
+        job.append(&text[start..end], 0.0, format);
+    }
+    ui.label(job);
+}
+
+/// Clickable verse number; returns true when clicked. Titles (verse 0) have none.
+fn verse_number(ui: &mut Ui, verse: &Verse, settings: &Settings, theme: &Theme, trailing: &str) -> bool {
+    if !settings.show_verse_numbers || verse.verse_number == 0 {
+        return false;
+    }
+    ui.add(
+        egui::Label::new(
+            RichText::new(format!("{}{}", verse.verse_number, trailing))
+                .size(settings.font_size.pixels())
+                .strong()
+                .color(theme.verse_number),
+        )
+        .sense(egui::Sense::click()),
+    )
+    .on_hover_text("Select this verse")
+    .clicked()
 }
 
 /// Render a verse with theme colors and accurate red-letter spans.
@@ -59,92 +117,72 @@ pub fn render_verse(
     highlight_terms: &[String],
     theme: &Theme,
     red_letter: Option<&RedLetterIndex>,
-) {
-    let font_size = settings.font_size.pixels();
-
+) -> VerseInteraction {
+    let mut interaction = VerseInteraction::default();
     ui.horizontal_wrapped(|ui: &mut Ui| {
-        if settings.show_verse_numbers {
-            ui.label(
-                RichText::new(format!("{} ", verse.verse_number))
-                    .size(font_size)
-                    .strong()
-                    .color(theme.verse_number),
-            );
-        }
-
+        interaction.selected = verse_number(ui, verse, settings, theme, " ");
         render_kjv_text(ui, verse, highlight_terms, theme, settings, red_letter);
     });
 
     ui.add_space(10.0);
+    interaction
 }
 
-/// Render text with search term highlighting
-fn render_highlighted_text(
+/// Original-language words as a wrapping paragraph (right-to-left for Hebrew),
+/// led by the verse number when `verse` is given. Returns true if the number was clicked.
+pub fn render_original_paragraph(
     ui: &mut Ui,
-    text: &str,
-    terms: &[String],
-    font_size: f32,
+    orig: &InterlinearVerse,
+    verse: Option<&Verse>,
+    settings: &Settings,
     theme: &Theme,
-) {
-    // Offsets from to_lowercase() are only safe to use on the original when ASCII.
-    if !text.is_ascii() || !terms.iter().all(|t| t.is_ascii()) {
-        ui.label(
-            RichText::new(text)
-                .size(font_size)
-                .color(theme.text_primary),
-        );
-        return;
+) -> bool {
+    let font_size = settings.font_size.pixels();
+    let is_hebrew = matches!(
+        orig.language,
+        OriginalLanguage::Hebrew | OriginalLanguage::Aramaic
+    );
+    let (color, offset) = if is_hebrew {
+        (theme.hebrew_text, settings.hebrew_font_size_offset)
+    } else {
+        (theme.greek_text, settings.greek_font_size_offset)
+    };
+
+    let words: Vec<&str> = orig
+        .original_words
+        .iter()
+        .map(|w| w.original_text.trim())
+        .filter(|t| !t.is_empty())
+        .collect();
+    if words.is_empty() {
+        ui.label(RichText::new("(empty)").italics().color(theme.text_muted));
+        return false;
     }
 
-    let text_lower = text.to_lowercase();
-
-    let mut highlights: Vec<(usize, usize)> = Vec::new();
-    for term in terms {
-        let term_lower = term.to_lowercase();
-        let mut start = 0;
-        while let Some(pos) = text_lower[start..].find(&term_lower) {
-            let abs_pos = start + pos;
-            highlights.push((abs_pos, abs_pos + term.len()));
-            start = abs_pos + 1;
+    // egui has no bidi support: lay words out right-to-left and reverse each
+    // word's letters so Hebrew reads correctly on screen.
+    let layout = if is_hebrew {
+        egui::Layout::right_to_left(egui::Align::TOP).with_main_wrap(true)
+    } else {
+        egui::Layout::left_to_right(egui::Align::TOP).with_main_wrap(true)
+    };
+    let mut selected = false;
+    ui.with_layout(layout, |ui| {
+        ui.spacing_mut().item_spacing.x = font_size * 0.3;
+        if let Some(verse) = verse {
+            // First item: at the right edge for Hebrew, the left edge for Greek
+            selected = verse_number(ui, verse, settings, theme, "");
         }
-    }
-
-    highlights.sort_by_key(|h| h.0);
-
-    if highlights.is_empty() {
-        ui.label(
-            RichText::new(text)
-                .size(font_size)
-                .color(theme.text_primary),
-        );
-        return;
-    }
-
-    let mut last_end = 0;
-    for (start, end) in highlights {
-        if start > last_end {
-            ui.label(
-                RichText::new(&text[last_end..start])
-                    .size(font_size)
-                    .color(theme.text_primary),
-            );
+        for word in words {
+            let shown = if is_hebrew {
+                hebrew_visual(word)
+            } else {
+                word.to_string()
+            };
+            ui.label(RichText::new(shown).size(font_size + offset).color(color));
         }
-        if start >= last_end {
-            ui.label(
-                RichText::new(&text[start..end])
-                    .size(font_size)
-                    .background_color(theme.highlight_bg),
-            );
-            last_end = end;
-        }
-    }
-    if last_end < text.len() {
-        ui.label(
-            RichText::new(&text[last_end..])
-                .size(font_size)
-                .color(theme.text_primary),
-        );
-    }
+    });
+    selected
 }
 
 /// Render a bookmark item - returns (clicked, delete)
@@ -264,7 +302,7 @@ pub fn nav_button(ui: &mut Ui, icon: &str, tooltip: &str, theme: &Theme) -> bool
             15,
         ))
         .stroke(Stroke::new(
-            1.0,
+            1.0_f32,
             Color32::from_rgba_unmultiplied(
                 theme.primary.r(),
                 theme.primary.g(),
@@ -307,9 +345,6 @@ pub fn action_button(ui: &mut Ui, icon: &str, tooltip: &str, active: bool, theme
 /// `id_source` salts egui widget IDs so sidebar and window instances don't clash.
 pub fn settings_panel(ui: &mut Ui, settings: &mut Settings, id_source: &str) -> bool {
     let mut changed = false;
-
-    ui.heading("Settings");
-    ui.separator();
 
     // Dark mode toggle
     ui.horizontal(|ui: &mut Ui| {
@@ -387,8 +422,9 @@ pub fn settings_panel(ui: &mut Ui, settings: &mut Settings, id_source: &str) -> 
     ui.add_space(6.0);
     ui.label(
         RichText::new(
-            "KJV text: Project Gutenberg. Original languages: STEP Bible (CC BY 4.0). \
-Red-letter map: Kenneth Reitz / kjvstudy.org (ISC). App code: MIT. See NOTICE.",
+            "KJV text: 1769 standard text via CrossWire / eBible.org (public domain). \
+Original languages: STEP Bible (CC BY 4.0). Red-letter map: Kenneth Reitz / kjvstudy.org (ISC). \
+App code: MIT. See NOTICE.",
         )
         .size(11.0)
         .color(Color32::GRAY),
@@ -410,17 +446,15 @@ pub fn render_verse_parallel(
     highlight_terms: &[String],
     theme: &Theme,
     red_letter: Option<&RedLetterIndex>,
-) {
+) -> VerseInteraction {
     let font_size = settings.font_size.pixels();
+    let mut interaction = VerseInteraction::default();
 
     // Shared verse number above both columns keeps rows aligned
-    if settings.show_verse_numbers {
-        ui.label(
-            RichText::new(format!("{}", verse.verse_number))
-                .size(font_size)
-                .strong()
-                .color(theme.verse_number),
-        );
+    if verse_number(ui, verse, settings, theme, "") {
+        interaction.selected = true;
+    }
+    if settings.show_verse_numbers && verse.verse_number > 0 {
         ui.add_space(2.0);
     }
 
@@ -440,55 +474,7 @@ pub fn render_verse_parallel(
             ui.set_min_width(ui.available_width());
 
             if let Some(orig) = interlinear {
-                let mut words: Vec<&OriginalWord> = orig.original_words.iter().collect();
-                words.sort_by_key(|w| w.position);
-
-                let is_hebrew = matches!(
-                    orig.language,
-                    OriginalLanguage::Hebrew | OriginalLanguage::Aramaic
-                );
-                let orig_color = if is_hebrew {
-                    theme.hebrew_text
-                } else {
-                    theme.greek_text
-                };
-                let offset = if is_hebrew {
-                    settings.hebrew_font_size_offset
-                } else {
-                    settings.greek_font_size_offset
-                };
-
-                let paragraph: String = words
-                    .iter()
-                    .map(|w| w.original_text.trim())
-                    .filter(|t| !t.is_empty())
-                    .collect::<Vec<_>>()
-                    .join(" ");
-
-                if paragraph.is_empty() {
-                    ui.label(
-                        RichText::new("(empty)")
-                            .italics()
-                            .color(theme.text_muted),
-                    );
-                } else if is_hebrew {
-                    ui.with_layout(
-                        egui::Layout::right_to_left(egui::Align::TOP).with_main_wrap(true),
-                        |ui| {
-                            ui.label(
-                                RichText::new(&paragraph)
-                                    .size(font_size + offset)
-                                    .color(orig_color),
-                            );
-                        },
-                    );
-                } else {
-                    ui.label(
-                        RichText::new(&paragraph)
-                            .size(font_size + offset)
-                            .color(orig_color),
-                    );
-                }
+                render_original_paragraph(ui, orig, None, settings, theme);
             } else {
                 ui.label(
                     RichText::new("(no original language data)")
@@ -503,8 +489,9 @@ pub fn render_verse_parallel(
     ui.add_space(6.0);
     let rect = ui.available_rect_before_wrap();
     ui.painter()
-        .hline(rect.x_range(), rect.top(), Stroke::new(1.0, theme.divider));
+        .hline(rect.x_range(), rect.top(), Stroke::new(1.0_f32, theme.divider));
     ui.add_space(10.0);
+    interaction
 }
 
 /// Render a verse in interlinear view (KJV line + aligned word columns).
@@ -515,30 +502,19 @@ pub fn render_verse_interlinear(
     settings: &Settings,
     theme: &Theme,
     red_letter: Option<&RedLetterIndex>,
-) -> Option<String> {
+) -> VerseInteraction {
     let font_size = settings.font_size.pixels();
-    let mut clicked_strongs: Option<String> = None;
+    let mut interaction = VerseInteraction::default();
 
     // Verse number + KJV English line (context for the stacks below)
     ui.horizontal_wrapped(|ui| {
-        if settings.show_verse_numbers {
-            ui.label(
-                RichText::new(format!("{} ", verse.verse_number))
-                    .size(font_size)
-                    .strong()
-                    .color(theme.verse_number),
-            );
-        }
-
+        interaction.selected = verse_number(ui, verse, settings, theme, " ");
         render_kjv_text(ui, verse, &[], theme, settings, red_letter);
     });
 
     ui.add_space(6.0);
 
     if let Some(orig) = interlinear {
-        let mut words: Vec<&OriginalWord> = orig.original_words.iter().collect();
-        words.sort_by_key(|w| w.position);
-
         let is_hebrew = matches!(
             orig.language,
             OriginalLanguage::Hebrew | OriginalLanguage::Aramaic
@@ -556,11 +532,11 @@ pub fn render_verse_interlinear(
             ui.set_max_width(wrap_width);
             ui.spacing_mut().item_spacing = egui::vec2(8.0, 10.0);
 
-            for word in words {
+            for word in &orig.original_words {
                 if let Some(strongs) =
                     render_interlinear_word_block(ui, word, settings, theme, is_hebrew)
                 {
-                    clicked_strongs = Some(strongs);
+                    interaction.strongs = Some(strongs);
                 }
             }
         });
@@ -578,23 +554,21 @@ pub fn render_verse_interlinear(
     ui.painter().hline(
         rect.x_range(),
         rect.top(),
-        Stroke::new(1.0, theme.divider),
+        Stroke::new(1.0_f32, theme.divider),
     );
     ui.add_space(10.0);
 
-    clicked_strongs
+    interaction
 }
 
+/// Tidy a STEP gloss for display: "and/ <obj.>" -> "and (obj.)".
+/// Slashes mirror Hebrew prefix/suffix boundaries; <..> marks words best left untranslated.
 fn format_gloss(gloss: &str) -> String {
-    let trimmed = gloss.trim();
-    if trimmed.starts_with('<') && trimmed.ends_with('>') && trimmed.len() > 2 {
-        format!("({})", &trimmed[1..trimmed.len() - 1])
-    } else {
-        trimmed.to_string()
-    }
+    let text = gloss.replace('/', " ").replace('<', "(").replace('>', ")");
+    text.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
-fn format_strongs_display(strongs: &str) -> String {
+pub fn format_strongs_display(strongs: &str) -> String {
     // G0027 → G27 for display (keep leading letter)
     if let Some(letter) = strongs.chars().next()
         && (letter == 'H' || letter == 'G') {
@@ -641,19 +615,30 @@ fn render_interlinear_word_block(
             settings.greek_font_size_offset
         };
 
-    // Column width from the widest visible line
+    // Column width from the widest visible line, measured at the size it is drawn
+    let strongs_label = word
+        .strongs_number
+        .as_deref()
+        .map(format_strongs_display)
+        .unwrap_or_default();
+    let morph = word.morphology.as_deref().unwrap_or("");
+    let lines = [
+        (orig_display, orig_size.max(base_size), true),
+        (word.transliteration.as_str(), (base_size - 2.0).max(10.0), settings.show_transliteration),
+        (strongs_label.as_str(), (base_size - 3.0).max(9.0), settings.show_strongs_inline),
+        (morph, (base_size - 4.0).max(8.0), settings.show_morphology),
+        (gloss.as_str(), (base_size - 1.0).max(11.0), true),
+    ];
     let mut col_width = 56.0_f32;
-    for text in [
-        orig_display,
-        word.transliteration.as_str(),
-        gloss.as_str(),
-        word.strongs_number.as_deref().unwrap_or(""),
-    ] {
-        if text.is_empty() {
-            continue;
+    for (text, size, shown) in lines {
+        if shown && !text.is_empty() {
+            let width = ui.fonts(|f| {
+                f.layout_no_wrap(text.to_string(), egui::FontId::proportional(size), Color32::WHITE)
+                    .size()
+                    .x
+            });
+            col_width = col_width.max(width + 4.0);
         }
-        let size = (text.chars().count() as f32) * (base_size * 0.55);
-        col_width = col_width.max(size).min(160.0);
     }
     // Never wider than the parent wrap row
     let max_card = (ui.available_width() - 8.0).max(56.0);
@@ -678,7 +663,7 @@ fn render_interlinear_word_block(
 
     let frame = egui::Frame::new()
         .fill(theme.bg_elevated)
-        .stroke(Stroke::new(1.0, theme.border))
+        .stroke(Stroke::new(1.0_f32, theme.border))
         .corner_radius(CornerRadius::same(6))
         .inner_margin(egui::Margin::symmetric(8, 6));
 
@@ -692,8 +677,13 @@ fn render_interlinear_word_block(
                 ui.set_min_width(col_width);
                 ui.set_max_width(col_width);
 
+                let shown = if is_hebrew {
+                    hebrew_visual(orig_display)
+                } else {
+                    orig_display.to_string()
+                };
                 ui.label(
-                    RichText::new(orig_display)
+                    RichText::new(shown)
                         .size(orig_size.max(base_size))
                         .strong()
                         .color(orig_color),
@@ -764,7 +754,7 @@ pub fn render_lexicon_popup(
 ) {
     let font_size = settings.font_size.pixels();
 
-    egui::Window::new(format!("Strong's {}", strongs_number))
+    egui::Window::new(format!("Strong's {}", format_strongs_display(strongs_number)))
         .collapsible(true)
         .resizable(true)
         .default_size([400.0, 300.0])
@@ -778,7 +768,7 @@ pub fn render_lexicon_popup(
                     Color32::from_rgb(100, 50, 150)
                 };
 
-                ui.heading(RichText::new(&entry.original_word).color(word_color));
+                ui.heading(RichText::new(visual_bidi(&entry.original_word)).color(word_color));
                 ui.label(
                     RichText::new(&entry.transliteration)
                         .italics()
@@ -789,7 +779,7 @@ pub fn render_lexicon_popup(
 
                 // Gloss
                 ui.strong("Gloss:");
-                ui.label(&entry.gloss);
+                ui.label(visual_bidi(&entry.gloss));
 
                 ui.add_space(8.0);
 
@@ -798,8 +788,13 @@ pub fn render_lexicon_popup(
                 egui::ScrollArea::vertical()
                     .max_height(220.0)
                     .show(ui, |ui| {
+                        // Definitions quote Hebrew inline; reorder it line by line
                         let definition =
-                            crate::original_languages::loader::clean_lexicon_markup(&entry.definition);
+                            crate::original_languages::loader::clean_lexicon_markup(&entry.definition)
+                                .lines()
+                                .map(visual_bidi)
+                                .collect::<Vec<_>>()
+                                .join("\n");
                         ui.label(
                             RichText::new(definition)
                                 .size(font_size - 1.0)
