@@ -44,10 +44,15 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-      # The Rust build of the Tauri CLI (the Android project calls back into it)
+      # The Rust build of the Tauri CLI (the Android project calls back into it).
+      # Prebuilt on Linux/Windows; built natively on macOS, where the prebuilt one is
+      # Intel-only and runs under Rosetta.
       - uses: taiki-e/install-action@v2
+        if: runner.os != 'macOS'
         with:
           tool: tauri-cli
+      - if: runner.os == 'macOS'
+        run: cargo tauri --version || cargo install tauri-cli --version "^2" --locked
       # macOS signing and notarization, only once the Apple account secrets exist
       # (an empty certificate variable makes the bundler fail)
       - name: Apple signing
@@ -147,10 +152,8 @@ jobs:
         with:
           targets: aarch64-apple-ios,aarch64-apple-ios-sim
       - uses: Swatinem/rust-cache@v2
-      # The Rust build of the Tauri CLI (the Android project calls back into it)
-      - uses: taiki-e/install-action@v2
-        with:
-          tool: tauri-cli
+      # Native (arm64) CLI: under Rosetta, Homebrew can't install xcodegen for the Xcode project
+      - run: cargo tauri --version || cargo install tauri-cli --version "^2" --locked
       - name: Generate the Xcode project if it isn't committed yet
         working-directory: app
         run: test -d gen/apple || cargo tauri ios init --ci
