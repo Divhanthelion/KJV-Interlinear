@@ -381,6 +381,25 @@ function onKeydown(event) {
   }
   if (mod || event.altKey) return;
 
+  // Arrow keys move between the options of a radio group (view switch, segmented controls)
+  const group = event.target.closest?.("[role=radiogroup]");
+  if (group && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) {
+    event.preventDefault();
+    const radios = [...group.querySelectorAll("[role=radio]")];
+    const i = radios.indexOf(event.target);
+    const step = event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 1;
+    const next = radios[(i + step + radios.length) % radios.length];
+    const label = next.textContent;
+    const groupLabel = group.getAttribute("aria-label");
+    next.click();
+    // The click may re-render the group; focus the option with the same label
+    const visibleGroup = [...document.querySelectorAll(`[role=radiogroup][aria-label="${groupLabel}"]`)]
+      .find((g) => g.offsetParent !== null);
+    const again = [...(visibleGroup?.querySelectorAll("[role=radio]") ?? [])].find((r) => r.textContent === label);
+    (again ?? next).focus();
+    return;
+  }
+
   if (event.key === "ArrowLeft" && !event.target.closest?.("[role=radiogroup]")) {
     event.preventDefault();
     step(-1);

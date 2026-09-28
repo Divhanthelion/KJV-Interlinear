@@ -115,10 +115,10 @@ export function renderChapter(container, chapter, { view, selectedVerse, nav }) 
       "nav",
       { class: "chapter-nav", "aria-label": "Chapters" },
       nav.prevLabel
-        ? h("button", { type: "button", onclick: nav.onPrev }, icon("chevronLeft"), nav.prevLabel)
+        ? h("button", { type: "button", onclick: nav.onPrev, title: nav.prevLabel }, icon("chevronLeft"), h("span", { class: "nav-label" }, nav.prevLabel))
         : h("span"),
       nav.nextLabel
-        ? h("button", { type: "button", onclick: nav.onNext }, nav.nextLabel, icon("chevronRight"))
+        ? h("button", { type: "button", onclick: nav.onNext, title: nav.nextLabel }, h("span", { class: "nav-label" }, nav.nextLabel), icon("chevronRight"))
         : h("span"),
     ),
   );

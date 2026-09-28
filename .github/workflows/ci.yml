@@ -26,6 +26,24 @@ jobs:
       - name: Parse every module
         run: for f in ui/js/*.js; do node --check "$f" || exit 1; done
 
+  ui-smoke:
+    name: UI smoke test (headless Chrome)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: cargo build --release -p kjv-devserver
+      - name: Start the preview server
+        run: |
+          ./target/release/kjv-devserver 1420 > devserver.log 2>&1 &
+          for i in $(seq 60); do curl -sf -X POST localhost:1420/api/books -d '{}' > /dev/null && exit 0; sleep 1; done
+          cat devserver.log; exit 1
+      - run: node tests/ui/smoke.mjs google-chrome
+
   build:
     name: Build app (${{ matrix.os }})
     strategy:

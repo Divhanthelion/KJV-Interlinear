@@ -22,7 +22,7 @@
   --border: #e3dfd6;
   --text: #1e1c19;
   --text-2: #57534c;
-  --muted: #7a756c;
+  --muted: #6f6a61;
   --accent: #2f5da8;
   --accent-soft: rgb(47 93 168 / 0.12);
   --on-accent: #ffffff;
@@ -105,7 +105,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
-  font-size: calc(100% * var(--text-scale));
+  font-size: 100%;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -259,6 +259,8 @@ svg.icon { width: 1.25rem; height: 1.25rem; flex: none; }
 
 .reader {
   grid-area: reader;
+  /* The text-size setting scales the reading pane, not the controls */
+  font-size: calc(1rem * var(--text-scale));
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 24px max(16px, var(--safe-right)) calc(120px + var(--safe-bottom)) max(16px, var(--safe-left));
@@ -275,10 +277,12 @@ svg.icon { width: 1.25rem; height: 1.25rem; flex: none; }
 
 .chapter-heading {
   font-family: var(--font-text);
-  font-size: 2rem;
+  /* Large text on a narrow screen: never wider than the viewport */
+  font-size: min(2em, 11vw);
   font-weight: 600;
   letter-spacing: -0.01em;
   margin: 0 0 1.25rem;
+  overflow-wrap: anywhere;
 }
 
 .status {
@@ -302,7 +306,7 @@ svg.icon { width: 1.25rem; height: 1.25rem; flex: none; }
 
 .verse-text {
   font-family: var(--font-text);
-  font-size: 1.1875rem;
+  font-size: 1.1875em;
   line-height: 1.65;
   margin: 0;
 }
@@ -336,7 +340,7 @@ mark.hit {
 /* Original text as a paragraph */
 .orig-text {
   margin: 0;
-  font-size: calc(1.1875rem * var(--orig-scale));
+  font-size: calc(1.1875em * var(--orig-scale));
   line-height: 1.9;
 }
 .orig-text:lang(he), .orig-text:lang(arc) { color: var(--hebrew); }
@@ -392,23 +396,23 @@ mark.hit {
 }
 .word:hover { border-color: var(--accent); }
 .word-orig {
-  font-size: calc(1.25rem * var(--orig-scale));
+  font-size: calc(1.25em * var(--orig-scale));
   line-height: 1.5;
   white-space: nowrap;
 }
 .word-orig:lang(he), .word-orig:lang(arc) { color: var(--hebrew); }
-.word-orig:lang(grc) { color: var(--greek); font-size: calc(1.125rem * var(--orig-scale)); }
-.word-translit { font-size: 0.8125rem; font-style: italic; color: var(--muted); white-space: nowrap; }
-.word-strongs { font-size: 0.75rem; color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
-.word-morph { font-size: 0.6875rem; color: var(--muted); font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
-.word-gloss { font-size: 0.9375rem; color: var(--text); white-space: nowrap; }
+.word-orig:lang(grc) { color: var(--greek); font-size: calc(1.125em * var(--orig-scale)); }
+.word-translit { font-size: 0.8125em; font-style: italic; color: var(--muted); white-space: nowrap; }
+.word-strongs { font-size: 0.75em; color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.word-morph { font-size: 0.6875em; color: var(--muted); font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; }
+.word-gloss { font-size: 0.9375em; color: var(--text); white-space: nowrap; }
 .app[data-translit="false"] .word-translit,
 .app[data-strongs="false"] .word-strongs,
 .app[data-morph="false"] .word-morph { display: none; }
 
 .no-original {
   margin: 8px 0 0;
-  font-size: 0.875rem;
+  font-size: 0.875em;
   font-style: italic;
   color: var(--muted);
 }
@@ -539,13 +543,13 @@ input[type="search"]:focus, input[type="text"]:focus, select:focus {
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-family: var(--font-text);
-  font-size: 1rem;
+  font-size: calc(1rem * var(--text-scale));
   line-height: 1.5;
   color: var(--text);
 }
 
 .lexicon-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
-.lexicon-word { font-size: 2rem; line-height: 1.4; }
+.lexicon-word { font-size: calc(2rem * var(--text-scale)); line-height: 1.4; }
 .lexicon-word:lang(he) { color: var(--hebrew); }
 .lexicon-word:lang(grc) { color: var(--greek); }
 .lexicon-translit { font-style: italic; color: var(--muted); }
@@ -553,7 +557,7 @@ input[type="search"]:focus, input[type="text"]:focus, select:focus {
 .lexicon-gloss { font-size: 1.125rem; font-weight: 600; margin: 0 0 12px; }
 .lexicon-def {
   white-space: pre-line;
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--text-scale));
   line-height: 1.6;
   color: var(--text-2);
   margin: 0 0 20px;
@@ -841,3 +845,18 @@ input[type="search"]:focus, input[type="text"]:focus, select:focus {
 
 /* Thin, theme-colored scrollbars */
 .reader, .panel-body, .picker-body { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+/* A card never outgrows the screen: long glosses and words wrap only when they must */
+.word { max-width: 100%; }
+.word-orig, .word-translit, .word-gloss { white-space: normal; overflow-wrap: anywhere; }
+
+/* Header never overflows: a long reference truncates, the view switch shrinks */
+.topbar-row { min-width: 0; }
+.ref-button { min-width: 0; overflow: hidden; }
+.ref-button #ref-label { overflow: hidden; text-overflow: ellipsis; }
+.view-switch { min-width: 0; }
+.view-switch button { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.chapter-nav button { min-width: 0; max-width: calc(50% - 6px); }
+.nav-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* A single word wider than a small screen at the largest sizes breaks rather than overflowing */
+.verse-text, .orig-text { overflow-wrap: anywhere; }
