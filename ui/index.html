@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>KJV Interlinear</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <div class="app" id="app" data-panel-open="false">
+    <header class="topbar">
+      <div class="topbar-row">
+        <button class="icon-btn" id="prev-chapter" type="button" aria-label="Previous chapter" title="Previous chapter (←)"></button>
+        <button class="ref-button" id="ref-button" type="button" aria-haspopup="dialog" aria-controls="picker">
+          <span id="ref-label">Loading…</span>
+          <span class="ref-caret" aria-hidden="true"></span>
+        </button>
+        <button class="icon-btn" id="next-chapter" type="button" aria-label="Next chapter" title="Next chapter (→)"></button>
+        <div class="view-switch desktop-only" role="radiogroup" aria-label="View" data-view-switch></div>
+        <div class="topbar-spacer"></div>
+        <nav class="desktop-tools desktop-only" aria-label="Tools">
+          <button class="icon-btn" type="button" data-open-panel="search" aria-label="Search" title="Search (Ctrl+F)"></button>
+          <button class="icon-btn" type="button" data-open-panel="saved" aria-label="Bookmarks and history" title="Bookmarks and history"></button>
+          <button class="icon-btn" type="button" data-open-panel="settings" aria-label="Settings" title="Settings"></button>
+        </nav>
+      </div>
+      <div class="topbar-row mobile-only">
+        <div class="view-switch" role="radiogroup" aria-label="View" data-view-switch></div>
+      </div>
+    </header>
+
+    <main class="reader" id="reader" tabindex="-1" aria-live="polite" aria-busy="true">
+      <p class="status">Loading…</p>
+    </main>
+
+    <aside class="panel" id="panel" aria-labelledby="panel-title" hidden>
+      <div class="panel-header">
+        <h2 class="panel-title" id="panel-title"></h2>
+        <button class="icon-btn" id="panel-close" type="button" aria-label="Close"></button>
+      </div>
+      <div class="panel-body" id="panel-body"></div>
+    </aside>
+
+    <div class="verse-actions" id="verse-actions" role="toolbar" aria-label="Verse actions" hidden>
+      <span class="verse-actions-ref" id="verse-actions-ref"></span>
+      <button type="button" class="action" data-action="bookmark"></button>
+      <button type="button" class="action" data-action="copy-verse"></button>
+      <button type="button" class="action" data-action="copy-chapter"></button>
+      <button type="button" class="icon-btn" data-action="deselect" aria-label="Close verse actions"></button>
+    </div>
+
+    <nav class="tabbar mobile-only" aria-label="Sections">
+      <button type="button" class="tab" data-tab="read"></button>
+      <button type="button" class="tab" data-tab="search"></button>
+      <button type="button" class="tab" data-tab="saved"></button>
+      <button type="button" class="tab" data-tab="settings"></button>
+    </nav>
+
+    <dialog class="picker" id="picker" aria-labelledby="picker-title">
+      <div class="picker-header">
+        <button class="icon-btn" id="picker-back" type="button" aria-label="Back to books" hidden></button>
+        <h2 class="picker-title" id="picker-title">Books</h2>
+        <button class="icon-btn" id="picker-close" type="button" aria-label="Close"></button>
+      </div>
+      <div class="picker-body" id="picker-body"></div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+</body>
+</html>

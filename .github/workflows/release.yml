@@ -1,0 +1,150 @@
+name: Release
+# Push a tag like v0.2.0 (or run by hand) to build every platform.
+# Desktop installers go to a *draft* GitHub Release for review before publishing.
+on:
+  push:
+    tags: ["v*"]
+    # TEMPORARY: build every platform while the cross-platform branch is in progress
+    branches: [feat/cross-platform]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  desktop:
+    name: Desktop (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS universal
+            os: macos-latest
+            args: --target universal-apple-darwin
+            targets: aarch64-apple-darwin,x86_64-apple-darwin
+          - name: Linux
+            os: ubuntu-22.04
+            args: ""
+            targets: ""
+          - name: Windows
+            os: windows-latest
+            args: ""
+            targets: ""
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.targets }}
+      - uses: Swatinem/rust-cache@v2
+      - name: Linux webview libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install -g @tauri-apps/cli@^2
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # macOS signing and notarization: used when these secrets exist
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          projectPath: app
+          tauriScript: tauri
+          args: ${{ matrix.args }}
+          tagName: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+          releaseName: KJV Interlinear ${{ github.ref_name }}
+          releaseBody: See the assets below for Windows, macOS, and Linux installers.
+          releaseDraft: true
+          prerelease: false
+      - name: Keep installers as workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ runner.os }}
+          path: |
+            target/release/bundle/**/*.msi
+            target/release/bundle/**/*.exe
+            target/release/bundle/**/*.deb
+            target/release/bundle/**/*.rpm
+            target/release/bundle/**/*.AppImage
+            target/universal-apple-darwin/release/bundle/**/*.dmg
+          if-no-files-found: ignore
+
+  android:
+    name: Android
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_KEY_BASE64: ${{ secrets.ANDROID_KEY_BASE64 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: android-actions/setup-android@v3
+      - name: Android NDK
+        run: |
+          sdkmanager --install "ndk;27.2.12479018"
+          echo "NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.2.12479018" >> "$GITHUB_ENV"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install -g @tauri-apps/cli@^2
+      - name: Generate the Android project if it isn't committed yet
+        working-directory: app
+        run: test -d gen/android || tauri android init --ci
+      - name: Signing key (when the upload-key secrets exist)
+        if: env.ANDROID_KEY_BASE64 != ''
+        env:
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        working-directory: app/gen/android
+        run: |
+          echo "$ANDROID_KEY_BASE64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          {
+            echo "storeFile=$RUNNER_TEMP/upload.jks"
+            echo "keyAlias=$ANDROID_KEY_ALIAS"
+            echo "password=$ANDROID_KEY_PASSWORD"
+          } > keystore.properties
+      - name: Build app bundle and APK
+        working-directory: app
+        run: tauri android build --aab --apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: |
+            app/gen/android/app/build/outputs/bundle/**/*.aab
+            app/gen/android/app/build/outputs/apk/**/*.apk
+
+  ios:
+    name: iOS (compile check)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios,aarch64-apple-ios-sim
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install -g @tauri-apps/cli@^2
+      - name: Generate the Xcode project if it isn't committed yet
+        working-directory: app
+        run: test -d gen/apple || tauri ios init --ci
+      # Signed App Store builds need an Apple Developer account (APPLE_DEVELOPMENT_TEAM)
+      - name: Build the Rust library for iOS
+        working-directory: app
+        run: cargo build --release --lib --target aarch64-apple-ios

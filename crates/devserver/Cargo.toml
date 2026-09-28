@@ -1,0 +1,12 @@
+[package]
+name = "kjv-devserver"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "Serves the UI and the app commands over HTTP for previewing in a browser"
+publish = false
+
+[dependencies]
+kjv-core = { path = "../core" }
+serde_json = "1.0"
+tiny_http = "0.12"

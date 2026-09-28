@@ -1,0 +1,44 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "KJV Interlinear",
+  "mainBinaryName": "kjv-interlinear",
+  "version": "0.2.0",
+  "identifier": "io.github.divhanthelion.kjvinterlinear",
+  "build": {
+    "frontendDist": "../ui"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "KJV Interlinear",
+        "width": 1200,
+        "height": 820,
+        "minWidth": 360,
+        "minHeight": 480,
+        "dragDropEnabled": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src ipc: http://ipc.localhost",
+      "freezePrototype": true
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "publisher": "Divhanthelion",
+    "copyright": "Copyright © 2025-2026 Divhanthelion. KJV text public domain; Hebrew/Greek data © STEP Bible, CC BY 4.0.",
+    "category": "Education",
+    "shortDescription": "KJV Bible with Hebrew and Greek interlinear",
+    "longDescription": "Read the King James Version with the Hebrew and Greek behind every verse: word-by-word interlinear with transliteration, Strong's numbers, grammar, and lexicon, following the Textus Receptus the KJV was translated from.",
+    "licenseFile": "../LICENSE"
+  }
+}

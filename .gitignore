@@ -14,3 +14,6 @@ __pycache__/
 *.pyc
 target/
 dist/
+
+# Tauri generates these on every build
+app/gen/schemas/
