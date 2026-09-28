@@ -1,0 +1,74 @@
+name: Device screenshots
+# Runs the app in an Android emulator and an iOS Simulator and uploads screenshots,
+# to check the real phone web engines (Android WebView, iOS WebKit).
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/cross-platform]
+
+jobs:
+  android:
+    name: Android emulator
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enable KVM for the emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Android NDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;27.2.12479018" > /dev/null
+          echo "NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-linux-android
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: tauri-cli
+      - name: Generate the Android project if it isn't committed yet
+        working-directory: app
+        run: test -d gen/android || cargo tauri android init --ci
+      - name: Debug APK for the emulator
+        working-directory: app
+        run: cargo tauri android build --debug --apk --target x86_64
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_7
+          disable-animations: true
+          script: bash .github/scripts/android-screens.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screens-android
+          path: screens/android
+
+  ios:
+    name: iOS Simulator
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios-sim
+      - uses: Swatinem/rust-cache@v2
+      # Native (arm64) CLI: the Xcode build phase calls back into it
+      - run: cargo tauri --version || cargo install tauri-cli --version "^2" --locked
+      - name: Generate the Xcode project if it isn't committed yet
+        working-directory: app
+        run: test -d gen/apple || cargo tauri ios init --ci
+      - run: bash .github/scripts/ios-screens.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screens-ios
+          path: screens/ios
