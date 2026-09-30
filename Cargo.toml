@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/core", "crates/devserver", "app"]
+members = ["crates/core", "crates/ai", "crates/devserver", "app"]
 
 [profile.release]
 lto = "thin"
@@ -11,4 +11,18 @@ codegen-units = 1
 opt-level = 3
 
 [profile.release.build-override]
+opt-level = 3
+
+# Unpacking the embedded Bible data is slow unoptimized; keep debug builds (and the
+# phone emulator runs in CI, which use them) starting in about a second
+[profile.dev.package.ruzstd]
+opt-level = 3
+
+[profile.dev.package.bincode]
+opt-level = 3
+
+[profile.dev.package.serde]
+opt-level = 3
+
+[profile.dev.package.kjv-core]
 opt-level = 3

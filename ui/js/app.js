@@ -2,6 +2,7 @@
 
 import { call, copyText } from "./backend.js";
 import { h, icon, replace } from "./dom.js";
+import { chatScopeChanged, renderChat } from "./chat.js";
 import { renderSaved, renderSearch, renderSettings, renderStrongs } from "./panels.js";
 import { closePicker, initPicker, isPickerOpen, openPicker } from "./picker.js";
 import { markSelected, renderChapter } from "./reader.js";
@@ -19,6 +20,7 @@ const PANELS = {
   search: { title: "Search", render: renderSearch },
   strongs: { title: "Strong's & Lexicon", render: renderStrongs },
   saved: { title: "Saved", render: renderSaved },
+  chat: { title: "Ask", render: renderChat },
   settings: { title: "Settings", render: renderSettings },
 };
 
@@ -110,6 +112,7 @@ async function goTo(book, chapter, verse = 0, opts = {}) {
   reader.setAttribute("aria-busy", "false");
 
   if (opts.fromPanel && !desktop.matches) closePanel();
+  chatScopeChanged(ctx);
 }
 
 function render() {
@@ -176,6 +179,7 @@ function selectVerse(n) {
     prefs.save(settings);
   }
   updateActions();
+  chatScopeChanged(ctx);
 }
 
 function updateActions() {
@@ -235,14 +239,16 @@ function toast(message) {
 
 // ------------------------------------------------------------------ panels
 
-function openPanel(name, { focus = true } = {}) {
+function openPanel(name, { focus = true, section = null } = {}) {
   const wasOpen = state.panel !== null;
   state.panel = name;
+  panel.dataset.panel = name;
   panel.hidden = false;
   app.dataset.panelOpen = "true";
   $("panel-title").textContent = PANELS[name].title;
   const input = PANELS[name].render(panelBody, ctx);
   panelBody.scrollTop = 0;
+  if (section) panelBody.querySelector(`[data-section="${section}"]`)?.scrollIntoView({ block: "start" });
   syncNavState();
   // On phones the panel covers the reader: let the system back gesture close it
   if (!desktop.matches && !wasOpen) history.pushState({ panel: name }, "");
@@ -356,6 +362,12 @@ function onKeydown(event) {
     openPanel("search");
     return;
   }
+  if (mod && key === "j") {
+    event.preventDefault();
+    if (state.panel === "chat") closePanel();
+    else openPanel("chat");
+    return;
+  }
   if (isPickerOpen() || isTyping(event.target)) {
     if (event.key === "Escape" && isTyping(event.target) && state.panel) {
       event.preventDefault();
@@ -441,7 +453,7 @@ function wireStaticControls() {
   $("panel-close").append(icon("close"));
   $("panel-close").addEventListener("click", () => closePanel());
 
-  const toolIcons = { search: "search", saved: "bookmark", settings: "settings" };
+  const toolIcons = { chat: "chat", search: "search", saved: "bookmark", settings: "settings" };
   for (const b of document.querySelectorAll("[data-open-panel]")) {
     b.append(icon(toolIcons[b.dataset.openPanel]));
     b.addEventListener("click", () =>
@@ -449,7 +461,7 @@ function wireStaticControls() {
     );
   }
 
-  const tabs = { read: ["book", "Read"], search: ["search", "Search"], saved: ["bookmark", "Saved"], settings: ["settings", "Settings"] };
+  const tabs = { read: ["book", "Read"], search: ["search", "Search"], chat: ["chat", "Ask"], saved: ["bookmark", "Saved"], settings: ["settings", "Settings"] };
   for (const tab of document.querySelectorAll("[data-tab]")) {
     const [iconName, label] = tabs[tab.dataset.tab];
     tab.append(icon(iconName), h("span", {}, label));

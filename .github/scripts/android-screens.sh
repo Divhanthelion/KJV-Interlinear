@@ -14,14 +14,30 @@ adb shell settings put global window_animation_scale 0
 adb shell settings put global transition_animation_scale 0
 adb shell settings put global animator_duration_scale 0
 
+# Wait (up to a minute) until the page has drawn a chapter, then let it settle
+wait_loaded() {
+  for i in $(seq 30); do
+    if adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1 &&
+       adb shell cat /sdcard/ui.xml | grep -q 'text="[0-9]' &&
+       ! adb shell cat /sdcard/ui.xml | grep -q 'Loading'; then
+      sleep 2
+      return 0
+    fi
+    sleep 2
+  done
+  echo "the app did not finish loading"
+}
+
 launch() {
   adb shell am force-stop "$PKG"
   adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 > /dev/null
-  sleep "${1:-8}"
+  wait_loaded
+  # A slow emulator can raise "isn't responding" dialogs for other apps
+  adb shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS > /dev/null 2>&1 || true
 }
 
 # First launch: the app saves its settings once the first chapter loads
-launch 20
+launch
 adb exec-out screencap -p > "$OUT/01-first-launch.png"
 settings=$(adb shell run-as "$PKG" find . -name settings.json | tr -d '\r' | head -1)
 echo "Settings file: ${settings:-not found}"
@@ -34,7 +50,7 @@ shot() { # name json
   # One quoted string, so the redirect runs inside run-as (as the app, in its data dir)
   echo "$2" | adb shell "run-as $PKG sh -c 'cat > $settings'"
   adb shell "run-as $PKG cat $settings" | grep -q "\"view\"" || { echo "settings write failed"; exit 1; }
-  launch 6
+  launch
   adb exec-out screencap -p > "$OUT/$1.png"
 }
 

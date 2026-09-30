@@ -14,8 +14,9 @@ A King James Bible with the Hebrew and Greek behind every verse, for Windows, ma
 - **Strong's & lexicon**: tap any word for its Hebrew (TBESH) or Greek (TBESG) dictionary entry and every verse that uses it
 - **Red letter**: the words of Christ, taken span-for-span from the 1769 edition's own markup
 - **Search**: live search across all books, one book, or one testament, with matches highlighted; `Caesar's` finds `Cæsar’s`
+- **Study assistant (optional)**: ask about a verse, a chapter, chosen books, or the whole Bible with the text attached, using your own AI: a local server (vLLM, Ollama, LM Studio, llama.cpp) or your API key for Anthropic, OpenAI, Gemini, DeepSeek, OpenRouter, or Groq. It shows whether the passage fits the model's context window, links every reference it cites, and keeps keys in the system keychain
 - **Bookmarks & history**, **light and dark themes**, adjustable text size and font
-- **Private**: fully offline, no accounts, no tracking ([privacy policy](PRIVACY.md))
+- **Private**: fully offline, no accounts, no tracking; the assistant talks only to the provider you set up ([privacy policy](PRIVACY.md))
 
 <br clear="right">
 

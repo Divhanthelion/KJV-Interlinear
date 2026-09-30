@@ -2,6 +2,7 @@
 // over the DevTools protocol. No npm dependencies; needs Node 22+ (global WebSocket).
 //
 //   cargo run --release -p kjv-devserver &      # serves http://localhost:1420
+//   python3 tests/ui/mock_llm.py &              # a stand-in model at :8765
 //   node tests/ui/smoke.mjs [path-to-chrome]
 
 import { spawn } from "node:child_process";
@@ -197,6 +198,74 @@ await test("Phone: tab bar and full-screen panels", "book=John&chapter=3", { wid
   $('[data-tab="read"]').click();
   await until(() => $("#panel").hidden, "panel closed");
 `);
+
+// ------------------------------------------------------------------ AI assistant
+
+const MOCK = { id: "mock", preset: "local", name: "Test server", kind: "openai", baseUrl: "http://127.0.0.1:8765/v1", contextWindow: null };
+async function aiSettings(ai) {
+  // Leave the app first: it saves its own settings as it unloads
+  await send("Page.navigate", { url: "about:blank" });
+  await sleep(300);
+  await fetch(`${BASE}/api/settings_save`, {
+    method: "POST",
+    body: JSON.stringify({ ai: { providers: [MOCK], providerId: "mock", model: null, scope: "chapter", books: [], consent: {}, calibration: {}, ...ai } }),
+  });
+}
+const CHAT_HELPERS = `
+  const ask = async (text) => {
+    const input = await until(() => $("#chat-input"), "chat input");
+    input.value = text;
+    input.dispatchEvent(new Event("input"));
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+  };
+  const lastAnswer = () => $$(".msg.assistant").at(-1);
+  const finished = () => $(".chat-send").getAttribute("aria-label") === "Send" && lastAnswer();
+`;
+
+await aiSettings({});
+await test("Chat asks consent, then streams an answer about the attached chapter", "book=John&chapter=11&verse=35", {}, `${CHAT_HELPERS}
+  $('[data-open-panel="chat"]').click();
+  await until(() => $(".chat-model")?.value.endsWith("mock-model"), "model list");
+  assert($(".chat-scope-label").textContent === "Attached: John 11", "chapter attached: " + $(".chat-scope-label").textContent);
+  assert($(".chat-scope-size").textContent === "≈2k of 32k tokens", "budget: " + $(".chat-scope-size").textContent);
+  await ask("Why did Jesus weep?");
+  await until(() => !$(".chat-consent").hidden, "consent prompt");
+  assert($(".chat-consent").textContent.includes("127.0.0.1:8765"), "consent names the server");
+  $$(".chat-consent button").find((b) => b.textContent === "Allow and send").click();
+  await until(() => finished() && lastAnswer().querySelector(".msg-tools"), "answer");
+  const body = lastAnswer().querySelector(".msg-body");
+  assert(body.querySelector("strong")?.textContent === "John 11", "the model got John 11: " + body.textContent);
+  assert(body.textContent.includes("(57 verses)"), "all 57 verses sent");
+  assert(lastAnswer().querySelector(".msg-reasoning summary").textContent === "Reasoning", "reasoning kept apart");
+  const refs = $$(".msg.assistant .ref-link").map((b) => b.textContent);
+  assert(refs.join() === "John 11:35,Romans 12:15", "references linked: " + refs);
+  refs && $$(".msg.assistant .ref-link")[1].click();
+  await until(() => $("#ref-label").textContent === "Romans 12" && $("#v15")?.getAttribute("aria-current") === "true", "reference opens the verse");
+  await until(() => $(".chat-scope-label").textContent === "Attached: Romans 12", "scope follows the reader");
+`);
+
+await aiSettings({ consent: { mock: true } });
+await test("Chat: Stop, errors, and a scope too large for the model", "book=John&chapter=11", {}, `${CHAT_HELPERS}
+  $('[data-open-panel="chat"]').click();
+  await until(() => $(".chat-model")?.value.endsWith("mock-model"), "model list");
+  await ask("slow answer please");
+  await until(() => $(".chat-send").getAttribute("aria-label") === "Stop", "streaming");
+  await wait(1200);
+  $(".chat-send").click();
+  await until(() => finished() && lastAnswer().querySelector(".chat-note")?.textContent === "Stopped.", "stopped");
+  await ask("please fail");
+  await until(() => finished() && lastAnswer().querySelector(".chat-error"), "error shown");
+  assert(lastAnswer().querySelector(".chat-error").textContent === "The service had an error (500): mock failure", "error text");
+  $(".chat-scope-button").click();
+  $$(".chat-scope [role=radio]").find((b) => b.textContent === "Whole Bible").click();
+  await until(() => $(".chat-scope-size.over"), "over budget");
+  assert($(".chat-scope-size").textContent === "≈1.12M of 32k tokens", "whole Bible size: " + $(".chat-scope-size").textContent);
+  const before = $$(".msg").length;
+  await ask("anything");
+  await wait(400);
+  assert($$(".msg").length === before, "nothing sent when it can't fit");
+`);
+await aiSettings({ providers: [], providerId: null });
 
 // Longest chapter, longest glosses, longest book name; smallest and largest text
 const overflowCases = [["Psalms", 119], ["Deuteronomy", 25], ["Second%20Thessalonians", 3]];

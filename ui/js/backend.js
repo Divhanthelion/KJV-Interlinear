@@ -41,3 +41,63 @@ export function openExternal(url) {
     window.open(url, "_blank", "noopener");
   }
 }
+
+// ------------------------------------------------------------------ AI assistant
+// API keys go to the Rust side and stay there (the system keychain); the page only
+// learns whether one is stored.
+
+export function aiModels(args) {
+  return tauri ? tauri.core.invoke("ai_models", { args }) : post("ai_models", args);
+}
+
+export function aiKeyStatus(providerId) {
+  return tauri ? tauri.core.invoke("ai_key_status", { providerId }) : post("ai_key_status", { providerId });
+}
+
+/** Save (or with an empty key, remove) a provider's key. Resolves to "keychain" or "file". */
+export function aiKeySet(providerId, key) {
+  return tauri ? tauri.core.invoke("ai_key_set", { providerId, key }) : post("ai_key_set", { providerId, key });
+}
+
+export function aiKeyDelete(providerId) {
+  return tauri ? tauri.core.invoke("ai_key_delete", { providerId }) : post("ai_key_delete", { providerId });
+}
+
+export function aiCancel(id) {
+  return tauri ? tauri.core.invoke("ai_cancel", { id }) : post("ai_cancel", { id });
+}
+
+/**
+ * Ask for an answer. `onEvent` receives {type: "text" | "reasoning" | "usage" | "done"}
+ * as they arrive; the promise settles when the answer ends (or rejects with the error).
+ */
+export async function aiChat(id, args, onEvent) {
+  if (tauri) {
+    const channel = new tauri.core.Channel();
+    channel.onmessage = onEvent;
+    return tauri.core.invoke("ai_chat", { id, args, onEvent: channel });
+  }
+  const response = await fetch("/api/ai_chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, args }),
+  });
+  if (!response.ok) throw new Error(await response.text());
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    buffer += decoder.decode(value ?? new Uint8Array(), { stream: !done });
+    let newline;
+    while ((newline = buffer.indexOf("\n")) >= 0) {
+      const line = buffer.slice(0, newline).trim();
+      buffer = buffer.slice(newline + 1);
+      if (!line) continue;
+      const event = JSON.parse(line);
+      if (event.type === "error") throw new Error(event.message);
+      onEvent(event);
+    }
+    if (done) return;
+  }
+}

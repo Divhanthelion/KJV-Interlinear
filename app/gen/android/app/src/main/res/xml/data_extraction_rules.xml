@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12 and later: settings and bookmarks back up and transfer; AI keys don't
+     (they are encrypted with a device-only Keystore key). -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="root" path="secrets.json" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="root" path="secrets.json" />
+    </device-transfer>
+</data-extraction-rules>

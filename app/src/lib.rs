@@ -1,14 +1,23 @@
 //! KJV Interlinear app: serves the web UI in `../ui` and answers its commands.
 
+mod secrets;
+
+use std::collections::HashMap;
 use std::fs;
 use std::io::Read;
 use std::path::PathBuf;
-use std::sync::OnceLock;
+use std::sync::{Arc, Mutex, OnceLock};
 
 use kjv_core::bundle::DataBundle;
+use kjv_ai::assistant::{AskArgs, ModelsArgs};
+use kjv_ai::{Event, ModelInfo};
 use kjv_core::dispatch::dispatch;
 use serde_json::Value;
-use tauri::{AppHandle, Manager};
+use tauri::ipc::Channel;
+use tauri::{AppHandle, Manager, State};
+use tokio::sync::Notify;
+
+use secrets::{KeyStatus, Secrets, Storage};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_opener::OpenerExt;
 
@@ -67,6 +76,76 @@ fn copy_to_clipboard(app: AppHandle, text: String) -> Result<(), String> {
     app.clipboard().write_text(text).map_err(|e| e.to_string())
 }
 
+// ---------------------------------------------------------------- AI chat
+
+struct Ai {
+    client: kjv_ai::Client,
+    secrets: Secrets,
+    /// Replies in progress, by the id the page gave them, so Stop can end them
+    running: Mutex<HashMap<String, Arc<Notify>>>,
+}
+
+fn api_key(ai: &Ai, provider_id: &str) -> Result<Option<String>, String> {
+    ai.secrets.get(provider_id)
+}
+
+/// The models a provider offers (with context sizes where it reports them).
+#[tauri::command]
+async fn ai_models(ai: State<'_, Ai>, args: ModelsArgs) -> Result<Vec<ModelInfo>, String> {
+    let key = api_key(&ai, &args.provider_id)?;
+    kjv_ai::models(&ai.client, &args.endpoint(key)).await
+}
+
+/// Stream an answer to `on_event`. Resolves when the answer ends or Stop is pressed.
+#[tauri::command]
+async fn ai_chat(ai: State<'_, Ai>, id: String, args: AskArgs, on_event: Channel<Event>) -> Result<(), String> {
+    let stop = Arc::new(Notify::new());
+    ai.running.lock().unwrap().insert(id.clone(), stop.clone());
+    let result = async {
+        let key = api_key(&ai, &args.provider_id)?;
+        let request = tauri::async_runtime::spawn_blocking(move || kjv_ai::assistant::prepare(data(), &args, key))
+            .await
+            .map_err(|e| e.to_string())??;
+        let send = |event: Event| {
+            let _ = on_event.send(event);
+        };
+        tokio::select! {
+            result = kjv_ai::chat(&ai.client, &request, send) => result,
+            // Dropping the request closes the connection, so the server stops generating
+            () = stop.notified() => {
+                let _ = on_event.send(Event::Done { reason: Some("cancelled".into()) });
+                Ok(())
+            }
+        }
+    }
+    .await;
+    ai.running.lock().unwrap().remove(&id);
+    result
+}
+
+#[tauri::command]
+fn ai_cancel(ai: State<'_, Ai>, id: String) {
+    if let Some(stop) = ai.running.lock().unwrap().get(&id) {
+        // Stored as a permit if the reply hasn't started waiting yet
+        stop.notify_one();
+    }
+}
+
+#[tauri::command]
+fn ai_key_status(ai: State<'_, Ai>, provider_id: String) -> Result<KeyStatus, String> {
+    ai.secrets.status(&provider_id)
+}
+
+#[tauri::command]
+fn ai_key_set(ai: State<'_, Ai>, provider_id: String, key: String) -> Result<Storage, String> {
+    ai.secrets.set(&provider_id, &key)
+}
+
+#[tauri::command]
+fn ai_key_delete(ai: State<'_, Ai>, provider_id: String) -> Result<(), String> {
+    ai.secrets.delete(&provider_id)
+}
+
 /// Sites the About section links to; nothing else can be opened.
 const ALLOWED_LINKS: [&str; 3] = [
     "https://ebible.org/",
@@ -87,11 +166,13 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_opener::init())
-        .setup(|_| {
+        .setup(|app| {
             // Decompress the data while the window loads
             std::thread::spawn(|| {
                 data();
             });
+            let dir = app.path().app_config_dir()?;
+            app.manage(Ai { client: kjv_ai::client(), secrets: Secrets::new(dir), running: Mutex::default() });
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -99,7 +180,13 @@ pub fn run() {
             settings_load,
             settings_save,
             copy_to_clipboard,
-            open_url
+            open_url,
+            ai_models,
+            ai_chat,
+            ai_cancel,
+            ai_key_status,
+            ai_key_set,
+            ai_key_delete
         ])
         .run(tauri::generate_context!())
         .expect("error while running KJV Interlinear");

@@ -26,9 +26,23 @@ export const DEFAULTS = {
   position: { book: "Genesis", chapter: 1, verse: 1 },
   bookmarks: [], // { book, chapter, verse, created }
   history: [], // { book, chapter, time }
+  ai: {
+    providers: [], // { id, preset, name, kind, baseUrl, contextWindow }
+    providerId: null,
+    model: null,
+    scope: "chapter", // none | verse | chapter | book | books | bible
+    books: [], // for scope "books"
+    original: false, // attach Hebrew/Greek words
+    // Providers the reader agreed to send questions to (keyed by id)
+    consent: {},
+    // Real ÷ estimated prompt tokens, per "provider|model", learned from replies
+    calibration: {},
+  },
 };
 
 const HISTORY_LIMIT = 50;
+export const AI_KINDS = ["openai", "anthropic", "gemini"];
+export const AI_SCOPES = ["none", "verse", "chapter", "book", "books", "bible"];
 
 const isObject = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 const isRef = (v) =>
@@ -36,6 +50,38 @@ const isRef = (v) =>
 
 function oneOf(value, allowed, fallback) {
   return allowed.includes(value) ? value : fallback;
+}
+
+function sanitizeAi(raw) {
+  const a = isObject(raw) ? raw : {};
+  const text = (v, max = 500) => (typeof v === "string" ? v.slice(0, max) : "");
+  const providers = (Array.isArray(a.providers) ? a.providers : [])
+    .filter((p) => isObject(p) && typeof p.id === "string" && p.id && AI_KINDS.includes(p.kind))
+    .map((p) => ({
+      id: p.id,
+      preset: text(p.preset, 40) || "custom",
+      name: text(p.name, 80) || "AI provider",
+      kind: p.kind,
+      baseUrl: text(p.baseUrl),
+      contextWindow: Number.isInteger(p.contextWindow) && p.contextWindow > 0 ? p.contextWindow : null,
+    }));
+  const ids = new Set(providers.map((p) => p.id));
+  const flags = (v) =>
+    Object.fromEntries(Object.entries(isObject(v) ? v : {}).filter(([k, x]) => ids.has(k) && x === true));
+  return {
+    providers,
+    providerId: ids.has(a.providerId) ? a.providerId : (providers[0]?.id ?? null),
+    model: typeof a.model === "string" && a.model ? a.model.slice(0, 200) : null,
+    scope: oneOf(a.scope, AI_SCOPES, DEFAULTS.ai.scope),
+    books: (Array.isArray(a.books) ? a.books : []).filter((b) => typeof b === "string").slice(0, 66),
+    original: typeof a.original === "boolean" ? a.original : false,
+    consent: flags(a.consent),
+    calibration: Object.fromEntries(
+      Object.entries(isObject(a.calibration) ? a.calibration : {})
+        .filter(([, v]) => Number.isFinite(v) && v > 0.3 && v < 4)
+        .slice(0, 100),
+    ),
+  };
 }
 
 /** Merge saved settings over the defaults, dropping anything malformed. */
@@ -73,6 +119,7 @@ export function sanitize(raw) {
       .filter(isRef)
       .slice(0, HISTORY_LIMIT)
       .map((h) => ({ book: h.book, chapter: h.chapter, time: Number.isFinite(h.time) ? h.time : Date.now() })),
+    ai: sanitizeAi(s.ai),
   };
 }
 

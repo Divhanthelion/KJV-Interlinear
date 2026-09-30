@@ -2,6 +2,7 @@
 
 import { call, openExternal } from "./backend.js";
 import { h, icon, plural, replace, timeAgo } from "./dom.js";
+import { renderAiSettings } from "./chat.js";
 import { ORIG_SCALES, TEXT_SCALES } from "./settings.js";
 
 /**
@@ -392,6 +393,8 @@ export function renderSettings(body, ctx) {
     switchRow("Transliteration", null, s.translit, (v) => set((x) => { x.translit = v; })),
     switchRow("Strong's numbers", null, s.strongs, (v) => set((x) => { x.strongs = v; })),
     switchRow("Grammar codes", "Morphology under each word", s.morph, (v) => set((x) => { x.morph = v; })),
+    h("h3", { class: "section-title", "data-section": "ai" }, "AI assistant"),
+    renderAiSettings(ctx),
     h("h3", { class: "section-title" }, "About"),
     h(
       "div",
@@ -401,7 +404,7 @@ export function renderSettings(body, ctx) {
       h("p", {}, "Hebrew, Greek, and lexicons: ", link("STEP Bible", "https://www.stepbible.org/"), " data (TAHOT, TAGNT, TBESH, TBESG), CC BY 4.0. The Greek follows the Textus Receptus the KJV was translated from."),
       h("p", {}, "Words of Christ: the red-letter markup of the same 1769 edition."),
       h("p", {}, "Fonts: Noto Sans and Noto Sans Hebrew (SIL Open Font License)."),
-      h("p", {}, "This app collects no data. Your settings and bookmarks stay on this device."),
+      h("p", {}, "This app collects no data. Your settings and bookmarks stay on this device. If you set up an AI provider, your questions and the passages you attach go only to that provider."),
     ),
   );
 }

@@ -6,6 +6,7 @@ use serde_json::{Value, json};
 
 use crate::api::{self, ChapterOptions, Scope};
 use crate::bundle::DataBundle;
+use crate::context;
 
 /// Most search results sent at once; the total count is always exact.
 pub const SEARCH_LIMIT: usize = 500;
@@ -29,6 +30,13 @@ struct SearchArgs {
 #[derive(Deserialize)]
 struct StrongsArgs {
     query: String,
+}
+
+#[derive(Deserialize)]
+struct ContextArgs {
+    scope: context::Scope,
+    #[serde(default)]
+    options: context::ContextOptions,
 }
 
 #[derive(Deserialize)]
@@ -75,6 +83,10 @@ pub fn dispatch(data: &DataBundle, name: &str, args: Value) -> Result<Value, Str
             };
             text.map(|t| json!(t))
                 .ok_or_else(|| format!("no text for {} {}", a.book, a.chapter))
+        }
+        "context_size" => {
+            let a: ContextArgs = parse(name, args)?;
+            to_json(context::size(data, &a.scope, &a.options)?)
         }
         _ => Err(format!("unknown command {:?}", name)),
     }
