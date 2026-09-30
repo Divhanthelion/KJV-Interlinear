@@ -31,7 +31,9 @@ if [ -z "$settings" ]; then
 fi
 
 shot() { # name json
-  echo "$2" | adb shell run-as "$PKG" sh -c "cat > '$settings'"
+  # One quoted string, so the redirect runs inside run-as (as the app, in its data dir)
+  echo "$2" | adb shell "run-as $PKG sh -c 'cat > $settings'"
+  adb shell "run-as $PKG cat $settings" | grep -q "\"view\"" || { echo "settings write failed"; exit 1; }
   launch 6
   adb exec-out screencap -p > "$OUT/$1.png"
 }

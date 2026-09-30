@@ -485,7 +485,27 @@ function wireStaticControls() {
   window.addEventListener("pagehide", persist);
 }
 
+// Android draws the page under the system bars but its WebView reports no
+// safe-area insets, so MainActivity.kt passes them in (CSS pixels).
+function syncAndroidInsets() {
+  let insets;
+  try {
+    insets = JSON.parse(window.AndroidInsets.get());
+  } catch {
+    return;
+  }
+  for (const side of ["top", "right", "bottom", "left"]) {
+    const px = Number(insets[side]);
+    if (Number.isFinite(px)) document.documentElement.style.setProperty(`--native-inset-${side}`, `${px}px`);
+  }
+}
+
 async function start() {
+  if (window.AndroidInsets) {
+    syncAndroidInsets();
+    window.addEventListener("androidinsets", syncAndroidInsets);
+    window.addEventListener("resize", syncAndroidInsets);
+  }
   wireStaticControls();
   try {
     const [loaded, books, version] = await Promise.all([

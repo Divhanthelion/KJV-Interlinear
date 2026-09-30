@@ -7,22 +7,18 @@ BUNDLE=io.github.divhanthelion.kjvinterlinear
 OUT=screens/ios
 mkdir -p "$OUT"
 
-project=$(find app/gen/apple -maxdepth 1 -name '*.xcodeproj' | head -1)
-scheme=$(xcodebuild -list -project "$project" -json | python3 -c "import json,sys; print([s for s in json.load(sys.stdin)['project']['schemes'] if s.endswith('_iOS')][0])")
-echo "Project $project, scheme $scheme"
-
-xcodebuild -project "$project" -scheme "$scheme" -configuration debug \
-  -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -arch arm64 \
-  -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO build | tail -40
-app=$(find build/ios/Build/Products -name '*.app' -maxdepth 2 | head -1)
-echo "Built $app"
+# Unsigned simulator build; the Tauri CLI has to drive Xcode (its build phase calls back into it)
+(cd app && cargo tauri ios build --debug --target aarch64-sim --no-sign --ci)
+app=$(find app/gen/apple/build -name '*.app' -maxdepth 3 -path '*sim*' | head -1)
+echo "Built ${app:-nothing}"
+[ -n "$app" ] || { find app/gen/apple/build -maxdepth 4; exit 1; }
 
 device=$(xcrun simctl list devices available -j | python3 -c "
 import json,sys
 d=json.load(sys.stdin)['devices']
 phones=[x for rt,xs in d.items() if 'iOS' in rt for x in xs if x['name'].startswith('iPhone') and 'Pro Max' in x['name']]
 print(phones[-1]['udid'])")
-xcrun simctl boot "$device"
+xcrun simctl boot "$device" || true
 xcrun simctl bootstatus "$device" -b
 xcrun simctl install "$device" "$app"
 
