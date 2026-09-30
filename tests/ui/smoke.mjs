@@ -87,7 +87,8 @@ const HELPERS = `
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
   const assert = (cond, msg) => { if (!cond) throw new Error(msg); };
-  const visible = (el) => !!el && el.offsetParent !== null;
+  // Rendered boxes, not offsetParent (always null for position: fixed, like the tab bar)
+  const visible = (el) => !!el && el.getClientRects().length > 0;
   const viewButton = (label) => $$('[aria-label="View"] button').find((b) => visible(b) && b.textContent === label);
 `;
 

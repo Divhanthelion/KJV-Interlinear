@@ -157,7 +157,7 @@ fn platform_store() -> Option<Arc<CredentialStore>> {
 
 #[cfg(all(unix, not(any(target_os = "macos", target_os = "ios", target_os = "android"))))]
 fn platform_store() -> Option<Arc<CredentialStore>> {
-    let store = zbus_secret_service_keyring_store::Store::new().ok()?;
+    let store: Arc<CredentialStore> = zbus_secret_service_keyring_store::Store::new().ok()?;
     // A Secret Service that exists but can't store anything (locked, or blocked by a
     // sandbox) is worse than none: check it works before trusting it
     let probe = store.build(SERVICE, "__probe__", None).ok()?;
