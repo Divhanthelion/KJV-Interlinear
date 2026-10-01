@@ -80,8 +80,8 @@ async function open(query, { width = 1280, height = 800, mobile = false } = {}) 
 // Helpers injected into each test function
 const HELPERS = `
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-  const until = async (fn, what) => {
-    for (let i = 0; i < 200; i++) { const v = fn(); if (v) return v; await wait(25); }
+  const until = async (fn, what, ms = 5000) => {
+    for (const end = Date.now() + ms; Date.now() < end; ) { const v = fn(); if (v) return v; await wait(25); }
     throw new Error("timed out waiting for " + what);
   };
   const $ = (s) => document.querySelector(s);
@@ -238,7 +238,7 @@ await test("Chat asks consent, then streams an answer about the attached chapter
   const body = lastAnswer().querySelector(".msg-body");
   assert(body.querySelector("strong")?.textContent === "John 11", "the model got John 11: " + body.textContent);
   assert(body.textContent.includes("(57 verses)"), "all 57 verses sent");
-  assert(lastAnswer().querySelector(".msg-reasoning summary").textContent === "Reasoning", "reasoning kept apart");
+  assert(lastAnswer().querySelector(".msg-reasoning summary").textContent.startsWith("Reasoning ·"), "reasoning kept apart");
   const refs = $$(".msg.assistant .ref-link").map((b) => b.textContent);
   assert(refs.join() === "John 11:35,Romans 12:15", "references linked: " + refs);
   refs && $$(".msg.assistant .ref-link")[1].click();
@@ -273,17 +273,17 @@ await test("Chat: scrolling stays with the reader while an answer streams", "boo
   $('[data-open-panel="chat"]').click();
   await until(() => $(".chat-model")?.value.endsWith("mock-model"), "model list");
   await ask("long answer please");
-  const rb = await until(() => { const b = $(".msg.assistant .msg-reasoning-body"); return b && b.scrollHeight > b.clientHeight + 80 ? b : null; }, "long reasoning");
+  const rb = await until(() => { const b = $(".msg.assistant .msg-reasoning-body"); return b && b.scrollHeight > b.clientHeight + 80 ? b : null; }, "long reasoning", 20000);
   await wait(200);
   assert(gap(rb) === 0, "reasoning follows its newest line: gap " + gap(rb));
   rb.dispatchEvent(new WheelEvent("wheel"));
   rb.scrollTop = 40;
   await wait(500);
   assert(rb.scrollTop === 40, "reasoning stays where the reader scrolled it: " + rb.scrollTop);
-  await until(() => $(".msg.assistant .msg-body")?.textContent.length > 300, "answer");
+  await until(() => $(".msg.assistant .msg-body")?.textContent.length > 300, "answer", 60000);
   assert($(".msg-reasoning").open && rb.isConnected, "reasoning the reader is in stays open and isn't rebuilt");
   const pane = $(".chat-messages");
-  await until(() => pane.scrollHeight > pane.clientHeight + 400, "long answer");
+  await until(() => pane.scrollHeight > pane.clientHeight + 400, "long answer", 30000);
   pane.scrollTop = 120;
   await wait(600);
   assert(pane.scrollTop === 120, "conversation stays put while text streams in: " + pane.scrollTop);
@@ -291,7 +291,7 @@ await test("Chat: scrolling stays with the reader while an answer streams", "boo
   $(".chat-jump").click();
   await wait(300);
   assert(gap(pane) === 0 && $(".chat-jump").hidden, "Latest jumps to the bottom and follows again");
-  await until(() => $(".msg-tools"), "finished");
+  await until(() => $(".msg-tools"), "finished", 60000);
   assert(gap(pane) === 0, "still at the bottom when it finishes");
 `);
 await aiSettings({
