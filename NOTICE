@@ -40,21 +40,15 @@ differing words, and words absent from the TR are omitted); Hebrew words
 reconstructed from the LXX ("X") and empty Ketiv placeholders are omitted.
 
 ---------------------------------------------------------------------------
-3. Red-letter words of Christ (kjvstudy.org)
+3. Words of Christ (red letter)
 ---------------------------------------------------------------------------
-File: data/red_letter_verses.json
-Source: https://github.com/kennethreitz/kjvstudy.org
-Author: Kenneth Reitz
-License: ISC License
-Modified: corrected a typo in the Luke 19:42 quote ("thines eyes" -> "thine eyes").
+File: data/words_of_jesus.json
+Source: the words-of-Jesus markup (\wj) in the same 1769 KJV edition from
+CrossWire / eBible.org, USFM format (https://ebible.org/Scriptures/eng-kjv_usfm.zip)
+License: Public Domain (see section 1)
 
-ISC License
-
-Copyright (c) 2025, Kenneth Reitz
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
+Extracted as the exact spoken substrings of each verse and verified to occur
+character for character in the bundled text.
 
 ---------------------------------------------------------------------------
 4. Fonts (Noto Sans / Noto Sans Hebrew)

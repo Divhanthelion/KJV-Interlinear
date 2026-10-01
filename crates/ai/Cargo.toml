@@ -1,0 +1,18 @@
+[package]
+name = "kjv-ai"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "Streaming chat client for OpenAI-compatible, Anthropic, and Gemini APIs"
+publish = false
+
+[dependencies]
+kjv-core = { path = "../core" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+futures-util = { version = "0.3", default-features = false, features = ["std"] }
+# ring + bundled Mozilla roots: builds the same on every desktop and phone target
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls-webpki-roots", "stream", "json", "http2", "charset"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "io-util"] }

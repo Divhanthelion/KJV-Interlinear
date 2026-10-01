@@ -1,0 +1,46 @@
+[package]
+name = "kjv-interlinear"
+version = "0.2.0"
+edition = "2024"
+license = "MIT"
+description = "KJV Bible study app with Hebrew and Greek interlinear"
+repository = "https://github.com/Divhanthelion/KJV-Interlinear"
+publish = false
+
+[lib]
+# staticlib/cdylib are needed for the iOS and Android builds
+name = "kjv_interlinear_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+kjv-core = { path = "../crates/core" }
+zstd = "0.13"
+
+[dependencies]
+kjv-core = { path = "../crates/core" }
+kjv-ai = { path = "../crates/ai" }
+tauri = { version = "2", features = [] }
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-opener = "2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+ruzstd = "0.8"
+tokio = { version = "1", features = ["sync", "macros"] }
+keyring-core = "1"
+
+# API keys live in each platform's own credential store (see src/secrets.rs)
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-native-keyring-store = "1"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+apple-native-keyring-store = { version = "1", features = ["keychain"] }
+
+[target.'cfg(target_os = "ios")'.dependencies]
+apple-native-keyring-store = { version = "1", features = ["protected"] }
+
+[target.'cfg(target_os = "android")'.dependencies]
+android-native-keyring-store = "1"
+
+[target.'cfg(all(unix, not(any(target_os = "macos", target_os = "ios", target_os = "android"))))'.dependencies]
+zbus-secret-service-keyring-store = { version = "1", features = ["crypto-rust"] }

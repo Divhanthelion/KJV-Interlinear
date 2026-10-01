@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Shown when the study assistant first connects to an AI server on the reader's own network -->
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>The study assistant connects to AI servers you run on your own network, if you set one up.</string>
+</dict>
+</plist>

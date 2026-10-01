@@ -1,0 +1,161 @@
+name: Release
+# Push a tag like v0.2.0 (or run by hand) to build every platform.
+# Desktop installers go to a *draft* GitHub Release for review before publishing.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  desktop:
+    name: Desktop (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS universal
+            os: macos-latest
+            args: --target universal-apple-darwin
+            targets: aarch64-apple-darwin,x86_64-apple-darwin
+          - name: Linux
+            os: ubuntu-22.04
+            args: ""
+            targets: ""
+          - name: Windows
+            os: windows-latest
+            args: ""
+            targets: ""
+    runs-on: ${{ matrix.os }}
+    env:
+      HAS_APPLE_SIGNING: ${{ secrets.APPLE_CERTIFICATE != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.targets }}
+      - uses: Swatinem/rust-cache@v2
+      - name: Linux webview libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+      # The Rust build of the Tauri CLI (the Android project calls back into it).
+      # Prebuilt on Linux/Windows; built natively on macOS, where the prebuilt one is
+      # Intel-only and runs under Rosetta.
+      - uses: taiki-e/install-action@v2
+        if: runner.os != 'macOS'
+        with:
+          tool: tauri-cli
+      - if: runner.os == 'macOS'
+        run: cargo tauri --version || cargo install tauri-cli --version "^2" --locked
+      # macOS signing and notarization, only once the Apple account secrets exist
+      # (an empty certificate variable makes the bundler fail)
+      - name: Apple signing
+        if: runner.os == 'macOS' && env.HAS_APPLE_SIGNING == 'true'
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          for name in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_SIGNING_IDENTITY APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID; do
+            echo "$name=${!name}" >> "$GITHUB_ENV"
+          done
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: app
+          tauriScript: cargo tauri
+          args: ${{ matrix.args }}
+          tagName: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+          releaseName: KJV Interlinear ${{ github.ref_name }}
+          releaseBody: See the assets below for Windows, macOS, and Linux installers.
+          releaseDraft: true
+          prerelease: false
+      - name: Keep installers as workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ runner.os }}
+          path: |
+            target/release/bundle/**/*.msi
+            target/release/bundle/**/*.exe
+            target/release/bundle/**/*.deb
+            target/release/bundle/**/*.rpm
+            target/release/bundle/**/*.AppImage
+            target/universal-apple-darwin/release/bundle/**/*.dmg
+          if-no-files-found: ignore
+
+  android:
+    name: Android
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_KEY_BASE64: ${{ secrets.ANDROID_KEY_BASE64 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      # The runner image already has the Android SDK; add the NDK Tauri needs
+      - name: Android NDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;27.2.12479018" > /dev/null
+          echo "NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+      - uses: Swatinem/rust-cache@v2
+      # The Rust build of the Tauri CLI (the Android project calls back into it)
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: tauri-cli
+      - name: Generate the Android project if it isn't committed yet
+        working-directory: app
+        run: test -d gen/android || cargo tauri android init --ci
+      - name: Signing key (when the upload-key secrets exist)
+        if: env.ANDROID_KEY_BASE64 != ''
+        env:
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        working-directory: app/gen/android
+        run: |
+          echo "$ANDROID_KEY_BASE64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          {
+            echo "storeFile=$RUNNER_TEMP/upload.jks"
+            echo "keyAlias=$ANDROID_KEY_ALIAS"
+            echo "password=$ANDROID_KEY_PASSWORD"
+          } > keystore.properties
+      - name: Build app bundle and APK
+        working-directory: app
+        run: cargo tauri android build --aab --apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: |
+            app/gen/android/app/build/outputs/bundle/**/*.aab
+            app/gen/android/app/build/outputs/apk/**/*.apk
+
+  ios:
+    name: iOS (compile check)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios,aarch64-apple-ios-sim
+      - uses: Swatinem/rust-cache@v2
+      # Native (arm64) CLI: under Rosetta, Homebrew can't install xcodegen for the Xcode project
+      - run: cargo tauri --version || cargo install tauri-cli --version "^2" --locked
+      - name: Generate the Xcode project if it isn't committed yet
+        working-directory: app
+        run: test -d gen/apple || cargo tauri ios init --ci
+      # Signed App Store builds need an Apple Developer account (APPLE_DEVELOPMENT_TEAM)
+      - name: Build the Rust library for iOS
+        working-directory: app
+        run: cargo build --release --lib --target aarch64-apple-ios

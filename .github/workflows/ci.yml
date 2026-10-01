@@ -3,13 +3,62 @@ on:
   push:
     branches: [main, master]
   pull_request:
+
 jobs:
   test:
+    name: Data and API tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - name: Install GUI libs
-        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libxkbcommon-dev libwayland-dev libx11-dev pkg-config
-      - run: cargo test
+      # Checks every verse, original-language word, lexicon link, and red-letter span
+      - run: cargo test --release -p kjv-core
+
+  ui:
+    name: UI script syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Parse every module
+        run: for f in ui/js/*.js; do node --check "$f" || exit 1; done
+
+  ui-smoke:
+    name: UI smoke test (headless Chrome)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: cargo build --release -p kjv-devserver
+      - name: Start the preview server and a stand-in model
+        run: |
+          python3 tests/ui/mock_llm.py 8765 &
+          ./target/release/kjv-devserver 1420 > devserver.log 2>&1 &
+          for i in $(seq 60); do curl -sf -X POST localhost:1420/api/books -d '{}' > /dev/null && exit 0; sleep 1; done
+          cat devserver.log; exit 1
+      - run: node tests/ui/smoke.mjs google-chrome
+
+  build:
+    name: Build app (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Linux webview libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+      - run: cargo build -p kjv-interlinear

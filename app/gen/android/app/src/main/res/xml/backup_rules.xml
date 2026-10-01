@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 and earlier. AI keys are encrypted with a device-only Keystore key,
+     so a backup of them could never be read on another device: leave them out. -->
+<full-backup-content>
+    <exclude domain="sharedpref" path="." />
+    <exclude domain="root" path="secrets.json" />
+</full-backup-content>
