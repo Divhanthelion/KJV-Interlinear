@@ -7,6 +7,7 @@
 
 mod anthropic;
 pub mod assistant;
+pub mod conversations;
 mod gemini;
 mod openai;
 mod sse;

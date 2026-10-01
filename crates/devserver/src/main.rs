@@ -12,6 +12,7 @@ use std::sync::{Arc, Mutex};
 
 use kjv_ai::Event;
 use kjv_ai::assistant::{AskArgs, ModelsArgs};
+use kjv_ai::conversations::Conversations;
 use kjv_core::bundle::DataBundle;
 use kjv_core::dispatch::dispatch;
 use serde::Deserialize;
@@ -27,6 +28,7 @@ struct State {
     running: Arc<Mutex<HashMap<String, Arc<Notify>>>>,
     runtime: tokio::runtime::Runtime,
     client: kjv_ai::Client,
+    conversations: Conversations,
 }
 
 fn content_type(path: &Path) -> &'static str {
@@ -71,6 +73,10 @@ fn main() {
         running: Arc::default(),
         runtime: tokio::runtime::Runtime::new().expect("async runtime"),
         client: kjv_ai::client(),
+        // A fresh folder each run, like the in-memory settings
+        conversations: Conversations::new(
+            std::env::temp_dir().join(format!("kjv-devserver-conversations-{}", std::process::id())),
+        ),
     });
 
     let server = Server::http(("127.0.0.1", port)).expect("port is free");
@@ -145,6 +151,10 @@ Connection: close
             let list = state.runtime.block_on(kjv_ai::models(&state.client, &a.endpoint(key)))?;
             Ok(json!(list))
         }),
+        "conversations_list" => state.conversations.list().map(Value::from),
+        "conversation_load" => parse::<IdArgs>(args).and_then(|a| state.conversations.load(&a.id)),
+        "conversation_save" => parse::<SaveArgs>(args).and_then(|a| state.conversations.save(&a.conversation).map(|()| Value::Null)),
+        "conversation_delete" => parse::<IdArgs>(args).and_then(|a| state.conversations.delete(&a.id).map(|()| Value::Null)),
         "ai_cancel" => parse::<IdArgs>(args).map(|a| {
             if let Some(stop) = state.running.lock().unwrap().get(&a.id) {
                 stop.notify_one();
@@ -180,6 +190,11 @@ Connection: close
 #[derive(Deserialize)]
 struct IdArgs {
     id: String,
+}
+
+#[derive(Deserialize)]
+struct SaveArgs {
+    conversation: Value,
 }
 
 #[derive(Deserialize)]

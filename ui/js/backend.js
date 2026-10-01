@@ -101,3 +101,22 @@ export async function aiChat(id, args, onEvent) {
     if (done) return;
   }
 }
+
+// ------------------------------------------------------------------ saved conversations
+// Kept on this device, in the app's private folder (conversations/).
+
+export function conversationsList() {
+  return tauri ? tauri.core.invoke("conversations_list") : post("conversations_list", {});
+}
+
+export function conversationLoad(id) {
+  return tauri ? tauri.core.invoke("conversation_load", { id }) : post("conversation_load", { id });
+}
+
+export function conversationSave(conversation) {
+  return tauri ? tauri.core.invoke("conversation_save", { conversation }) : post("conversation_save", { conversation });
+}
+
+export function conversationDelete(id) {
+  return tauri ? tauri.core.invoke("conversation_delete", { id }) : post("conversation_delete", { id });
+}

@@ -46,6 +46,10 @@ const PATHS = {
   stop: '<rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   arrowDown: '<path d="M12 5v14M6 13l6 6 6-6"/>',
+  history: '<path d="M3.5 12a8.5 8.5 0 1 0 2.5-6L3.5 8.5"/><path d="M3.5 3.5v5h5M12 7.5V12l3 2"/>',
+  star: '<path d="M12 3.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>',
+  starFilled: '<path d="M12 3.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" fill="currentColor"/>',
+  pencil: '<path d="M4 20h4L18.5 9.5l-4-4L4 16z"/><path d="M13 7l4 4"/>',
   flag: '<path d="M5 21V4M5 4h12l-2.5 4.5L17 13H5"/>',
 };
 
