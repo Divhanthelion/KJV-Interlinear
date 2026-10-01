@@ -294,6 +294,28 @@ await test("Chat: scrolling stays with the reader while an answer streams", "boo
   await until(() => $(".msg-tools"), "finished");
   assert(gap(pane) === 0, "still at the bottom when it finishes");
 `);
+await aiSettings({
+  providers: [MOCK, { ...MOCK, id: "mock2", preset: "custom", name: "Second server" }],
+  consent: { mock: true, mock2: true },
+});
+await test("Chat: several providers in one menu", "book=John&chapter=11", {}, `${CHAT_HELPERS}
+  $('[data-open-panel="chat"]').click();
+  await until(() => $$(".chat-model option").filter((o) => o.value.endsWith("mock-model")).length === 2, "both model lists");
+  assert($$(".chat-model optgroup").map((g) => g.label).join() === "Test server,Second server", "a group per provider");
+  assert($$(".chat-model option").at(-1).textContent === "Add a provider…", "add entry at the end");
+  assert($(".think-toggle"), "Think first for your own server");
+  $(".chat-model").value = "mock2\nmock-model";
+  $(".chat-model").dispatchEvent(new Event("change"));
+  await until(() => !$(".think-toggle"), "Think first hidden for other services");
+  await ask("hello");
+  await until(() => finished() && lastAnswer().querySelector(".msg-tools"), "answer from the second provider");
+  $(".chat-model").value = "__add__";
+  $(".chat-model").dispatchEvent(new Event("change"));
+  await until(() => $("#provider-preset"), "new provider form");
+  $("#provider-preset").value = "deepseek";
+  $("#provider-preset").dispatchEvent(new Event("change"));
+  await until(() => $("#provider-url")?.value === "https://api.deepseek.com/v1", "DeepSeek's address filled in");
+`);
 await aiSettings({ providers: [], providerId: null });
 
 // Longest chapter, longest glosses, longest book name; smallest and largest text

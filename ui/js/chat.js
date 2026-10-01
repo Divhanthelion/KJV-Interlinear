@@ -148,7 +148,7 @@ export function renderChat(body, ctx) {
         { class: "chat-empty" },
         h("p", {}, "Ask questions about a verse, a chapter, whole books, or the entire Bible, with the text attached for the model to read."),
         h("p", {}, "Use your own server (such as vLLM or Ollama on your network) or an API key from Anthropic, OpenAI, Google, DeepSeek, OpenRouter, or Groq. The app has no AI service of its own and never sees your questions."),
-        h("button", { type: "button", class: "button primary", onclick: () => ctx.openPanel("settings", { section: "ai" }) }, "Set up an AI provider"),
+        h("button", { type: "button", class: "button primary", onclick: () => openProviderForm(ctx) }, "Set up an AI provider"),
       ),
     );
     return null;
@@ -209,7 +209,8 @@ export function renderChat(body, ctx) {
   drawSend();
   drawConsent(ctx);
   refreshSize(ctx);
-  loadModels(ctx);
+  // Every provider's models, so any of them can be picked from the menu
+  for (const p of ai.providers) loadModels(ctx, { p });
   autosize(input);
   drawBudget(ctx);
   return input;
@@ -245,15 +246,22 @@ function modelPicker(ctx) {
     }
     select.append(group);
   }
+  select.append(h("option", { value: "__add__" }, "Add a provider…"));
   select.value = `${ai.providerId}\n${ai.model ?? ""}`;
   select.addEventListener("change", () => {
+    if (select.value === "__add__") {
+      select.value = `${ctx.settings.ai.providerId}\n${ctx.settings.ai.model ?? ""}`;
+      openProviderForm(ctx);
+      return;
+    }
     const [providerId, model] = select.value.split("\n");
     ctx.changeSettings((s) => {
       s.ai.providerId = providerId;
       s.ai.model = model || null;
     });
     loadModels(ctx);
-    drawBudget(ctx);
+    // Redraw: the controls depend on the provider ("Think first" is for your own server)
+    ctx.refreshPanel();
   });
   const status = chat.models.get(ai.providerId);
   // Local reasoning models (Qwen, DeepSeek-R1, …) can skip thinking for quick questions
@@ -307,8 +315,8 @@ function modelPicker(ctx) {
   );
 }
 
-function loadModels(ctx, { force = false } = {}) {
-  const p = provider(ctx);
+/** Load a provider's models (the current one unless `p` is given). */
+function loadModels(ctx, { force = false, p = provider(ctx) } = {}) {
   if (!p) return Promise.resolve();
   const existing = chat.models.get(p.id);
   if (existing?.loading) return existing.loading;
@@ -939,6 +947,12 @@ function report(ctx, m) {
 // ------------------------------------------------------------------ settings: providers
 
 const editing = { form: null }; // { id | null, preset, name, baseUrl, key, contextWindow, status }
+
+/** Settings, scrolled to a new provider form. */
+function openProviderForm(ctx) {
+  editing.form = { id: null, preset: "local", name: "", baseUrl: "", key: "", contextWindow: "" };
+  ctx.openPanel("settings", { section: "ai" });
+}
 
 export function renderAiSettings(ctx) {
   const ai = ctx.settings.ai;
