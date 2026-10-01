@@ -78,6 +78,18 @@ jobs:
           releaseBody: See the assets below for Windows, macOS, and Linux installers.
           releaseDraft: true
           prerelease: false
+      # Microsoft Store package (unsigned: Partner Center signs it). Upload the .msix
+      # from the "microsoft-store" artifact in Partner Center > Packages.
+      - name: Microsoft Store package
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: app/windows/msix/pack.ps1 -Exe target/release/kjv-interlinear.exe
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Windows'
+        with:
+          name: microsoft-store
+          path: KJV-Interlinear_*_x64.msix
+          if-no-files-found: error
       - name: Keep installers as workflow artifacts
         uses: actions/upload-artifact@v4
         with:
