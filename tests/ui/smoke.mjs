@@ -304,7 +304,7 @@ await test("Chat: several providers in one menu", "book=John&chapter=11", {}, `$
   assert($$(".chat-model optgroup").map((g) => g.label).join() === "Test server,Second server", "a group per provider");
   assert($$(".chat-model option").at(-1).textContent === "Add a provider…", "add entry at the end");
   assert($(".think-toggle"), "Think first for your own server");
-  $(".chat-model").value = "mock2\nmock-model";
+  $(".chat-model").value = "mock2\\nmock-model";
   $(".chat-model").dispatchEvent(new Event("change"));
   await until(() => !$(".think-toggle"), "Think first hidden for other services");
   await ask("hello");
