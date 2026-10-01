@@ -2,8 +2,21 @@
 // books, or the whole Bible, using the reader's own AI provider (a local server or
 // their API key). Also the provider setup shown in Settings.
 
-import { aiCancel, aiChat, aiKeySet, aiKeyStatus, aiModels, call, copyText, openExternal } from "./backend.js";
-import { h, icon, replace } from "./dom.js";
+import {
+  aiCancel,
+  aiChat,
+  aiKeySet,
+  aiKeyStatus,
+  aiModels,
+  call,
+  conversationDelete,
+  conversationLoad,
+  conversationSave,
+  conversationsList,
+  copyText,
+  openExternal,
+} from "./backend.js";
+import { h, icon, replace, timeAgo } from "./dom.js";
 import { referenceFinder, renderMarkdown } from "./markdown.js";
 
 export const PRESETS = [
@@ -49,6 +62,9 @@ const chat = {
   showScope: false,
   draft: "",
   view: null, // current DOM references
+  // The open conversation as saved: { id, title, created, starred }; null until the first question
+  current: null,
+  showHistory: false,
 };
 
 let finder = null;
@@ -191,17 +207,22 @@ export function renderChat(body, ctx) {
   chat.view.follow = follower(messages, drawJump);
   jump.addEventListener("click", () => chat.view.follow.resume());
 
+  const history = h("div", { class: "chat-history" });
+  chat.view.history = history;
+
   replace(
     body,
     h(
       "div",
-      { class: "chat" },
+      { class: "chat", "data-mode": chat.showHistory ? "history" : "chat" },
       h("div", { class: "chat-top" }, modelPicker(ctx), budget, scopeEditor),
       h("div", { class: "chat-scroll" }, messages, jump),
+      history,
       consent,
       h("div", { class: "chat-compose" }, input, sendButton),
     ),
   );
+  if (chat.showHistory) drawHistory(ctx);
   drawScopeEditor(ctx);
   if (previous && !previous.following) chat.view.follow.following = false;
   drawMessages(ctx);
@@ -294,14 +315,31 @@ function modelPicker(ctx) {
         class: "icon-btn",
         "aria-label": "New conversation",
         title: "New conversation",
-        disabled: !chat.messages.length || !!chat.requestId,
+        "data-new-conversation": "",
         onclick: () => {
           chat.messages = [];
+          chat.current = null;
+          chat.showHistory = false;
           ctx.refreshPanel();
           chat.view?.input.focus();
         },
       },
       icon("plus"),
+    ),
+    h(
+      "button",
+      {
+        type: "button",
+        class: "icon-btn",
+        "aria-label": "Conversations",
+        title: "Conversations",
+        "aria-pressed": String(chat.showHistory),
+        onclick: () => {
+          chat.showHistory = !chat.showHistory;
+          ctx.refreshPanel();
+        },
+      },
+      icon("history"),
     ),
     status?.error
       ? h(
@@ -754,6 +792,9 @@ function drawSend() {
   const v = chat.view;
   if (!v) return;
   const busy = !!chat.requestId;
+  // Kept current here: it's drawn once, but the conversation changes under it
+  const fresh = v.body.querySelector("[data-new-conversation]");
+  if (fresh) fresh.disabled = busy || (!chat.messages.length && !chat.showHistory);
   replace(v.sendButton, icon(busy ? "stop" : "send"));
   v.sendButton.setAttribute("aria-label", busy ? "Stop" : "Send");
   v.sendButton.title = busy ? "Stop" : "Send (Enter)";
@@ -842,6 +883,10 @@ async function sendNow(ctx) {
     return;
   }
 
+  if (!chat.current) {
+    const now = Date.now();
+    chat.current = { id: `c${now.toString(36)}${Math.random().toString(36).slice(2, 8)}`, title: titleFor(text), created: now, starred: false };
+  }
   const scope = scopeArgs(ctx);
   const history = chat.messages
     .filter((m) => m.content && !m.error)
@@ -907,6 +952,7 @@ async function sendNow(ctx) {
     chat.requestId = null;
     finishLive(ctx);
     drawSend();
+    saveCurrent(ctx);
     drawBudget(ctx);
   }
 }
@@ -942,6 +988,184 @@ function report(ctx, m) {
   ].join("\n");
   const url = `https://github.com/Divhanthelion/KJV-Interlinear/issues/new?labels=ai-report&title=${encodeURIComponent("AI answer report")}&body=${encodeURIComponent(body)}`;
   openExternal(url);
+}
+
+// ------------------------------------------------------------------ saved conversations
+
+/** "Why did Jesus weep in verse 35, when he already knew…" */
+function titleFor(question) {
+  const t = question.replace(/\s+/g, " ").trim();
+  return t.length > 80 ? `${t.slice(0, 77).trimEnd()}…` : t;
+}
+
+/** Save the open conversation (after each answer). Failures are shown, never fatal. */
+async function saveCurrent(ctx) {
+  const c = chat.current;
+  if (!c || !chat.messages.length) return;
+  const p = provider(ctx);
+  const conversation = {
+    id: c.id,
+    title: c.title,
+    created: c.created,
+    updated: Date.now(),
+    starred: c.starred,
+    provider: p?.name ?? null,
+    model: ctx.settings.ai.model,
+    messages: chat.messages.map(({ streaming, ...m }) => m),
+  };
+  try {
+    await conversationSave(conversation);
+  } catch (error) {
+    ctx.toast(`Couldn't save this conversation: ${error.message ?? error}`);
+  }
+}
+
+/** Open a saved conversation to read or continue. */
+async function openConversation(ctx, id) {
+  try {
+    const c = await conversationLoad(id);
+    chat.messages = (c.messages ?? []).map((m) => ({ ...m, streaming: false }));
+    chat.current = { id: c.id, title: c.title, created: c.created, starred: !!c.starred };
+    chat.showHistory = false;
+    ctx.refreshPanel();
+    chat.view?.follow.resume();
+  } catch (error) {
+    ctx.toast(String(error.message ?? error));
+  }
+}
+
+/** Change a saved conversation's title or star without opening it. */
+async function updateSaved(ctx, id, change) {
+  const c = await conversationLoad(id);
+  change(c);
+  await conversationSave(c);
+  if (chat.current?.id === id) Object.assign(chat.current, { title: c.title, starred: !!c.starred });
+}
+
+async function drawHistory(ctx) {
+  const v = chat.view;
+  if (!v) return;
+  let list;
+  try {
+    list = await conversationsList();
+  } catch (error) {
+    replace(v.history, h("p", { class: "chat-error" }, `Couldn't read saved conversations: ${error.message ?? error}`));
+    return;
+  }
+  if (chat.view !== v) return; // redrawn meanwhile
+  if (!list.length) {
+    replace(v.history, h("p", { class: "empty" }, "No conversations yet. Each conversation is saved here on this device as you go."));
+    return;
+  }
+  const starred = list.filter((c) => c.starred);
+  const recent = list.filter((c) => !c.starred);
+  const section = (title, items) =>
+    items.length ? [h("h3", { class: "section-title" }, title), h("ul", { class: "result-list conversation-list" }, items.map((c) => row(ctx, c)))] : null;
+  replace(
+    v.history,
+    section("Saved", starred),
+    section("Recent", recent),
+    recent.length ? clearButton(ctx, recent) : null,
+  );
+}
+
+function row(ctx, c) {
+  const open = chat.current?.id === c.id;
+  const sub = [timeAgo(c.updated ?? c.created ?? Date.now()), c.model, `${c.questions} question${c.questions === 1 ? "" : "s"}`]
+    .filter(Boolean)
+    .join(" · ");
+  const li = h("li", { class: `conversation-row${open ? " is-open" : ""}` });
+  const showRow = () =>
+    replace(
+      li,
+      h(
+        "button",
+        { type: "button", class: "row-button", onclick: () => openConversation(ctx, c.id) },
+        h("span", { class: "grow" }, h("span", { class: "row-main" }, c.title), h("span", { class: "row-sub" }, sub)),
+      ),
+      h(
+        "button",
+        {
+          type: "button",
+          class: "icon-btn",
+          "aria-label": c.starred ? `Unsave “${c.title}”` : `Save “${c.title}”`,
+          title: c.starred ? "Saved: click to unsave" : "Save (keeps it when you clear history)",
+          "aria-pressed": String(!!c.starred),
+          onclick: async () => {
+            await updateSaved(ctx, c.id, (x) => { x.starred = !x.starred; });
+            drawHistory(ctx);
+          },
+        },
+        icon(c.starred ? "starFilled" : "star"),
+      ),
+      h("button", { type: "button", class: "icon-btn", "aria-label": `Rename “${c.title}”`, title: "Rename", onclick: showRename }, icon("pencil")),
+      h("button", { type: "button", class: "icon-btn", "aria-label": `Delete “${c.title}”`, title: "Delete", onclick: showDelete }, icon("trash")),
+    );
+  const showRename = () => {
+    const input = h("input", { type: "text", value: c.title, "aria-label": "Conversation name", maxlength: "120" });
+    const save = async () => {
+      const title = input.value.trim();
+      if (title && title !== c.title) {
+        await updateSaved(ctx, c.id, (x) => { x.title = title; });
+        drawHistory(ctx);
+      } else showRow();
+    };
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") save();
+      if (e.key === "Escape") { e.stopPropagation(); showRow(); }
+    });
+    replace(
+      li,
+      h("div", { class: "conversation-edit" }, input,
+        h("button", { type: "button", class: "button primary", onclick: save }, "Save"),
+        h("button", { type: "button", class: "button", onclick: showRow }, "Cancel")),
+    );
+    input.focus();
+    input.select();
+  };
+  const showDelete = () =>
+    replace(
+      li,
+      h("div", { class: "conversation-edit" },
+        h("span", { class: "grow" }, `Delete “${c.title}”?`),
+        h("button", { type: "button", class: "button danger", onclick: async () => {
+          await conversationDelete(c.id);
+          if (chat.current?.id === c.id) {
+            chat.current = null;
+            chat.messages = [];
+          }
+          drawHistory(ctx);
+        } }, "Delete"),
+        h("button", { type: "button", class: "button", onclick: showRow }, "Cancel")),
+    );
+  showRow();
+  return li;
+}
+
+/** "Clear history": deletes the unsaved conversations, after a confirmation. */
+function clearButton(ctx, recent) {
+  const wrap = h("div", { class: "conversation-clear" });
+  const ask = () =>
+    replace(
+      wrap,
+      h("button", { type: "button", class: "text-button", onclick: confirm }, "Clear history"),
+    );
+  const confirm = () =>
+    replace(
+      wrap,
+      h("span", { class: "grow" }, `Delete ${recent.length} conversation${recent.length === 1 ? "" : "s"}? Saved ones stay.`),
+      h("button", { type: "button", class: "button danger", onclick: async () => {
+        for (const c of recent) await conversationDelete(c.id);
+        if (chat.current && recent.some((c) => c.id === chat.current.id)) {
+          chat.current = null;
+          chat.messages = [];
+        }
+        drawHistory(ctx);
+      } }, "Delete"),
+      h("button", { type: "button", class: "button", onclick: ask }, "Cancel"),
+    );
+  ask();
+  return wrap;
 }
 
 // ------------------------------------------------------------------ settings: providers

@@ -10,6 +10,7 @@ use std::sync::{Arc, Mutex, OnceLock};
 
 use kjv_core::bundle::DataBundle;
 use kjv_ai::assistant::{AskArgs, ModelsArgs};
+use kjv_ai::conversations::Conversations;
 use kjv_ai::{Event, ModelInfo};
 use kjv_core::dispatch::dispatch;
 use serde_json::Value;
@@ -83,6 +84,8 @@ struct Ai {
     secrets: Secrets,
     /// Replies in progress, by the id the page gave them, so Stop can end them
     running: Mutex<HashMap<String, Arc<Notify>>>,
+    /// Saved conversations, in the app's private config folder
+    conversations: Conversations,
 }
 
 fn api_key(ai: &Ai, provider_id: &str) -> Result<Option<String>, String> {
@@ -131,6 +134,26 @@ fn ai_cancel(ai: State<'_, Ai>, id: String) {
     }
 }
 
+#[tauri::command(async)]
+fn conversations_list(ai: State<'_, Ai>) -> Result<Vec<Value>, String> {
+    ai.conversations.list()
+}
+
+#[tauri::command(async)]
+fn conversation_load(ai: State<'_, Ai>, id: String) -> Result<Value, String> {
+    ai.conversations.load(&id)
+}
+
+#[tauri::command(async)]
+fn conversation_save(ai: State<'_, Ai>, conversation: Value) -> Result<(), String> {
+    ai.conversations.save(&conversation)
+}
+
+#[tauri::command(async)]
+fn conversation_delete(ai: State<'_, Ai>, id: String) -> Result<(), String> {
+    ai.conversations.delete(&id)
+}
+
 #[tauri::command]
 fn ai_key_status(ai: State<'_, Ai>, provider_id: String) -> Result<KeyStatus, String> {
     ai.secrets.status(&provider_id)
@@ -172,7 +195,12 @@ pub fn run() {
                 data();
             });
             let dir = app.path().app_config_dir()?;
-            app.manage(Ai { client: kjv_ai::client(), secrets: Secrets::new(dir), running: Mutex::default() });
+            app.manage(Ai {
+                client: kjv_ai::client(),
+                conversations: Conversations::new(dir.join("conversations")),
+                secrets: Secrets::new(dir),
+                running: Mutex::default(),
+            });
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -186,7 +214,11 @@ pub fn run() {
             ai_cancel,
             ai_key_status,
             ai_key_set,
-            ai_key_delete
+            ai_key_delete,
+            conversations_list,
+            conversation_load,
+            conversation_save,
+            conversation_delete
         ])
         .run(tauri::generate_context!())
         .expect("error while running KJV Interlinear");

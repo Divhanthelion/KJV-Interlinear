@@ -744,6 +744,29 @@ input[readonly] { color: var(--muted); }
 .book-checks { margin-top: 8px; }
 .book-checks .chip { min-height: 30px; padding: 0 10px; font-size: 0.8125rem; }
 
+/* Conversations list, shown in place of the conversation */
+.chat-history { display: none; }
+.chat[data-mode="history"] .chat-scroll,
+.chat[data-mode="history"] .chat-compose,
+.chat[data-mode="history"] .chat-consent { display: none; }
+.chat[data-mode="history"] .chat-history {
+  display: block;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px max(16px, var(--safe-right)) 16px max(16px, var(--safe-left));
+}
+.conversation-row { display: flex; align-items: center; gap: 2px; }
+.conversation-row .row-button { flex: 1; min-width: 0; }
+.conversation-row .row-main { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.conversation-row.is-open .row-main { color: var(--accent); }
+.conversation-row .icon-btn { width: 36px; height: 36px; }
+.conversation-row .icon-btn[aria-pressed="true"] { color: #c8a24a; background: none; }
+.conversation-edit, .conversation-clear { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 0; }
+.conversation-edit input { flex: 1; min-width: 0; min-height: 40px; }
+.conversation-edit .button, .conversation-clear .button { min-height: 36px; padding: 0 12px; }
+.conversation-clear { margin-top: 12px; }
 .chat-scroll { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .chat-jump {
   position: absolute;

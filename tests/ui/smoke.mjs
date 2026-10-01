@@ -316,6 +316,44 @@ await test("Chat: several providers in one menu", "book=John&chapter=11", {}, `$
   $("#provider-preset").dispatchEvent(new Event("change"));
   await until(() => $("#provider-url")?.value === "https://api.deepseek.com/v1", "DeepSeek's address filled in");
 `);
+await aiSettings({ consent: { mock: true } });
+await test("Chat: conversations are saved, starred, renamed, reopened, and cleared", "book=John&chapter=11", {}, `${CHAT_HELPERS}
+  const rows = () => $$(".conversation-row .row-main").map((e) => e.textContent);
+  const historyView = () => $('[aria-label="Conversations"]');
+  // Start from an empty list (the earlier chat tests saved theirs)
+  const api = (name, body) => fetch("/api/" + name, { method: "POST", body: JSON.stringify(body) }).then((r) => r.json());
+  for (const c of await api("conversations_list", {})) await api("conversation_delete", { id: c.id });
+  $('[data-open-panel="chat"]').click();
+  await until(() => $(".chat-model")?.value.endsWith("mock-model"), "model list");
+  await ask("Why did Jesus weep at the tomb of Lazarus?");
+  await until(() => finished() && lastAnswer().querySelector(".msg-tools"), "first answer");
+  await wait(200);
+  assert(!$("[data-new-conversation]").disabled, "New conversation is enabled once there's a conversation");
+  $("[data-new-conversation]").click();
+  await ask("What does the word Logos mean in John 1?");
+  await until(() => finished() && $$(".msg-tools").length === 1 && $(".msg.user").textContent.includes("Logos"), "second answer in a new conversation");
+  await wait(200);
+  historyView().click();
+  await until(() => rows().length === 2, "both in the list");
+  assert(rows()[0].startsWith("What does the word Logos"), "newest first: " + rows());
+  $$(".conversation-row").find((r) => r.textContent.includes("Lazarus")).querySelector("[aria-pressed]").click();
+  await until(() => $$(".chat-history .section-title").map((e) => e.textContent).join() === "Saved,Recent", "starred one under Saved");
+  $$(".conversation-row").find((r) => r.textContent.includes("Logos")).querySelector('[title="Rename"]').click();
+  const box = await until(() => $(".conversation-edit input"), "rename box");
+  box.value = "The Word in John 1";
+  box.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+  await until(() => rows().includes("The Word in John 1"), "renamed");
+  $$(".conversation-row").find((r) => r.textContent.includes("Lazarus")).querySelector(".row-button").click();
+  await until(() => $(".msg.user")?.textContent.includes("Lazarus"), "reopened");
+  await ask("Where else did Jesus weep?");
+  await until(() => finished() && $$(".msg-tools").length === 2, "continued");
+  await wait(200);
+  historyView().click();
+  await until(() => $$(".conversation-row .row-sub").some((e) => e.textContent.endsWith("2 questions")), "follow-up saved to the same conversation");
+  $$(".conversation-clear button").find((b) => b.textContent === "Clear history").click();
+  $$(".conversation-clear button").find((b) => b.textContent === "Delete").click();
+  await until(() => rows().length === 1 && rows()[0].includes("Lazarus"), "clear history keeps the saved one");
+`);
 await aiSettings({ providers: [], providerId: null });
 
 // Longest chapter, longest glosses, longest book name; smallest and largest text
