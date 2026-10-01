@@ -2,7 +2,7 @@
 
 A King James Bible with the Hebrew and Greek behind every verse, for Windows, macOS, Linux, iPhone and iPad, and Android. Built with Rust and [Tauri](https://tauri.app/).
 
-![Interlinear view of Genesis 1: each Hebrew word with its transliteration, Strong's number, and English gloss](assets/screenshots/interlinear-genesis-1.jpg)
+![John 11 with the study assistant open: a local Qwen model explains why Jesus wept, quoting the KJV, contrasting the Greek verbs δακρύω (G1145) and κλαίω (G2799), and linking every reference](assets/screenshots/study-assistant-john-11.jpg)
 
 <img src="assets/screenshots/phone-psalm-23.jpg" alt="Psalm 23 in interlinear view on a phone" width="260" align="right">
 
@@ -14,11 +14,13 @@ A King James Bible with the Hebrew and Greek behind every verse, for Windows, ma
 - **Strong's & lexicon**: tap any word for its Hebrew (TBESH) or Greek (TBESG) dictionary entry and every verse that uses it
 - **Red letter**: the words of Christ, taken span-for-span from the 1769 edition's own markup
 - **Search**: live search across all books, one book, or one testament, with matches highlighted; `Caesar's` finds `Cæsar’s`
-- **Study assistant (optional)**: ask about a verse, a chapter, chosen books, or the whole Bible with the text attached, using your own AI: a local server (vLLM, Ollama, LM Studio, llama.cpp) or your API key for Anthropic, OpenAI, Gemini, DeepSeek, OpenRouter, or Groq. It shows whether the passage fits the model's context window, links every reference it cites, and keeps keys in the system keychain
+- **Study assistant (optional)**: ask about a verse, a chapter, chosen books, or the whole Bible with the text attached (and, if you like, every verse's Hebrew or Greek words with Strong's numbers). Use your own AI: a server on your network (vLLM, Ollama, LM Studio, llama.cpp) or your API key for Anthropic, OpenAI, Gemini, DeepSeek, OpenRouter, or Groq. It shows whether the passage fits the model's context window, streams the model's reasoning apart from the answer, links every reference it cites, and keeps keys in the system keychain. Long answers never pull the page out from under you: it follows new text only while you're at the bottom
 - **Bookmarks & history**, **light and dark themes**, adjustable text size and font
 - **Private**: fully offline, no accounts, no tracking; the assistant talks only to the provider you set up ([privacy policy](PRIVACY.md))
 
 <br clear="right">
+
+![Interlinear view of Genesis 1: each Hebrew word with its transliteration, Strong's number, and English gloss](assets/screenshots/interlinear-genesis-1.jpg)
 
 ## Following the text the KJV translated
 
@@ -32,6 +34,7 @@ A King James Bible with the Hebrew and Greek behind every verse, for Windows, ma
 |---|---|
 | ← / → | Previous / next chapter (crosses book boundaries) |
 | Ctrl+F | Search |
+| Ctrl+J | Ask the study assistant |
 | Esc | Deselect, close the panel, or clear search highlights |
 | Ctrl+B | Bookmark the selected verse |
 | Ctrl+C / Ctrl+Shift+C | Copy the selected verse / the whole chapter |
@@ -45,7 +48,7 @@ Requires [Rust](https://rustup.rs/) and the [Tauri CLI](https://tauri.app/start/
 ```sh
 cargo tauri dev          # run the app (from the app/ directory)
 cargo tauri build        # installers for this platform
-cargo test --release -p kjv-core   # data and API tests
+cargo test --release -p kjv-core -p kjv-ai   # data, API, and assistant tests
 ```
 
 The app's build script compiles all the text and Hebrew/Greek data into one compressed bundle (about 6.6 MB) that is embedded in the app, so it needs no data files at runtime.
@@ -63,9 +66,11 @@ Release builds for every platform (Windows, macOS universal, Linux, Android, iOS
 ```
 crates/core/      Text, Hebrew/Greek loader, search, red letter, and the app's API (Rust)
   tests/          Data checks over every verse, word, lexicon link, and red-letter span
+crates/ai/        Study assistant: streaming client for OpenAI-compatible, Anthropic, and Gemini APIs
 crates/devserver/ Browser preview server for UI work
 app/              Tauri app: embeds the data bundle and serves the UI
 ui/               The interface: HTML, CSS, and JavaScript modules (no build step)
+tests/ui/         Headless-Chrome UI test and a stand-in model server for it
 old_testament/    KJV text, one file per book, "chapter:verse text" (Psalm titles are verse 0)
 new_testament/
 data/             STEP Bible Hebrew/Greek files, lexicons, and the words of Christ

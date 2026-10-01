@@ -27,6 +27,9 @@ pub fn request(client: &reqwest::Client, req: &ChatRequest, usage_option: bool) 
     if let Some(max) = req.max_tokens {
         body["max_tokens"] = json!(max);
     }
+    if let Some(on) = req.enable_thinking {
+        body["chat_template_kwargs"] = json!({"enable_thinking": on});
+    }
     if let Some(effort) = &req.effort {
         // OpenAI reasoning models; other servers ignore unknown fields or say so
         if req.endpoint.base_url.contains("api.openai.com") {

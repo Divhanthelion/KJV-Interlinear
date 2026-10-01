@@ -27,6 +27,8 @@ pub struct AskArgs {
     pub effort: Option<String>,
     #[serde(default)]
     pub thinking: bool,
+    #[serde(default)]
+    pub enable_thinking: Option<bool>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -60,6 +62,7 @@ pub fn prepare(data: &DataBundle, args: &AskArgs, api_key: Option<String>) -> Re
         max_tokens: args.max_tokens,
         effort: args.effort.clone(),
         thinking: args.thinking,
+        enable_thinking: args.enable_thinking,
     })
 }
 

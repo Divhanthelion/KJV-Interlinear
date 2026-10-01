@@ -31,6 +31,7 @@ async fn main() {
         max_tokens: Some(2000),
         effort: None,
         thinking: false,
+        enable_thinking: None,
     };
     let started = std::time::Instant::now();
     let mut first = None;

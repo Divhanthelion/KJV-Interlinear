@@ -45,6 +45,7 @@ const PATHS = {
   send: '<path d="M12 19V5M6 11l6-6 6 6"/>',
   stop: '<rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
+  arrowDown: '<path d="M12 5v14M6 13l6 6 6-6"/>',
   flag: '<path d="M5 21V4M5 4h12l-2.5 4.5L17 13H5"/>',
 };
 

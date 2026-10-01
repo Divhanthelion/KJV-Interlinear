@@ -75,6 +75,10 @@ pub struct ChatRequest {
     /// Ask for visible reasoning summaries (models whose `ModelInfo` says they can)
     #[serde(default)]
     pub thinking: bool,
+    /// Turn a local reasoning model's thinking on or off (`chat_template_kwargs`,
+    /// understood by vLLM and llama.cpp); None leaves the server's default
+    #[serde(default)]
+    pub enable_thinking: Option<bool>,
 }
 
 /// Something the model produced, in order.

@@ -5,7 +5,9 @@
 GET /v1/models lists one model with a 32k context window. POST /v1/chat/completions
 streams reasoning, then a Markdown answer that quotes a reference and reports how
 much Scripture was attached, then token usage. A question containing "slow" streams
-slowly (for testing Stop); one containing "fail" gets a 500.
+slowly (for testing Stop); one containing "fail" gets a 500; one containing "long"
+streams a long reasoning trace and a long answer (for testing scrolling). With
+chat_template_kwargs.enable_thinking false there is no reasoning, as with vLLM.
 """
 
 import json
@@ -54,6 +56,13 @@ class Handler(BaseHTTPRequestHandler):
             f"Your question had {len(question)} characters."
         )
         delay = 0.4 if "slow" in question else 0.01
+        thoughts = "Reading the attached text."
+        if "long" in question:
+            thoughts = " ".join(f"Step {i}: weighing verse {i % 57 + 1} against the question." for i in range(1, 121))
+            answer += "".join(f"\n\nParagraph {i}. " + "The text bears this out. " * 12 for i in range(1, 41))
+            delay = 0.02
+        if body.get("chat_template_kwargs", {}).get("enable_thinking") is False:
+            thoughts = ""
 
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream")
@@ -68,7 +77,7 @@ class Handler(BaseHTTPRequestHandler):
             time.sleep(delay)
 
         try:
-            for word in "Reading the attached text.".split(" "):
+            for word in thoughts.split(" ") if thoughts else []:
                 event(json.dumps({"choices": [{"delta": {"reasoning_content": word + " "}}]}))
             pieces = [answer[i : i + 12] for i in range(0, len(answer), 12)]
             for i, piece in enumerate(pieces):

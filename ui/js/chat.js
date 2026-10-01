@@ -154,6 +154,11 @@ export function renderChat(body, ctx) {
     return null;
   }
 
+  // A redraw (say, the model list arriving) mustn't move the reader
+  const previous = chat.view?.messages.isConnected
+    ? { following: chat.view.follow.following, top: chat.view.messages.scrollTop }
+    : null;
+
   const input = h("textarea", {
     id: "chat-input",
     class: "chat-input",
@@ -177,11 +182,14 @@ export function renderChat(body, ctx) {
 
   const sendButton = h("button", { type: "button", class: "icon-btn chat-send", onclick: () => (chat.requestId ? stop() : send(ctx)) });
   const messages = h("div", { class: "chat-messages", role: "log", "aria-live": "polite", "aria-relevant": "additions" });
+  const jump = h("button", { type: "button", class: "chat-jump", hidden: true }, icon("arrowDown"), "Latest");
   const budget = h("div", { class: "chat-budget" });
   const scopeEditor = h("div", { class: "chat-scope", hidden: !chat.showScope });
   const consent = h("div", { class: "chat-consent", hidden: true });
 
-  chat.view = { body, input, sendButton, messages, budget, scopeEditor, consent };
+  chat.view = { body, input, sendButton, messages, jump, budget, scopeEditor, consent };
+  chat.view.follow = follower(messages, drawJump);
+  jump.addEventListener("click", () => chat.view.follow.resume());
 
   replace(
     body,
@@ -189,13 +197,15 @@ export function renderChat(body, ctx) {
       "div",
       { class: "chat" },
       h("div", { class: "chat-top" }, modelPicker(ctx), budget, scopeEditor),
-      messages,
+      h("div", { class: "chat-scroll" }, messages, jump),
       consent,
       h("div", { class: "chat-compose" }, input, sendButton),
     ),
   );
   drawScopeEditor(ctx);
+  if (previous && !previous.following) chat.view.follow.following = false;
   drawMessages(ctx);
+  if (previous && !previous.following) messages.scrollTop = previous.top;
   drawSend();
   drawConsent(ctx);
   refreshSize(ctx);
@@ -246,10 +256,29 @@ function modelPicker(ctx) {
     drawBudget(ctx);
   });
   const status = chat.models.get(ai.providerId);
+  // Local reasoning models (Qwen, DeepSeek-R1, …) can skip thinking for quick questions
+  const think =
+    provider(ctx)?.preset === "local"
+      ? h(
+          "button",
+          {
+            type: "button",
+            class: "chip think-toggle",
+            "aria-pressed": String(ai.think),
+            title: "Let the model reason before it answers (slower, often better on hard questions)",
+            onclick: (event) => {
+              ctx.changeSettings((s) => { s.ai.think = !s.ai.think; });
+              event.currentTarget.setAttribute("aria-pressed", String(ctx.settings.ai.think));
+            },
+          },
+          "Think first",
+        )
+      : null;
   return h(
     "div",
     { class: "chat-model-row" },
     select,
+    think,
     h(
       "button",
       {
@@ -455,13 +484,57 @@ function drawScopeEditor(ctx) {
   );
 }
 
+// ------------------------------------------------------------------ scrolling
+
+/**
+ * Follow new content only while the reader is at the bottom of `el`. Scrolling away
+ * by any means (wheel, touch, scrollbar, keys) lets go at once; coming back to the
+ * bottom picks it up again. Content that streams in never moves the view otherwise.
+ */
+function follower(el, onChange = () => {}) {
+  const f = { following: true };
+  const gap = () => el.scrollHeight - el.scrollTop - el.clientHeight;
+  // Our own jumps to the bottom also fire scroll events; they land at the bottom,
+  // so they keep following on. Growth between frames doesn't fire scroll events.
+  el.addEventListener(
+    "scroll",
+    () => {
+      const atBottom = gap() <= 2;
+      if (atBottom !== f.following) {
+        f.following = atBottom;
+        onChange();
+      }
+    },
+    { passive: true },
+  );
+  f.stick = () => {
+    if (f.following && gap() > 0) el.scrollTop = el.scrollHeight;
+    onChange();
+  };
+  f.resume = () => {
+    f.following = true;
+    el.scrollTop = el.scrollHeight;
+    onChange();
+  };
+  f.below = () => gap() > 40;
+  return f;
+}
+
+function drawJump() {
+  const v = chat.view;
+  if (!v) return;
+  v.jump.hidden = v.follow.following || !v.follow.below();
+}
+
 // ------------------------------------------------------------------ messages
 
+/** Draw every message. Keeps the reader's place unless they were at the bottom. */
 function drawMessages(ctx) {
   const v = chat.view;
   if (!v) return;
+  live.node = null;
   replace(v.messages, chat.messages.length ? chat.messages.map((m, i) => messageNode(ctx, m, i)) : hints(ctx));
-  v.messages.scrollTop = v.messages.scrollHeight;
+  v.follow.stick();
 }
 
 function hints(ctx) {
@@ -487,6 +560,28 @@ function messageNode(ctx, m, index) {
   return node;
 }
 
+const words = (text) => (text.match(/\S+/g) ?? []).length;
+
+/**
+ * True when the latest stretch of reasoning is mostly phrases already used: a model
+ * stuck in a loop. Healthy reasoning that redrafts its answer stays well under this
+ * (a 4,600-word Qwen trace peaked at 10%); a real loop sits near 100%.
+ */
+function repeating(text) {
+  const w = text.split(/\s+/).filter(Boolean);
+  if (w.length < 600) return false;
+  const n = 8;
+  const tail = 300;
+  const earlier = new Set();
+  for (let i = 0; i + n <= w.length - tail; i++) earlier.add(w.slice(i, i + n).join(" "));
+  let seen = 0;
+  let total = 0;
+  for (let i = w.length - tail; i + n <= w.length; i++, total++) if (earlier.has(w.slice(i, i + n).join(" "))) seen++;
+  return seen / total > 0.6;
+}
+const reasoningSummary = (m) =>
+  `${m.streaming && !m.content ? "Thinking…" : "Reasoning"} · ${words(m.reasoning).toLocaleString()} words`;
+
 function fillMessage(ctx, node, m) {
   if (m.role === "user") {
     replace(
@@ -496,18 +591,24 @@ function fillMessage(ctx, node, m) {
     );
     return;
   }
-  const onReference = (ref) => ctx.goTo(ref.book, ref.chapter, ref.verse, { fromPanel: true });
-  const body = h("div", { class: "msg-body" }, renderMarkdown(m.content, { findReferences: finder, onReference }));
-  const thinking = m.reasoning
-    ? h(
-        "details",
-        { class: "msg-reasoning", open: m.streaming && !m.content ? true : null },
-        h("summary", {}, m.streaming && !m.content ? "Thinking…" : "Reasoning"),
-        h("div", { class: "msg-reasoning-body" }, m.reasoning),
-      )
-    : null;
+  const body = h("div", { class: "msg-body" }, renderMarkdown(m.content, markdownOptions(ctx)));
+  const reasoningBody = h("div", { class: "msg-reasoning-body", tabindex: "0" }, m.reasoning);
+  const expand = h("button", { type: "button", class: "text-button reasoning-expand" }, "Show all");
+  const thinking = h(
+    "details",
+    { class: "msg-reasoning", hidden: !m.reasoning, open: m.streaming && !m.content ? true : null },
+    h("summary", {}, m.reasoning ? reasoningSummary(m) : ""),
+    reasoningBody,
+    expand,
+  );
+  expand.addEventListener("click", () => {
+    const all = thinking.classList.toggle("expanded");
+    expand.textContent = all ? "Show less" : "Show all";
+  });
   const status =
     m.error ? h("p", { class: "chat-error" }, m.error)
+    : m.reason === "length" && !m.content
+      ? h("p", { class: "chat-note" }, "The model used its whole length limit thinking and didn't reach an answer. Try again with “Think first” off, or ask a narrower question.")
     : m.reason === "length" ? h("p", { class: "chat-note" }, "The answer reached its length limit.")
     : m.reason === "refusal" ? h("p", { class: "chat-note" }, "The model declined to answer this.")
     : m.reason === "cancelled" ? h("p", { class: "chat-note" }, "Stopped.")
@@ -532,8 +633,42 @@ function fillMessage(ctx, node, m) {
   replace(node, thinking, waiting, body, status, tools);
 }
 
+function markdownOptions(ctx) {
+  return { findReferences: finder, onReference: (ref) => ctx.goTo(ref.book, ref.chapter, ref.verse, { fromPanel: true }) };
+}
+
+/**
+ * The answer being streamed, updated in place: reasoning text is appended, and of
+ * the answer only the blocks that changed (normally just the last) are replaced.
+ * Nothing the reader is looking at, scrolling, or selecting gets rebuilt.
+ */
+const live = { node: null };
+
+function attachLive(node, m) {
+  const thinking = node.querySelector(".msg-reasoning");
+  const reasoningBody = thinking.querySelector(".msg-reasoning-body");
+  if (!reasoningBody.firstChild) reasoningBody.append(document.createTextNode(""));
+  Object.assign(live, {
+    node,
+    thinking,
+    summary: thinking.querySelector("summary"),
+    reasoningBody,
+    reasoningText: reasoningBody.firstChild,
+    reasoningLength: m.reasoning.length,
+    reasoningFollow: follower(reasoningBody),
+    // Once the reader opens, closes, or scrolls the reasoning, it's theirs to manage
+    touched: false,
+    body: node.querySelector(".msg-body"),
+  });
+  const touch = () => { live.touched = true; };
+  thinking.querySelector("summary").addEventListener("click", touch);
+  reasoningBody.addEventListener("wheel", touch, { passive: true });
+  reasoningBody.addEventListener("touchstart", touch, { passive: true });
+  reasoningBody.addEventListener("keydown", touch);
+}
+
 let drawQueued = false;
-/** Redraw the answer being streamed, at most once per frame. */
+/** Update the answer being streamed, at most once per frame. */
 function drawStreaming(ctx) {
   if (drawQueued) return;
   drawQueued = true;
@@ -542,16 +677,69 @@ function drawStreaming(ctx) {
     const v = chat.view;
     if (!v) return;
     const index = chat.messages.length - 1;
+    const m = chat.messages[index];
     const node = v.messages.querySelector(`[data-index="${index}"]`);
     if (!node) return drawMessages(ctx);
-    const nearBottom = v.messages.scrollHeight - v.messages.scrollTop - v.messages.clientHeight < 80;
-    // Keep an open reasoning box open
-    const wasOpen = node.querySelector(".msg-reasoning")?.open;
-    fillMessage(ctx, node, chat.messages[index]);
-    const details = node.querySelector(".msg-reasoning");
-    if (details && wasOpen !== undefined) details.open = wasOpen;
-    if (nearBottom) v.messages.scrollTop = v.messages.scrollHeight;
+    if (live.node !== node) attachLive(node, m);
+
+    if (m.reasoning.length > live.reasoningLength) {
+      live.thinking.hidden = false;
+      node.querySelector(".typing")?.remove();
+      live.reasoningText.appendData(m.reasoning.slice(live.reasoningLength));
+      live.reasoningLength = m.reasoning.length;
+      live.reasoningFollow.stick();
+      if (!m.content && m.reasoning.length - (live.loopCheckedAt ?? 0) > 4000) {
+        live.loopCheckedAt = m.reasoning.length;
+        const looping = repeating(m.reasoning);
+        let note = live.node.querySelector(".loop-note");
+        if (looping && !note) {
+          note = h("p", { class: "chat-note loop-note" }, "The model seems to be repeating itself. You can stop it and ask again, perhaps with “Think first” off.");
+          live.thinking.after(note);
+        } else if (!looping) note?.remove();
+      }
+    }
+    if (m.reasoning) live.summary.textContent = reasoningSummary(m);
+    if (m.content) {
+      node.querySelector(".typing")?.remove();
+      // Fold the reasoning away when the answer starts, unless the reader is in it
+      if (live.thinking.open && !live.touched && !live.answering) live.thinking.open = false;
+      live.answering = true;
+      patchChildren(live.body, renderMarkdown(m.content, markdownOptions(ctx)));
+    }
+    v.follow.stick();
   });
+}
+
+/** Make `target`'s children match `fresh`, replacing only from the first difference. */
+function patchChildren(target, fresh) {
+  const next = [...fresh.childNodes];
+  const old = [...target.childNodes];
+  let same = 0;
+  while (same < old.length && same < next.length && old[same].isEqualNode(next[same])) same++;
+  for (const node of old.slice(same)) node.remove();
+  target.append(...next.slice(same));
+}
+
+/** The answer ended: add its status and tools without touching what's already shown. */
+function finishLive(ctx) {
+  const v = chat.view;
+  if (!v) return;
+  const index = chat.messages.length - 1;
+  const m = chat.messages[index];
+  const node = v.messages.querySelector(`[data-index="${index}"]`);
+  if (!node) return drawMessages(ctx);
+  if (live.node !== node) {
+    // Nothing streamed into it (an early error): there's nothing to preserve
+    fillMessage(ctx, node, m);
+  } else {
+    node.querySelector(".typing")?.remove();
+    patchChildren(live.body, renderMarkdown(m.content, markdownOptions(ctx)));
+    if (m.reasoning) live.summary.textContent = reasoningSummary(m);
+    const done = messageNode(ctx, m, index);
+    for (const part of done.querySelectorAll(":scope > .chat-error, :scope > .chat-note, :scope > .msg-tools")) node.append(part);
+  }
+  live.node = null;
+  v.follow.stick();
 }
 
 function drawSend() {
@@ -608,11 +796,20 @@ function drawConsent(ctx) {
 // ------------------------------------------------------------------ sending
 
 async function send(ctx) {
-  const v = chat.view;
+  if (chat.preparing) return;
+  chat.preparing = true;
+  try {
+    await sendNow(ctx);
+  } finally {
+    chat.preparing = false;
+  }
+}
+
+async function sendNow(ctx) {
   const p = provider(ctx);
   const ai = ctx.settings.ai;
-  if (!v || !p || chat.requestId) return;
-  const text = v.input.value.trim();
+  if (!chat.view || !p || chat.requestId) return;
+  const text = chat.view.input.value.trim();
   if (!text) return;
   if (!ai.model) await loadModels(ctx);
   if (!ai.model) {
@@ -625,6 +822,9 @@ async function send(ctx) {
     return;
   }
   await refreshSize(ctx);
+  // The panel may have been redrawn while waiting: use what's on screen now
+  const v = chat.view;
+  if (!v) return;
   const limit = contextWindow(ctx);
   if (limit && promptTokens(ctx, text) + answerTokens(ctx) > limit) {
     chat.showScope = true;
@@ -652,6 +852,8 @@ async function send(ctx) {
   const estimate = sentScopeTokens + INSTRUCTION_TOKENS + history.reduce((n, m) => n + estimateTokens(m.content), 0);
   const key = calibrationKey(ctx);
   drawMessages(ctx);
+  // Asking a question means wanting to see the answer
+  chat.view?.follow.resume();
   drawSend();
 
   const info = modelInfo(ctx);
@@ -668,6 +870,7 @@ async function send(ctx) {
         messages: history,
         maxTokens: answerTokens(ctx),
         thinking: !!info?.adaptiveThinking,
+        enableThinking: p.preset === "local" ? ai.think : null,
       },
       (event) => {
         if (event.type === "text") answer.content += event.text;
@@ -694,7 +897,7 @@ async function send(ctx) {
     answer.content = answer.content.replace(/^\s+/, "");
     answer.streaming = false;
     chat.requestId = null;
-    drawMessages(ctx);
+    finishLive(ctx);
     drawSend();
     drawBudget(ctx);
   }

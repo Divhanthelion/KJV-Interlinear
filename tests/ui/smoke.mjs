@@ -234,6 +234,7 @@ await test("Chat asks consent, then streams an answer about the attached chapter
   assert($(".chat-consent").textContent.includes("127.0.0.1:8765"), "consent names the server");
   $$(".chat-consent button").find((b) => b.textContent === "Allow and send").click();
   await until(() => finished() && lastAnswer().querySelector(".msg-tools"), "answer");
+  assert($("#chat-input").value === "", "the question box is cleared after sending");
   const body = lastAnswer().querySelector(".msg-body");
   assert(body.querySelector("strong")?.textContent === "John 11", "the model got John 11: " + body.textContent);
   assert(body.textContent.includes("(57 verses)"), "all 57 verses sent");
@@ -265,6 +266,33 @@ await test("Chat: Stop, errors, and a scope too large for the model", "book=John
   await ask("anything");
   await wait(400);
   assert($$(".msg").length === before, "nothing sent when it can't fit");
+`);
+await aiSettings({ consent: { mock: true } });
+await test("Chat: scrolling stays with the reader while an answer streams", "book=John&chapter=11", {}, `${CHAT_HELPERS}
+  const gap = (el) => Math.round(el.scrollHeight - el.scrollTop - el.clientHeight);
+  $('[data-open-panel="chat"]').click();
+  await until(() => $(".chat-model")?.value.endsWith("mock-model"), "model list");
+  await ask("long answer please");
+  const rb = await until(() => { const b = $(".msg.assistant .msg-reasoning-body"); return b && b.scrollHeight > b.clientHeight + 80 ? b : null; }, "long reasoning");
+  await wait(200);
+  assert(gap(rb) === 0, "reasoning follows its newest line: gap " + gap(rb));
+  rb.dispatchEvent(new WheelEvent("wheel"));
+  rb.scrollTop = 40;
+  await wait(500);
+  assert(rb.scrollTop === 40, "reasoning stays where the reader scrolled it: " + rb.scrollTop);
+  await until(() => $(".msg.assistant .msg-body")?.textContent.length > 300, "answer");
+  assert($(".msg-reasoning").open && rb.isConnected, "reasoning the reader is in stays open and isn't rebuilt");
+  const pane = $(".chat-messages");
+  await until(() => pane.scrollHeight > pane.clientHeight + 400, "long answer");
+  pane.scrollTop = 120;
+  await wait(600);
+  assert(pane.scrollTop === 120, "conversation stays put while text streams in: " + pane.scrollTop);
+  assert(!$(".chat-jump").hidden, "Latest button shown");
+  $(".chat-jump").click();
+  await wait(300);
+  assert(gap(pane) === 0 && $(".chat-jump").hidden, "Latest jumps to the bottom and follows again");
+  await until(() => $(".msg-tools"), "finished");
+  assert(gap(pane) === 0, "still at the bottom when it finishes");
 `);
 await aiSettings({ providers: [], providerId: null });
 
