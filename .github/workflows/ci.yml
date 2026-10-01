@@ -1,8 +1,7 @@
 name: CI
 on:
   push:
-    # TEMPORARY: feat/cross-platform until it's merged
-    branches: [main, master, feat/cross-platform]
+    branches: [main, master]
   pull_request:
 
 jobs:

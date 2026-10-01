@@ -4,8 +4,6 @@ name: Release
 on:
   push:
     tags: ["v*"]
-    # TEMPORARY: build every platform while the cross-platform branch is in progress
-    branches: [feat/cross-platform]
   workflow_dispatch:
 
 permissions:
