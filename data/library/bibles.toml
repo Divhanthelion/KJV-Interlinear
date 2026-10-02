@@ -1,0 +1,525 @@
+# The translations in the library, in the order the app lists them.
+#
+# Every text comes from eBible.org (https://ebible.org), as USFM, and is checked word
+# for word against eBible's own plain-text edition of the same translation. Licences
+# and credit lines were checked against each translation's eBible copyright page on
+# 2026-10-01/02. The app never alters a text and never charges money, which satisfies
+# every licence below, including NonCommercial and NoDerivatives.
+#
+# Fields:
+#   id          our id, used in data/library/bibles/<id>/ and in the app
+#   abbr        the abbreviation shown beside verses
+#   name, year  as the translation is known
+#   group       how the picker groups translations
+#   ebible      eBible.org translation id (source: <ebible>_usfm.zip)
+#   licence     pd | cc-by-4.0 | cc-by-sa-4.0 | cc-by-nd-4.0 | cc-by-nc-nd-4.0 | net
+#   credit      the copyright / credit line the licence requires (shown in the app)
+#   about       one or two sentences for the picker
+#   heading_markers  paragraph markers this edition uses for headings (see usfm::Options)
+
+[[bible]]
+id = "kjv"
+abbr = "KJV"
+name = "King James Version"
+year = "1611 (1769 text)"
+group = "Classic English"
+ebible = "eng-kjv"
+licence = "pd"
+credit = "Public domain outside the United Kingdom. Text: eBible.org / CrossWire Bible Society."
+about = "The Authorized Version in the standard 1769 Oxford text, with the Apocrypha as printed in the 1611 edition."
+
+[[bible]]
+id = "kjvcpb"
+abbr = "KJV-CPB"
+name = "King James Version, Cambridge Paragraph Bible"
+year = "1873"
+group = "Classic English"
+ebible = "engkjvcpb"
+licence = "pd"
+credit = "Public domain outside the United Kingdom. Text: eBible.org."
+about = "F. H. A. Scrivener's edition of the KJV for Cambridge, set in paragraphs, with the Apocrypha; differs from the 1769 text in some spelling and wording."
+heading_markers = ["qc"]
+
+[[bible]]
+id = "gnv"
+abbr = "GNV"
+name = "Geneva Bible"
+year = "1599"
+group = "Classic English"
+ebible = "enggnv"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "The Reformation Bible of Shakespeare and the Pilgrims, in its original spelling."
+
+[[bible]]
+id = "tyndale"
+abbr = "TNT"
+name = "Tyndale New Testament"
+year = "1534"
+group = "Classic English"
+ebible = "engtnt"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "William Tyndale's New Testament, the foundation of the KJV New Testament, in Tudor spelling."
+
+[[bible]]
+id = "wyc"
+abbr = "WYC"
+name = "Wycliffe's Bible, Modern Spelling"
+year = "c. 1395 (2017 spelling)"
+group = "Classic English"
+ebible = "engwyc2017"
+licence = "cc-by-nc-nd-4.0"
+credit = "© 2001, 2010, 2011, 2012, 2013, 2015 Terry Noble. Licensed under CC BY-NC-ND 4.0. Text: eBible.org."
+about = "The 14th-century Wycliffe translation from the Latin Vulgate, with the Apocrypha, in modernized spelling."
+
+[[bible]]
+id = "wycplus"
+abbr = "WYC+"
+name = "Wycliffe's Bible, Modern Spelling (Enhanced)"
+year = "c. 1395 (2018 spelling)"
+group = "Classic English"
+ebible = "engwyc2018"
+licence = "cc-by-nc-nd-4.0"
+credit = "© 2001, 2010, 2011, 2012, 2013, 2015 Terry Noble. Licensed under CC BY-NC-ND 4.0. Text: eBible.org."
+about = "Wycliffe's Bible in modern spelling with added explanatory phrases in parentheses."
+
+[[bible]]
+id = "wycme"
+abbr = "WYC-ME"
+name = "Wycliffe Bible (Middle English)"
+year = "c. 1395"
+group = "Classic English"
+ebible = "engWycliffe"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "The Later Wycliffe Version in its original Middle English: the Pentateuch and the Gospels."
+
+[[bible]]
+id = "webster"
+abbr = "WBS"
+name = "Webster Bible"
+year = "1833"
+group = "Classic English"
+ebible = "engwebster"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "Noah Webster's revision of the KJV, updating its grammar and vocabulary."
+
+[[bible]]
+id = "rv"
+abbr = "RV"
+name = "Revised Version"
+year = "1885 (Apocrypha 1895)"
+group = "Classic English"
+ebible = "eng-rv"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "The British committee revision of the KJV, with the Apocrypha."
+
+[[bible]]
+id = "asv"
+abbr = "ASV"
+name = "American Standard Version"
+year = "1901"
+group = "Classic English"
+ebible = "eng-asv"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "The American edition of the Revised Version: literal, and using \"Jehovah\" for the divine name."
+
+[[bible]]
+id = "asvbt"
+abbr = "ASV-BT"
+name = "American Standard Version, Byzantine Text"
+year = "1901 (2021 edition)"
+group = "Classic English"
+ebible = "engasvbt"
+licence = "pd"
+credit = "Public domain (ASV; edits by Robert Adam Boyd dedicated to the public domain). Text: eBible.org."
+about = "The ASV with its New Testament conformed to the Byzantine Greek text, with the Apocrypha."
+
+[[bible]]
+id = "ylt"
+abbr = "YLT"
+name = "Young's Literal Translation"
+year = "1862 (1898)"
+group = "Literal"
+ebible = "engylt"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "Robert Young's very literal translation, following the tenses and word order of the Hebrew and Greek."
+
+[[bible]]
+id = "darby"
+abbr = "DBY"
+name = "Darby Translation"
+year = "1890"
+group = "Literal"
+ebible = "engDBY"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "J. N. Darby's literal translation from the original languages."
+
+[[bible]]
+id = "lsv"
+abbr = "LSV"
+name = "Literal Standard Version"
+year = "2020"
+group = "Literal"
+ebible = "englsv"
+licence = "cc-by-sa-4.0"
+credit = "© 2020 Covenant Press. Licensed under CC BY-SA 4.0. Text: eBible.org."
+about = "A modern, very literal translation that renders the divine name as YHWH."
+
+[[bible]]
+id = "ulb"
+abbr = "ULB"
+name = "Unlocked Literal Bible"
+year = "2017"
+group = "Literal"
+ebible = "engULB"
+licence = "cc-by-sa-4.0"
+credit = "© 2017 Door43 World Missions Community. Licensed under CC BY-SA 4.0. Text: eBible.org."
+about = "An openly licensed, form-centred update of the ASV, made as a literal base for Bible translators."
+
+[[bible]]
+id = "web"
+abbr = "WEB"
+name = "World English Bible"
+year = "2020"
+group = "Modern English"
+ebible = "engwebp"
+licence = "pd"
+credit = "Public domain. \"World English Bible\" is a trademark of eBible.org. Text: eBible.org."
+about = "A modern update of the ASV in American English, using \"LORD\" for the divine name."
+
+[[bible]]
+id = "webu"
+abbr = "WEBU"
+name = "World English Bible Updated, with Deuterocanon"
+year = "2020"
+group = "Modern English"
+ebible = "engwebu"
+licence = "pd"
+credit = "Public domain. \"World English Bible\" is a trademark of eBible.org. Text: eBible.org."
+about = "The World English Bible with the deuterocanonical books."
+
+[[bible]]
+id = "webc"
+abbr = "WEB-C"
+name = "World English Bible, Catholic Edition"
+year = "2020"
+group = "Catholic"
+ebible = "eng-web-c"
+licence = "pd"
+credit = "Public domain. \"World English Bible\" is a trademark of eBible.org. Text: eBible.org."
+about = "The World English Bible with the Catholic canon and book order."
+
+[[bible]]
+id = "webclassic"
+abbr = "WEB-Y"
+name = "World English Bible Classic"
+year = "2020"
+group = "Modern English"
+ebible = "eng-web"
+licence = "pd"
+credit = "Public domain. \"World English Bible\" is a trademark of eBible.org. Text: eBible.org."
+about = "The World English Bible using \"Yahweh\" for the divine name, with the deuterocanonical books."
+
+[[bible]]
+id = "webbe"
+abbr = "WEB-UK"
+name = "World English Bible, British Edition"
+year = "2020"
+group = "Modern English"
+ebible = "eng-webbe"
+licence = "pd"
+credit = "Public domain. \"World English Bible\" is a trademark of eBible.org. Text: eBible.org."
+about = "The World English Bible in British spelling, with the deuterocanonical books."
+
+[[bible]]
+id = "webpb"
+abbr = "WEB-UK66"
+name = "World English Bible, British Edition (66 books)"
+year = "2020"
+group = "Modern English"
+ebible = "engwebpb"
+licence = "pd"
+credit = "Public domain. \"World English Bible\" is a trademark of eBible.org. Text: eBible.org."
+about = "The World English Bible in British spelling, Protestant canon."
+
+[[bible]]
+id = "bsb"
+abbr = "BSB"
+name = "Berean Standard Bible"
+year = "2023"
+group = "Modern English"
+ebible = "engbsb"
+licence = "pd"
+credit = "Public domain (dedicated by the Berean Bible Translation Committee). Text: eBible.org."
+about = "A modern, accurate translation based on the critical Greek text."
+
+[[bible]]
+id = "msb"
+abbr = "MSB"
+name = "Majority Standard Bible"
+year = "2023"
+group = "Modern English"
+ebible = "engmsb"
+licence = "pd"
+credit = "Public domain. Produced in cooperation with Bible Hub, Discovery Bible, unfoldingWord, Bible Aquifer, and the Berean Bible Translation Committee. Text: eBible.org."
+about = "The Berean Standard Bible with its New Testament based on the Majority (Byzantine) Greek text."
+
+[[bible]]
+id = "net"
+abbr = "NET"
+name = "NET Bible"
+year = "2019"
+group = "Modern English"
+ebible = "engnet"
+licence = "net"
+credit = "Scripture quoted by permission. Quotations designated (NET) are from the NET Bible® copyright ©1996, 2019 by Biblical Studies Press, L.L.C. http://netbible.com All rights reserved."
+about = "The New English Translation by more than 25 scholars, here without its translators' notes."
+
+[[bible]]
+id = "fbv"
+abbr = "FBV"
+name = "Free Bible Version"
+year = "2018"
+group = "Modern English"
+ebible = "engfbv"
+licence = "cc-by-sa-4.0"
+credit = "© 2018 Dr. Jonathan Gallagher. Licensed under CC BY-SA 4.0. Text: eBible.org."
+about = "A readable modern translation of the whole Bible."
+
+[[bible]]
+id = "oeb"
+abbr = "OEB"
+name = "Open English Bible"
+year = "in progress"
+group = "Modern English"
+ebible = "engoebus"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "A modern translation in progress (U.S. spelling): the New Testament and parts of the Old."
+
+[[bible]]
+id = "oebcw"
+abbr = "OEB-CW"
+name = "Open English Bible, Commonwealth Spelling"
+year = "in progress"
+group = "Modern English"
+ebible = "engoebcw"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "The Open English Bible in Commonwealth spelling."
+
+[[bible]]
+id = "bbe"
+abbr = "BBE"
+name = "Bible in Basic English"
+year = "1965"
+group = "Modern English"
+ebible = "engBBE"
+licence = "pd"
+credit = "Public domain in the United States. Text: eBible.org."
+about = "A translation into Basic English, a vocabulary of about 1,000 words."
+
+[[bible]]
+id = "noyes"
+abbr = "NOY"
+name = "Noyes Bible"
+year = "1869"
+group = "Modern English"
+ebible = "engnoy"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "George R. Noyes's translation of Job through Malachi and the New Testament."
+
+[[bible]]
+id = "t4t"
+abbr = "T4T"
+name = "Translation for Translators"
+year = "2017"
+group = "Modern English"
+ebible = "eng-t4t"
+licence = "cc-by-sa-4.0"
+credit = "© 2008-2017 Ellis W. Deibler, Jr. Licensed under CC BY-SA 4.0. Text: eBible.org."
+about = "A meaning-based translation that makes implied information explicit, written as an aid to translators."
+
+[[bible]]
+id = "pev"
+abbr = "PEV"
+name = "Plain English Version"
+year = "2026"
+group = "Modern English"
+ebible = "engPEV"
+licence = "cc-by-sa-4.0"
+credit = "Plain English Version © 2026 by Wycliffe Bible Translators Australia, licensed under CC BY-SA 4.0. Text: eBible.org."
+about = "Plain English for Aboriginal Australians who speak English as a second language; parts of both testaments."
+
+[[bible]]
+id = "glw"
+abbr = "GLW"
+name = "God's Living Word"
+year = "1996"
+group = "Modern English"
+ebible = "eng-glw"
+licence = "cc-by-nd-4.0"
+credit = "© 1996 Michael Paul Johnson. Licensed under CC BY-ND 4.0. Text: eBible.org."
+about = "John's Gospel and letters in modern English."
+
+[[bible]]
+id = "emtv"
+abbr = "EMTV"
+name = "English Majority Text Version"
+year = "2014"
+group = "New Testament"
+ebible = "engemtv"
+licence = "cc-by-nc-nd-4.0"
+credit = "© 2014 Dr. Paul W. Esposito. Licensed under CC BY-NC-ND 4.0. Text: eBible.org."
+about = "A New Testament translated from the Majority (Byzantine) Greek text."
+
+[[bible]]
+id = "tcent"
+abbr = "TCENT"
+name = "Text-Critical English New Testament"
+year = "2022"
+group = "New Testament"
+ebible = "engtcent"
+licence = "cc-by-4.0"
+credit = "© 2022 Robert Adam Boyd. Licensed under CC BY 4.0. \"Text-Critical English New Testament\" and \"Byzantine Text Version\" are trademarks of Robert Adam Boyd. Text: eBible.org."
+about = "A New Testament from the Byzantine Greek text with extensive text-critical notes."
+
+[[bible]]
+id = "f35"
+abbr = "F35"
+name = "Family 35 New Testament"
+year = "2016"
+group = "New Testament"
+ebible = "engf35"
+licence = "cc-by-sa-4.0"
+credit = "© 2016 Wilbur N. Pickering. Licensed under CC BY-SA 4.0. Text: eBible.org."
+about = "Wilbur Pickering's New Testament from the Family 35 Greek text, with his commentary."
+
+[[bible]]
+id = "dra"
+abbr = "DRA"
+name = "Douay-Rheims Bible"
+year = "1899 (Challoner revision)"
+group = "Catholic"
+ebible = "engDRA"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "The classic English Catholic Bible, translated from the Latin Vulgate, with Vulgate numbering."
+
+[[bible]]
+id = "brenton"
+abbr = "LXX"
+name = "Brenton's Septuagint"
+year = "1844"
+group = "Septuagint"
+ebible = "eng-Brenton"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "Sir Lancelot Brenton's translation of the Greek Old Testament, the Old Testament of the Orthodox Church."
+
+[[bible]]
+id = "brentonup"
+abbr = "LXX-UP"
+name = "Updated Brenton Septuagint"
+year = "1844 (2020 update)"
+group = "Septuagint"
+ebible = "englxxup"
+licence = "pd"
+credit = "Public domain (Brenton; spelling updates by Robert Adam Boyd dedicated to the public domain). Text: eBible.org."
+about = "Brenton's Septuagint with updated spelling and formatting."
+
+[[bible]]
+id = "lxx2012"
+abbr = "LXX2012"
+name = "LXX2012: Septuagint in American English"
+year = "2012"
+group = "Septuagint"
+ebible = "eng-lxx2012"
+licence = "pd"
+credit = "Public domain (Brenton; edits by Michael Paul Johnson dedicated to the public domain). Text: eBible.org."
+about = "Brenton's Septuagint in modern American English."
+
+[[bible]]
+id = "jps"
+abbr = "JPS"
+name = "JPS Tanakh"
+year = "1917"
+group = "Jewish"
+ebible = "engjps"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "The Jewish Publication Society's translation of the Hebrew Bible, in Hebrew order and numbering."
+
+[[bible]]
+id = "leeser"
+abbr = "LEE"
+name = "Leeser Tanakh"
+year = "1853"
+group = "Jewish"
+ebible = "englee"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "Isaac Leeser's translation, the first Jewish English Bible in America."
+
+[[bible]]
+id = "onkelos"
+abbr = "ONK"
+name = "Targum Onkelos (Etheridge)"
+year = "1862"
+group = "Jewish"
+ebible = "engoke"
+licence = "pd"
+credit = "Public domain. Text: eBible.org."
+about = "J. W. Etheridge's translation of the Aramaic targums on the Pentateuch."
+
+[[bible]]
+id = "ojb"
+abbr = "OJB"
+name = "Orthodox Jewish Bible"
+year = "2024"
+group = "Messianic"
+ebible = "engojb"
+licence = "cc-by-nc-nd-4.0"
+credit = "© 2002-2011, 2021, 2024 Artists for Israel International. Licensed under CC BY-NC-ND 4.0. Text: eBible.org."
+about = "Tanakh and New Testament in English rich with Hebrew and Yiddish terms, for Messianic Jewish readers."
+
+[[bible]]
+id = "wmb"
+abbr = "WMB"
+name = "World Messianic Bible"
+year = "2022"
+group = "Messianic"
+ebible = "engwmb"
+licence = "pd"
+credit = "Public domain. \"World Messianic Bible\" is a trademark of eBible.org. Text: eBible.org."
+about = "The World English Bible with Hebrew names (Yeshua, Moshe), for Messianic readers."
+
+[[bible]]
+id = "wmbbe"
+abbr = "WMB-UK"
+name = "World Messianic Bible, British Edition"
+year = "2022"
+group = "Messianic"
+ebible = "engwmbb"
+licence = "pd"
+credit = "Public domain. \"World Messianic Bible\" is a trademark of eBible.org. Text: eBible.org."
+about = "The World Messianic Bible in British spelling."
+
+[[bible]]
+id = "ourb"
+abbr = "OURB"
+name = "One Unity Resource Bible"
+year = "2019"
+group = "Messianic"
+ebible = "engourb"
+licence = "cc-by-sa-4.0"
+credit = "© 2016, 2019 Thomas Robinson. Licensed under CC BY-SA 4.0. Text: eBible.org."
+about = "A study text with Hebrew transliterations and name meanings; selected books."

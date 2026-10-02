@@ -1,0 +1,648 @@
+# Every upstream file the library is built from, pinned by size and SHA-256.
+# `kjv-import fetch` downloads them into .cache/sources/ and refuses any file whose
+# hash differs; `kjv-import pin` re-records them after an upstream change has been
+# reviewed. See docs/LIBRARY.md.
+
+[[source]]
+path = "ebible/eng-kjv_usfm.zip"
+url = "https://ebible.org/Scriptures/eng-kjv_usfm.zip"
+size = 2765648
+sha256 = "1bab5d4d030439831fc0b39d7f11001dd8527fc6277405e7f6512273c200c3a4"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-kjv_vpl.zip"
+url = "https://ebible.org/Scriptures/eng-kjv_vpl.zip"
+size = 5225900
+sha256 = "c0526ded109f413faf90091d63352fd8426147e138686b16ce94a640fdef197f"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engkjvcpb_usfm.zip"
+url = "https://ebible.org/Scriptures/engkjvcpb_usfm.zip"
+size = 1792486
+sha256 = "d981237fd58831976e960166efa1b3c746e70e77b906da170b638fd78690d4f2"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engkjvcpb_vpl.zip"
+url = "https://ebible.org/Scriptures/engkjvcpb_vpl.zip"
+size = 5252857
+sha256 = "fdbc1e4a980f9d2ce1d063ad22505f4b2fee5c9be1741197d525bde665c0bfe0"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/enggnv_usfm.zip"
+url = "https://ebible.org/Scriptures/enggnv_usfm.zip"
+size = 1405737
+sha256 = "49aa8edd978ceca8e9b4ba7589b790a02f44f5e0b1ab494d4135f06c0fbc7215"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/enggnv_vpl.zip"
+url = "https://ebible.org/Scriptures/enggnv_vpl.zip"
+size = 4400870
+sha256 = "c8b522f8afd021d184db57f128d8202761611721f772fb6c3d9179a3b16beecc"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engtnt_usfm.zip"
+url = "https://ebible.org/Scriptures/engtnt_usfm.zip"
+size = 369501
+sha256 = "12b1fb09831fdd259e45faba6fb29df95780a637596af83eb87ef19028d4e453"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engtnt_vpl.zip"
+url = "https://ebible.org/Scriptures/engtnt_vpl.zip"
+size = 1088629
+sha256 = "2308f91a9acfe331b3efce6b001f9533b999c0a22d9deb9a2631a415b98a610a"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwyc2017_usfm.zip"
+url = "https://ebible.org/Scriptures/engwyc2017_usfm.zip"
+size = 1746384
+sha256 = "ff937bd1c1933b72221146162d4e7299c67e0fe4d7148b59a1d25c4b6ee52a8c"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwyc2017_vpl.zip"
+url = "https://ebible.org/Scriptures/engwyc2017_vpl.zip"
+size = 5194176
+sha256 = "1117f611c02d99b5af58f943b1be9289d268c7817aeb78f66629557cd30ed79e"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwyc2018_usfm.zip"
+url = "https://ebible.org/Scriptures/engwyc2018_usfm.zip"
+size = 2620000
+sha256 = "d89c8c12d79a3268b7a5c8e8465ca5b4e54dc09cb2ace0a60d9c01a6d559b420"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwyc2018_vpl.zip"
+url = "https://ebible.org/Scriptures/engwyc2018_vpl.zip"
+size = 7631500
+sha256 = "10dbd2a761d90fb28c4fecb8238fce79f2490b4dee5d07bdd751c7d345f15d90"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engWycliffe_usfm.zip"
+url = "https://ebible.org/Scriptures/engWycliffe_usfm.zip"
+size = 419866
+sha256 = "d3bca9a2304c1c2df8b190c1bdde27baca3ddc25eb32d666da301f8c4f35ef3c"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engWycliffe_vpl.zip"
+url = "https://ebible.org/Scriptures/engWycliffe_vpl.zip"
+size = 1273792
+sha256 = "26f367c8248640fa657da5491f6ad80b62b0b72e89dd57a99516bf189b837554"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwebster_usfm.zip"
+url = "https://ebible.org/Scriptures/engwebster_usfm.zip"
+size = 1419962
+sha256 = "fb12085e48a2a4ada77d6b12497411c9bd321aae929d58afe74861d450009db8"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwebster_vpl.zip"
+url = "https://ebible.org/Scriptures/engwebster_vpl.zip"
+size = 4340853
+sha256 = "6769b65f6d96a6deb83cdad4d424ca86da7582cd02b7ea5ff29184d67b518f62"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-rv_usfm.zip"
+url = "https://ebible.org/Scriptures/eng-rv_usfm.zip"
+size = 3161579
+sha256 = "87d12b8a37103925c672c4d5d1d20ec239725dc793e68ebdd792b5f9e863fde8"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-rv_vpl.zip"
+url = "https://ebible.org/Scriptures/eng-rv_vpl.zip"
+size = 5208137
+sha256 = "c03f49e0303715762f3e44579a7a5cbfd571714a29013c65c0a2581f3537e44e"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-asv_usfm.zip"
+url = "https://ebible.org/Scriptures/eng-asv_usfm.zip"
+size = 2870837
+sha256 = "c4fbf7f9d2f98be14f45020366be41179a4dfe2338058b7f6247276d70609b46"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-asv_vpl.zip"
+url = "https://ebible.org/Scriptures/eng-asv_vpl.zip"
+size = 4331683
+sha256 = "78936cfa0d2909d7c6979ba270e676855d94d44586ba567ee51b30cf30fd5130"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engasvbt_usfm.zip"
+url = "https://ebible.org/Scriptures/engasvbt_usfm.zip"
+size = 3209979
+sha256 = "3ec0af35de5cf0ded5bef8092f34b89712c95eb2db4c31dba57accd3126dc902"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engasvbt_vpl.zip"
+url = "https://ebible.org/Scriptures/engasvbt_vpl.zip"
+size = 5378829
+sha256 = "4d8221859205a942f178afaa39251175ef48facb2c4c33c272ec44abc9596f22"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engylt_usfm.zip"
+url = "https://ebible.org/Scriptures/engylt_usfm.zip"
+size = 1381464
+sha256 = "7cb58148cac1901a502e83a869329fc76095a97cda997ecbe83f816dd76d95d1"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engylt_vpl.zip"
+url = "https://ebible.org/Scriptures/engylt_vpl.zip"
+size = 4316734
+sha256 = "ba5028d525bc3e2723265b874345d1d78f4486f80b15ef8cfdc10b35fe999b5a"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engDBY_usfm.zip"
+url = "https://ebible.org/Scriptures/engDBY_usfm.zip"
+size = 2793622
+sha256 = "95209a4795f91901411e52cbff212ec2ce02dd1acad65e5b701c4dd5bfcb2122"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engDBY_vpl.zip"
+url = "https://ebible.org/Scriptures/engDBY_vpl.zip"
+size = 4314908
+sha256 = "eec952a596451b25045bc612de822ec77d2d912d978f5fd73e0f856957eba0ff"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/englsv_usfm.zip"
+url = "https://ebible.org/Scriptures/englsv_usfm.zip"
+size = 2801989
+sha256 = "d458862326fa9def3fc1fb61896584b9cff7144b6ec035606d72e0934e60a006"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/englsv_vpl.zip"
+url = "https://ebible.org/Scriptures/englsv_vpl.zip"
+size = 4274243
+sha256 = "119c0cceb8b6c56508f335ddb3139c2a71245b0bb582cb8a6acb723615082a3e"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engULB_usfm.zip"
+url = "https://ebible.org/Scriptures/engULB_usfm.zip"
+size = 1457800
+sha256 = "eef9d48becfc099f8bebb854775214884beed7c7ff40feab0ce34c4c8d7ebe53"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engULB_vpl.zip"
+url = "https://ebible.org/Scriptures/engULB_vpl.zip"
+size = 4442829
+sha256 = "25897aa9ba289f2f40ce1dd4a1f5ef458823c5be6849e097b6f0bb774d74fb6c"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwebp_usfm.zip"
+url = "https://ebible.org/Scriptures/engwebp_usfm.zip"
+size = 2903129
+sha256 = "c725155aa8192b954e552a0b08aa75f8e7b85e6e56f1eb22efd6d30f5b4aa3cc"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwebp_vpl.zip"
+url = "https://ebible.org/Scriptures/engwebp_vpl.zip"
+size = 4281554
+sha256 = "7d2e0b91ba43e2500fcab9c64d9db1962750deeff4e1186aed4c30220f5689be"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwebu_usfm.zip"
+url = "https://ebible.org/Scriptures/engwebu_usfm.zip"
+size = 3261864
+sha256 = "3cb8df41bca789211742c9a375802c1c50ed7a220cb9726f64eadc746b7e3f2c"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwebu_vpl.zip"
+url = "https://ebible.org/Scriptures/engwebu_vpl.zip"
+size = 5347560
+sha256 = "cbed8914abff11ff715242ae06351ef7cc77931b89968c6c57142bb8616ddb82"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-web-c_usfm.zip"
+url = "https://ebible.org/Scriptures/eng-web-c_usfm.zip"
+size = 3081426
+sha256 = "8fb2395e7eb0c9c8526c79347062048f85d6dcc3e396ed2edcc436a67713d929"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-web-c_vpl.zip"
+url = "https://ebible.org/Scriptures/eng-web-c_vpl.zip"
+size = 4734484
+sha256 = "161ba317dc582c0ee30948acef8a6cbf1828d60db4c42ad2bda682f3ff0edb59"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-web_usfm.zip"
+url = "https://ebible.org/Scriptures/eng-web_usfm.zip"
+size = 3244206
+sha256 = "ba4e0cd941156deba01e164a5779effcf592b1053e5de26b950772b6c336073c"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-web_vpl.zip"
+url = "https://ebible.org/Scriptures/eng-web_vpl.zip"
+size = 5343545
+sha256 = "996c0b19e08752feea2b2a2e7def2a653f22661e0b4c572b93252a518df9fe6a"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-webbe_usfm.zip"
+url = "https://ebible.org/Scriptures/eng-webbe_usfm.zip"
+size = 3262844
+sha256 = "5143596a47d5a338fd2eae45e0ff470788a754dfe6b150d520fa2c05d0579b0c"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-webbe_vpl.zip"
+url = "https://ebible.org/Scriptures/eng-webbe_vpl.zip"
+size = 5350731
+sha256 = "aeff05488cd8d57ac8c3800893a3c86988c929a07c58363d1d94909ec23252fd"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwebpb_usfm.zip"
+url = "https://ebible.org/Scriptures/engwebpb_usfm.zip"
+size = 2903769
+sha256 = "db93ccc5ce77d4f80e6b37599d0699cdaae45036584b18ff34e0ddaa063ab6cb"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwebpb_vpl.zip"
+url = "https://ebible.org/Scriptures/engwebpb_vpl.zip"
+size = 4283440
+sha256 = "a6a1a4f849241ae5e48036de42b27068ecbaed8b02fc551ffd14d88239029b39"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engbsb_usfm.zip"
+url = "https://ebible.org/Scriptures/engbsb_usfm.zip"
+size = 3017011
+sha256 = "c065fa11decc416071985692b959dbd49506b188dc354e37805941f248b3da9e"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engbsb_vpl.zip"
+url = "https://ebible.org/Scriptures/engbsb_vpl.zip"
+size = 4324626
+sha256 = "51d4d53b37d3ba2147b8eeb0697eb36d339d08acdda97baec8c4ed606faf2361"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engmsb_usfm.zip"
+url = "https://ebible.org/Scriptures/engmsb_usfm.zip"
+size = 2785733
+sha256 = "d5c796c9c92ff9a273ac2054a82f6766fa6ad9e002b272940eff4bd84b5c2449"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engmsb_vpl.zip"
+url = "https://ebible.org/Scriptures/engmsb_vpl.zip"
+size = 4330746
+sha256 = "7a6aad55189886f5325481f6b82b5e43ae7c09b05f2259265f51ef0542265073"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engnet_usfm.zip"
+url = "https://ebible.org/Scriptures/engnet_usfm.zip"
+size = 2912943
+sha256 = "5cfbab9166bfc1d93f12a94dbe2bb97f29276e893f91b0747de1b77ca59b18b9"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engnet_vpl.zip"
+url = "https://ebible.org/Scriptures/engnet_vpl.zip"
+size = 4464387
+sha256 = "c62d20ced0957aac4e4bcf16d33934f53680c05e08cffd25f3dd51606b8be0f1"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engfbv_usfm.zip"
+url = "https://ebible.org/Scriptures/engfbv_usfm.zip"
+size = 3077646
+sha256 = "c79cc0ac6a965e929ab7781eaae3a5991c04414a200d4aa9cc5e4adb64b247f3"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engfbv_vpl.zip"
+url = "https://ebible.org/Scriptures/engfbv_vpl.zip"
+size = 4483395
+sha256 = "bee33eefa7b82d9f6f0433814eb81cfcf1e4923ccb756490dcc97c7c8226d00a"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engoebus_usfm.zip"
+url = "https://ebible.org/Scriptures/engoebus_usfm.zip"
+size = 1282080
+sha256 = "eed2f33f1ae906f1dbba77ba9c096c9d0cb18a50bf7da45dc0d44e1e3273689f"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engoebus_vpl.zip"
+url = "https://ebible.org/Scriptures/engoebus_vpl.zip"
+size = 1973423
+sha256 = "99a03f16fb8294c76e8fa8c6e5cfff845672bbf37de8e0afa4fa908f0df9e110"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engoebcw_usfm.zip"
+url = "https://ebible.org/Scriptures/engoebcw_usfm.zip"
+size = 1281748
+sha256 = "f60871394d2011e7ccb22a1a67667a1dc8e653865ae1a96dd32a7a869dd6eb16"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engoebcw_vpl.zip"
+url = "https://ebible.org/Scriptures/engoebcw_vpl.zip"
+size = 1973577
+sha256 = "31e3273200500d9272cd3ca7f43233b4e936ccee3e315f522293dad76753cba4"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engBBE_usfm.zip"
+url = "https://ebible.org/Scriptures/engBBE_usfm.zip"
+size = 2853316
+sha256 = "adfe61404bfe2a9f28428598c2f554060a6581a6c2b36c045a612d49af9d200d"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engBBE_vpl.zip"
+url = "https://ebible.org/Scriptures/engBBE_vpl.zip"
+size = 4211267
+sha256 = "9752f2ead93ba500182c071014d59131a5b61f98b8efd43789e9f6b1f2a77f86"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engnoy_usfm.zip"
+url = "https://ebible.org/Scriptures/engnoy_usfm.zip"
+size = 815275
+sha256 = "2aa4d2cbfa6c71180fff1a5014ac6f7d55cf8cbb950e956581b8b32db627dc6b"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engnoy_vpl.zip"
+url = "https://ebible.org/Scriptures/engnoy_vpl.zip"
+size = 2512061
+sha256 = "3a0dd11b0642d7fb8fde75b9426ef5af596a1306c5930794febd3991bd6e9019"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-t4t_usfm.zip"
+url = "https://ebible.org/Scriptures/eng-t4t_usfm.zip"
+size = 3753583
+sha256 = "40c959989897d793a84f8cc42dbc3e21b0c6f8cf95e03f1f9fca7de053bbef80"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-t4t_vpl.zip"
+url = "https://ebible.org/Scriptures/eng-t4t_vpl.zip"
+size = 5789112
+sha256 = "3111eadd03606d7649be234cf4cbc33b16733e099397364197dd01050517240a"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engPEV_usfm.zip"
+url = "https://ebible.org/Scriptures/engPEV_usfm.zip"
+size = 1111625
+sha256 = "79f49ed1602e5cbe2287cb25636f07e474c05fa3f47f1017b886bcf75dca4195"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engPEV_vpl.zip"
+url = "https://ebible.org/Scriptures/engPEV_vpl.zip"
+size = 1472044
+sha256 = "d088a1832d3754a9fe15798df4a436eb03176426b3e93c82012a722e5fc7959b"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-glw_usfm.zip"
+url = "https://ebible.org/Scriptures/eng-glw_usfm.zip"
+size = 108846
+sha256 = "12eb37dd27fa7be77a01466ae1ef4cfd31cb3e44ac07e592c245291a7b6a24d2"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-glw_vpl.zip"
+url = "https://ebible.org/Scriptures/eng-glw_vpl.zip"
+size = 132357
+sha256 = "bf66dc3f51808a2e96359ef1cfdd2ba723dea655f8700bfefbcd2be9b5d1c226"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engemtv_usfm.zip"
+url = "https://ebible.org/Scriptures/engemtv_usfm.zip"
+size = 399624
+sha256 = "969879f340aac80c37e17018dfc8cbf71059d98ae36944ed14c1f338a4c8cd20"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engemtv_vpl.zip"
+url = "https://ebible.org/Scriptures/engemtv_vpl.zip"
+size = 1104064
+sha256 = "7136c6a43f66aa3ba6f66e7d781fde99921c7e770f22aeac094acb2cb2ac9c67"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engtcent_usfm.zip"
+url = "https://ebible.org/Scriptures/engtcent_usfm.zip"
+size = 842131
+sha256 = "13ef9e472e906d2328da50a3153200be62fc2b0ee7e20f5593413771c1e11baa"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engtcent_vpl.zip"
+url = "https://ebible.org/Scriptures/engtcent_vpl.zip"
+size = 1097841
+sha256 = "a9a9fff5e8789a6e5a9e2c0b7a807b876784434aad1eaa299a05744e43a9e466"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engf35_usfm.zip"
+url = "https://ebible.org/Scriptures/engf35_usfm.zip"
+size = 1317296
+sha256 = "b77629b530e4f74d12ace5d933413f16a0ad42547b3cc556a4cd30719f90d53e"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engf35_vpl.zip"
+url = "https://ebible.org/Scriptures/engf35_vpl.zip"
+size = 1126149
+sha256 = "2a63f3c61c28179fede51aed5b6342c4fcaaff39c8d708bed18220dec6318871"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engDRA_usfm.zip"
+url = "https://ebible.org/Scriptures/engDRA_usfm.zip"
+size = 2937906
+sha256 = "b891705afb54aac46b98d9b87320620fde7cab9cf6d1fc5459d2785d2df5cd94"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engDRA_vpl.zip"
+url = "https://ebible.org/Scriptures/engDRA_vpl.zip"
+size = 4995212
+sha256 = "d953c97b16ab4529ed119f6673c89cc928a1e790160b4f286b7af01782997a4f"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-Brenton_usfm.zip"
+url = "https://ebible.org/Scriptures/eng-Brenton_usfm.zip"
+size = 1438240
+sha256 = "93496ef23f7ff2427c32f5d353089dee73e82975ab92c80a00663fb333c57e32"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-Brenton_vpl.zip"
+url = "https://ebible.org/Scriptures/eng-Brenton_vpl.zip"
+size = 4175902
+sha256 = "60d5ce2f2ba2c873d2e58c44681e08b529890641e835be0c22fbae0050276759"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/englxxup_usfm.zip"
+url = "https://ebible.org/Scriptures/englxxup_usfm.zip"
+size = 1348985
+sha256 = "f1d669d395ef2ce4f6c7444b6780705b4bb1a062d9ed957e4079bd344cd4248c"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/englxxup_vpl.zip"
+url = "https://ebible.org/Scriptures/englxxup_vpl.zip"
+size = 4122753
+sha256 = "ab73ddfd26ac2a83a4c18601a9bb96729f33c82f587ea61eafa8023908658745"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-lxx2012_usfm.zip"
+url = "https://ebible.org/Scriptures/eng-lxx2012_usfm.zip"
+size = 1390827
+sha256 = "9853ef3a0307414f869b463c1f2d73d6fad34f2a2b750a761e45c253e5bfc777"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/eng-lxx2012_vpl.zip"
+url = "https://ebible.org/Scriptures/eng-lxx2012_vpl.zip"
+size = 4105676
+sha256 = "32735526b3b170f91768e30f29caa43f3f88261cb2efdc9ec7e759c6279300e1"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engjps_usfm.zip"
+url = "https://ebible.org/Scriptures/engjps_usfm.zip"
+size = 1048967
+sha256 = "e48d141d29c4e3a73e2307b8fa5975d16fee73490f79b92191f7852986f4393d"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engjps_vpl.zip"
+url = "https://ebible.org/Scriptures/engjps_vpl.zip"
+size = 3304485
+sha256 = "e139b51f1d2b0a0ca28d6037f7d15e360b80ba55df687efada6bb7a5367a6035"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/englee_usfm.zip"
+url = "https://ebible.org/Scriptures/englee_usfm.zip"
+size = 1105058
+sha256 = "d5db94a37321ba613a2f8ac9b3039064a6560a0e115dc42221195afc9b7053de"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/englee_vpl.zip"
+url = "https://ebible.org/Scriptures/englee_vpl.zip"
+size = 3455907
+sha256 = "3e1de5b00b15fb8c7253a1a18aaea6b90954080d42f66a986663175a7b6cac17"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engoke_usfm.zip"
+url = "https://ebible.org/Scriptures/engoke_usfm.zip"
+size = 265034
+sha256 = "193398d4d510ccaa042db64aec0e2b3e834a0894fd7a463b2944ca2e982d6558"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engoke_vpl.zip"
+url = "https://ebible.org/Scriptures/engoke_vpl.zip"
+size = 803604
+sha256 = "4319c7fa3544327585e586d666a2a3e0cb4e7667f8af4fd97826f2d298ba0855"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engojb_usfm.zip"
+url = "https://ebible.org/Scriptures/engojb_usfm.zip"
+size = 1821975
+sha256 = "f071dfbc72e36e77a07bfe776c13a14d78fa7c79999632595c9f0db96a01a462"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engojb_vpl.zip"
+url = "https://ebible.org/Scriptures/engojb_vpl.zip"
+size = 5073017
+sha256 = "be8dd7126f3f2580044f595c60528cfa5cd9421544676c1f53ba1bb598ba5687"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwmb_usfm.zip"
+url = "https://ebible.org/Scriptures/engwmb_usfm.zip"
+size = 2886108
+sha256 = "276b10c2077268809c023727334b0bc9975116179890d07ca96fd70b0bb9d433"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwmb_vpl.zip"
+url = "https://ebible.org/Scriptures/engwmb_vpl.zip"
+size = 4283548
+sha256 = "cf4b39548bfe7b9c15931ee652c83a7aaf0e1d4d18ba83576aa120f91d48c2cd"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwmbb_usfm.zip"
+url = "https://ebible.org/Scriptures/engwmbb_usfm.zip"
+size = 2886135
+sha256 = "a7ac614643259a84d38afe5ad4ded656df88acd1ccc946fe0a5a81071e446fe3"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engwmbb_vpl.zip"
+url = "https://ebible.org/Scriptures/engwmbb_vpl.zip"
+size = 4285537
+sha256 = "cf14ae3bd5d69468f872060c4305669ef1a4360d4a93c27e9606476edb4fbb6e"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engourb_usfm.zip"
+url = "https://ebible.org/Scriptures/engourb_usfm.zip"
+size = 876541
+sha256 = "2addfcf53ceb68a9212363b9e888578e762c7fa115031b7cf29b49283e3c3523"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ebible/engourb_vpl.zip"
+url = "https://ebible.org/Scriptures/engourb_vpl.zip"
+size = 2089320
+sha256 = "4514aced8d3cd1dc4023bc99f2ab291ef6fd4003a5d63c29346c77f9a87c4284"
+retrieved = "2026-10-02"

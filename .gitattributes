@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Library data is byte-identical on every platform (checked against pinned sources)
+data/library/** text eol=lf
