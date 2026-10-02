@@ -1,0 +1,120 @@
+# The commentaries in the library, in the order the app lists them.
+#
+# Every one is a public-domain work, read from the SWORD module named in `source` with
+# `kjv-sword` and converted to the library's note markup (docs/LIBRARY.md) by kjv-import.
+# Each note is keyed to the KJV's verse numbering and checked character by character
+# against its source (see crates/import/src/commentaries.rs).
+#
+# Fields:
+#   id        our id, used in data/library/commentaries/<id>/ and in the app
+#   name      the work as it is known
+#   author    who wrote it
+#   year      when it was published
+#   tradition the author's tradition, shown so a reader knows the angle
+#   coverage  what the commentary covers
+#   licence   pd (public domain)
+#   credit    the credit line shown in the app and in NOTICE
+#   about     one or two sentences for the picker
+#   source    the module's zip, under .cache/sources/
+#   url       where `kjv-import fetch` downloads it
+#   jud_is_judges        "Jud" in this module's scripture references means Judges
+#   trim_cross_chapter   cut a note linked across a chapter boundary at its first chapter's end
+#   relative_refs        a scripture reference with no book is in the note's own book and chapter
+#                        (the convention of TSK and Wesley: "8:22" or "13" under Genesis 1:5)
+
+[[commentary]]
+id = "mhc"
+name = "Matthew Henry's Complete Commentary"
+author = "Matthew Henry"
+year = "1706–1721"
+tradition = "Puritan / Reformed"
+coverage = "Whole Bible"
+licence = "pd"
+credit = "Public domain. Text: CrossWire Bible Society, prepared from the Christian Classics Ethereal Library (ccel.org) with thanks to Logos Research Systems."
+about = "The best-loved devotional commentary in English: each chapter's text is set out with Henry's plain, practical, often quotable exposition."
+source = "crosswire/MHC.zip"
+url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHC.zip"
+
+[[commentary]]
+id = "catena"
+name = "Catena Aurea"
+author = "Thomas Aquinas (translated by John Henry Newman)"
+year = "1263–1264 (translation 1841–1845)"
+tradition = "Patristic; compiled by a Catholic Dominican"
+coverage = "The four Gospels"
+licence = "pd"
+credit = "Public domain. Translation by John Henry Newman. Text: CrossWire Bible Society, from the digital edition by Tom Lemmens (github.com/lemtom/catena)."
+about = "A \"golden chain\" of quotations from the Church Fathers, verse by verse through the Gospels, arranged by Thomas Aquinas."
+source = "crosswire/Catena.zip"
+url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Catena.zip"
+
+[[commentary]]
+id = "wesley"
+name = "Wesley's Notes on the Bible"
+author = "John Wesley"
+year = "1754–1765"
+tradition = "Methodist"
+coverage = "Whole Bible (brief notes on selected passages)"
+licence = "pd"
+credit = "Public domain. Text: CrossWire Bible Society, from the electronic edition by Sulu Kelley and Bill Brown."
+about = "Short, clear explanatory notes on the whole Bible, drawing on Bengel and others and aimed at the ordinary reader."
+source = "crosswire/Wesley.zip"
+url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Wesley.zip"
+jud_is_judges = true
+trim_cross_chapter = true
+relative_refs = true
+
+[[commentary]]
+id = "kd"
+name = "Keil & Delitzsch Commentary on the Old Testament"
+author = "C. F. Keil and F. Delitzsch"
+year = "1857–1878"
+tradition = "Lutheran"
+coverage = "Old Testament"
+licence = "pd"
+credit = "Public domain. Text: CrossWire Bible Society, from Wikisource and the BibleWorks module by Willem Swanepoel."
+about = "A learned grammatical and historical commentary on the Old Testament, written to meet German critical scholarship with faith in the text; rich in Hebrew."
+source = "crosswire/KD.zip"
+url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/KD.zip"
+
+[[commentary]]
+id = "jfb"
+name = "Jamieson-Fausset-Brown Commentary"
+author = "Robert Jamieson, A. R. Fausset, and David Brown"
+year = "1871"
+tradition = "Evangelical"
+coverage = "Whole Bible"
+licence = "pd"
+credit = "Public domain. Text: CrossWire Bible Society, from the Christian Classics Ethereal Library (ccel.org)."
+about = "Commentary Critical and Explanatory on the Whole Bible: a one-work study Bible from three Scottish and English scholars, concise and verse by verse."
+source = "crosswire/JFB.zip"
+url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/JFB.zip"
+jud_is_judges = true
+
+[[commentary]]
+id = "tsk"
+name = "Treasury of Scripture Knowledge"
+author = "R. A. Torrey (introduction); Canne, Browne, Blayney, Scott, and others"
+year = "c. 1880"
+tradition = "Cross-references"
+coverage = "Whole Bible (cross-references)"
+licence = "pd"
+credit = "Public domain. Text: CrossWire Bible Society."
+about = "Some half a million cross-references and parallel passages, set under each verse: the classic way to let Scripture interpret Scripture."
+source = "crosswire/TSK.zip"
+url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/TSK.zip"
+jud_is_judges = true
+relative_refs = true
+
+[[commentary]]
+id = "gill"
+name = "John Gill's Exposition of the Bible"
+author = "John Gill"
+year = "1746–1763"
+tradition = "Reformed Baptist"
+coverage = "Whole Bible"
+licence = "pd"
+credit = "Public domain. Text: SermonIndex.net (sermonindex.net/commentary/gill)."
+about = "The most thorough verse-by-verse commentary by a single author, strong on Hebrew, Greek, and rabbinical sources. This edition keeps the original Hebrew."
+source = "sermonindex/sigill.zip"
+url = "https://www.sermonindex.net/modules/sword/sigill.zip"

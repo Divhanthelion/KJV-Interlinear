@@ -2357,6 +2357,7 @@ name = "kjv-core"
 version = "0.1.0"
 dependencies = [
  "bincode",
+ "kjv-library",
  "serde",
  "serde_json",
 ]
@@ -2367,10 +2368,12 @@ version = "0.1.0"
 dependencies = [
  "kjv-ai",
  "kjv-core",
+ "kjv-library",
  "serde",
  "serde_json",
  "tiny_http",
  "tokio",
+ "zstd",
 ]
 
 [[package]]
@@ -2378,8 +2381,10 @@ name = "kjv-import"
 version = "0.1.0"
 dependencies = [
  "kjv-library",
+ "kjv-sword",
  "reqwest 0.12.28",
  "serde",
+ "serde_json",
  "sha2 0.10.9",
  "toml 0.8.2",
  "zip 2.4.2",
@@ -2394,6 +2399,7 @@ dependencies = [
  "keyring-core",
  "kjv-ai",
  "kjv-core",
+ "kjv-library",
  "ruzstd",
  "serde",
  "serde_json",
@@ -2412,6 +2418,9 @@ name = "kjv-library"
 version = "0.1.0"
 dependencies = [
  "ruzstd",
+ "serde",
+ "serde_json",
+ "toml 0.8.2",
  "zip 2.4.2",
  "zstd",
 ]

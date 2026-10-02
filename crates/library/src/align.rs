@@ -17,7 +17,9 @@
 //!
 //! Every group carries how it was matched, so the alignment tables can be reviewed.
 
+use std::collections::hash_map::DefaultHasher;
 use std::collections::{HashMap, HashSet};
+use std::hash::BuildHasherDefault;
 
 /// Words too common to tell verses apart.
 const STOP: &[&str] = &[
@@ -42,8 +44,9 @@ pub fn words(text: &str) -> Vec<String> {
         .collect()
 }
 
-/// A verse's comparable words and their weights.
-pub type Weights = HashMap<String, f32>;
+/// A verse's comparable words and their weights. The hasher is fixed (not seeded per
+/// run) so sums happen in the same order every time and alignments are reproducible.
+pub type Weights = HashMap<String, f32, BuildHasherDefault<DefaultHasher>>;
 
 /// Weighted word sets for two runs of verses, weighted by how rare each word is
 /// across both (inverse document frequency).
@@ -57,7 +60,7 @@ pub fn weigh(a: &[String], b: &[String]) -> (Vec<Weights>, Vec<Weights>) {
         }
     }
     let weights = |d: &Vec<String>| -> Weights {
-        let mut m = Weights::new();
+        let mut m = Weights::default();
         for w in d {
             let idf = (n / df[w.as_str()] as f32).ln() + 1.0;
             // Numbers are strong evidence (lists, counts, ages)
@@ -131,6 +134,9 @@ const JOIN_HALF: f32 = 0.2;
 /// is empty in this translation (left out, with a footnote): different recensions
 /// (the Vulgate's Tobias and the Greek Tobit) share numbers but not text.
 const NUMBER_MIN: f32 = 0.1;
+/// A leftover moves away from the verse its number stands for only when the other
+/// verse is this much more similar.
+const MOVE_MARGIN: f32 = 0.15;
 
 /// Align `a` with `b` in order. `same(i, j)`: whether a[i] and b[j] carry the same
 /// verse number. Every index of each side appears in exactly one group.
@@ -226,7 +232,9 @@ fn group(a: &[Weights], b: &[Weights], ga: Vec<usize>, gb: Vec<usize>, how: How)
 /// The second pass. `groups` aligned `a` with the first verses of `b`; `b` may
 /// continue with related books' verses (KJV Susanna for Douay-Rheims Daniel 13).
 /// Returns groups in `a`'s order, then `b`'s unmatched verses.
-pub fn refine(a: &[Weights], b: &[Weights], groups: Vec<Group>, same: &dyn Fn(usize, usize) -> bool) -> Vec<Group> {
+/// `partners(i)`: the indexes in `b` that a[i]'s number stands for (one verse, a
+/// bridged verse's whole range, or none).
+pub fn refine(a: &[Weights], b: &[Weights], groups: Vec<Group>, partners: &dyn Fn(usize) -> Vec<usize>) -> Vec<Group> {
     // Joins whose halves don't both match are split; the stray half is left over
     let mut split: Vec<Group> = Vec::new();
     for g in groups {
@@ -287,38 +295,107 @@ pub fn refine(a: &[Weights], b: &[Weights], groups: Vec<Group>, same: &dyn Fn(us
         }
     }
 
-    // Leftovers paired by best similarity anywhere, strongest first
-    let mut pairs: Vec<(f32, usize, usize)> = Vec::new();
-    for &i in &left_a {
-        for &j in &left_b {
-            let s = cosine(&a[i], &b[j]);
-            if s >= RECOVER {
-                pairs.push((s, i, j));
-            }
-        }
-    }
-    pairs.sort_by(|x, y| y.0.total_cmp(&x.0).then(x.1.cmp(&y.1)).then(x.2.cmp(&y.2)));
-    let mut done_a: HashSet<usize> = HashSet::new();
-    for (s, i, j) in pairs {
-        if done_a.contains(&i) || !left_b.contains(&j) {
-            continue;
-        }
-        done_a.insert(i);
-        left_b.remove(&j);
-        kept.push(Group { a: vec![i], b: vec![j], score: s, how: How::Moved });
-    }
+    // Leftovers. A verse pairs with the KJV verse(s) its number stands for when the
+    // text agrees a little, the verse is empty here, or a neighbour is paired the same
+    // way; it moves to another verse only when that verse is clearly more similar
+    // (reordered or relocated text). Moves are taken strongest first; number pairs
+    // spread through runs of leftovers from paired neighbours.
+    let mut paired: HashMap<usize, Vec<usize>> = kept.iter().filter(|g| g.a.len() == 1).map(|g| (g.a[0], g.b.clone())).collect();
+    let mut rest: Vec<usize> = left_a;
+    rest.sort_unstable();
+    rest.dedup();
 
-    // Last: leftovers carrying the same number on both sides
-    let mut rest_a: Vec<usize> = left_a.into_iter().filter(|i| !done_a.contains(i)).collect();
-    rest_a.sort_unstable();
-    for i in rest_a {
-        let partner = left_b.iter().copied().filter(|&j| same(i, j)).min();
-        match partner.filter(|&j| a[i].is_empty() || cosine(&a[i], &b[j]) >= NUMBER_MIN) {
-            Some(j) => {
-                left_b.remove(&j);
-                kept.push(Group { a: vec![i], b: vec![j], score: cosine(&a[i], &b[j]), how: How::Number });
+    let best_move = |i: usize, exclude: &[usize], left_b: &HashSet<usize>| -> Option<(f32, usize)> {
+        left_b
+            .iter()
+            .copied()
+            .filter(|j| !exclude.contains(j))
+            .map(|j| (cosine(&a[i], &b[j]), j))
+            .filter(|(s, _)| *s >= RECOVER)
+            .max_by(|x, y| x.0.total_cmp(&y.0).then(y.1.cmp(&x.1)))
+    };
+    // The KJV verses `i`'s number stands for, if all are still free
+    let by_number = |i: usize, left_b: &HashSet<usize>| -> Option<Vec<usize>> {
+        let p = partners(i);
+        (!p.is_empty() && p.iter().all(|j| left_b.contains(j))).then_some(p)
+    };
+    let number_score = |i: usize, p: &[usize]| -> f32 {
+        let joined_b = p.iter().fold(Weights::default(), |acc, &j| joined(&acc, &b[j]));
+        cosine(&a[i], &joined_b)
+    };
+
+    loop {
+        let mut changed = false;
+        // Number pairs that nothing clearly beats
+        let mut still = Vec::new();
+        for i in rest {
+            let Some(p) = by_number(i, &left_b) else {
+                still.push(i);
+                continue;
+            };
+            let s = number_score(i, &p);
+            let neighbour = (i > 0 && paired.get(&(i - 1)).is_some_and(|q| *q == partners(i - 1)))
+                || paired.get(&(i + 1)).is_some_and(|q| *q == partners(i + 1));
+            // An empty verse (left out here, its number kept) is the weakest evidence:
+            // it waits until every move has been made
+            let supported = !a[i].is_empty() && (s >= NUMBER_MIN || neighbour);
+            let beaten = best_move(i, &p, &left_b).is_some_and(|(m, _)| m >= s + MOVE_MARGIN);
+            if supported && !beaten {
+                for j in &p {
+                    left_b.remove(j);
+                }
+                paired.insert(i, p.clone());
+                kept.push(Group { a: vec![i], b: p, score: s, how: How::Number });
+                changed = true;
+            } else {
+                still.push(i);
             }
-            None => kept.push(Group { a: vec![i], b: vec![], score: 0.0, how: How::Unmatched }),
+        }
+        rest = still;
+        // Then the single strongest move, so number pairs can follow from it
+        let mut best: Option<(f32, usize, usize)> = None;
+        for &i in &rest {
+            if let Some((s, j)) = best_move(i, &[], &left_b)
+                && best.is_none_or(|(bs, bi, bj)| s > bs || (s == bs && (i, j) < (bi, bj)))
+            {
+                best = Some((s, i, j));
+            }
+        }
+        if let Some((s, i, j)) = best {
+            left_b.remove(&j);
+            paired.insert(i, vec![j]);
+            rest.retain(|&x| x != i);
+            kept.push(Group { a: vec![i], b: vec![j], score: s, how: How::Moved });
+            changed = true;
+        }
+        if !changed {
+            break;
+        }
+    }
+    // Last, empty verses take the verse their number stands for, if it's still free
+    let mut unmatched = Vec::new();
+    for i in rest {
+        match by_number(i, &left_b).filter(|_| a[i].is_empty()) {
+            Some(p) => {
+                for j in &p {
+                    left_b.remove(j);
+                }
+                kept.push(Group { a: vec![i], b: p, score: 0.0, how: How::Number });
+            }
+            None => unmatched.push(i),
+        }
+    }
+    kept.extend(unmatched.into_iter().map(|i| Group { a: vec![i], b: vec![], score: 0.0, how: How::Unmatched }));
+
+    // A bridged verse matched to part of its range takes the rest of it, if free
+    for g in kept.iter_mut() {
+        let [i] = g.a[..] else { continue };
+        let p = partners(i);
+        if p.len() > 1 && !g.b.is_empty() && g.b.iter().all(|j| p.contains(j)) && p.iter().all(|j| g.b.contains(j) || left_b.contains(j)) {
+            for j in &p {
+                left_b.remove(j);
+            }
+            g.b = p;
         }
     }
     kept.sort_by_key(|g| g.a.first().copied().unwrap_or(usize::MAX));
@@ -342,7 +419,8 @@ mod tests {
 
     fn run(other: &[String], kjv: &[String], same: &dyn Fn(usize, usize) -> bool) -> Vec<Group> {
         let (a, b) = weigh(other, kjv);
-        refine(&a, &b, align(&a, &b, same), same)
+        let partners = |i: usize| (0..kjv.len()).filter(|&j| same(i, j)).collect::<Vec<_>>();
+        refine(&a, &b, align(&a, &b, same), &partners)
     }
 
     #[test]
@@ -403,6 +481,21 @@ mod tests {
     }
 
     #[test]
+    fn an_empty_verse_does_not_take_text_printed_elsewhere() {
+        // The WEB prints Romans 16:25-27 at 14:24-26 and keeps 16:25 empty
+        let kjv = s(&[
+            "The grace of our Lord Jesus Christ be with you all. Amen.",
+            "Now to him that is of power to stablish you according to my gospel, and the preaching of Jesus Christ",
+        ]);
+        let web = s(&["Now to him who is able to establish you according to my Good News and the preaching of Jesus Christ", "The grace of our Lord Jesus Christ be with you all! Amen.", ""]);
+        // WEB 16:24 is KJV 16:24 and WEB 16:25 is KJV 16:25 by number; WEB 14:24 has no KJV number
+        let g = run(&web, &kjv, &|i, j| (i, j) == (1, 0) || (i, j) == (2, 1));
+        let mut got = pairs(&g);
+        got.sort();
+        assert_eq!(got, [(vec![0], vec![1]), (vec![1], vec![0]), (vec![2], vec![])], "{:?}", g);
+    }
+
+    #[test]
     fn leftovers_with_the_same_number_pair_last() {
         // An empty verse (left out, with a footnote) keeps its number's place
         let kjv = s(&["Two women shall be grinding together", "Two men shall be in the field; the one shall be taken"]);
@@ -412,4 +505,104 @@ mod tests {
         // Kept in place: the ends of the run frame it
         assert_eq!(g[1].how, How::Framed);
     }
+}
+
+// ---------------------------------------------------------------- whole translations
+
+/// The KJV book a translation's book is aligned with in order, and the KJV books
+/// whose leftover verses it may also match: Douay-Rheims Daniel 13 is the KJV's
+/// Susanna, its Esther 10:4-16:24 the KJV's Additions to Esther.
+pub fn kjv_books_for(code: &str) -> Option<(&str, &'static [&'static str])> {
+    Some(match code {
+        "EST" => ("EST", &["ESG"]),
+        "ESG" => ("ESG", &["EST"]),
+        "DAN" => ("DAN", &["S3Y", "SUS", "BEL"]),
+        "DAG" => ("DAN", &["S3Y", "SUS", "BEL"]),
+        "S3Y" | "SUS" | "BEL" => (code, &["DAN"]),
+        // The KJV prints the Letter of Jeremiah as Baruch 6
+        "LJE" => ("BAR", &[]),
+        // Books the KJV doesn't have
+        "3MA" | "4MA" | "PS2" | "PSS" => return None,
+        other => (other, &[]),
+    })
+}
+
+/// A verse as the aligner sees it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Verse {
+    pub chapter: u32,
+    /// "16", "1-2", "0" for a title
+    pub number: String,
+    pub title: bool,
+    pub text: String,
+}
+
+/// One row of a translation's alignment: its verses `native` (in its book `book`)
+/// correspond to the KJV's verses `kjv` (book code, chapter, number).
+#[derive(Debug, Clone, PartialEq)]
+pub struct Row {
+    pub book: String,
+    pub native: Vec<(u32, String)>,
+    pub kjv: Vec<(String, u32, String)>,
+    pub how: How,
+    pub score: f32,
+}
+
+impl Row {
+    /// One native verse matched to the KJV verse of the same book and number.
+    pub fn is_same_number(&self) -> bool {
+        self.native.len() == 1
+            && self.kjv.len() == 1
+            && self.kjv[0].0 == self.book
+            && self.kjv[0].1 == self.native[0].0
+            && self.kjv[0].2 == self.native[0].1
+    }
+}
+
+/// Align book `code` of a translation (`native`) with the KJV, whose books come from
+/// `kjv(code)`. Returns every native verse in exactly one row, then rows for the
+/// KJV verses (of the book itself and its related books) left without a counterpart.
+pub fn align_book(code: &str, native: &[Verse], kjv: &dyn Fn(&str) -> Option<Vec<Verse>>) -> Vec<Row> {
+    let unmatched = |v: &Verse| Row { book: code.to_string(), native: vec![(v.chapter, v.number.clone())], kjv: vec![], how: How::Unmatched, score: 0.0 };
+    let Some((primary, related)) = kjv_books_for(code) else {
+        return native.iter().map(unmatched).collect();
+    };
+    let Some(first) = kjv(primary) else {
+        return native.iter().map(unmatched).collect();
+    };
+    let in_order = first.len();
+    let mut k: Vec<(String, Verse)> = first.into_iter().map(|v| (primary.to_string(), v)).collect();
+    for r in related {
+        k.extend(kjv(r).unwrap_or_default().into_iter().map(|v| (r.to_string(), v)));
+    }
+    let ta: Vec<String> = native.iter().map(|v| v.text.clone()).collect();
+    let tk: Vec<String> = k.iter().map(|v| v.1.text.clone()).collect();
+    let (wa, wk) = weigh(&ta, &tk);
+    // The KJV verses a native verse's number stands for: the same-numbered verse, or
+    // every verse of a bridged verse's range ("24-30"). Worked out once per verse.
+    let index: HashMap<(u32, &str, bool), usize> =
+        k[..in_order].iter().enumerate().map(|(j, (_, w))| ((w.chapter, w.number.as_str(), w.title), j)).collect();
+    let lists: Vec<Vec<usize>> = native
+        .iter()
+        .map(|v| {
+            let range = v.number.split_once('-').and_then(|(lo, hi)| Some((lo.parse::<u32>().ok()?, hi.parse::<u32>().ok()?)));
+            match range {
+                Some((lo, hi)) if !v.title => (lo..=hi).filter_map(|x| index.get(&(v.chapter, x.to_string().as_str(), false)).copied()).collect(),
+                _ => index.get(&(v.chapter, v.number.as_str(), v.title)).copied().into_iter().collect(),
+            }
+        })
+        .collect();
+    let partners = |i: usize| -> Vec<usize> { lists[i].clone() };
+    let same = |i: usize, j: usize| lists[i].contains(&j);
+    let groups = refine(&wa, &wk, align(&wa, &wk[..in_order], &same), &partners);
+    groups
+        .into_iter()
+        .map(|g| Row {
+            book: code.to_string(),
+            native: g.a.iter().map(|&i| (native[i].chapter, native[i].number.clone())).collect(),
+            kjv: g.b.iter().map(|&j| (k[j].0.clone(), k[j].1.chapter, k[j].1.number.clone())).collect(),
+            how: g.how,
+            score: g.score,
+        })
+        .collect()
 }

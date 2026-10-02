@@ -4,26 +4,43 @@
 //!     cargo run -p kjv-import -- fetch          download missing sources, verify every hash
 //!     cargo run -p kjv-import -- build [ids…]   convert sources into data/library/
 //!     cargo run -p kjv-import -- check          rebuild in memory and compare with data/library/
+//!     cargo run -p kjv-import -- inventory      list every markup element each commentary source uses
 //!
 //! Sources live in `.cache/sources/` (git-ignored); `data/library/sources.toml` pins
 //! each one by URL, size, and SHA-256 so every build converts exactly the same bytes.
 
-mod bibles;
-mod sources;
-
-use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-pub fn root() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../..").canonicalize().expect("repository root")
-}
+use kjv_import::{align, bibles, commentaries, sources};
 
-pub fn cache() -> PathBuf {
-    root().join(".cache/sources")
-}
-
-pub fn library() -> PathBuf {
-    root().join("data/library")
+/// `build` with no ids converts everything, then aligns every translation with the KJV;
+/// each id names a translation or a commentary ("commentaries" means all of them).
+fn build(ids: &[String], mode: bibles::Mode) -> Result<(), String> {
+    if ids.is_empty() {
+        bibles::build(&[], mode)?;
+        commentaries::build(&[], mode)?;
+        return align::build(&[], mode);
+    }
+    let known = commentaries::catalogue()?;
+    let (mut translations, mut commentary_ids, mut all_commentaries) = (Vec::new(), Vec::new(), false);
+    for id in ids {
+        if id == "commentaries" {
+            all_commentaries = true;
+        } else if known.iter().any(|c| &c.id == id) {
+            commentary_ids.push(id.clone());
+        } else {
+            translations.push(id.clone());
+        }
+    }
+    if !translations.is_empty() {
+        bibles::build(&translations, mode)?;
+    }
+    if all_commentaries {
+        commentaries::build(&[], mode)?;
+    } else if !commentary_ids.is_empty() {
+        commentaries::build(&commentary_ids, mode)?;
+    }
+    Ok(())
 }
 
 fn main() -> ExitCode {
@@ -31,9 +48,11 @@ fn main() -> ExitCode {
     let result = match args.first().map(String::as_str) {
         Some("pin") => sources::pin(),
         Some("fetch") => sources::fetch(),
-        Some("build") => sources::verify().and_then(|_| bibles::build(&args[1..], bibles::Mode::Write)),
-        Some("check") => sources::verify().and_then(|_| bibles::build(&[], bibles::Mode::Check)),
-        _ => Err("usage: kjv-import pin | fetch | build [ids…] | check".to_string()),
+        Some("build") => sources::verify().and_then(|_| build(&args[1..], bibles::Mode::Write)),
+        Some("check") => sources::verify().and_then(|_| build(&[], bibles::Mode::Check)),
+        Some("align") => align::build(&args[1..], bibles::Mode::Write),
+        Some("inventory") => commentaries::inventory(&args[1..]),
+        _ => Err("usage: kjv-import pin | fetch | build [ids…] | check | inventory [commentary ids…]".to_string()),
     };
     match result {
         Ok(()) => ExitCode::SUCCESS,

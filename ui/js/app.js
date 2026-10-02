@@ -386,14 +386,29 @@ function useBooks(id) {
   $("translation-button").title = state.bibles.find((b) => b.id === id)?.name ?? "King James Version";
 }
 
-/** Read translation `id`, staying on the same chapter (or the nearest it has). */
+/** Read translation `id`, at the verse that corresponds to where the reader is (the
+ * Douay-Rheims's Psalm 22 for the KJV's Psalm 23), or as near it as it has. */
 async function setTranslation(id) {
-  if (id === settings.translation) return;
+  const from = settings.translation;
+  if (id === from) return;
+  const at = state.chapter ?? settings.position;
+  const selected = state.selectedVerse;
+  const verse = selected ?? firstVisibleVerse() ?? 0;
+  let target = null;
+  try {
+    target = await call("bible_map", { from, to: id, book: at.book, chapter: at.chapter, verse });
+  } catch (error) {
+    console.warn("map verse", error);
+  }
   settings.translation = id;
   prefs.save(settings);
   useBooks(id);
   cache.clear();
-  const at = state.chapter ?? settings.position;
+  if (target && state.bookMap.has(target.book)) {
+    const v = parseInt(target.verse, 10) || 0;
+    await goTo(target.book, target.chapter, v, { select: selected != null });
+    return;
+  }
   const book = state.bookMap.has(at.book) ? at.book : state.books[0]?.name;
   await goTo(book, book === at.book ? at.chapter : 1, 0, { top: true });
 }

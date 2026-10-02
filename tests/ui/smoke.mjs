@@ -6,7 +6,7 @@
 //   node tests/ui/smoke.mjs [path-to-chrome]
 
 import { spawn } from "node:child_process";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -14,9 +14,11 @@ const BASE = "http://localhost:1420";
 const PORT = 9333;
 const chromePath = process.argv[2] || process.env.CHROME || "google-chrome";
 
+// A fresh profile for this run, removed when Chrome exits (see the end)
+const profile = mkdtempSync(join(tmpdir(), "kjv-ui-"));
 const chrome = spawn(chromePath, [
   "--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check",
-  `--remote-debugging-port=${PORT}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), "kjv-ui-"))}`, "about:blank",
+  `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`, "about:blank",
 ], { stdio: "ignore" });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -402,6 +404,22 @@ await test("Translations: pick one, read it, keep the place", "book=John&chapter
   await until(() => $("#translation-label").textContent === "KJV" && $("#reader").getAttribute("aria-busy") === "false", "back to the KJV");
 `);
 
+await test("Translations: switching keeps the place, across different numbering", "book=Psalms&chapter=23&tr=kjv", {}, `
+  $("#v4").click();
+  $("#translation-button").click();
+  await until(() => $("#translations").open, "translation picker");
+  $$(".translation-item").find((b) => b.querySelector(".translation-abbr").textContent === "DRA").click();
+  // The Douay-Rheims numbers the Psalms as the Vulgate does: KJV 23 is its 22
+  await until(() => $("#translation-label").textContent === "DRA" && $("#reader").getAttribute("aria-busy") === "false", "Douay-Rheims");
+  assert($("#ref-label").textContent === "Psalm 22", "Psalm 22: " + $("#ref-label").textContent);
+  assert($(".verse[aria-current='true']")?.dataset.label === "4", "verse 4 still selected");
+  assert($(".verse[aria-current='true']").textContent.includes("shadow of death"), "the same verse");
+  $("#translation-button").click();
+  await until(() => $("#translations").open, "translation picker again");
+  $$(".translation-item").find((b) => b.querySelector(".translation-abbr").textContent === "KJV").click();
+  await until(() => $("#translation-label").textContent === "KJV" && $("#ref-label").textContent === "Psalm 23", "back to KJV Psalm 23");
+`);
+
 await test("Translations: words of Jesus in red", "book=John&chapter=11&tr=web", {}, `
   assert($("#v43 .red")?.textContent.includes("Lazarus, come out"), "John 11:43 in red");
   assert(!$("#v35 .red"), "narration is not red");
@@ -469,7 +487,11 @@ results.push(["No console errors", consoleErrors.length ? `FAIL: ${consoleErrors
 // ------------------------------------------------------------------ report
 
 ws.close();
+const exited = new Promise((resolve) => chrome.once("exit", resolve));
 chrome.kill();
+await Promise.race([exited, sleep(5000)]);
+// Chrome's helpers can hold files for a moment after it exits
+rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
 let failed = 0;
 for (const [name, outcome] of results) {
   if (outcome !== "ok") failed++;

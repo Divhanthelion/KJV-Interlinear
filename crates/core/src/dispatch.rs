@@ -112,6 +112,35 @@ pub fn dispatch_all(
             let a: BibleChapterArgs = parse(name, args)?;
             to_json(crate::translations::chapter(library, &a.bible, &a.book, a.chapter)?)
         }
+        "commentaries" => to_json(library.commentaries()),
+        "notes" => {
+            let a: NotesArgs = parse(name, args)?;
+            to_json(crate::translations::notes(library, &a.commentaries, &a.bible, &a.book, a.chapter, a.verse)?)
+        }
+        "bible_map" => {
+            let a: BibleMapArgs = parse(name, args)?;
+            to_json(crate::translations::map(library, &a.from, &a.to, &a.book, a.chapter, a.verse)?)
+        }
         _ => dispatch(data, name, args),
     }
+}
+
+#[derive(Deserialize)]
+struct BibleMapArgs {
+    from: String,
+    to: String,
+    book: String,
+    chapter: u32,
+    #[serde(default)]
+    verse: u32,
+}
+
+#[derive(Deserialize)]
+struct NotesArgs {
+    commentaries: Vec<String>,
+    bible: String,
+    book: String,
+    chapter: u32,
+    #[serde(default)]
+    verse: u32,
 }

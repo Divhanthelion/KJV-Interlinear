@@ -23,6 +23,8 @@ pub struct BibleSummary {
 
 #[derive(Debug, Serialize)]
 pub struct BibleBook {
+    /// USFM code ("1SA"), as Scripture references in notes use
+    pub code: String,
     /// The app's key ("First Samuel")
     pub name: String,
     /// "1 Samuel"
@@ -63,6 +65,7 @@ pub fn bibles(lib: &Library) -> Vec<BibleSummary> {
                 .filter_map(|e| {
                     let k = books::by_code(&e.code)?;
                     Some(BibleBook {
+                        code: k.code.to_string(),
                         name: k.name.to_string(),
                         display: k.display.to_string(),
                         abbr: k.abbr.to_string(),
@@ -139,4 +142,123 @@ pub fn chapter(lib: &Library, bible: &str, book: &str, chapter: u32) -> Result<B
         prev,
         next,
     })
+}
+
+#[derive(Debug, Serialize, PartialEq)]
+pub struct Mapped {
+    /// The app's book key
+    pub book: String,
+    pub chapter: u32,
+    /// The verse as numbered there ("16", "1-2"; "0" a Psalm title)
+    pub verse: String,
+}
+
+/// Where verse `verse` of `book` `chapter` in translation `from` is in translation
+/// `to`: the first corresponding verse, or None if `to` has no counterpart. Verse 0
+/// stands for the chapter (its first verse is mapped).
+pub fn map(lib: &Library, from: &str, to: &str, book: &str, chapter: u32, verse: u32) -> Result<Option<Mapped>, String> {
+    let k = books::by_name(book).ok_or_else(|| format!("no book named {:?}", book))?;
+    let number = if verse > 0 {
+        verse.to_string()
+    } else {
+        // The chapter's first verse (or its title)
+        let b = lib.book(from, k.code)?;
+        let first = kjv_library::usfm::verses(&b).into_iter().find(|v| v.chapter == chapter);
+        match first {
+            Some(v) => v.number,
+            None => return Ok(None),
+        }
+    };
+    // A verse number may sit inside a bridged verse ("1-2")
+    let r = {
+        let exact = (k.code.to_string(), chapter, number.clone());
+        if lib.has_verse(from, &exact) {
+            exact
+        } else {
+            let b = lib.book(from, k.code)?;
+            let n: u32 = number.parse().unwrap_or(0);
+            kjv_library::usfm::verses(&b)
+                .into_iter()
+                .find(|v| {
+                    v.chapter == chapter
+                        && v.number.split_once('-').is_some_and(|(lo, hi)| {
+                            lo.parse::<u32>().is_ok_and(|lo| lo <= n) && hi.parse::<u32>().is_ok_and(|hi| n <= hi)
+                        })
+                })
+                .map(|v| (k.code.to_string(), chapter, v.number))
+                .unwrap_or(exact)
+        }
+    };
+    let found = lib.map(from, to, &r)?;
+    Ok(found.into_iter().next().and_then(|(code, c, v)| {
+        Some(Mapped { book: books::by_code(&code)?.name.to_string(), chapter: c, verse: v })
+    }))
+}
+
+// ---------------------------------------------------------------- commentaries
+
+#[derive(Debug, Serialize)]
+pub struct CommentaryNotes {
+    pub id: String,
+    pub name: String,
+    pub author: String,
+    pub tradition: String,
+    pub credit: String,
+    pub notes: Vec<NoteView>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct NoteView {
+    /// "John 3:14-16", "John 3 (introduction)", "John (introduction)"
+    pub label: String,
+    pub body: String,
+}
+
+fn note_label(display: &str, code: &str, from: (u32, u32), to: (u32, u32)) -> String {
+    let head = |c: u32| if code == "PSA" { format!("Psalm {}", c) } else { format!("{} {}", display, c) };
+    match (from, to) {
+        ((0, _), _) => format!("{} (introduction)", display),
+        ((c, 0), (c2, 0)) if c == c2 => format!("{} (introduction)", head(c)),
+        ((c, v), (c2, v2)) if (c, v) == (c2, v2) => format!("{}:{}", head(c), v),
+        ((c, v), (c2, v2)) if c == c2 => format!("{}:{}-{}", head(c), v, v2),
+        ((c, v), (c2, v2)) => format!("{}:{}-{}:{}", head(c), v, c2, v2),
+    }
+}
+
+/// The notes of commentaries `ids` on verse `verse` of `book` `chapter` as numbered in
+/// translation `bible` (every commentary is keyed to the KJV, so the verse is mapped
+/// to the KJV first). Verse 0: the chapter's introductions.
+pub fn notes(lib: &Library, ids: &[String], bible: &str, book: &str, chapter: u32, verse: u32) -> Result<Vec<CommentaryNotes>, String> {
+    let k = books::by_name(book).ok_or_else(|| format!("no book named {:?}", book))?;
+    let places: Vec<(String, u32, u32)> = if verse == 0 {
+        vec![(k.code.to_string(), chapter, 0)]
+    } else {
+        lib.map(bible, "kjv", &(k.code.to_string(), chapter, verse.to_string()))?
+            .into_iter()
+            .filter_map(|(code, c, v)| Some((code, c, v.split('-').next()?.parse().ok()?)))
+            .collect()
+    };
+    let mut out = Vec::new();
+    for id in ids {
+        let info = lib.commentaries().iter().find(|c| &c.id == id).ok_or_else(|| format!("no commentary {:?}", id))?;
+        let mut notes: Vec<NoteView> = Vec::new();
+        let mut seen = std::collections::HashSet::new();
+        for (code, c, v) in &places {
+            let display = books::by_code(code).map_or(code.as_str(), |b| b.display);
+            for n in lib.notes_on(id, code, *c, *v)? {
+                if seen.insert((code.clone(), n.from, n.to)) {
+                    notes.push(NoteView { label: note_label(display, code, n.from, n.to), body: n.body });
+                }
+            }
+        }
+        out.push(CommentaryNotes {
+            id: info.id.clone(),
+            name: info.name.clone(),
+            author: info.author.clone(),
+            tradition: info.tradition.clone(),
+            credit: info.credit.clone(),
+            notes,
+        });
+    }
+    Ok(out)
 }

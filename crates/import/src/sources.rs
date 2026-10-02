@@ -7,7 +7,7 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-use crate::{bibles, cache, library};
+use crate::{bibles, cache, commentaries, library};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Source {
@@ -57,6 +57,9 @@ fn wanted() -> Result<Vec<(String, String)>, String> {
             let name = format!("{}_{}.zip", b.ebible, kind);
             out.push((format!("ebible/{}", name), format!("https://ebible.org/Scriptures/{}", name)));
         }
+    }
+    for c in commentaries::catalogue()? {
+        out.push((c.source, c.url));
     }
     Ok(out)
 }

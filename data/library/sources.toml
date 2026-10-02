@@ -618,3 +618,52 @@ url = "https://ebible.org/Scriptures/engourb_vpl.zip"
 size = 2089320
 sha256 = "4514aced8d3cd1dc4023bc99f2ab291ef6fd4003a5d63c29346c77f9a87c4284"
 retrieved = "2026-10-02"
+
+[[source]]
+path = "crosswire/MHC.zip"
+url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHC.zip"
+size = 15195123
+sha256 = "6bcb936873ca144e317805e5c1677940fd86e2403f7c14517752e44f25c8882b"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "crosswire/Catena.zip"
+url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Catena.zip"
+size = 2272947
+sha256 = "b48c9d75bbc142a9bf4f4e078026d049e386e27a263169f26dca112dde619918"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "crosswire/Wesley.zip"
+url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Wesley.zip"
+size = 1895943
+sha256 = "d4423b084bfc2a4dd00f7ed0b2004113d62010317ddb14a62c1b31801fff360e"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "crosswire/KD.zip"
+url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/KD.zip"
+size = 11170353
+sha256 = "ca3bdb6a04c0b717ee2faed71b432d58195db96f217f490ce6f7d9c36a2876f7"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "crosswire/JFB.zip"
+url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/JFB.zip"
+size = 5687741
+sha256 = "76d57e75288174dc580dbf0b2cf7c21d6f6dd2745e9cd2930ea6a9e173ecb19c"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "crosswire/TSK.zip"
+url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/TSK.zip"
+size = 2643739
+sha256 = "6784c7099465995a8e66f02ead82b0bca66603c1bdeaf8332949774b7bfd4293"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "sermonindex/sigill.zip"
+url = "https://www.sermonindex.net/modules/sword/sigill.zip"
+size = 17759817
+sha256 = "17eac460993aa95239d8c3a598c612b3ffcbc3e9e102a51a0335159fbbb03ea2"
+retrieved = "2026-10-02"

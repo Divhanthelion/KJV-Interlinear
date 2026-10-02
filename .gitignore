@@ -19,3 +19,5 @@ dist/
 app/gen/schemas/
 /.cache/
 /target-sword/
+/target-agent/
+/target-test/

@@ -41,7 +41,7 @@ jobs:
         run: |
           python3 tests/ui/mock_llm.py 8765 &
           ./target/release/kjv-devserver 1420 > devserver.log 2>&1 &
-          for i in $(seq 60); do curl -sf -X POST localhost:1420/api/books -d '{}' > /dev/null && exit 0; sleep 1; done
+          for i in $(seq 180); do curl -sf -X POST localhost:1420/api/books -d '{}' > /dev/null && exit 0; sleep 1; done
           cat devserver.log; exit 1
       - run: node tests/ui/smoke.mjs google-chrome
 

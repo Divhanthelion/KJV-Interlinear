@@ -7,7 +7,9 @@ use std::sync::{Arc, Mutex};
 
 use serde::{Deserialize, Serialize};
 
+use crate::alignment::{Alignment, Ref};
 use crate::archive::Archive;
+use crate::notes::{self, CommentaryInfo, Note};
 use crate::usfm::{self, Options};
 use crate::view::{self, ChapterView};
 
@@ -50,7 +52,18 @@ pub struct Library {
     archive: Archive,
     bibles: Vec<BibleInfo>,
     parsed: Mutex<Parsed>,
+    alignments: Mutex<HashMap<String, Arc<Alignment>>>,
+    commentaries: Vec<CommentaryInfo>,
+    /// (commentary, book) -> its notes
+    notes: Mutex<HashMap<(String, String), Notes>>,
+    verse_sets: Mutex<HashMap<(String, String), Arc<VerseSet>>>,
 }
+
+/// A commentary book's notes, shared.
+type Notes = Arc<Vec<Note>>;
+
+/// The (chapter, number) of every verse in a book.
+type VerseSet = std::collections::HashSet<(u32, String)>;
 
 struct Parsed {
     books: HashMap<(String, String), (Arc<usfm::Book>, u64)>,
@@ -62,7 +75,20 @@ impl Library {
         let archive = Archive::open(bytes)?;
         let bibles: Vec<BibleInfo> = serde_json::from_str(&archive.get_str("bibles.json")?)
             .map_err(|e| format!("bibles.json: {}", e))?;
-        Ok(Self { archive, bibles, parsed: Mutex::new(Parsed { books: HashMap::new(), clock: 0 }) })
+        let commentaries: Vec<CommentaryInfo> = if archive.contains("commentaries.json") {
+            serde_json::from_str(&archive.get_str("commentaries.json")?).map_err(|e| format!("commentaries.json: {}", e))?
+        } else {
+            Vec::new()
+        };
+        Ok(Self {
+            archive,
+            bibles,
+            commentaries,
+            notes: Mutex::new(HashMap::new()),
+            parsed: Mutex::new(Parsed { books: HashMap::new(), clock: 0 }),
+            alignments: Mutex::new(HashMap::new()),
+            verse_sets: Mutex::new(HashMap::new()),
+        })
     }
 
     /// Every translation, in the order the app lists them.
@@ -108,6 +134,87 @@ impl Library {
         Ok(book)
     }
 
+    /// How translation `id`'s verses correspond to the KJV's (the KJV's own is identity).
+    pub fn alignment(&self, id: &str) -> Result<Arc<Alignment>, String> {
+        if let Some(a) = self.alignments.lock().unwrap().get(id) {
+            return Ok(a.clone());
+        }
+        let key = format!("align/{}.tsv", id);
+        let a = Arc::new(if id == "kjv" || !self.archive.contains(&key) {
+            Alignment::identity()
+        } else {
+            Alignment::parse(&self.archive.get_str(&key)?)?
+        });
+        self.alignments.lock().unwrap().insert(id.to_string(), a.clone());
+        Ok(a)
+    }
+
+    /// Whether translation `id` has verse `r` (a Psalm title is number "0").
+    pub fn has_verse(&self, id: &str, r: &Ref) -> bool {
+        let key = (id.to_string(), r.0.clone());
+        let set = {
+            let cached = self.verse_sets.lock().unwrap().get(&key).cloned();
+            match cached {
+                Some(s) => s,
+                None => {
+                    let Ok(book) = self.book(id, &r.0) else { return false };
+                    let s: Arc<VerseSet> =
+                        Arc::new(usfm::verses(&book).into_iter().map(|v| (v.chapter, v.number)).collect());
+                    self.verse_sets.lock().unwrap().insert(key, s.clone());
+                    s
+                }
+            }
+        };
+        set.contains(&(r.1, r.2.clone()))
+    }
+
+    /// The verses of translation `to` that correspond to verse `r` of translation
+    /// `from`, through the KJV. Empty when `to` has no counterpart.
+    pub fn map(&self, from: &str, to: &str, r: &Ref) -> Result<Vec<Ref>, String> {
+        let kjv: Vec<Ref> = self.alignment(from)?.to_kjv(r, &|k| self.has_verse("kjv", k));
+        if to == "kjv" {
+            return Ok(kjv);
+        }
+        let target = self.alignment(to)?;
+        let mut out: Vec<Ref> = kjv.iter().flat_map(|k| target.from_kjv(k, &|x| self.has_verse(to, x))).collect();
+        out.sort();
+        out.dedup();
+        Ok(out)
+    }
+
+    /// Every commentary, in the order the app lists them.
+    pub fn commentaries(&self) -> &[CommentaryInfo] {
+        &self.commentaries
+    }
+
+    /// Every note of commentary `id` on book `code` (KJV numbering), in order.
+    pub fn commentary_book(&self, id: &str, code: &str) -> Result<Arc<Vec<Note>>, String> {
+        let key = (id.to_string(), code.to_string());
+        if let Some(n) = self.notes.lock().unwrap().get(&key) {
+            return Ok(n.clone());
+        }
+        let info = self.commentaries.iter().find(|c| c.id == id).ok_or_else(|| format!("no commentary {:?}", id))?;
+        let parsed = if info.books.iter().any(|b| b == code) {
+            notes::parse(&self.archive.get_str(&format!("comm/{}/{}.jsonl", id, code))?).map_err(|e| format!("{} {}: {}", id, code, e))?
+        } else {
+            Vec::new()
+        };
+        let parsed = Arc::new(parsed);
+        let mut cache = self.notes.lock().unwrap();
+        // Commentary books are large (Gill's Psalms is megabytes): keep a few
+        if cache.len() >= 16 {
+            cache.clear();
+        }
+        cache.insert(key, parsed.clone());
+        Ok(parsed)
+    }
+
+    /// The notes of commentary `id` covering KJV verse `chapter`:`verse` of `code`
+    /// (verse 0: the chapter's introduction).
+    pub fn notes_on(&self, id: &str, code: &str, chapter: u32, verse: u32) -> Result<Vec<Note>, String> {
+        Ok(self.commentary_book(id, code)?.iter().filter(|n| n.covers(chapter, verse)).cloned().collect())
+    }
+
     /// Chapter `chapter` of book `code` in translation `id`, ready to draw.
     pub fn chapter(&self, id: &str, code: &str, chapter: u32) -> Result<ChapterView, String> {
         let book = self.book(id, code)?;
@@ -135,6 +242,24 @@ pub mod build {
     #[derive(Deserialize)]
     struct CatalogueEntry {
         id: String,
+    }
+
+    #[derive(Deserialize)]
+    struct CommentaryCatalogue {
+        commentary: Vec<CommentaryEntry>,
+    }
+
+    #[derive(Deserialize)]
+    struct CommentaryEntry {
+        id: String,
+        name: String,
+        author: String,
+        year: String,
+        tradition: String,
+        coverage: String,
+        licence: String,
+        credit: String,
+        about: String,
     }
 
     #[derive(Deserialize)]
@@ -222,6 +347,45 @@ pub mod build {
             });
         }
         entries.push(("bibles.json".into(), serde_json::to_string(&bibles).map_err(|e| e.to_string())?));
+        // Commentaries: the catalogue, and one entry per commentary and book
+        let path = lib.join("commentaries.toml");
+        if path.exists() {
+            let cat: CommentaryCatalogue = toml::from_str(&read_text(&path, &mut read)?).map_err(|e| format!("commentaries.toml: {}", e))?;
+            let mut infos = Vec::new();
+            for c in cat.commentary {
+                let dir = lib.join("commentaries").join(&c.id);
+                let mut codes: Vec<String> = fs::read_dir(&dir)
+                    .map_err(|e| format!("{}: {}", dir.display(), e))?
+                    .flatten()
+                    .filter_map(|e| e.file_name().to_string_lossy().strip_suffix(".jsonl").map(str::to_string))
+                    .collect();
+                codes.sort_by_key(|code| books::order(code));
+                for code in &codes {
+                    let text = read_text(&dir.join(format!("{}.jsonl", code)), &mut read)?;
+                    entries.push((format!("comm/{}/{}.jsonl", c.id, code), text));
+                }
+                infos.push(crate::notes::CommentaryInfo {
+                    id: c.id,
+                    name: c.name,
+                    author: c.author,
+                    year: c.year,
+                    tradition: c.tradition,
+                    coverage: c.coverage,
+                    licence: c.licence,
+                    credit: c.credit,
+                    about: c.about,
+                    books: codes,
+                });
+            }
+            entries.push(("commentaries.json".into(), serde_json::to_string(&infos).map_err(|e| e.to_string())?));
+        }
+        // Verse alignment tables, where made (data/library/alignment/<id>.tsv)
+        for entry in &catalogue.bible {
+            let path = lib.join("alignment").join(format!("{}.tsv", entry.id));
+            if path.exists() {
+                entries.push((format!("align/{}.tsv", entry.id), read_text(&path, &mut read)?));
+            }
+        }
 
         let threads = std::thread::available_parallelism().map_or(4, |n| n.get());
         let next = std::sync::atomic::AtomicUsize::new(0);

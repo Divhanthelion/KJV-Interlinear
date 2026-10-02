@@ -49,13 +49,15 @@ The interlinear stays, but it is no longer the centre of the app.
 ```
 data/library/
   sources.toml                every upstream file: URL, size, SHA-256, date, licence
-  bibles/<id>/meta.toml       name, abbreviation, year, description, licence, attribution, versification
+  bibles.toml                 the translations: name, abbreviation, year, description, licence, credit
+  bibles/<id>/index.toml      generated: its books, chapter numbers, verse counts, source and SHA-256
   bibles/<id>/<BOOK>.usfm     the source USFM, cleaned (see below), one file per book
-  commentaries/<id>/meta.toml
+  commentaries.toml           the commentaries: name, author, year, tradition, licence, credit
+  commentaries/<id>/index.toml     generated: counts, orphans placed, ranges trimmed, references
   commentaries/<id>/<BOOK>.jsonl   one note per line: {"from":"3:16","to":"3:18","body":"…"}
                                    ("0" verse = chapter introduction, "0:0" = book introduction)
   crossrefs/<id>.tsv
-  versification/              mappings from each numbering scheme to the KJV's
+  alignment/<id>.tsv          generated: the verses whose KJV counterpart isn't the same-numbered verse
 ```
 
 **Bibles are stored as cleaned USFM.** USFM is the standard the sources use, and it
@@ -84,7 +86,8 @@ escaped as `&amp;`, `&lt;`, `&gt;`, and nothing else escaped.
 | `<tr><td>…</td>…</tr>` | a table row (rare: TSK, KD) |
 | `<i>`, `<b>`, `<sup>`, `<sc>` (small caps) | inline styles, nestable |
 | `<lang code="he">…</lang>` | text in another language: `he`, `arc`, `grc`, `la`, `syr`, … |
-| `<ref to="JHN.3.16">John 3:16</ref>` | a Scripture reference; `to` is OSIS-style, `JHN.3.16-JHN.3.18` for ranges, book codes as in `books.rs` |
+| `<ref to="JHN.3.16">John 3:16</ref>` | a Scripture reference; `to` is OSIS-style, `JHN.3.16-JHN.3.18` for ranges, several ranges separated by spaces, book codes as in `books.rs`. `to` is left out when the reference can't be read with certainty; the text is always kept |
+| `<fn>…</fn>` | a footnote inside a note, kept where it stands |
 | `<br/>` | a line break inside a block |
 
 Rules: blocks don't nest; inline elements nest only inside blocks; whitespace
@@ -119,9 +122,39 @@ a text shows up in review as a readable diff.
   memory use stays low on phones however many works ship.
 - **Catalogue.** Every work with its name, kind, description, coverage, licence,
   and attribution. An About page lists them all.
-- **References.** The app speaks KJV numbering. Each work declares its own numbering,
-  and the versification tables map between them. Parallel reading, commentary lookup,
-  and context building all go through that one mapping.
+- **References.** The app speaks KJV numbering. Each translation's verses are aligned
+  with the KJV's (see "Verse alignment"), and parallel reading, switching translations,
+  commentary lookup, and context building all go through that one mapping.
+
+## Verse alignment
+
+Translations number verses differently: the Douay-Rheims follows the Vulgate's
+Psalms, the Septuagint orders Jeremiah differently, Jewish editions count Psalm titles
+as verses, some translations join, split, swap, or leave out verses, and the KJV
+prints Susanna and the additions to Esther in its Apocrypha where Catholic Bibles
+print them in Daniel and Esther. Published mapping tables cover some of this, with
+known errors.
+
+Every text in the library is English, so the library aligns verses by what they say
+(`crates/library/src/align.rs`): the distinctive words two verses share (names,
+numbers, rarer words), in two passes.
+
+1. An in-order sequence alignment of each book against the KJV's, allowing one-to-one
+   matches, joins of two verses, swapped pairs, and verses with no counterpart, with a
+   small preference for verses carrying the same number.
+2. A second pass keeps only matches the text (or strong matches on both sides)
+   supports, splits joins whose halves don't both match, moves leftovers to a clearly
+   better match anywhere in the book or its related books (reordered chapters,
+   relocated additions), and pairs remaining leftovers by number only where the text
+   agrees a little, a neighbour is paired the same way, or the verse is empty here. A
+   bridged verse ("24-30") stands for its whole range.
+
+`kjv-import align` writes the result per translation to `data/library/alignment/<id>.tsv`:
+only the verses whose KJV counterpart isn't the same-numbered verse, each with how it
+was matched (content, framed, moved, number, unmatched) and its similarity, so every
+row can be reviewed. Without being told any mapping, it reproduces the Vulgate's Psalm
+numbering, Psalm titles counted as verses, the Romans doxology where the WEB prints it,
+and swapped verses; `crates/library/tests/alignment.rs` pins these hard cases.
 - **Reader.** Choose a translation, or read several in parallel. A notes panel shows
   the chosen commentaries and cross-references for the selected verse.
 
@@ -182,9 +215,10 @@ The same standard as the KJV today (`crates/core/tests/text_fidelity.rs`):
 - **Commentaries.** Every note in the source appears in the data, under the same verse,
   with the same text once markup is removed. Counts are checked per book. No unknown
   markup may remain. Spot checks pin known notes to known verses.
-- **Versification.** Every mapped reference exists in both schemes. Known hard cases,
-  such as Psalm titles, Malachi 4 and Joel 3 in Hebrew numbering, and the Vulgate
-  Psalms, have explicit tests.
+- **Alignment.** Every row names verses that exist on both sides; the hard cases
+  (the Vulgate Psalms, the Romans doxology, Susanna, Esther's additions, Hebrew
+  numbering, omitted verses) have explicit tests; tables are reproducible byte for
+  byte.
 - **Reproducibility.** CI runs `kjv-import check`: re-converting the pinned sources
   must reproduce `data/library/` exactly.
 

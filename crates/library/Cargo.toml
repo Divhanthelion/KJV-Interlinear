@@ -23,3 +23,7 @@ zstd = "0.13"
 [[test]]
 name = "library"
 required-features = ["build"]
+
+[[test]]
+name = "alignment"
+required-features = ["build"]
