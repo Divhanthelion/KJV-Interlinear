@@ -637,3 +637,80 @@ fn a_reference_to_a_chapter_or_verse_the_kjv_lacks_gets_no_link_and_keeps_its_te
         assert!(stats.refs_impossible.is_empty(), "{raw}");
     }
 }
+
+// ------------------------------------------------------------------ the Tyndale Open Study Notes
+
+fn tyndale_opts() -> Options {
+    Options { dialect: Dialect::Tyndale, jud_is_judges: false, context: Some(("GEN", 1)) }
+}
+
+#[track_caller]
+fn tyndale(raw: &str) -> (String, Stats) {
+    let mut links = std::collections::BTreeMap::new();
+    links.insert("Blessing_ThemeNote".to_string(), "GEN.12.1-GEN.12.3".to_string());
+    links.insert("title:The Messianic Banquet_ThemeNote".to_string(), "ISA.25.6".to_string());
+    links.insert("Gen.7.11-12_StudyNote".to_string(), "GEN.7.11-GEN.7.12".to_string());
+    let (body, stats) = kjv_import::markup::convert_linked(raw, tyndale_opts(), &links).unwrap_or_else(|e| panic!("{raw:?}: {e}"));
+    prove(raw, &body, Dialect::Tyndale).unwrap_or_else(|e| panic!("{raw:?} -> {body:?}: {e}"));
+    (body, stats)
+}
+
+#[test]
+fn tyndale_paragraphs_and_spans() {
+    let (b, _) = tyndale(
+        r#"<p class="sn-text"><span class="sn-ref"><a href="?bref=Gen.1.1">1:1</a></span> <span class="sn-excerpt">In the beginning</span> (Hebrew <span class="hebrew">bara’</span>, <span class="sn-hebrew-chars">ב</span>), <span class="sup">1</span>/<span class="sub">10</span> <span class="era">BC</span></p>"#,
+    );
+    assert_eq!(
+        b,
+        r#"<p><b><ref to="GEN.1.1">1:1</ref></b> <i>In the beginning</i> (Hebrew <lang code="he-Latn">bara’</lang>, <lang code="he">ב</lang>), <sup>1</sup>/<sub>10</sub> <sc>BC</sc></p>"#
+    );
+    // Headings, and list items with their indent
+    let (b, _) = tyndale(r#"<p class="profile-title">Adam and Eve</p><p class="sn-list-1">A</p><p class="sn-list-2">B</p><p class="sn-list-3">C</p>"#);
+    assert_eq!(b, r#"<h>Adam and Eve</h><li>A</li><li level="2">B</li><li level="3">C</li>"#);
+    // A roman word set off inside an excerpt
+    let (b, _) = tyndale(r#"<p class="sn-text"><span class="sn-excerpt">lots (called</span> <span class="sn-excerpt-roman">purim</span><span class="sn-excerpt">)</span></p>"#);
+    assert_eq!(b, r#"<p><i>lots (called</i> purim<i>)</i></p>"#);
+    // The en space typesetting code reads as a space; typesetting attributes are dropped
+    let (b, stats) = tyndale(r#"<p class="sn-text" ts="sn-text -1v -5"><span class="sn-ref"><a href="?bref=Num.20.1">20:1</a></span><x2002/>The number</p>"#);
+    assert_eq!(b, r#"<p><b><ref to="NUM.20.1">20:1</ref></b> The number</p>"#);
+    assert_eq!(stats.dropped_data.values().sum::<u64>(), 1);
+    // Anything unknown is an error
+    assert!(convert(r#"<p class="new">x</p>"#, tyndale_opts()).is_err());
+    assert!(convert(r#"<p class="sn-text"><span class="new">x</span></p>"#, tyndale_opts()).is_err());
+    assert!(convert(r#"<p class="sn-text"><i>x</i></p>"#, tyndale_opts()).is_err());
+}
+
+#[test]
+fn tyndale_links() {
+    let link = |a: &str| tyndale(&format!(r#"<p class="sn-text">{a}</p>"#));
+    // Ranges written short, across chapters, and across books
+    assert_eq!(link(r#"<a href="?bref=Gen.1.22-25">1:22-25</a>"#).0, r#"<p><ref to="GEN.1.22-GEN.1.25">1:22-25</ref></p>"#);
+    assert_eq!(link(r#"<a href="?bref=Gen.1.1-2.3">1:1–2:3</a>"#).0, r#"<p><ref to="GEN.1.1-GEN.2.3">1:1–2:3</ref></p>"#);
+    assert_eq!(
+        link(r#"<a href="?bref=1Sam.1.1-2Kgs.25.30">1 Sam 1:1–2 Kgs 25:30</a>"#).0,
+        r#"<p><ref to="1SA.1.1-1SA 2SA 1KI 2KI.1-2KI.25.30">1 Sam 1:1–2 Kgs 25:30</ref></p>"#
+    );
+    // The source's variant separators
+    assert_eq!(link(r#"<a href="?bref=Gen.49.33–50.13">49:33–50:13</a>"#).0, r#"<p><ref to="GEN.49.33-GEN.50.13">49:33–50:13</ref></p>"#);
+    assert_eq!(link(r#"<a href="?bref=Exod.3.1-4:17">Exod 3:1–4:17</a>"#).0, r#"<p><ref to="EXO.3.1-EXO.4.17">Exod 3:1–4:17</ref></p>"#);
+    // The NLT's 3 John 1:15 is the KJV's 1:14
+    let (b, stats) = link(r#"<a href="?bref=3Jn.1.15">3 John 1:15</a>"#);
+    assert_eq!(b, r#"<p><ref to="3JN.1.14">3 John 1:15</ref></p>"#);
+    assert_eq!(stats.renumbered, 1);
+    // A range cut short is read from its text, when the text starts where the link does
+    let (b, stats) = link(r#"<a href="?bref=Gen.1.3-2">1:3–2:3</a>"#);
+    assert_eq!(b, r#"<p><ref to="GEN.1.3-GEN.2.3">1:3–2:3</ref></p>"#);
+    assert_eq!(stats.refs_corrected.len(), 1);
+    // ... and not when the text says somewhere else: no `to`, the text kept
+    let (b, stats) = link(r#"<a href="?bref=Exod.19.23-34">e.g., Exod 17:1-4</a>"#);
+    assert_eq!(b, r#"<p><ref>e.g., Exod 17:1-4</ref></p>"#);
+    assert_eq!(stats.refs_impossible.len(), 1);
+    // Other items: by name, by passage, by title where the name is mistyped
+    assert_eq!(link(r#"<a href="?item=Blessing_ThemeNote_Filament">Blessing</a>"#).0, r#"<p><ref to="GEN.12.1-GEN.12.3">Blessing</ref></p>"#);
+    assert_eq!(link(r#"<a href="?item=Gen.7.11-12_StudyNote_Filament">study note</a>"#).0, r#"<p><ref to="GEN.7.11-GEN.7.12">study note</ref></p>"#);
+    let (b, stats) = link(r#"<a href="?item=TheMessiahsBanquet_ThemeNote_Filament">The Messianic Banquet</a>"#);
+    assert_eq!(b, r#"<p><ref to="ISA.25.6">The Messianic Banquet</ref></p>"#);
+    assert_eq!(stats.refs_corrected.len(), 1);
+    // An item no one has: the text kept, no `to`
+    assert_eq!(link(r#"<a href="?item=Nobody_Profile_Filament">Nobody</a>"#).0, r#"<p><ref>Nobody</ref></p>"#);
+}

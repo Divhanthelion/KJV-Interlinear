@@ -4,8 +4,9 @@
 //! # The target markup
 //!
 //! Blocks `<p>` `<h>` `<l>` `<li>` and `<tr><td>…</td></tr>`; inline `<i>` `<b>` `<sup>`
-//! `<sc>` `<lang code="…">` `<ref to="…">` `<br/>` and `<fn>`. Text is plain Unicode with
-//! `&`, `<`, `>` escaped as `&amp;`, `&lt;`, `&gt;` and nothing else escaped.
+//! `<sub>` `<sc>` `<lang code="…">` `<ref to="…">` `<br/>` and `<fn>`. A line or list item
+//! below the first level of indent carries it: `<li level="2">`. Text is plain Unicode
+//! with `&`, `<`, `>` escaped as `&amp;`, `&lt;`, `&gt;` and nothing else escaped.
 //!
 //! `<fn>…</fn>` is an addition to the documented markup: a note inside a note (Catena
 //! Aurea's editor's notes, Keil & Delitzsch's and Matthew Henry's footnotes). It stays
@@ -35,6 +36,9 @@
 //! | `reference osisRef` | `scripRef passage` (or its text) | `<ref to>` |
 //! | `div` (book, introduction, section, x-milestone), `chapter`, `lg`, `list`, `table`, `milestone x-usfm-toc*` | | structure only: dropped and counted |
 //! | | `sync type=Strongs` | dropped and counted (a Strong's number, not text) |
+//!
+//! The Tyndale Open Study Notes ([`Dialect::Tyndale`]) are HTML-like XML: `p` and `span`
+//! by `class` (see [`Conv::tyndale`]), and `a href="?bref=Gen.1.1"` links.
 //!
 //! Anything else is an error naming the element, never silently dropped.
 //!
@@ -67,7 +71,9 @@
 //! `<br/>` (those separate lines; the count is reported as `structural_gaps`).
 
 use std::collections::{BTreeMap, BTreeSet};
+use std::fmt::Write as _;
 
+use kjv_library::books;
 use kjv_library::reference::{self, Context, Options as RefOptions};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -77,6 +83,9 @@ pub enum Dialect {
     /// Wesley's and TSK's ThML is not well-formed: a bare `&` ("&c.") and stray `<` / `>`
     /// are text. They are kept as text and counted.
     Thml,
+    /// The Tyndale Open Study Notes: well-formed XML of `p` and `span` by class, and
+    /// `a href` links in the NLT's numbering.
+    Tyndale,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -84,8 +93,9 @@ pub struct Options {
     pub dialect: Dialect,
     /// "Jud" in this module's scripture references means Judges (not Jude).
     pub jud_is_judges: bool,
-    /// ThML only: a scripture reference with no book is in this book (and, when the
-    /// chapter is not 0, a bare number is a verse of this chapter).
+    /// ThML: a scripture reference with no book is in this book (and, when the chapter is
+    /// not 0, a bare number is a verse of this chapter). Tyndale: the book and chapter a
+    /// link's shown text ("1:3–2:3") is read in, when the link itself can't be read.
     pub context: Option<(&'static str, u32)>,
 }
 
@@ -116,6 +126,9 @@ pub struct Stats {
     pub structural_gaps: u64,
     /// Footnotes (`<fn>`) emitted.
     pub footnotes: u64,
+    /// Places renumbered from the source's numbering to the KJV's (Tyndale: the NLT's
+    /// 3 John 1:15 and Revelation 12:18).
+    pub renumbered: u64,
 }
 
 impl Stats {
@@ -135,6 +148,7 @@ impl Stats {
         self.bare_ampersands += other.bare_ampersands;
         self.structural_gaps += other.structural_gaps;
         self.footnotes += other.footnotes;
+        self.renumbered += other.renumbered;
     }
 }
 
@@ -410,6 +424,7 @@ enum Tag {
     I,
     B,
     Sup,
+    Sub,
     Sc,
     Lang(String),
     Ref(Option<String>),
@@ -422,6 +437,7 @@ impl Tag {
             Tag::I => "i",
             Tag::B => "b",
             Tag::Sup => "sup",
+            Tag::Sub => "sub",
             Tag::Sc => "sc",
             Tag::Lang(_) => "lang",
             Tag::Ref(_) => "ref",
@@ -442,8 +458,10 @@ enum Item {
 enum Kind {
     P,
     H,
-    L,
-    Li,
+    /// A line of verse, at a level of indent (1 the first)
+    L(u8),
+    /// A list item, at a level of indent (1 the first)
+    Li(u8),
 }
 
 impl Kind {
@@ -451,8 +469,15 @@ impl Kind {
         match self {
             Kind::P => "p",
             Kind::H => "h",
-            Kind::L => "l",
-            Kind::Li => "li",
+            Kind::L(_) => "l",
+            Kind::Li(_) => "li",
+        }
+    }
+
+    fn level(self) -> u8 {
+        match self {
+            Kind::L(n) | Kind::Li(n) => n,
+            _ => 1,
         }
     }
 }
@@ -652,6 +677,9 @@ fn write_blocks(blocks: &[Block]) -> String {
             Block::Flow(kind, items) => {
                 out.push('<');
                 out.push_str(kind.name());
+                if kind.level() > 1 {
+                    write!(out, " level=\"{}\"", kind.level()).unwrap();
+                }
                 out.push('>');
                 write_items(items, &mut out);
                 out.push_str("</");
@@ -719,7 +747,7 @@ fn verse_set(ranges: &[reference::Range]) -> Option<BTreeSet<(&'static str, u32,
 
 /// Do the ranges lie in the KJV's chapters and verses? A book the KJV does not have (the
 /// Apocrypha) cannot be judged and passes.
-fn possible(ranges: &[reference::Range]) -> bool {
+pub fn possible(ranges: &[reference::Range]) -> bool {
     ranges.iter().all(|r| kjv_sword::kjv::book(r.book).is_none() || verse_set(std::slice::from_ref(r)).is_some())
 }
 
@@ -734,8 +762,10 @@ fn checkable(shown: &str) -> bool {
     !words.any(|w| w.chars().all(|c| matches!(c.to_ascii_lowercase(), 'i' | 'v' | 'x' | 'l' | 'c')))
 }
 
-struct Conv {
+struct Conv<'a> {
     opts: Options,
+    /// Tyndale: where each item a link may name is about (see [`convert_linked`])
+    links: &'a BTreeMap<String, String>,
     blocks: Vec<Block>,
     cur: Option<(Kind, Vec<Item>)>,
     /// Inside a footnote or another inline-only container (a heading, list item, cell).
@@ -757,7 +787,7 @@ fn check_attrs(el: &El, allowed: &[&str]) -> Res {
     Ok(())
 }
 
-impl Conv {
+impl Conv<'_> {
     fn count(&mut self, what: impl Into<String>) {
         *self.stats.ignored.entry(what.into()).or_default() += 1;
     }
@@ -849,6 +879,9 @@ impl Conv {
     }
 
     fn element(&mut self, e: &El) -> Res {
+        if self.opts.dialect == Dialect::Tyndale {
+            return self.tyndale(e);
+        }
         let thml = self.opts.dialect == Dialect::Thml;
         let kids = &e.kids[..];
         match (e.name.as_str(), thml) {
@@ -894,12 +927,12 @@ impl Conv {
                     if self.inline_depth > 0 {
                         return Err(format!("{} where only inline content can be", e.describe()));
                     }
-                    self.begin(Kind::L);
+                    self.begin(Kind::L(1));
                 } else {
                     if self.inline_depth > 0 {
                         return Err(format!("{} where only inline content can be", e.describe()));
                     }
-                    self.begin(Kind::L);
+                    self.begin(Kind::L(1));
                     self.inline_depth += 1;
                     let r = self.walk(kids);
                     self.inline_depth -= 1;
@@ -1020,7 +1053,7 @@ impl Conv {
                 if self.inline_depth > 0 {
                     return Err(format!("{} where only inline content can be", e.describe()));
                 }
-                self.begin(Kind::Li);
+                self.begin(Kind::Li(1));
                 self.inline_depth += 1;
                 let r = self.walk(kids);
                 self.inline_depth -= 1;
@@ -1116,6 +1149,151 @@ impl Conv {
         }
     }
 
+    /// The Tyndale Open Study Notes' elements. Paragraphs by class: body text, headings
+    /// (titles, subheads, "For Further Study"), list items and lines of verse with their
+    /// level of indent. Spans by class: Bible excerpts and `ital` italic, references and
+    /// `bold` bold, small capitals (the divine name, BC/AD, `sc`), `sup`/`sub`, and
+    /// languages: `hebrew`, `greek`, `aramaic` are transliterations (`he-Latn`, …),
+    /// `sn-hebrew-chars` Hebrew letters. `sn-excerpt-roman` is the roman word set off
+    /// inside an excerpt ("purim"): plain.
+    fn tyndale(&mut self, e: &El) -> Res {
+        let kids = &e.kids[..];
+        let class = e.attr("class").unwrap_or("");
+        match e.name.as_str() {
+            "p" => {
+                check_attrs(e, &["class", "id", "ts"])?;
+                if self.inline_depth > 0 {
+                    return Err(format!("{} where only inline content can be", e.describe()));
+                }
+                if e.attr("id").is_some() {
+                    self.drop_data("p id= (an anchor for links within the source)");
+                }
+                if e.attr("ts").is_some() {
+                    self.drop_data("p ts= (typesetting: spacing for print)");
+                }
+                let kind = match class {
+                    "sn-text" | "intro-overview" | "intro-body" | "intro-body-fl" | "intro-body-fl-sp" | "intro-extract"
+                    | "intro-sidebar-body-fl" | "profile-body" | "profile-body-fl" | "profile-body-fl-sp" | "profile-refs"
+                    | "theme-body" | "theme-body-fl" | "theme-body-fl-sp" | "theme-body-sp" | "theme-refs" => Kind::P,
+                    "intro-title" | "intro-h1" | "intro-sidebar-h1" | "profile-title" | "profile-h1" | "profile-refs-title"
+                    | "theme-title" | "theme-h2" | "theme-refs-title" => Kind::H,
+                    "sn-list-1" | "intro-list" | "intro-list-sp" | "theme-list" | "theme-list-sp" => Kind::Li(1),
+                    "sn-list-2" => Kind::Li(2),
+                    "sn-list-3" => Kind::Li(3),
+                    "intro-poetry-1-sp" => Kind::L(1),
+                    "intro-poetry-2" => Kind::L(2),
+                    _ => return Err(format!("unknown paragraph {}", e.describe())),
+                };
+                self.begin(kind);
+                self.inline_depth += 1;
+                let r = self.walk(kids);
+                self.inline_depth -= 1;
+                r?;
+                self.flush();
+                Ok(())
+            }
+            "span" => {
+                check_attrs(e, &["class"])?;
+                let tags: Vec<Tag> = match class {
+                    "sn-excerpt" | "ital" => vec![Tag::I],
+                    "sn-excerpt-roman" => vec![],
+                    "sn-ref" | "bold" | "intro-h2" => vec![Tag::B],
+                    "ital-bold" => vec![Tag::B, Tag::I],
+                    "sc" | "sn-sc" | "sn-ref-sc" | "sn-excerpt-sc" | "divine-name" | "sn-excerpt-divine-name" | "era"
+                    | "intro-h2-era" | "intro-h2-sc" => vec![Tag::Sc],
+                    "divine-name-ital" | "sc-ital" => vec![Tag::I, Tag::Sc],
+                    "bold-sc" | "bold-era" => vec![Tag::B, Tag::Sc],
+                    "sup" => vec![Tag::Sup],
+                    "sub" => vec![Tag::Sub],
+                    "hebrew" => vec![Tag::Lang("he-Latn".into())],
+                    "greek" => vec![Tag::Lang("grc-Latn".into())],
+                    "aramaic" => vec![Tag::Lang("arc-Latn".into())],
+                    "latin" => vec![Tag::Lang("la".into())],
+                    "sn-hebrew-chars" => vec![Tag::Lang("he".into())],
+                    _ => return Err(format!("unknown span {}", e.describe())),
+                };
+                for t in &tags {
+                    self.push(Item::Open(t.clone()));
+                }
+                self.walk(kids)?;
+                for t in tags.iter().rev() {
+                    self.push(Item::Close(t.clone()));
+                }
+                Ok(())
+            }
+            // A typesetting code left in one note: an en space (read as a space, here and
+            // by the proof)
+            "x2002" => {
+                check_attrs(e, &[])?;
+                if !kids.is_empty() {
+                    return Err(format!("{} has content", e.describe()));
+                }
+                self.count("<x2002/> (an en space) read as a space");
+                self.text(" ");
+                Ok(())
+            }
+            "a" => {
+                check_attrs(e, &["href"])?;
+                let href = e.attr("href").ok_or_else(|| format!("{} has no href", e.describe()))?;
+                let link = self.tyndale_link(href, &e.text());
+                self.reference(e, link)
+            }
+            _ => Err(format!("unknown element {}", e.describe())),
+        }
+    }
+
+    /// The `to` for a Tyndale link: `?bref=` a passage, or `?item=` another study note (its
+    /// passage), read by [`tyndale_ranges`]. A link that can't be read, or names verses
+    /// the KJV hasn't, is read again from its shown text ("1:3–2:3" for the cut-short
+    /// `Gen.1.3-2`) in the note's book and chapter; that reading is used only when it
+    /// starts where the link does (counted in `refs_corrected`).
+    fn tyndale_link(&mut self, href: &str, shown: &str) -> Link {
+        // (one link has stray characters before its `?`, one is a bare reference)
+        let href_read = href.trim_start_matches([' ', '\\']);
+        if let Some(item) = href_read.strip_prefix("?item=") {
+            // Another item: "Blessing_ThemeNote_Filament", "Gen_BookIntro_ISB"
+            let key = item.rsplit_once('_').map_or(item, |(key, _)| key);
+            if let Some(to) = self.links.get(key) {
+                return Link::To(to.clone());
+            }
+            // A name mistyped ("TheMessiahsBanquet" for "TheMessianicBanquet"): the item of
+            // that kind whose title is the link's text
+            let kind = key.rsplit_once('_').map_or("", |(_, kind)| kind);
+            if let Some(to) = self.links.get(&format!("title:{shown}_{kind}")) {
+                self.stats.refs_corrected.push(format!("{href} ({shown})"));
+                return Link::To(to.clone());
+            }
+        }
+        let target = href_read.strip_prefix("?bref=").or_else(|| href_read.strip_prefix("?item=")).unwrap_or(href_read);
+        let target = target.strip_suffix("_StudyNote_Filament").unwrap_or(target);
+        let read = tyndale_ranges(target, &mut self.stats.renumbered);
+        if let Some(r) = &read
+            && possible(r)
+        {
+            return Link::To(join_osis(r));
+        }
+        // Where the link starts, to check a reading of the text against; the text is read in
+        // the link's book and chapter ("2:14–3:14" for `Gal.2.14-3` in a note on Acts)
+        let start = target.replace(['–', ':'], ".").split('-').next().and_then(|a| tyndale_point(a, None));
+        let context = start.map(|(book, chapter, _)| (book, chapter)).or(self.opts.context);
+        let options = RefOptions { context: context.map(|(book, chapter)| Context { book, chapter }), ..RefOptions::default() };
+        if let (Some(start), Ok(from_text)) = (start, reference::parse_with(shown, options))
+            && let [first, ..] = from_text.as_slice()
+            && (first.book, first.start) == (start.0, (start.1, start.2))
+            && possible(&from_text)
+        {
+            self.stats.refs_corrected.push(format!("{href} ({shown})"));
+            return Link::To(join_osis(&from_text));
+        }
+        match read {
+            Some(_) => {
+                self.stats.refs_impossible.push(format!("{href} ({shown})"));
+                Link::Withheld
+            }
+            None => Link::Unresolved,
+        }
+    }
+
     fn push_br(&mut self) -> Res {
         self.push(Item::Br);
         Ok(())
@@ -1187,10 +1365,11 @@ impl Conv {
             }
             Link::Withheld => None,
             Link::Unresolved => {
-                let shown = e.attr("osisRef").or_else(|| e.attr("passage")).map(str::to_string).unwrap_or_else(|| e.text());
+                let cited = e.attr("osisRef").or_else(|| e.attr("passage")).or_else(|| e.attr("href"));
+                let shown = cited.map(str::to_string).unwrap_or_else(|| e.text());
                 let text = e.text();
                 // Record what the source cited: the attribute if there is one, and the shown text
-                self.stats.unparsed.push(if shown == text || e.attr("osisRef").is_none() && e.attr("passage").is_none() {
+                self.stats.unparsed.push(if shown == text || cited.is_none() {
                     text
                 } else {
                     format!("{shown} ({text})")
@@ -1229,13 +1408,104 @@ impl Conv {
     }
 }
 
+// ------------------------------------------------------------------------------------
+// Tyndale references
+// ------------------------------------------------------------------------------------
+
+/// Tyndale's book abbreviations and the library's codes.
+const TYNDALE_BOOKS: &[(&str, &str)] = &[
+    ("Gen", "GEN"), ("Exod", "EXO"), ("Lev", "LEV"), ("Num", "NUM"), ("Deut", "DEU"), ("Josh", "JOS"),
+    ("Judg", "JDG"), ("Ruth", "RUT"), ("1Sam", "1SA"), ("2Sam", "2SA"), ("1Kgs", "1KI"), ("2Kgs", "2KI"),
+    ("1Chr", "1CH"), ("2Chr", "2CH"), ("Ezra", "EZR"), ("Neh", "NEH"), ("Esth", "EST"), ("Job", "JOB"),
+    ("Ps", "PSA"), ("Pr", "PRO"), ("Eccl", "ECC"), ("Song", "SNG"), ("Isa", "ISA"), ("Jer", "JER"),
+    ("Lam", "LAM"), ("Ezek", "EZK"), ("Dan", "DAN"), ("Hos", "HOS"), ("Joel", "JOL"), ("Amos", "AMO"),
+    ("Obad", "OBA"), ("Jon", "JON"), ("Mic", "MIC"), ("Nah", "NAM"), ("Hab", "HAB"), ("Zeph", "ZEP"),
+    ("Hagg", "HAG"), ("Zech", "ZEC"), ("Mal", "MAL"), ("Matt", "MAT"), ("Mark", "MRK"), ("Luke", "LUK"),
+    ("John", "JHN"), ("Acts", "ACT"), ("Rom", "ROM"), ("1Cor", "1CO"), ("2Cor", "2CO"), ("Gal", "GAL"),
+    ("Eph", "EPH"), ("Phil", "PHP"), ("Col", "COL"), ("1Thes", "1TH"), ("2Thes", "2TH"), ("1Tim", "1TI"),
+    ("2Tim", "2TI"), ("Titus", "TIT"), ("Phlm", "PHM"), ("Heb", "HEB"), ("Jas", "JAS"), ("1Pet", "1PE"),
+    ("2Pet", "2PE"), ("1Jn", "1JN"), ("2Jn", "2JN"), ("3Jn", "3JN"), ("Jude", "JUD"), ("Rev", "REV"),
+    ("2Macc", "2MA"),
+];
+
+/// "Gen.1.22" -> ("GEN", 1, 22); a point after a range's start may leave out the book
+/// ("2.3") or the book and chapter ("25").
+fn tyndale_point(s: &str, after: Option<(&'static str, u32, u32)>) -> Option<(&'static str, u32, u32)> {
+    let parts: Vec<&str> = s.split('.').collect();
+    let num = |x: &str| x.parse::<u32>().ok();
+    match (parts.as_slice(), after) {
+        ([b, c, v], _) => Some((TYNDALE_BOOKS.iter().find(|(t, _)| t == b)?.1, num(c)?, num(v)?)),
+        ([c, v], Some((book, ..))) => Some((book, num(c)?, num(v)?)),
+        ([v], Some((book, c, _))) => Some((book, c, num(v)?)),
+        _ => None,
+    }
+}
+
+/// The NLT numbers two verses the KJV prints as parts of others: 3 John 1:15 (the KJV's
+/// 1:14) and Revelation 12:18 (the KJV's 13:1).
+fn to_kjv(p: (&'static str, u32, u32), renumbered: &mut u64) -> (&'static str, u32, u32) {
+    let kjv = match p {
+        ("3JN", 1, 15) => ("3JN", 1, 14),
+        ("REV", 12, 18) => ("REV", 13, 1),
+        other => other,
+    };
+    if kjv != p {
+        *renumbered += 1;
+    }
+    kjv
+}
+
+/// A Tyndale reference as ranges in the KJV's numbering: `Gen.1.27`, `Gen.1.22-25`,
+/// `Gen.1.1-2.3`, `1Sam.1.1-2Kgs.25.30` (a range across books becomes one range per
+/// book), with the source's variant separators (`–`, `--`, `:` for `.`) read as theirs.
+/// `None` if it can't be read (`John.2.13-16-20`, a backwards range).
+pub fn tyndale_ranges(s: &str, renumbered: &mut u64) -> Option<Vec<reference::Range>> {
+    let s = s.replace('–', "-").replace("--", "-").replace(':', ".");
+    let (a, b) = match s.split_once('-') {
+        Some((a, b)) => (a, Some(b)),
+        None => (s.as_str(), None),
+    };
+    let first = tyndale_point(a, None)?;
+    let last = match b {
+        Some(b) => Some(tyndale_point(b, Some(first))?),
+        None => None,
+    };
+    let start = to_kjv(first, renumbered);
+    let end = last.map_or(start, |p| to_kjv(p, renumbered));
+    if start.0 == end.0 {
+        if (end.1, end.2) < (start.1, start.2) {
+            return None;
+        }
+        return Some(vec![reference::Range::new(start.0, (start.1, start.2), (end.1, end.2)).ok()?]);
+    }
+    let (i, j) = (books::order(start.0)?, books::order(end.0)?);
+    if j <= i {
+        return None;
+    }
+    let mut out = vec![reference::Range::new(start.0, (start.1, start.2), (reference::END, reference::END)).ok()?];
+    for b in &books::BOOKS[i + 1..j] {
+        if b.section != books::Section::Apocrypha {
+            out.push(reference::Range::whole_book(b.code).ok()?);
+        }
+    }
+    out.push(reference::Range::new(end.0, (1, 0), (end.1, end.2)).ok()?);
+    Some(out)
+}
+
 /// Converts one note's raw markup to the note markup. The body is empty when the source
 /// had no text (only structure).
 pub fn convert(raw: &str, opts: Options) -> Result<(String, Stats), String> {
+    convert_linked(raw, opts, &BTreeMap::new())
+}
+
+/// [`convert`], for a source whose links name its other items (the Tyndale notes:
+/// `?item=Blessing_ThemeNote_Filament`): `links` gives each item's passage as a `to`,
+/// keyed `Blessing_ThemeNote`, and by title, `title:Blessing_ThemeNote`.
+pub fn convert_linked(raw: &str, opts: Options, links: &BTreeMap<String, String>) -> Result<(String, Stats), String> {
     let mut stats = Stats::default();
     let toks = tokenize(raw, opts.dialect, &mut stats)?;
     let tree = build_tree(toks)?;
-    let mut conv = Conv { opts, blocks: Vec::new(), cur: None, inline_depth: 0, in_fn: 0, stats, };
+    let mut conv = Conv { opts, links, blocks: Vec::new(), cur: None, inline_depth: 0, in_fn: 0, stats, };
     conv.walk(&tree)?;
     conv.flush();
     let body = write_blocks(&conv.blocks);
@@ -1295,7 +1565,11 @@ fn source_stream(raw: &str, dialect: Dialect) -> Result<Vec<Sym>, String> {
         let c = rest.chars().next().unwrap();
         match c {
             '<' => match scan_tag(rest) {
-                Some((_, n)) => {
+                Some((tok, n)) => {
+                    // Tyndale's typesetting code for an en space
+                    if dialect == Dialect::Tyndale && tok == Tok::Empty("x2002".into(), Vec::new()) {
+                        out.push(Sym::Gap);
+                    }
                     i += n;
                     continue;
                 }
@@ -1323,7 +1597,7 @@ fn sym(c: char) -> Sym {
 }
 
 const BLOCKS: &[&str] = &["p", "h", "l", "li", "tr", "td"];
-const INLINES: &[&str] = &["i", "b", "sup", "sc", "lang", "ref", "fn"];
+const INLINES: &[&str] = &["i", "b", "sup", "sub", "sc", "lang", "ref", "fn"];
 
 /// The converted body's text content, checking that the body is well formed in the closed
 /// markup: known tags only, properly nested, blocks only at the top (cells inside rows),
@@ -1343,6 +1617,7 @@ fn body_stream(body: &str) -> Result<Vec<Sym>, String> {
                         let ok_attrs = match name.as_str() {
                             "lang" => attrs.len() == 1 && attrs[0].0 == "code",
                             "ref" => attrs.is_empty() || (attrs.len() == 1 && attrs[0].0 == "to"),
+                            "l" | "li" => attrs.is_empty() || (attrs.len() == 1 && attrs[0].0 == "level" && matches!(attrs[0].1.as_str(), "2" | "3")),
                             _ => attrs.is_empty(),
                         };
                         if !ok_attrs {

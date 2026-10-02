@@ -451,7 +451,7 @@ const NOTES_HELPERS = `
   const panel = $("#panel");
   const where = () => panel.querySelector(".notes-where")?.textContent;
   const section = (name) => $$("#panel .commentary").find((c) => c.querySelector(".commentary-name").textContent.startsWith(name));
-  const labels = (name) => [...(section(name)?.querySelectorAll(".note-label") ?? [])].map((l) => l.firstChild.textContent);
+  const labels = (name) => [...(section(name)?.querySelectorAll(".note-label .note-place") ?? [])].map((l) => l.textContent);
 `;
 
 await test("Commentary: notes on the selected verse, through the KJV's numbering", "book=Psalms&chapter=22&tr=dra&verse=4&select=1&panel=notes", {}, `${NOTES_HELPERS}
@@ -496,6 +496,39 @@ await test("Commentary: choose commentaries and follow a reference", "book=John&
   await until(() => $("#panel").hidden, "panel closed");
   $('[data-action="notes"]').click();
   await until(() => !$("#panel").hidden && where() === "On Luke 2:14", "Notes from the verse bar");
+`);
+
+await test("Commentary: the Tyndale notes, book introductions, and articles", "book=Romans&chapter=2&tr=kjv&verse=8&select=1&panel=notes", {}, `${NOTES_HELPERS}
+  await until(() => section("Tyndale Open Study Notes"), "the Tyndale notes");
+  const ty = section("Tyndale Open Study Notes");
+  // The chiasm of Romans 2:6-11, indented as printed
+  const items = [...ty.querySelectorAll(".note-item")];
+  assert(items.map((i) => i.className).join() === "note-item,note-item level-2,note-item level-3,note-item level-3,note-item level-2,note-item", "the chiasm's levels");
+  // A transliteration: italic, in the text's own font
+  const greek = ty.querySelector('[lang="grc-Latn"]');
+  assert(greek && getComputedStyle(greek).fontStyle === "italic", "eritheia in italic");
+  assert(ty.querySelector(".commentary-credit").textContent.startsWith("Adapted from Tyndale Open Study Notes."), "Tyndale's attribution");
+  // A book's introductions come with its first chapter
+  {
+    $("#ref-button").click();
+    await until(() => $("#picker").open, "book picker");
+    $$(".book-grid button").find((b) => b.textContent === "Genesis").click();
+    await until(() => $(".chapter-grid"), "chapters");
+    $$(".chapter-grid button").find((b) => b.textContent === "1").click();
+  }
+  await until(() => $("#ref-label").textContent === "Genesis 1" && /introductions/.test(where() ?? ""), "Genesis 1");
+  await until(() => labels("Tyndale Open Study Notes").join() === "Genesis (introduction),Genesis (introduction)", "Genesis's summary and introduction");
+  // Articles on a passage fold, named by their titles
+  $("#ref-button").click();
+  await until(() => $("#picker").open, "book picker");
+  $$(".book-grid button").find((b) => b.textContent === "Genesis").click();
+  await until(() => $(".chapter-grid"), "chapters");
+  $$(".chapter-grid button").find((b) => b.textContent === "3").click();
+  await until(() => $("#ref-label").textContent === "Genesis 3" && $("#reader").getAttribute("aria-busy") === "false", "Genesis 3");
+  $("#v6").click();
+  await until(() => section("Tyndale Open Study Notes: Profiles and Themes"), "the articles");
+  const titles = [...section("Tyndale Open Study Notes: Profiles and Themes").querySelectorAll("summary")].map((x) => x.textContent);
+  assert(titles.some((t) => t.startsWith("Adam and Eve · Genesis 2:7-4:2")), "Adam and Eve, folded: " + titles.join(" | "));
 `);
 
 const XREF_HELPERS = `

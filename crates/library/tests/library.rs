@@ -106,3 +106,29 @@ fn every_drawn_verse_reads_as_its_text() {
     // Verses and Psalm titles across the 44 translations
     assert_eq!(checked, 1_155_004);
 }
+
+#[test]
+fn the_tyndale_open_study_notes() {
+    let lib = library();
+    let info = |id: &str| lib.commentaries().iter().find(|c| c.id == id).unwrap().clone();
+    for id in ["tyndale", "tyndalearticles"] {
+        assert_eq!(info(id).licence, "cc-by-sa-4.0", "{id}");
+        assert!(info(id).credit.starts_with("Adapted from Tyndale Open Study Notes."), "{id}");
+    }
+    assert_eq!(info("tyndale").books.len(), 66);
+    assert_eq!(info("tyndale").short.as_deref(), Some("Tyndale"));
+    // John 3:16: the section's note, then the verse's
+    let notes = lib.notes_on("tyndale", "JHN", 3, 16).unwrap();
+    assert!(notes.iter().any(|n| n.from == (3, 16) && n.to == (3, 21)));
+    assert!(notes.iter().any(|n| n.from == (3, 16) && n.to == (3, 16) && n.body.contains("<i>God loved the world</i>")));
+    // A book's summary and introduction are its introduction
+    let intro = lib.notes_on("tyndale", "GEN", 0, 0).unwrap();
+    assert_eq!(intro.len(), 2);
+    assert!(intro[0].body.starts_with("<h>The Book of Genesis</h><h>Purpose</h>"));
+    assert!(intro[1].body.starts_with("<p>Genesis is the book of beginnings"));
+    // The NLT's Revelation 12:18 is the KJV's 13:1
+    assert!(lib.notes_on("tyndale", "REV", 13, 1).unwrap().iter().any(|n| n.body.contains("12:18")));
+    // A profile on its passage, opening with its title
+    let adam = lib.notes_on("tyndalearticles", "GEN", 3, 1).unwrap();
+    assert!(adam.iter().any(|n| n.from == (2, 7) && n.to == (4, 2) && n.body.starts_with("<h>Adam and Eve</h>")));
+}

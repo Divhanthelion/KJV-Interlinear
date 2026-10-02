@@ -36,9 +36,9 @@ function codeOf(ctx, book) {
   return null;
 }
 
-/** "Matthew Henry's Complete Commentary" -> "Matthew Henry" */
+/** A commentary's name for buttons and lists: "Matthew Henry", "Tyndale" */
 function shortName(c) {
-  return c.name.replace(/'s (Complete )?Commentary.*$|'s Exposition.*$|'s Notes.*$| Commentary.*$/, "");
+  return c.short ?? c.name;
 }
 
 function list(names) {
@@ -120,6 +120,12 @@ function references(node, ctx, kids) {
   return link(ctx, targets[0], kids());
 }
 
+/** A line's or list item's indent below the first: " level-2" */
+function level(node) {
+  const n = node.getAttribute("level");
+  return n === "2" || n === "3" ? ` level-${n}` : "";
+}
+
 /** The library's note markup (docs/LIBRARY.md) as page elements. Only the known
  * elements are drawn; nothing in a note is ever treated as HTML. */
 export function renderMarkup(body, ctx) {
@@ -139,9 +145,9 @@ export function renderMarkup(body, ctx) {
       case "h":
         return h("h4", { class: "note-heading" }, kids());
       case "l":
-        return h("div", { class: "note-line" }, kids());
+        return h("div", { class: `note-line${level(node)}` }, kids());
       case "li":
-        return h("div", { class: "note-item" }, kids());
+        return h("div", { class: `note-item${level(node)}` }, kids());
       case "tr":
         return h("div", { class: "note-row" }, kids());
       case "td":
@@ -152,6 +158,8 @@ export function renderMarkup(body, ctx) {
         return h("strong", null, kids());
       case "sup":
         return h("sup", null, kids());
+      case "sub":
+        return h("sub", null, kids());
       case "sc":
         return h("span", { class: "sc" }, kids());
       case "lang":
@@ -212,9 +220,16 @@ function chooser(ctx, all) {
 function note(n, ctx) {
   const long = n.body.length > FOLD;
   const content = h("div", { class: "note-body" }, renderMarkup(n.body, ctx));
-  return long
-    ? h("details", { class: "note" }, h("summary", { class: "note-label" }, n.label, h("span", { class: "muted" }, ` · ${Math.round(n.body.length / 1000)}k characters`)), content)
-    : h("section", { class: "note" }, h("h4", { class: "note-label" }, n.label), content);
+  const place = h("span", { class: "note-place" }, n.label);
+  if (!long) return h("section", { class: "note" }, h("h4", { class: "note-label" }, place), content);
+  // A folded article is named by its title ("Adam and Eve"), where it opens with one
+  const title = /^<h>(.*?)<\/h>/.exec(n.body)?.[1].replace(/<[^>]*>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+  return h(
+    "details",
+    { class: "note" },
+    h("summary", { class: "note-label" }, title ? `${title} · ` : null, place, h("span", { class: "muted" }, ` · ${Math.round(n.body.length / 1000)}k characters`)),
+    content,
+  );
 }
 
 export async function renderNotes(body, ctx) {

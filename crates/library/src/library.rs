@@ -351,6 +351,8 @@ pub mod build {
     struct CommentaryEntry {
         id: String,
         name: String,
+        #[serde(default)]
+        short: Option<String>,
         author: String,
         year: String,
         tradition: String,
@@ -482,6 +484,7 @@ pub mod build {
                 infos.push(crate::notes::CommentaryInfo {
                     id: c.id,
                     name: c.name,
+                    short: c.short,
                     author: c.author,
                     year: c.year,
                     tradition: c.tradition,

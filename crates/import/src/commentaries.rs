@@ -52,6 +52,14 @@ pub struct Entry {
     /// Scripture references with no book are in the note's own book (TSK, Wesley)
     #[serde(default)]
     pub relative_refs: bool,
+    /// How the source is read: a SWORD module (the default), or "tyndale" (the Tyndale
+    /// Open Study Notes' XML, see [`crate::tyndale`])
+    #[serde(default)]
+    pub format: Option<String>,
+    /// Which works of a source holding several this entry is: Tyndale "notes" (study
+    /// notes and book introductions) or "articles" (profiles and themes)
+    #[serde(default)]
+    pub part: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -71,8 +79,13 @@ pub fn catalogue() -> Result<Vec<Entry>, String> {
         if !b.id.chars().all(|ch| ch.is_ascii_lowercase() || ch.is_ascii_digit()) {
             return Err(format!("commentaries.toml: id {:?} must be lowercase letters and digits", b.id));
         }
-        if b.licence != "pd" {
-            return Err(format!("commentaries.toml: {} has licence {:?}; only \"pd\" is handled here", b.id, b.licence));
+        let licence = match b.format.as_deref() {
+            None => "pd",
+            Some("tyndale") => "cc-by-sa-4.0",
+            Some(other) => return Err(format!("commentaries.toml: {} has unknown format {:?}", b.id, other)),
+        };
+        if b.licence != licence {
+            return Err(format!("commentaries.toml: {} has licence {:?}; its source is {:?}", b.id, b.licence, licence));
         }
     }
     Ok(c.commentary)
@@ -350,6 +363,8 @@ struct Index {
     refs_corrected: usize,
     refs_withheld: usize,
     refs_impossible: usize,
+    #[serde(skip_serializing_if = "is_zero")]
+    refs_renumbered: u64,
     footnotes: u64,
     structural_gaps: u64,
     bare_ampersands: u64,
@@ -364,6 +379,10 @@ struct Index {
     book_counts: Vec<BookCount>,
     #[serde(rename = "trimmed")]
     trimmed: Vec<TrimmedRange>,
+}
+
+fn is_zero(n: &u64) -> bool {
+    *n == 0
 }
 
 fn examples(unparsed: &[String]) -> Vec<String> {
@@ -382,7 +401,19 @@ pub struct Built {
     pub report: Report,
 }
 
+/// What a source was read as, for `index.toml`.
+pub struct SourceInfo {
+    pub module: String,
+    pub version: Option<String>,
+    pub text_source: Option<String>,
+    pub markup: String,
+    pub encoding: String,
+}
+
 pub fn convert(entry: &Entry, pinned: &[sources::Source]) -> Result<Built, String> {
+    if entry.format.as_deref() == Some("tyndale") {
+        return crate::tyndale::convert(entry, pinned);
+    }
     let source = pinned.iter().find(|s| s.path == entry.source).ok_or_else(|| format!("{} is not pinned", entry.source))?;
     let module = Module::open_zip(&cache().join(&entry.source)).map_err(|e| format!("{}: {}", entry.source, e))?;
     let ex = module.read().map_err(|e| format!("{}: {}", entry.source, e))?;
@@ -393,10 +424,28 @@ pub fn convert(entry: &Entry, pinned: &[sources::Source]) -> Result<Built, Strin
     };
     let opts = Options2 { dialect, jud_is_judges: entry.jud_is_judges, trim_cross_chapter: entry.trim_cross_chapter, relative_refs: entry.relative_refs };
     let (notes, report) = convert_extraction(&entry.id, &ex, &opts)?;
+    let info = SourceInfo {
+        module: module.name.clone(),
+        version: module.conf.get("Version").map(str::to_string),
+        text_source: module.conf.get("TextSource").map(str::to_string),
+        markup: match dialect {
+            Dialect::Osis => "OSIS".into(),
+            Dialect::Thml => "ThML".into(),
+            Dialect::Tyndale => unreachable!("a SWORD module"),
+        },
+        encoding: match ex.encoding {
+            Encoding::Utf8 => "UTF-8".into(),
+            Encoding::Latin1 => "Latin-1".into(),
+        },
+    };
+    built(entry, source, info, &notes, report)
+}
 
+/// The files for a commentary: one per book, and `index.toml`.
+pub fn built(entry: &Entry, source: &sources::Source, info: SourceInfo, notes: &[Note], report: Report) -> Result<Built, String> {
     let mut files = BTreeMap::new();
     let mut by_book: BTreeMap<&str, Vec<&Note>> = BTreeMap::new();
-    for n in &notes {
+    for n in notes {
         by_book.entry(n.book).or_default().push(n);
     }
     for (code, list) in &by_book {
@@ -414,17 +463,11 @@ pub fn convert(entry: &Entry, pinned: &[sources::Source]) -> Result<Built, Strin
         about: entry.about.clone(),
         source: source.url.clone(),
         source_sha256: source.sha256.clone(),
-        module: module.name.clone(),
-        module_version: module.conf.get("Version").map(str::to_string),
-        module_text_source: module.conf.get("TextSource").map(str::to_string),
-        markup: match dialect {
-            Dialect::Osis => "OSIS".into(),
-            Dialect::Thml => "ThML".into(),
-        },
-        encoding: match ex.encoding {
-            Encoding::Utf8 => "UTF-8".into(),
-            Encoding::Latin1 => "Latin-1".into(),
-        },
+        module: info.module,
+        module_version: info.version,
+        module_text_source: info.text_source,
+        markup: info.markup,
+        encoding: info.encoding,
         notes: report.notes,
         books: report.per_book.len(),
         characters: report.chars,
@@ -439,6 +482,7 @@ pub fn convert(entry: &Entry, pinned: &[sources::Source]) -> Result<Built, Strin
         refs_corrected: report.stats.refs_corrected.len(),
         refs_withheld: report.stats.refs_withheld.len(),
         refs_impossible: report.stats.refs_impossible.len(),
+        refs_renumbered: report.stats.renumbered,
         footnotes: report.stats.footnotes,
         structural_gaps: report.stats.structural_gaps,
         bare_ampersands: report.stats.bare_ampersands,
@@ -565,7 +609,7 @@ pub fn build(ids: &[String], mode: Mode) -> Result<(), String> {
 /// including the text of orphans.
 pub fn inventory(ids: &[String]) -> Result<(), String> {
     let all = catalogue()?;
-    for e in all.iter().filter(|e| ids.is_empty() || ids.contains(&e.id)) {
+    for e in all.iter().filter(|e| (ids.is_empty() || ids.contains(&e.id)) && e.format.is_none()) {
         let module = Module::open_zip(&cache().join(&e.source)).map_err(|x| format!("{}: {}", e.source, x))?;
         let ex = module.read().map_err(|x| format!("{}: {}", e.source, x))?;
         let dialect = if module.conf.get("SourceType") == Some("ThML") { Dialect::Thml } else { Dialect::Osis };

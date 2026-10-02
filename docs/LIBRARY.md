@@ -35,7 +35,7 @@ The interlinear stays, but it is no longer the centre of the app.
 | Bibles | ~35 English translations (list in `data/library/bibles/`) | eBible.org USFM, cross-checked against eBible VPL | each translation's own numbering | per translation |
 | Commentary | Matthew Henry, Complete | CrossWire `MHC` | KJV | Public domain |
 | Commentary | Catena Aurea (Aquinas) | CrossWire `Catena` | KJV | Public domain |
-| Commentary | Tyndale Open Study Notes | `tyndale_open-studynotes.zip` from tyndaleopenresources.com | English (NLT wording) | CC BY-SA 4.0 |
+| Commentary | Tyndale Open Study Notes: study notes and book introductions (`tyndale`); profiles of people and theme articles (`tyndalearticles`) | `tyndale_open-studynotes.zip` from tyndaleopenresources.com (its XML) | NLT numbering, placed on the KJV's (3 John 1:15 and Revelation 12:18 are the KJV's 1:14 and 13:1) | CC BY-SA 4.0 |
 | Commentary | Wesley's Notes | CrossWire `Wesley` | KJV | Public domain |
 | Commentary | Keil & Delitzsch | CrossWire `KD` | KJV | Public domain |
 | Commentary | John Gill | SermonIndex SWORD module `sigill` (keeps the Hebrew; HelloAO's copy strips it) | KJV | Public domain |
@@ -72,8 +72,13 @@ publishing metadata. The cleaning rule is simple enough to audit, and the plain
 text of every verse is checked against eBible's separately produced VPL edition.
 
 **Commentary notes** use a small, closed markup in `body`, described below. The
-importer turns each source format (OSIS, ThML, JSON, XML) into this one markup;
-anything it doesn't recognise is an import error, never silently dropped.
+importer turns each source format (OSIS, ThML, the Tyndale notes' XML) into this one
+markup; anything it doesn't recognise is an import error, never silently dropped. The
+Tyndale notes' links to their own items (a theme article, a book's introduction,
+another study note) open the passage that item is about; a link whose target is cut
+short ("Gen.1.3-2") is read from its shown text ("1:3–2:3") only when that starts
+where the link does. Every repair and every link left without a `to` is counted in
+the commentary's `index.toml`.
 
 ### Note markup
 
@@ -87,8 +92,9 @@ escaped as `&amp;`, `&lt;`, `&gt;`, and nothing else escaped.
 | `<l>…</l>` | a line of verse (poetry quoted in a note); consecutive lines form a stanza |
 | `<li>…</li>` | a list item |
 | `<tr><td>…</td>…</tr>` | a table row (rare: TSK, KD) |
-| `<i>`, `<b>`, `<sup>`, `<sc>` (small caps) | inline styles, nestable |
-| `<lang code="he">…</lang>` | text in another language: `he`, `arc`, `grc`, `la`, `syr`, … |
+| `<l level="2">`, `<li level="2">` | a line or list item indented to the second (or third) level; the first level has no `level` |
+| `<i>`, `<b>`, `<sup>`, `<sub>`, `<sc>` (small caps) | inline styles, nestable |
+| `<lang code="he">…</lang>` | text in another language: `he`, `arc`, `grc`, `la`, `syr`, …; a transliteration in Latin letters adds the script, `he-Latn` |
 | `<ref to="JHN.3.16">John 3:16</ref>` | a Scripture reference; `to` is OSIS-style, `JHN.3.16-JHN.3.18` for ranges, several ranges separated by spaces, book codes as in `books.rs`. `to` is left out when the reference can't be read with certainty; the text is always kept |
 | `<fn>…</fn>` | a footnote inside a note, kept where it stands |
 | `<br/>` | a line break inside a block |
@@ -138,7 +144,9 @@ must name verses the KJV has.
   introductions are those of each KJV chapter holding at least a quarter of its
   verses (the Douay-Rheims' Psalm 9 is the KJV's 9 and 10). Commentaries are chosen
   with chips (remembered); those with nothing on the verse, or on the book, are
-  listed in a line rather than shown empty. Long notes start folded. A reference
+  listed in a line rather than shown empty. A book's introductions come with its
+  first chapter's. Long notes start folded, named by their title where they open
+  with one ("Adam and Eve · Genesis 2:7-4:2"). A reference
   opens its passage in the translation being read; where one reference lists
   several places (the Treasury's "Lu 2:14; Ro 5:8; 1Jo 4:9,10,19", Wesley's "Numb
   1:22 26:14") and its text has a part for each, in order, each part opens its own.

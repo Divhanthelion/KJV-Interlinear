@@ -1,18 +1,21 @@
 # The commentaries in the library, in the order the app lists them.
 #
-# Every one is a public-domain work, read from the SWORD module named in `source` with
-# `kjv-sword` and converted to the library's note markup (docs/LIBRARY.md) by kjv-import.
-# Each note is keyed to the KJV's verse numbering and checked character by character
-# against its source (see crates/import/src/commentaries.rs).
+# Each is read from the source named in `source` (a SWORD module, read with `kjv-sword`,
+# or the Tyndale Open Study Notes' XML) and converted to the library's note markup
+# (docs/LIBRARY.md) by kjv-import. Each note is keyed to the KJV's verse numbering and
+# checked character by character against its source (see crates/import/src/commentaries.rs
+# and tyndale.rs). The SWORD modules are public domain; the Tyndale notes are CC BY-SA 4.0
+# and stay in their own data files.
 #
 # Fields:
 #   id        our id, used in data/library/commentaries/<id>/ and in the app
 #   name      the work as it is known
+#   short     a short name for buttons
 #   author    who wrote it
 #   year      when it was published
 #   tradition the author's tradition, shown so a reader knows the angle
 #   coverage  what the commentary covers
-#   licence   pd (public domain)
+#   licence   pd (public domain), or cc-by-sa-4.0 (the Tyndale notes)
 #   credit    the credit line shown in the app and in NOTICE
 #   about     one or two sentences for the picker
 #   source    the module's zip, under .cache/sources/
@@ -21,10 +24,14 @@
 #   trim_cross_chapter   cut a note linked across a chapter boundary at its first chapter's end
 #   relative_refs        a scripture reference with no book is in the note's own book and chapter
 #                        (the convention of TSK and Wesley: "8:22" or "13" under Genesis 1:5)
+#   format    "tyndale" for the Tyndale Open Study Notes' XML (otherwise a SWORD module)
+#   part      which of the Tyndale works: "notes" (study notes and book introductions) or
+#             "articles" (profiles of people and theme articles)
 
 [[commentary]]
 id = "mhc"
 name = "Matthew Henry's Complete Commentary"
+short = "Matthew Henry"
 author = "Matthew Henry"
 year = "1706–1721"
 tradition = "Puritan / Reformed"
@@ -38,6 +45,7 @@ url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHC.zip"
 [[commentary]]
 id = "catena"
 name = "Catena Aurea"
+short = "Catena Aurea"
 author = "Thomas Aquinas (translated by John Henry Newman)"
 year = "1263–1264 (translation 1841–1845)"
 tradition = "Patristic; compiled by a Catholic Dominican"
@@ -51,6 +59,7 @@ url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Catena.zip"
 [[commentary]]
 id = "wesley"
 name = "Wesley's Notes on the Bible"
+short = "Wesley"
 author = "John Wesley"
 year = "1754–1765"
 tradition = "Methodist"
@@ -67,6 +76,7 @@ relative_refs = true
 [[commentary]]
 id = "kd"
 name = "Keil & Delitzsch Commentary on the Old Testament"
+short = "Keil & Delitzsch"
 author = "C. F. Keil and F. Delitzsch"
 year = "1857–1878"
 tradition = "Lutheran"
@@ -80,6 +90,7 @@ url = "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/KD.zip"
 [[commentary]]
 id = "jfb"
 name = "Jamieson-Fausset-Brown Commentary"
+short = "Jamieson-Fausset-Brown"
 author = "Robert Jamieson, A. R. Fausset, and David Brown"
 year = "1871"
 tradition = "Evangelical"
@@ -94,6 +105,7 @@ jud_is_judges = true
 [[commentary]]
 id = "tsk"
 name = "Treasury of Scripture Knowledge"
+short = "Treasury of Scripture Knowledge"
 author = "R. A. Torrey (introduction); Canne, Browne, Blayney, Scott, and others"
 year = "c. 1880"
 tradition = "Cross-references"
@@ -109,6 +121,7 @@ relative_refs = true
 [[commentary]]
 id = "gill"
 name = "John Gill's Exposition of the Bible"
+short = "John Gill"
 author = "John Gill"
 year = "1746–1763"
 tradition = "Reformed Baptist"
@@ -118,3 +131,35 @@ credit = "Public domain. Text: SermonIndex.net (sermonindex.net/commentary/gill)
 about = "The most thorough verse-by-verse commentary by a single author, strong on Hebrew, Greek, and rabbinical sources. This edition keeps the original Hebrew."
 source = "sermonindex/sigill.zip"
 url = "https://www.sermonindex.net/modules/sword/sigill.zip"
+
+[[commentary]]
+id = "tyndale"
+name = "Tyndale Open Study Notes"
+short = "Tyndale"
+author = "Tyndale House Publishers"
+year = "2022"
+tradition = "Evangelical"
+coverage = "Whole Bible"
+licence = "cc-by-sa-4.0"
+credit = "Adapted from Tyndale Open Study Notes. The original work by Tyndale House Publishers is available for free at http://www.tyndaleopenresources.com. Copyright © 2022 Tyndale House Publishers, licensed under CC BY-SA 4.0 (creativecommons.org/licenses/by-sa/4.0). Changes: converted to this app's note format and keyed to the KJV's verse numbering (the NLT's 3 John 1:15 and Revelation 12:18 are the KJV's 1:14 and 13:1)."
+about = "Modern study notes on the history, culture, and theology behind the text, verse by verse, with an introduction to every book. Their excerpts quote the New Living Translation."
+source = "tyndale/tyndale_open-studynotes.zip"
+url = "https://tyndaleopenresources.com/wp-content/themes/tyndale-openresources/files/tyndale_open-studynotes.zip"
+format = "tyndale"
+part = "notes"
+
+[[commentary]]
+id = "tyndalearticles"
+name = "Tyndale Open Study Notes: Profiles and Themes"
+short = "Tyndale profiles & themes"
+author = "Tyndale House Publishers"
+year = "2022"
+tradition = "Evangelical"
+coverage = "Whole Bible (articles on people and themes)"
+licence = "cc-by-sa-4.0"
+credit = "Adapted from Tyndale Open Study Notes. The original work by Tyndale House Publishers is available for free at http://www.tyndaleopenresources.com. Copyright © 2022 Tyndale House Publishers, licensed under CC BY-SA 4.0 (creativecommons.org/licenses/by-sa/4.0). Changes: converted to this app's note format and keyed to the KJV's verse numbering."
+about = "124 profiles of people in the Bible and 299 articles on its themes, each shown with the passage it is about and listing passages for further study."
+source = "tyndale/tyndale_open-studynotes.zip"
+url = "https://tyndaleopenresources.com/wp-content/themes/tyndale-openresources/files/tyndale_open-studynotes.zip"
+format = "tyndale"
+part = "articles"

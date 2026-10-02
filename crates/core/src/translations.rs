@@ -303,7 +303,7 @@ fn places_label(places: &[(String, u32, u32)]) -> String {
 /// The notes of commentaries `ids` on verse `verse` of `book` `chapter` as numbered in
 /// translation `bible` (every commentary is keyed to the KJV, so the verse is mapped
 /// to the KJV first). Verse 0: the chapter's introductions (those of the KJV
-/// chapters it corresponds to).
+/// chapters it corresponds to), and with a book's first chapter, the book's.
 pub fn notes(lib: &Library, ids: &[String], bible: &str, book: &str, chapter: u32, verse: u32) -> Result<NotesOn, String> {
     let k = books::by_name(book).ok_or_else(|| format!("no book named {:?}", book))?;
     let places: Vec<(String, u32, u32)> = if verse == 0 {
@@ -316,15 +316,25 @@ pub fn notes(lib: &Library, ids: &[String], bible: &str, book: &str, chapter: u3
             .collect()
     };
     let same = places.len() == 1 && places[0] == (k.code.to_string(), chapter, verse);
+    // A book's introduction comes before its first chapter's
+    let mut lookups: Vec<(String, u32, u32)> = Vec::new();
+    for p in &places {
+        if verse == 0 && p.1 == 1 {
+            lookups.push((p.0.clone(), 0, 0));
+        }
+        lookups.push(p.clone());
+    }
     let mut out = Vec::new();
     for id in ids {
         let info = lib.commentaries().iter().find(|c| &c.id == id).ok_or_else(|| format!("no commentary {:?}", id))?;
         let mut notes: Vec<NoteView> = Vec::new();
         let mut seen = std::collections::HashSet::new();
-        for (code, c, v) in &places {
+        for (code, c, v) in &lookups {
             let display = books::by_code(code).map_or(code.as_str(), |b| b.display);
             for n in lib.notes_on(id, code, *c, *v)? {
-                if seen.insert((code.clone(), n.from, n.to)) {
+                // The same note reached from two places once (a commentary may have two
+                // notes on one passage: Tyndale's book summary and introduction)
+                if seen.insert((code.clone(), n.from, n.to, n.body.clone())) {
                     notes.push(NoteView { label: note_label(display, code, n.from, n.to), body: n.body });
                 }
             }

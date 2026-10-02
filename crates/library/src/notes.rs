@@ -11,6 +11,9 @@ use serde::{Deserialize, Serialize};
 pub struct CommentaryInfo {
     pub id: String,
     pub name: String,
+    /// For buttons: "Matthew Henry", "Tyndale"
+    #[serde(default)]
+    pub short: Option<String>,
     pub author: String,
     pub year: String,
     pub tradition: String,

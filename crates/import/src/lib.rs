@@ -8,6 +8,7 @@ pub mod commentaries;
 pub mod crossrefs;
 pub mod markup;
 pub mod sources;
+pub mod tyndale;
 
 use std::path::{Path, PathBuf};
 

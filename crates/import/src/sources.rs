@@ -59,7 +59,10 @@ fn wanted() -> Result<Vec<(String, String)>, String> {
         }
     }
     for c in commentaries::catalogue()? {
-        out.push((c.source, c.url));
+        // (the Tyndale Open Study Notes are two entries from one download)
+        if !out.iter().any(|(path, _)| *path == c.source) {
+            out.push((c.source, c.url));
+        }
     }
     for x in crossrefs::catalogue()? {
         if let (Some(source), Some(url)) = (x.source, x.url) {

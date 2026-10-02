@@ -669,6 +669,13 @@ sha256 = "17eac460993aa95239d8c3a598c612b3ffcbc3e9e102a51a0335159fbbb03ea2"
 retrieved = "2026-10-02"
 
 [[source]]
+path = "tyndale/tyndale_open-studynotes.zip"
+url = "https://tyndaleopenresources.com/wp-content/themes/tyndale-openresources/files/tyndale_open-studynotes.zip"
+size = 3065210
+sha256 = "7b4d5ae088449d5a6925170c4b89b978acee2f78f73dc6b8a278fa948a7e8498"
+retrieved = "2026-10-02"
+
+[[source]]
 path = "openbible/cross-references.zip"
 url = "https://a.openbible.info/data/cross-references.zip"
 size = 1982012
