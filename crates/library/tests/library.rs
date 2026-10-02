@@ -104,5 +104,5 @@ fn every_drawn_verse_reads_as_its_text() {
     }
     assert!(problems.is_empty(), "{}", problems.join("\n"));
     // Verses and Psalm titles across the 44 translations
-    assert_eq!(checked, 1_155_017);
+    assert_eq!(checked, 1_155_004);
 }

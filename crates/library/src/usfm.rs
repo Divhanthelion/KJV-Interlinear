@@ -255,6 +255,16 @@ pub fn parse(src: &str, options: &Options) -> Result<Book, Error> {
     if p.book.code.is_empty() {
         return Err(Error { line: 1, message: "no \\id line".into() });
     }
+    // A `\d` before verse 1 is a Psalm title, unless the chapter has more `\d` lines
+    // between its verses: then they are all acrostic letters (Psalm 119's ALEPH, BETH…)
+    for ch in &mut p.book.chapters {
+        let acrostic = ch.blocks.iter().any(|b| b.marker == "d" && b.class == Class::Heading);
+        if acrostic {
+            for b in ch.blocks.iter_mut().filter(|b| b.class == Class::Title) {
+                b.class = Class::Heading;
+            }
+        }
+    }
     Ok(p.book)
 }
 
@@ -771,12 +781,17 @@ mod tests {
 
     #[test]
     fn psalm_titles_and_mid_chapter_headings() {
+        // A title before verse 1
+        let b = book("\\id PSA\n\\c 23\n\\d A Psalm of David.\n\\q1\n\\v 1 The LORD is my shepherd;\n");
+        let v = verses(&b);
+        assert_eq!((v[0].title, v[0].number.as_str(), v[0].text.as_str()), (true, "0", "A Psalm of David."));
+        // Acrostic letters, the first before verse 1: all headings, none a title
         let b = book("\\id PSA\n\\c 119\n\\d ALEPH\n\\q1\n\\v 1 Blessed are the undefiled.\n\\d BETH\n\\q1\n\\v 9 Wherewithal\n");
         let v = verses(&b);
-        assert_eq!((v[0].number.as_str(), v[0].text.as_str()), ("0", "ALEPH"));
-        assert_eq!(v[1].text, "Blessed are the undefiled.");
-        assert_eq!(v[1].asides, ["BETH"]);
-        assert_eq!(v[2].text, "Wherewithal");
+        assert_eq!(v.len(), 2);
+        assert_eq!((v[0].number.as_str(), v[0].text.as_str()), ("1", "Blessed are the undefiled."));
+        assert_eq!(v[0].asides, ["ALEPH", "BETH"]);
+        assert_eq!(v[1].text, "Wherewithal");
     }
 
     #[test]
