@@ -125,6 +125,17 @@ a text shows up in review as a readable diff.
 - **References.** The app speaks KJV numbering. Each translation's verses are aligned
   with the KJV's (see "Verse alignment"), and parallel reading, switching translations,
   commentary lookup, and context building all go through that one mapping.
+- **Commentary panel.** The chosen commentaries' notes on the selected verse, or the
+  chapter's introductions when none is selected, in whatever translation is being
+  read: the verse is mapped to the KJV first, and the panel says so when the
+  numbering differs (the Douay-Rheims' Psalm 22:4 is the KJV's 23:4). A chapter's
+  introductions are those of each KJV chapter holding at least a quarter of its
+  verses (the Douay-Rheims' Psalm 9 is the KJV's 9 and 10). Commentaries are chosen
+  with chips (remembered); those with nothing on the verse, or on the book, are
+  listed in a line rather than shown empty. Long notes start folded. A reference
+  opens its passage in the translation being read; where one reference lists
+  several places (the Treasury's "Lu 2:14; Ro 5:8; 1Jo 4:9,10,19", Wesley's "Numb
+  1:22 26:14") and its text has a part for each, in order, each part opens its own.
 
 ## Verse alignment
 

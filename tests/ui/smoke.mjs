@@ -447,6 +447,57 @@ await test("Translations: the KJV keeps its interlinear and gains the Apocrypha"
   assert($(".word") || visible($("[data-view-switch]")), "back in the KJV's own reader");
 `);
 
+const NOTES_HELPERS = `
+  const panel = $("#panel");
+  const where = () => panel.querySelector(".notes-where")?.textContent;
+  const section = (name) => $$("#panel .commentary").find((c) => c.querySelector(".commentary-name").textContent.startsWith(name));
+  const labels = (name) => [...(section(name)?.querySelectorAll(".note-label") ?? [])].map((l) => l.firstChild.textContent);
+`;
+
+await test("Commentary: notes on the selected verse, through the KJV's numbering", "book=Psalms&chapter=22&tr=dra&verse=4&select=1&panel=notes", {}, `${NOTES_HELPERS}
+  await until(() => section("Matthew Henry"), "Matthew Henry's notes");
+  assert(where() === "On Psalm 22:4", "the Douay-Rheims' verse: " + where());
+  assert($(".notes-kjv")?.textContent.includes("Psalm 23:4"), "which is the KJV's Psalm 23:4");
+  assert(labels("Matthew Henry").join() === "Psalm 23:1-6", "Matthew Henry on KJV Psalm 23: " + labels("Matthew Henry"));
+  assert(labels("Treasury").join() === "Psalm 23:4", "the Treasury on 23:4: " + labels("Treasury"));
+  assert(section("Treasury").querySelector(".commentary-credit").textContent.length > 20, "credited");
+  assert(panel.textContent.includes("Nothing on Psalms from Catena Aurea"), "Catena covers the Gospels only");
+  $("#v5").click();
+  await until(() => where() === "On Psalm 22:5" && labels("Treasury").join() === "Psalm 23:5", "follows the selected verse");
+  $('[data-action="deselect"]').click();
+  await until(() => /introductions/.test(where() ?? "") && labels("Matthew Henry").join() === "Psalm 23 (introduction)", "the chapter's introduction");
+`);
+
+await test("Commentary: choose commentaries and follow a reference", "book=John&chapter=3&tr=kjv&verse=16&select=1&panel=notes", {}, `${NOTES_HELPERS}
+  await until(() => section("Treasury"), "the Treasury's notes");
+  assert(where() === "On John 3:16" && !$(".notes-kjv"), "the KJV's own numbering");
+  assert(section("Catena Aurea") && section("John Gill") && section("Wesley"), "Catena, Gill, Wesley");
+  assert(panel.textContent.includes("Nothing on John from Keil & Delitzsch"), "Keil & Delitzsch is the Old Testament only");
+  const chip = (name) => $$("#panel .chip").find((c) => c.textContent === name);
+  chip("Wesley").click();
+  await until(() => !section("Wesley") && chip("Wesley")?.getAttribute("aria-pressed") === "false", "Wesley turned off");
+  chip("Wesley").click();
+  await until(() => section("Wesley"), "Wesley back");
+  // Long notes start folded
+  assert(section("Matthew Henry").querySelector("details.note"), "Matthew Henry's long note folded");
+  // A reference in a note opens the passage, and the notes follow
+  // The Treasury lists several places under one reference; each opens its own
+  const links = [...section("Treasury").querySelectorAll(".note-link")];
+  assert(links.find((a) => a.textContent === "10")?.title === "Open 1 John 4:10", "1Jo 4:9,10,19: 10 opens 1 John 4:10");
+  assert(links.find((a) => a.textContent === "2Co 5:19-21")?.title === "Open 2 Corinthians 5:19-21", "a range");
+  const link = links.find((a) => a.textContent === "Lu 2:14");
+  assert(link, "the Treasury links Luke 2:14");
+  link.click();
+  await until(() => $("#ref-label").textContent === "Luke 2" && $("#reader").getAttribute("aria-busy") === "false", "Luke 2");
+  await until(() => $(".verse[aria-current='true']")?.id === "v14", "Luke 2:14 selected");
+  await until(() => where() === "On Luke 2:14", "notes on Luke 2:14");
+  // The verse bar opens the panel too
+  $("#panel-close").click();
+  await until(() => $("#panel").hidden, "panel closed");
+  $('[data-action="notes"]').click();
+  await until(() => !$("#panel").hidden && where() === "On Luke 2:14", "Notes from the verse bar");
+`);
+
 // Every verse of every translation on screen, compared with the data (whose text is
 // checked against eBible's own editions in crates/library/tests). A full sweep of
 // everything runs weekly (FULL_SWEEP=1); every push sweeps a representative set in

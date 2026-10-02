@@ -7,6 +7,7 @@ import { renderSaved, renderSearch, renderSettings, renderStrongs } from "./pane
 import { closePicker, initPicker, isPickerOpen, openPicker, setPickerBooks } from "./picker.js";
 import { libraryVerseText, markSelected, renderChapter, renderLibraryChapter } from "./reader.js";
 import { initTranslations, openTranslations } from "./translations.js";
+import { notesStale, renderNotes } from "./notes.js";
 import * as prefs from "./settings.js";
 
 const $ = (id) => document.getElementById(id);
@@ -21,6 +22,7 @@ const PANELS = {
   search: { title: "Search", render: renderSearch },
   strongs: { title: "Strong's & Lexicon", render: renderStrongs },
   saved: { title: "Saved", render: renderSaved },
+  notes: { title: "Commentary", render: renderNotes },
   chat: { title: "Ask", render: renderChat },
   settings: { title: "Settings", render: renderSettings },
 };
@@ -128,6 +130,7 @@ async function goTo(book, chapter, verse = 0, opts = {}) {
   reader.setAttribute("aria-busy", "false");
 
   if (opts.fromPanel && !desktop.matches) closePanel();
+  else if (state.panel === "notes" && notesStale(ctx)) refreshPanel();
   chatScopeChanged(ctx);
 }
 
@@ -195,6 +198,7 @@ async function setHighlight(query) {
 function selectVerse(n) {
   state.selectedVerse = n;
   markSelected(reader, n);
+  if (state.panel === "notes" && notesStale(ctx)) refreshPanel();
   if (n) {
     settings.position = { ...settings.position, verse: n };
     prefs.save(settings);
@@ -552,7 +556,7 @@ function wireStaticControls() {
   $("panel-close").append(icon("close"));
   $("panel-close").addEventListener("click", () => closePanel());
 
-  const toolIcons = { chat: "chat", search: "search", saved: "bookmark", settings: "settings" };
+  const toolIcons = { notes: "notes", chat: "chat", search: "search", saved: "bookmark", settings: "settings" };
   for (const b of document.querySelectorAll("[data-open-panel]")) {
     b.append(icon(toolIcons[b.dataset.openPanel]));
     b.addEventListener("click", () =>
@@ -567,16 +571,17 @@ function wireStaticControls() {
     tab.addEventListener("click", () => (tab.dataset.tab === "read" ? closePanel() : openPanel(tab.dataset.tab, { focus: false })));
   }
 
-  const actionIcons = { "copy-verse": ["copy", "Copy"], "copy-chapter": ["chapter", "Copy chapter"] };
+  const actionIcons = { notes: ["notes", "Notes"], "copy-verse": ["copy", "Copy"], "copy-chapter": ["chapter", "Copy chapter"] };
   for (const [action, [iconName, label]] of Object.entries(actionIcons)) {
     const b = actions.querySelector(`[data-action="${action}"]`);
     b.append(icon(iconName), h("span", { class: "action-label" }, label));
-    b.title = action === "copy-verse" ? "Copy verse (Ctrl+C)" : "Copy chapter (Ctrl+Shift+C)";
+    b.title = { notes: "Commentary on this verse", "copy-verse": "Copy verse (Ctrl+C)", "copy-chapter": "Copy chapter (Ctrl+Shift+C)" }[action];
   }
   actions.querySelector('[data-action="deselect"]').append(icon("close"));
   actions.addEventListener("click", (event) => {
     const action = event.target.closest("[data-action]")?.dataset.action;
     if (action === "bookmark") toggleBookmark();
+    else if (action === "notes") openPanel("notes", { focus: false });
     else if (action === "copy-verse") copyVerse();
     else if (action === "copy-chapter") copyChapter();
     else if (action === "deselect") selectVerse(null);

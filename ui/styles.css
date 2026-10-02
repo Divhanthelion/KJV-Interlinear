@@ -800,6 +800,32 @@ input[readonly] { color: var(--muted); }
 .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
 .chip:disabled { opacity: 0.4; cursor: default; }
 
+/* ------------------------------------------------------------------ commentary */
+
+.notes-where { font-weight: 650; margin: 0 0 10px; }
+.notes-kjv { font-size: 0.875rem; color: var(--muted); margin: -6px 0 10px; }
+.panel[data-panel="notes"] .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; }
+.panel[data-panel="notes"] .chip { min-height: 30px; padding: 0 10px; font-size: 0.8125rem; }
+.commentary { padding: 14px 0 6px; border-top: 1px solid var(--border); }
+.commentary-name { font-size: 1rem; font-weight: 700; margin: 0 0 8px; }
+.commentary-meta { font-weight: 400; color: var(--muted); font-size: 0.875rem; }
+.commentary-credit { font-size: 0.75rem; color: var(--muted); margin: 6px 0 0; }
+.notes-silent { padding-top: 10px; border-top: 1px solid var(--border); }
+.notes-silent .empty { font-size: 0.875rem; margin: 0 0 6px; }
+.note { margin: 0 0 12px; }
+.note-label { font-size: 0.8125rem; font-weight: 650; color: var(--text-2); margin: 0 0 4px; }
+details.note > summary { cursor: pointer; min-height: 32px; display: list-item; }
+.note-body { font-family: var(--font-text); font-size: 1rem; line-height: 1.6; overflow-wrap: anywhere; }
+.note-body p { margin: 0 0 0.6em; }
+.note-body .note-heading { font-family: var(--font-ui); font-size: 0.875rem; font-weight: 700; margin: 0.9em 0 0.3em; }
+.note-body .note-line { padding-inline-start: 1.5em; text-indent: -1.5em; }
+.note-body .note-item { padding-inline-start: 1.2em; margin: 0 0 0.3em; }
+.note-body .note-row { display: flex; gap: 1em; }
+.note-body .note-cell { flex: 1; }
+.note-body .note-fn { font-size: 0.875em; color: var(--muted); }
+.note-link { color: var(--accent); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent); text-underline-offset: 2px; }
+.note-link:hover { text-decoration-color: currentColor; }
+
 /* ------------------------------------------------------------------ AI assistant */
 
 .panel[data-panel="chat"] .panel-body {

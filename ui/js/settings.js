@@ -18,6 +18,7 @@ export const DEFAULTS = {
   textFont: "serif", // serif | sans
   view: "kjv",
   translation: "kjv", // the library translation being read ("kjv" is the KJV with its interlinear)
+  commentaries: null, // ids shown in the Commentary panel; null: all of them
   verseNumbers: true,
   redLetter: true,
   translit: true,
@@ -107,6 +108,7 @@ export function sanitize(raw) {
     view: oneOf(s.view, VIEWS.map((v) => v.id), DEFAULTS.view),
     // Checked against the library's list once it has loaded
     translation: typeof s.translation === "string" && /^[a-z0-9]{1,20}$/.test(s.translation) ? s.translation : DEFAULTS.translation,
+    commentaries: Array.isArray(s.commentaries) ? s.commentaries.filter((c) => typeof c === "string" && /^[a-z0-9]{1,20}$/.test(c)).slice(0, 40) : null,
     verseNumbers: bool("verseNumbers"),
     redLetter: bool("redLetter"),
     translit: bool("translit"),

@@ -1,6 +1,7 @@
 //! The library's translations for the app's interface: the catalogue, and any
 //! chapter of any translation with its heading and neighbours.
 
+use kjv_library::alignment::Ref;
 use kjv_library::books::{self, Section};
 use kjv_library::view::ChapterView;
 use kjv_library::{BibleInfo, Library};
@@ -153,6 +154,27 @@ pub struct Mapped {
     pub verse: String,
 }
 
+/// Verse `number` of `code` `chapter` as translation `id` numbers it: the verse
+/// itself, or the bridged verse that holds it ("1-2").
+fn resolve(lib: &Library, id: &str, code: &str, chapter: u32, number: String) -> Result<Ref, String> {
+    let exact = (code.to_string(), chapter, number);
+    if lib.has_verse(id, &exact) {
+        return Ok(exact);
+    }
+    let Ok(n) = exact.2.parse::<u32>() else { return Ok(exact) };
+    let b = lib.book(id, code)?;
+    Ok(kjv_library::usfm::verses(&b)
+        .into_iter()
+        .find(|v| {
+            v.chapter == chapter
+                && v.number.split_once('-').is_some_and(|(lo, hi)| {
+                    lo.parse::<u32>().is_ok_and(|lo| lo <= n) && hi.parse::<u32>().is_ok_and(|hi| n <= hi)
+                })
+        })
+        .map(|v| (code.to_string(), chapter, v.number))
+        .unwrap_or(exact))
+}
+
 /// Where verse `verse` of `book` `chapter` in translation `from` is in translation
 /// `to`: the first corresponding verse, or None if `to` has no counterpart. Verse 0
 /// stands for the chapter (its first verse is mapped).
@@ -169,26 +191,7 @@ pub fn map(lib: &Library, from: &str, to: &str, book: &str, chapter: u32, verse:
             None => return Ok(None),
         }
     };
-    // A verse number may sit inside a bridged verse ("1-2")
-    let r = {
-        let exact = (k.code.to_string(), chapter, number.clone());
-        if lib.has_verse(from, &exact) {
-            exact
-        } else {
-            let b = lib.book(from, k.code)?;
-            let n: u32 = number.parse().unwrap_or(0);
-            kjv_library::usfm::verses(&b)
-                .into_iter()
-                .find(|v| {
-                    v.chapter == chapter
-                        && v.number.split_once('-').is_some_and(|(lo, hi)| {
-                            lo.parse::<u32>().is_ok_and(|lo| lo <= n) && hi.parse::<u32>().is_ok_and(|hi| n <= hi)
-                        })
-                })
-                .map(|v| (k.code.to_string(), chapter, v.number))
-                .unwrap_or(exact)
-        }
-    };
+    let r = resolve(lib, from, k.code, chapter, number)?;
     let found = lib.map(from, to, &r)?;
     Ok(found.into_iter().next().and_then(|(code, c, v)| {
         Some(Mapped { book: books::by_code(&code)?.name.to_string(), chapter: c, verse: v })
@@ -225,19 +228,93 @@ fn note_label(display: &str, code: &str, from: (u32, u32), to: (u32, u32)) -> St
     }
 }
 
+#[derive(Debug, Serialize)]
+pub struct NotesOn {
+    /// Where the notes are, in the KJV's numbering that every commentary follows
+    /// ("Psalm 23:4" for the Douay-Rheims' Psalm 22:4)
+    pub kjv: String,
+    /// Whether that is the place as the translation numbers it
+    pub same: bool,
+    pub commentaries: Vec<CommentaryNotes>,
+}
+
+/// The KJV chapters that chapter `chapter` of `code` in translation `bible`
+/// corresponds to: each that holds at least a quarter of its verses (so the
+/// Douay-Rheims' Psalm 9 is the KJV's 9 and 10, but the WEB's Romans 14, which
+/// prints the doxology the KJV has at 16:25-27, is only the KJV's 14).
+fn kjv_chapters(lib: &Library, bible: &str, code: &str, chapter: u32) -> Result<Vec<(String, u32)>, String> {
+    let b = lib.book(bible, code)?;
+    let verses: Vec<String> =
+        kjv_library::usfm::verses(&b).into_iter().filter(|v| v.chapter == chapter).map(|v| v.number).collect();
+    let mut counts: Vec<((String, u32), usize)> = Vec::new();
+    for n in &verses {
+        let mut seen: Vec<(String, u32)> = Vec::new();
+        for (kc, c, _) in lib.map(bible, "kjv", &(code.to_string(), chapter, n.clone()))? {
+            if seen.contains(&(kc.clone(), c)) {
+                continue;
+            }
+            seen.push((kc.clone(), c));
+            match counts.iter_mut().find(|(k, _)| k.0 == kc && k.1 == c) {
+                Some((_, count)) => *count += 1,
+                None => counts.push(((kc, c), 1)),
+            }
+        }
+    }
+    let total = verses.len().max(1);
+    Ok(counts.into_iter().filter(|(_, count)| count * 4 >= total).map(|(k, _)| k).collect())
+}
+
+/// "Psalm 23:4", "Psalm 9; Psalm 10", "Song of Three Children 1:1-2"
+fn places_label(places: &[(String, u32, u32)]) -> String {
+    let mut parts: Vec<String> = Vec::new();
+    let mut i = 0;
+    while i < places.len() {
+        let (code, c, _) = &places[i];
+        let display = books::by_code(code).map_or(code.as_str(), |b| b.display);
+        let head = if code == "PSA" { format!("Psalm {}", c) } else { format!("{} {}", display, c) };
+        let mut verses: Vec<u32> = Vec::new();
+        while i < places.len() && &places[i].0 == code && places[i].1 == *c {
+            verses.push(places[i].2);
+            i += 1;
+        }
+        verses.retain(|&v| v > 0);
+        verses.sort();
+        verses.dedup();
+        if verses.is_empty() {
+            parts.push(head);
+            continue;
+        }
+        let mut runs: Vec<String> = Vec::new();
+        let mut j = 0;
+        while j < verses.len() {
+            let start = verses[j];
+            while j + 1 < verses.len() && verses[j + 1] == verses[j] + 1 {
+                j += 1;
+            }
+            runs.push(if verses[j] == start { start.to_string() } else { format!("{}-{}", start, verses[j]) });
+            j += 1;
+        }
+        parts.push(format!("{}:{}", head, runs.join(", ")));
+    }
+    parts.join("; ")
+}
+
 /// The notes of commentaries `ids` on verse `verse` of `book` `chapter` as numbered in
 /// translation `bible` (every commentary is keyed to the KJV, so the verse is mapped
-/// to the KJV first). Verse 0: the chapter's introductions.
-pub fn notes(lib: &Library, ids: &[String], bible: &str, book: &str, chapter: u32, verse: u32) -> Result<Vec<CommentaryNotes>, String> {
+/// to the KJV first). Verse 0: the chapter's introductions (those of the KJV
+/// chapters it corresponds to).
+pub fn notes(lib: &Library, ids: &[String], bible: &str, book: &str, chapter: u32, verse: u32) -> Result<NotesOn, String> {
     let k = books::by_name(book).ok_or_else(|| format!("no book named {:?}", book))?;
     let places: Vec<(String, u32, u32)> = if verse == 0 {
-        vec![(k.code.to_string(), chapter, 0)]
+        kjv_chapters(lib, bible, k.code, chapter)?.into_iter().map(|(code, c)| (code, c, 0)).collect()
     } else {
-        lib.map(bible, "kjv", &(k.code.to_string(), chapter, verse.to_string()))?
+        let r = resolve(lib, bible, k.code, chapter, verse.to_string())?;
+        lib.map(bible, "kjv", &r)?
             .into_iter()
             .filter_map(|(code, c, v)| Some((code, c, v.split('-').next()?.parse().ok()?)))
             .collect()
     };
+    let same = places.len() == 1 && places[0] == (k.code.to_string(), chapter, verse);
     let mut out = Vec::new();
     for id in ids {
         let info = lib.commentaries().iter().find(|c| &c.id == id).ok_or_else(|| format!("no commentary {:?}", id))?;
@@ -260,5 +337,23 @@ pub fn notes(lib: &Library, ids: &[String], bible: &str, book: &str, chapter: u3
             notes,
         });
     }
-    Ok(out)
+    Ok(NotesOn { kjv: places_label(&places), same, commentaries: out })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::places_label;
+
+    fn p(code: &str, c: u32, v: u32) -> (String, u32, u32) {
+        (code.to_string(), c, v)
+    }
+
+    #[test]
+    fn place_labels() {
+        assert_eq!(places_label(&[p("PSA", 23, 4)]), "Psalm 23:4");
+        assert_eq!(places_label(&[p("PSA", 9, 0), p("PSA", 10, 0)]), "Psalm 9; Psalm 10");
+        assert_eq!(places_label(&[p("JHN", 3, 16), p("JHN", 3, 17), p("JHN", 3, 19)]), "John 3:16-17, 19");
+        assert_eq!(places_label(&[p("1SA", 1, 1)]), "1 Samuel 1:1");
+        assert_eq!(places_label(&[]), "");
+    }
 }
