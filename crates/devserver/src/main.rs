@@ -14,7 +14,8 @@ use kjv_ai::Event;
 use kjv_ai::assistant::{AskArgs, ModelsArgs};
 use kjv_ai::conversations::Conversations;
 use kjv_core::bundle::DataBundle;
-use kjv_core::dispatch::dispatch;
+use kjv_core::dispatch::dispatch_all;
+use kjv_library::Library;
 use serde::Deserialize;
 use serde_json::{Value, json};
 use tiny_http::{Header, Method, Request, Response, Server};
@@ -23,6 +24,7 @@ use tokio::sync::Notify;
 struct State {
     ui: PathBuf,
     data: Arc<DataBundle>,
+    library: Arc<Library>,
     settings: Mutex<Value>,
     keys: Mutex<HashMap<String, String>>,
     running: Arc<Mutex<HashMap<String, Arc<Notify>>>>,
@@ -68,6 +70,12 @@ fn main() {
     let state = Arc::new(State {
         ui: root.join("ui"),
         data: Arc::new(DataBundle::from_sources(&root).expect("run from the repository root")),
+        library: Arc::new({
+            // Fast compression: the preview rebuilds this on every start
+            let (bytes, _) = kjv_library::library::build::archive(&root, &|b| zstd::encode_all(b, 1).expect("compress"))
+                .expect("build the library archive");
+            Library::open(bytes).expect("open the library archive")
+        }),
         settings: Mutex::new(Value::Null),
         keys: Mutex::default(),
         running: Arc::default(),
@@ -178,7 +186,7 @@ Connection: close
             state.keys.lock().unwrap().remove(&a.provider_id);
             Value::Null
         }),
-        _ => dispatch(&state.data, &name, args),
+        _ => dispatch_all(&state.data, &state.library, &name, args),
     };
     let response = match result {
         Ok(value) => Response::from_string(value.to_string()).with_header(header("Content-Type", "application/json")),

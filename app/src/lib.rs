@@ -12,7 +12,8 @@ use kjv_core::bundle::DataBundle;
 use kjv_ai::assistant::{AskArgs, ModelsArgs};
 use kjv_ai::conversations::Conversations;
 use kjv_ai::{Event, ModelInfo};
-use kjv_core::dispatch::dispatch;
+use kjv_core::dispatch::dispatch_all;
+use kjv_library::Library;
 use serde_json::Value;
 use tauri::ipc::Channel;
 use tauri::{AppHandle, Manager, State};
@@ -25,6 +26,14 @@ use tauri_plugin_opener::OpenerExt;
 /// All text and interlinear data, compressed at build time (see build.rs).
 static BUNDLE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/bundle.bin.zst"));
 static DATA: OnceLock<DataBundle> = OnceLock::new();
+
+/// Translations and commentaries, compressed per book (see kjv_library::archive).
+static LIBRARY: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/library.bin"));
+static LIBRARY_DATA: OnceLock<Library> = OnceLock::new();
+
+fn library() -> &'static Library {
+    LIBRARY_DATA.get_or_init(|| Library::open(LIBRARY).expect("embedded library matches this build"))
+}
 
 fn data() -> &'static DataBundle {
     DATA.get_or_init(|| {
@@ -40,7 +49,7 @@ fn data() -> &'static DataBundle {
 /// Run a data command (books, chapter, search, strongs, lexicon, copy_text).
 #[tauri::command]
 async fn call(name: String, args: Value) -> Result<Value, String> {
-    tauri::async_runtime::spawn_blocking(move || dispatch(data(), &name, args))
+    tauri::async_runtime::spawn_blocking(move || dispatch_all(data(), library(), &name, args))
         .await
         .map_err(|e| e.to_string())?
 }

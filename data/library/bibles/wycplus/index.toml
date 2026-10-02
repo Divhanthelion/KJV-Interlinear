@@ -265,6 +265,7 @@ code = "ESG"
 name = "ADDITIONS TO ESTHER"
 chapters = 7
 verses = 105
+chapter_numbers = [10, 11, 12, 13, 14, 15, 16]
 
 [[book]]
 code = "WIS"

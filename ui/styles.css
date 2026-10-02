@@ -339,6 +339,110 @@ mark.hit {
   color: var(--text-2);
 }
 
+/* ------------------------------------------------------------------ library translations */
+
+.translation-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 10px;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.translation-button:hover { background: var(--surface-2); }
+
+/* The view switch (interlinear, parallel) belongs to the KJV's own reader. Specific enough
+   to beat the layout's !important display rules for the switch. */
+.app[data-reading="library"] .topbar .topbar-row .view-switch[data-view-switch] { display: none !important; }
+.app[data-reading="library"] .topbar .topbar-row.mobile-only:has(.view-switch) { display: none !important; }
+
+.translation-list { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: 2px; }
+.translation-item {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  text-align: start;
+}
+.translation-item:hover { background: var(--surface-2); }
+.translation-item[aria-current="true"] { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.translation-abbr { flex: 0 0 5.5rem; font-weight: 700; color: var(--accent); }
+.translation-text { display: grid; gap: 2px; min-width: 0; }
+.translation-name { font-weight: 600; }
+.translation-year { font-weight: 400; color: var(--muted); }
+.translation-about { font-size: 0.875rem; color: var(--text-2); }
+
+.chapter-translation {
+  font-family: var(--font-ui);
+  font-size: 0.45em;
+  font-weight: 650;
+  color: var(--muted);
+  margin-inline-start: 0.6em;
+  vertical-align: 0.2em;
+}
+
+.library-text .line { display: block; }
+/* Poetry: a line that wraps continues indented, as printed Bibles set it */
+.library-text .line[data-kind^="q"], .library-text .line[data-kind^="li"] { padding-inline-start: 1.5em; text-indent: -1.5em; }
+.library-text .line[data-kind="q2"], .library-text .line[data-kind="li2"] { padding-inline-start: 3em; }
+.library-text .line[data-kind="q3"], .library-text .line[data-kind="li3"] { padding-inline-start: 4.5em; }
+.library-text .line[data-kind="q4"] { padding-inline-start: 6em; }
+.library-text .line[data-kind="qr"] { text-align: end; }
+.library-text .line[data-kind="qc"] { text-align: center; }
+.library-text .line[data-kind="b"] { height: 0.6em; }
+.library-text .line[data-kind="pi1"], .library-text .line[data-kind="pi2"], .library-text .line[data-kind="mi"] { padding-inline-start: 1.5em; }
+
+.it { font-style: italic; }
+.b { font-weight: 700; }
+.sc { font-variant: small-caps; }
+.sup { vertical-align: super; font-size: 0.75em; }
+.vlabel { font-family: var(--font-ui); font-size: 0.72em; font-weight: 700; color: var(--muted); }
+.valt { font-weight: 400; color: var(--muted); }
+
+.section-heading {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 1.25rem 0 0.4rem;
+}
+.section-heading.minor { font-size: 0.9375rem; font-weight: 600; color: var(--text-2); }
+.major-heading { font-family: var(--font-ui); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 1.5rem 0 0.5rem; }
+.heading-refs { font-size: 0.875rem; font-style: italic; color: var(--muted); margin: -0.25rem 0 0.5rem; }
+.speaker { font-family: var(--font-ui); font-size: 0.8125rem; font-weight: 650; color: var(--muted); margin: 0.75rem 0 0.25rem; }
+.acrostic { font-family: var(--font-text); font-style: italic; color: var(--text-2); margin: 1rem 0 0.25rem; }
+
+.note-ref {
+  font-family: var(--font-ui);
+  font-size: 0.7em;
+  font-weight: 700;
+  color: var(--accent);
+  vertical-align: 0.45em;
+  line-height: 1;
+  padding: 1px 2px;
+  margin-inline: -1px 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.note-ref:hover, .note-ref[aria-expanded="true"] { background: var(--accent-soft); }
+.verse-note {
+  margin: 0.35rem 0 0.15rem;
+  padding: 8px 12px;
+  border-inline-start: 3px solid var(--accent);
+  background: var(--surface-2);
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  cursor: auto;
+}
+.verse-note-ref { font-weight: 700; color: var(--muted); }
+
 /* Original text as a paragraph */
 .orig-text {
   margin: 0;

@@ -22,5 +22,14 @@ fn main() {
     let out = PathBuf::from(env::var("OUT_DIR").unwrap()).join("bundle.bin.zst");
     fs::write(&out, compressed).expect("write the data bundle");
 
+    // The library (translations, commentaries): one compressed entry per book
+    println!("cargo:rerun-if-changed={}", root.join("data/library").display());
+    let (library, _) = kjv_library::library::build::archive(&root, &|bytes| {
+        zstd::encode_all(bytes, level).expect("compress a library entry")
+    })
+    .expect("build the library archive");
+    let out = PathBuf::from(env::var("OUT_DIR").unwrap()).join("library.bin");
+    fs::write(&out, library).expect("write the library archive");
+
     tauri_build::build();
 }

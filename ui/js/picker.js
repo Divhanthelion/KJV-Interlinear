@@ -33,6 +33,11 @@ export function initPicker(allBooks, pick) {
   });
 }
 
+/** The books to offer (the current translation's). */
+export function setPickerBooks(list) {
+  books = list;
+}
+
 export function isPickerOpen() {
   return dialog?.open ?? false;
 }
@@ -57,7 +62,7 @@ function bookButton(book) {
     {
       type: "button",
       "aria-current": book.name === current.book ? "true" : null,
-      onclick: () => (book.chapters === 1 ? choose(book.name, 1) : showChapters(book)),
+      onclick: () => (book.chapters === 1 ? choose(book.name, numbersOf(book)[0]) : showChapters(book)),
     },
     book.display,
   );
@@ -85,7 +90,7 @@ function showBooks() {
         ? [h("h3", { class: "section-title" }, label), h("div", { class: "book-grid" }, list.map(bookButton))]
         : [];
     };
-    const content = [...section("Old Testament", "old"), ...section("New Testament", "new")];
+    const content = [...section("Old Testament", "old"), ...section("Apocrypha", "apocrypha"), ...section("New Testament", "new")];
     replace(lists, content.length ? content : h("p", { class: "empty" }, "No book matches."));
   };
   filter.addEventListener("input", draw);
@@ -102,7 +107,7 @@ function showChapters(book) {
   title.textContent = book.display;
   backButton.hidden = false;
   const buttons = [];
-  for (let n = 1; n <= book.chapters; n++) {
+  for (const n of numbersOf(book)) {
     buttons.push(
       h(
         "button",
@@ -118,6 +123,11 @@ function showChapters(book) {
   }
   replace(body, h("div", { class: "chapter-grid" }, buttons));
   (body.querySelector('[aria-current="true"]') ?? body.querySelector("button"))?.focus();
+}
+
+/** A book's chapter numbers: 1..n unless the translation numbers them otherwise. */
+function numbersOf(book) {
+  return book.numbers ?? Array.from({ length: book.chapters }, (_, i) => i + 1);
 }
 
 function choose(book, chapter) {

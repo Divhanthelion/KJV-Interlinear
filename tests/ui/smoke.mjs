@@ -6,7 +6,7 @@
 //   node tests/ui/smoke.mjs [path-to-chrome]
 
 import { spawn } from "node:child_process";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -371,6 +371,97 @@ for (const width of [320, 768, 1440]) {
       }
     }
   }
+}
+
+// ------------------------------------------------------------------ translations
+
+await test("Translations: pick one, read it, keep the place", "book=John&chapter=3&tr=kjv", {}, `
+  assert($("#translation-label").textContent === "KJV", "starts on the KJV");
+  $("#translation-button").click();
+  await until(() => $("#translations").open, "translation picker");
+  assert($$(".translation-item").length === 44, "44 translations: " + $$(".translation-item").length);
+  assert($(".translation-item[aria-current='true'] .translation-abbr").textContent === "KJV", "current marked");
+  const find = $("#translations input");
+  find.value = "berean";
+  find.dispatchEvent(new Event("input"));
+  await until(() => $$(".translation-item").length === 1, "filtered to the BSB");
+  $(".translation-item").click();
+  await until(() => $("#translation-label").textContent === "BSB" && $("#ref-label").textContent === "John 3" && $("#reader").getAttribute("aria-busy") === "false", "BSB John 3");
+  assert($("#v16").textContent.includes("For God so loved the world"), "John 3:16 in the BSB");
+  assert(!visible($("[data-view-switch]")), "the view switch is the KJV's only");
+  // Footnotes open under their verse
+  const note = $("#reader .note-ref");
+  note.click();
+  await until(() => note.closest(".verse").querySelector(".verse-note"), "footnote shown");
+  note.click();
+  assert(!note.closest(".verse").querySelector(".verse-note"), "footnote hidden again");
+  // Back to the KJV (settings persist between tests)
+  $("#translation-button").click();
+  await until(() => $("#translations").open, "translation picker again");
+  $$(".translation-item").find((b) => b.querySelector(".translation-abbr").textContent === "KJV").click();
+  await until(() => $("#translation-label").textContent === "KJV" && $("#reader").getAttribute("aria-busy") === "false", "back to the KJV");
+`);
+
+await test("Translations: words of Jesus in red", "book=John&chapter=11&tr=web", {}, `
+  assert($("#v43 .red")?.textContent.includes("Lazarus, come out"), "John 11:43 in red");
+  assert(!$("#v35 .red"), "narration is not red");
+`);
+
+await test("Translations: the divine name in small capitals, poetry in lines", "book=Psalms&chapter=23&tr=kjvcpb", {}, `
+  const lord = $("#v1 .sc");
+  assert(lord?.textContent === "Lord", "KJV-CPB Psalm 23:1 marks Lord: " + lord?.textContent);
+  assert(getComputedStyle(lord).fontVariantCaps === "small-caps", "drawn in small capitals");
+  assert($("#v0.is-title")?.textContent.startsWith("A Psalm of David"), "the title");
+  assert($$("#v1 .line").length >= 1, "verse set in lines");
+`);
+
+await test("Translations: the KJV keeps its interlinear and gains the Apocrypha", "book=Tobit&chapter=1&tr=kjv", {}, `
+  assert($("#ref-label").textContent === "Tobit 1", "KJV Tobit 1 opens");
+  assert($("#v1").textContent.includes("The book of the words of Tobit"), "Tobit 1:1");
+  assert(!visible($("[data-view-switch]")), "no interlinear for the Apocrypha");
+  $("#ref-button").click();
+  await until(() => $("#picker").open, "book picker");
+  assert($$(".picker .section-title").map((e) => e.textContent).join() === "Old Testament,Apocrypha,New Testament", "three sections");
+  $$(".book-grid button").find((b) => b.textContent === "John").click();
+  await until(() => $(".chapter-grid"), "chapters");
+  $$(".chapter-grid button").find((b) => b.textContent === "1").click();
+  await until(() => $("#ref-label").textContent === "John 1" && $("#reader").getAttribute("aria-busy") === "false", "John 1");
+  assert($(".word") || visible($("[data-view-switch]")), "back in the KJV's own reader");
+`);
+
+// Every verse of every translation on screen, compared with the data (whose text is
+// checked against eBible's own editions in crates/library/tests). A full sweep of
+// everything runs weekly (FULL_SWEEP=1); every push sweeps a representative set in
+// full and the opening of every other translation.
+{
+  const sweep = readFileSync(new URL("./every_library_verse.js", import.meta.url), "utf8");
+  const bibles = await (await fetch(`${BASE}/api/bibles`, { method: "POST", body: "{}" })).json();
+  const full = new Set(process.env.FULL_SWEEP ? bibles.map((b) => b.id) : ["web", "dra", "brenton", "kjvcpb", "jps", "ojb"]);
+  let chapters = 0;
+  let verses = 0;
+  const problems = [];
+  for (const b of bibles) {
+    // The KJV's own reader draws its 66 books; the library draws its Apocrypha
+    const only = b.id === "kjv" ? b.books.filter((x) => x.section === "apocrypha").map((x) => x.name) : null;
+    let start = null;
+    for (const book of b.books.filter((x) => !only || only.includes(x.name))) {
+      start = { book: book.name, chapter: book.numbers[0] };
+      if (start) break;
+    }
+    try {
+      await open(`tr=${b.id}&book=${encodeURIComponent(start.book)}&chapter=${start.chapter}`);
+      const r = await run(`async () => (${sweep})(${JSON.stringify(b.id)}, ${full.has(b.id) ? 100000 : 25}, ${JSON.stringify(only)})`);
+      chapters += r.chapters;
+      verses += r.verses;
+      problems.push(...r.problems.map((p) => `${b.id}: ${p}`));
+    } catch (error) {
+      problems.push(`${b.id}: ${error.message}`);
+    }
+  }
+  results.push([
+    `Every library verse on screen matches its text (${verses} verses, ${chapters} chapters; full: ${[...full].join(", ")})`,
+    problems.length ? `FAIL: ${problems.length} problems\n      ${problems.slice(0, 40).join("\n      ")}` : "ok",
+  ]);
 }
 
 results.push(["No console errors", consoleErrors.length ? `FAIL: ${consoleErrors.join(" | ")}` : "ok"]);

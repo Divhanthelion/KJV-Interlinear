@@ -37,6 +37,9 @@ pub struct BookEntry {
     /// The translation's own name for it ("Kings I" in Brenton)
     pub name: String,
     pub chapters: usize,
+    /// The chapter numbers, in order: usually 1..=chapters, but not always (Greek
+    /// Esther starting at 10, a translation of selected chapters)
+    pub numbers: Vec<u32>,
     pub verses: usize,
 }
 
@@ -158,11 +161,13 @@ pub mod build {
         name: String,
         chapters: usize,
         verses: usize,
+        #[serde(default)]
+        chapter_numbers: Option<Vec<u32>>,
     }
 
     /// The archive for `root/data/library`, compressing each entry with `compress`.
     /// Every file it reads is returned too, for `cargo:rerun-if-changed`.
-    pub fn archive(root: &Path, compress: &dyn Fn(&[u8]) -> Vec<u8>) -> Result<(Vec<u8>, Vec<std::path::PathBuf>), String> {
+    pub fn archive(root: &Path, compress: &(dyn Fn(&[u8]) -> Vec<u8> + Sync)) -> Result<(Vec<u8>, Vec<std::path::PathBuf>), String> {
         let lib = root.join("data/library");
         let mut read = Vec::new();
         let read_text = |path: &Path, read: &mut Vec<std::path::PathBuf>| -> Result<String, String> {
@@ -171,7 +176,8 @@ pub mod build {
         };
         let catalogue: Catalogue = toml::from_str(&read_text(&lib.join("bibles.toml"), &mut read)?).map_err(|e| format!("bibles.toml: {}", e))?;
 
-        let mut w = Writer::new();
+        // (key, text) for every entry, compressed in parallel at the end
+        let mut entries: Vec<(String, String)> = Vec::new();
         let mut bibles = Vec::new();
         for entry in &catalogue.bible {
             let dir = lib.join("bibles").join(&entry.id);
@@ -189,7 +195,7 @@ pub mod build {
             index_books.sort_by_key(|b| books::order(&b.code));
             for b in &index_books {
                 let text = read_text(&dir.join(format!("{}.usfm", b.code)), &mut read)?;
-                w.add(&format!("bible/{}/{}.usfm", entry.id, b.code), compress(text.as_bytes()), text.len());
+                entries.push((format!("bible/{}/{}.usfm", entry.id, b.code), text));
             }
             bibles.push(BibleInfo {
                 id: index.id,
@@ -203,14 +209,41 @@ pub mod build {
                 heading_markers: index.heading_markers,
                 books: index_books
                     .into_iter()
-                    .map(|b| BookEntry { code: b.code, name: b.name, chapters: b.chapters, verses: b.verses })
+                    .map(|b| BookEntry {
+                        numbers: b.chapter_numbers.unwrap_or_else(|| (1..=b.chapters as u32).collect()),
+                        code: b.code,
+                        name: b.name,
+                        chapters: b.chapters,
+                        verses: b.verses,
+                    })
                     .collect(),
                 chapters: index.chapters,
                 verses: index.verses,
             });
         }
-        let json = serde_json::to_string(&bibles).map_err(|e| e.to_string())?;
-        w.add("bibles.json", compress(json.as_bytes()), json.len());
+        entries.push(("bibles.json".into(), serde_json::to_string(&bibles).map_err(|e| e.to_string())?));
+
+        let threads = std::thread::available_parallelism().map_or(4, |n| n.get());
+        let next = std::sync::atomic::AtomicUsize::new(0);
+        let done: std::sync::Mutex<Vec<(usize, Vec<u8>)>> = std::sync::Mutex::new(Vec::with_capacity(entries.len()));
+        std::thread::scope(|s| {
+            for _ in 0..threads {
+                s.spawn(|| {
+                    loop {
+                        let i = next.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                        let Some((_, text)) = entries.get(i) else { break };
+                        let frame = compress(text.as_bytes());
+                        done.lock().unwrap().push((i, frame));
+                    }
+                });
+            }
+        });
+        let mut frames = done.into_inner().unwrap();
+        frames.sort_by_key(|(i, _)| *i);
+        let mut w = Writer::new();
+        for ((key, text), (_, frame)) in entries.iter().zip(frames) {
+            w.add(key, frame, text.len());
+        }
         Ok((w.finish(), read))
     }
 }

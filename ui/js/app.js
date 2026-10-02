@@ -4,8 +4,9 @@ import { call, copyText } from "./backend.js";
 import { h, icon, replace } from "./dom.js";
 import { chatScopeChanged, renderChat } from "./chat.js";
 import { renderSaved, renderSearch, renderSettings, renderStrongs } from "./panels.js";
-import { closePicker, initPicker, isPickerOpen, openPicker } from "./picker.js";
-import { markSelected, renderChapter } from "./reader.js";
+import { closePicker, initPicker, isPickerOpen, openPicker, setPickerBooks } from "./picker.js";
+import { libraryVerseText, markSelected, renderChapter, renderLibraryChapter } from "./reader.js";
+import { initTranslations, openTranslations } from "./translations.js";
 import * as prefs from "./settings.js";
 
 const $ = (id) => document.getElementById(id);
@@ -25,8 +26,12 @@ const PANELS = {
 };
 
 const state = {
+  // The books of the translation being read
   books: [],
   bookMap: new Map(),
+  // The KJV's books (its own reader), and every translation in the library
+  kjvBooks: [],
+  bibles: [],
   chapter: null,
   selectedVerse: null,
   highlight: null,
@@ -49,21 +54,32 @@ const cache = new Map();
 const CACHE_SIZE = 16;
 
 async function fetchChapter(book, chapter) {
-  const key = `${book}|${chapter}|${state.highlight ?? ""}`;
+  const translation = settings.translation;
+  const key = `${translation}|${book}|${chapter}|${state.highlight ?? ""}`;
   if (cache.has(key)) {
     const hit = cache.get(key);
     cache.delete(key);
     cache.set(key, hit); // most recently used last
     return hit;
   }
-  const view = await call("chapter", {
-    book,
-    chapter,
-    options: { red_letter: true, original: true, query: state.highlight },
-  });
+  const view =
+    !fromLibrary(book)
+      ? await call("chapter", {
+          book,
+          chapter,
+          options: { red_letter: true, original: true, query: state.highlight },
+        })
+      : { ...(await call("bible_chapter", { bible: translation, book, chapter })), library: true };
   cache.set(key, view);
   if (cache.size > CACHE_SIZE) cache.delete(cache.keys().next().value);
   return view;
+}
+
+/** `chapter`, or the nearest chapter `book` has (not every book numbers them 1..n). */
+function nearestChapter(book, chapter) {
+  const numbers = book.numbers ?? Array.from({ length: book.chapters }, (_, i) => i + 1);
+  if (numbers.includes(chapter)) return chapter;
+  return numbers.reduce((best, n) => (Math.abs(n - chapter) < Math.abs(best - chapter) ? n : best), numbers[0]);
 }
 
 let navSeq = 0;
@@ -78,7 +94,7 @@ async function goTo(book, chapter, verse = 0, opts = {}) {
     chapter = 1;
     verse = 0;
   }
-  chapter = Math.min(Math.max(1, chapter), state.bookMap.get(book).chapters);
+  chapter = nearestChapter(state.bookMap.get(book), chapter);
   if (opts.highlight !== undefined) state.highlight = opts.highlight || null;
 
   const seq = ++navSeq;
@@ -98,7 +114,7 @@ async function goTo(book, chapter, verse = 0, opts = {}) {
   const changedChapter = state.chapter?.book !== book || state.chapter?.chapter !== chapter;
   const anchor = opts.keepScroll ? firstVisibleVerse() : null;
   state.chapter = view;
-  const target = verse > 0 && verse <= view.verses.length ? verse : null;
+  const target = verse > 0 && hasVerse(view, verse) ? verse : null;
   state.selectedVerse = opts.select === false ? null : target;
   render();
 
@@ -115,23 +131,28 @@ async function goTo(book, chapter, verse = 0, opts = {}) {
   chatScopeChanged(ctx);
 }
 
+function hasVerse(view, n) {
+  return view.library ? view.verses.some((v) => parseInt(v.number, 10) === n) : n <= view.verses.length;
+}
+
 function render() {
   const view = state.chapter;
   if (!view) return;
-  renderChapter(reader, view, {
-    view: settings.view,
-    selectedVerse: state.selectedVerse,
-    nav: {
-      prevLabel: view.prev ? heading(view.prev.book, view.prev.chapter) : null,
-      nextLabel: view.next ? heading(view.next.book, view.next.chapter) : null,
-      onPrev: () => step(-1),
-      onNext: () => step(1),
-    },
-  });
+  const nav = {
+    prevLabel: view.prev ? heading(view.prev.book, view.prev.chapter) : null,
+    nextLabel: view.next ? heading(view.next.book, view.next.chapter) : null,
+    onPrev: () => step(-1),
+    onNext: () => step(1),
+  };
+  // The interlinear and parallel layouts are the KJV's; other translations read plainly
+  app.dataset.view = view.library ? "kjv" : settings.view;
+  app.dataset.reading = view.library ? "library" : "kjv";
+  if (view.library) renderLibraryChapter(reader, view, { selectedVerse: state.selectedVerse, nav });
+  else renderChapter(reader, view, { view: settings.view, selectedVerse: state.selectedVerse, nav });
   $("ref-label").textContent = view.heading;
   $("prev-chapter").disabled = !view.prev;
   $("next-chapter").disabled = !view.next;
-  document.title = `${view.heading} · KJV Interlinear`;
+  document.title = `${view.heading} (${translationAbbr()}) · KJV Interlinear`;
   updateActions();
 }
 
@@ -207,9 +228,21 @@ async function copyChapter() {
   await copy({ book, chapter }, `Copied ${heading(book, chapter)}`);
 }
 
+/** Clipboard text for a library translation, like the KJV's: reference line, then text. */
+function libraryCopyText({ verse }) {
+  const view = state.chapter;
+  if (verse) {
+    const v = view.verses.find((x) => parseInt(x.number, 10) === verse);
+    return `${reference(view.book, view.chapter, verse)} ${view.abbr}\n${libraryVerseText(v)}`;
+  }
+  const lines = view.title ? [libraryVerseText(view.title)] : [];
+  for (const v of view.verses) lines.push(`${v.number} ${libraryVerseText(v)}`);
+  return `${view.heading} ${view.abbr}\n${lines.join("\n")}\n`;
+}
+
 async function copy(args, message) {
   try {
-    await copyText(await call("copy_text", args));
+    await copyText(state.chapter?.library ? libraryCopyText(args) : await call("copy_text", args));
     toast(message);
   } catch (error) {
     toast("Could not copy to the clipboard");
@@ -314,6 +347,56 @@ const ctx = {
     syncViewSwitch();
   },
 };
+
+// ------------------------------------------------------------------ translations
+
+function translationAbbr() {
+  return state.bibles.find((b) => b.id === settings.translation)?.abbr ?? "KJV";
+}
+
+/** The books translation `id` has, as the picker and navigation expect them. */
+function booksOf(id) {
+  const bible = state.bibles.find((b) => b.id === id);
+  const books = (bible?.books ?? []).map((b) => ({
+    name: b.name,
+    display: b.display,
+    abbr: b.abbr,
+    testament: b.section,
+    chapters: b.chapters,
+    numbers: b.numbers,
+  }));
+  if (id !== "kjv") return books;
+  // The KJV's own reader for the 66 books, with the 1611 Apocrypha from the library
+  const apocrypha = books.filter((b) => b.testament === "apocrypha");
+  const at = state.kjvBooks.findIndex((b) => b.testament === "new");
+  return [...state.kjvBooks.slice(0, at), ...apocrypha, ...state.kjvBooks.slice(at)];
+}
+
+/** Whether `book` is read through the library (every translation but the KJV's 66 books). */
+function fromLibrary(book) {
+  return settings.translation !== "kjv" || state.bookMap.get(book)?.testament === "apocrypha";
+}
+
+function useBooks(id) {
+  state.books = booksOf(id);
+  state.bookMap = new Map(state.books.map((b) => [b.name, b]));
+  setPickerBooks(state.books);
+  app.dataset.translation = id;
+  $("translation-label").textContent = translationAbbr();
+  $("translation-button").title = state.bibles.find((b) => b.id === id)?.name ?? "King James Version";
+}
+
+/** Read translation `id`, staying on the same chapter (or the nearest it has). */
+async function setTranslation(id) {
+  if (id === settings.translation) return;
+  settings.translation = id;
+  prefs.save(settings);
+  useBooks(id);
+  cache.clear();
+  const at = state.chapter ?? settings.position;
+  const book = state.bookMap.has(at.book) ? at.book : state.books[0]?.name;
+  await goTo(book, book === at.book ? at.chapter : 1, 0, { top: true });
+}
 
 // ------------------------------------------------------------------ view switch
 
@@ -447,6 +530,7 @@ function wireStaticControls() {
   $("next-chapter").append(icon("chevronRight"));
   $("prev-chapter").addEventListener("click", () => step(-1));
   $("next-chapter").addEventListener("click", () => step(1));
+  $("translation-button").addEventListener("click", () => openTranslations(state.bibles, settings.translation));
   $("ref-button").addEventListener("click", () => {
     if (state.chapter) openPicker(state.chapter.book, state.chapter.chapter);
   });
@@ -520,15 +604,17 @@ async function start() {
   }
   wireStaticControls();
   try {
-    const [loaded, books, version] = await Promise.all([
+    const [loaded, books, bibles, version] = await Promise.all([
       prefs.load(),
       call("books"),
+      call("bibles"),
       window.__TAURI__?.app?.getVersion?.().catch(() => null) ?? null,
     ]);
     settings = loaded;
     ctx.version = version;
-    state.books = books;
-    state.bookMap = new Map(books.map((b) => [b.name, b]));
+    state.kjvBooks = books;
+    state.bibles = bibles;
+    if (!bibles.some((b) => b.id === settings.translation)) settings.translation = "kjv";
   } catch (error) {
     replace(reader, h("p", { class: "status" }, `Could not load the Bible text: ${error.message ?? error}`));
     reader.setAttribute("aria-busy", "false");
@@ -540,6 +626,8 @@ async function start() {
   buildViewSwitches();
   syncNavState();
   initPicker(state.books, (book, chapter) => goTo(book, chapter, 0, { top: true }));
+  initTranslations((id) => setTranslation(id));
+  useBooks(settings.translation);
   const p = settings.position;
   if (preview) await applyPreviewState(preview);
   else await goTo(p.book, p.chapter, p.verse > 1 ? p.verse : 0, { select: false });
@@ -560,6 +648,7 @@ function applyPreviewSettings(p) {
   if (p.has("scale")) raw.textScale = Number(p.get("scale"));
   if (p.has("font")) raw.textFont = p.get("font");
   if (p.has("morph")) raw.morph = p.get("morph") === "1";
+  if (p.has("tr")) raw.translation = p.get("tr");
   settings = prefs.sanitize(raw);
 }
 

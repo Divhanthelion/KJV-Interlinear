@@ -17,6 +17,7 @@ export const DEFAULTS = {
   textScale: 1,
   textFont: "serif", // serif | sans
   view: "kjv",
+  translation: "kjv", // the library translation being read ("kjv" is the KJV with its interlinear)
   verseNumbers: true,
   redLetter: true,
   translit: true,
@@ -104,6 +105,8 @@ export function sanitize(raw) {
     textScale: oneOf(s.textScale, TEXT_SCALES, DEFAULTS.textScale),
     textFont: oneOf(s.textFont, ["serif", "sans"], DEFAULTS.textFont),
     view: oneOf(s.view, VIEWS.map((v) => v.id), DEFAULTS.view),
+    // Checked against the library's list once it has loaded
+    translation: typeof s.translation === "string" && /^[a-z0-9]{1,20}$/.test(s.translation) ? s.translation : DEFAULTS.translation,
     verseNumbers: bool("verseNumbers"),
     redLetter: bool("redLetter"),
     translit: bool("translit"),

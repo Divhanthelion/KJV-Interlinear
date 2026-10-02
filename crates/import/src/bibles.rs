@@ -181,6 +181,11 @@ fn convert(b: &Entry, pinned: &[sources::Source]) -> Result<BTreeMap<String, Str
             verses
         )
         .unwrap();
+        // Chapters that aren't simply 1..n (Greek Esther from 10, selected chapters)
+        let numbers: Vec<u32> = reparsed.chapters.iter().map(|c| c.number).collect();
+        if numbers.iter().enumerate().any(|(i, &n)| n as usize != i + 1) {
+            writeln!(index, "chapter_numbers = {:?}", numbers).unwrap();
+        }
         files.insert(format!("{}.usfm", reparsed.code), cleaned);
     }
 

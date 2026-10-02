@@ -9,3 +9,4 @@ pub mod original_languages;
 pub mod parsing;
 pub mod red_letter;
 pub mod text;
+pub mod translations;

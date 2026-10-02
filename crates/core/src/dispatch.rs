@@ -91,3 +91,27 @@ pub fn dispatch(data: &DataBundle, name: &str, args: Value) -> Result<Value, Str
         _ => Err(format!("unknown command {:?}", name)),
     }
 }
+
+#[derive(Deserialize)]
+struct BibleChapterArgs {
+    bible: String,
+    book: String,
+    chapter: u32,
+}
+
+/// Every command: the library's translations, then everything `dispatch` answers.
+pub fn dispatch_all(
+    data: &DataBundle,
+    library: &kjv_library::Library,
+    name: &str,
+    args: Value,
+) -> Result<Value, String> {
+    match name {
+        "bibles" => to_json(crate::translations::bibles(library)),
+        "bible_chapter" => {
+            let a: BibleChapterArgs = parse(name, args)?;
+            to_json(crate::translations::chapter(library, &a.bible, &a.book, a.chapter)?)
+        }
+        _ => dispatch(data, name, args),
+    }
+}

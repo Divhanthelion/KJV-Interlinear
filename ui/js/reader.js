@@ -130,3 +130,154 @@ export function markSelected(container, n) {
   for (const el of container.querySelectorAll(".verse[aria-current]")) el.removeAttribute("aria-current");
   if (n) container.querySelector(`#v${n}`)?.setAttribute("aria-current", "true");
 }
+
+// ------------------------------------------------------------------ library translations
+
+// Character styles from the source (USFM) and how they look
+const STYLE_CLASSES = {
+  wj: "red", // words of Jesus
+  add: "it", // words the translators supplied
+  it: "it",
+  em: "it",
+  tl: "it", // transliterated words
+  bk: "it", // book titles
+  sls: "it",
+  qt: "it",
+  nd: "sc", // the divine name, LORD
+  sc: "sc",
+  bd: "b",
+  bdit: "b it",
+  qs: "selah it", // "Selah"
+  sup: "sup",
+  vp: "vlabel", // a verse number printed in the text
+  va: "vlabel",
+};
+
+const HEADING_CLASSES = {
+  ms: "major-heading", // "BOOK 1" in the Psalms
+  mr: "heading-refs",
+  r: "heading-refs", // parallel passages
+  sp: "speaker", // "Beloved", "Friends" in the Song of Songs
+  d: "acrostic", // Psalm 119's letters, set apart
+  qa: "acrostic",
+};
+
+/** A verse's text: its words only, line breaks as spaces, notes and labels left out. */
+export function libraryVerseText(verse) {
+  return verse.parts
+    .map((p) => (p.t === "text" ? (p.styles.includes("vp") || p.styles.includes("va") ? " " : p.text) : p.t === "break" ? " " : ""))
+    .join("")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function styled(part) {
+  const classes = [...new Set(part.styles.flatMap((s) => (STYLE_CLASSES[s] ?? "").split(" ")).filter(Boolean))];
+  return classes.length ? h("span", { class: classes.join(" ") }, part.text) : part.text;
+}
+
+function headingElement(heading) {
+  const base = heading.marker.replace(/\d+$/, "");
+  const cls = HEADING_CLASSES[base] ?? (base === "s" && heading.marker !== "s1" ? "section-heading minor" : "section-heading");
+  return h(cls.includes("section-heading") || cls === "major-heading" ? "h2" : "p", { class: cls }, heading.text);
+}
+
+function noteButton(part, onToggle) {
+  const text = part.parts.map((p) => p.text).join("").replace(/\s+/g, " ").trim();
+  const isCrossRef = part.marker === "x" || part.marker === "ex";
+  return h(
+    "button",
+    {
+      type: "button",
+      class: "note-ref",
+      "aria-expanded": "false",
+      "aria-label": isCrossRef ? `Cross references: ${text}` : `Note: ${text}`,
+      title: text,
+      onclick: (event) => onToggle(event.currentTarget, part, text),
+    },
+    isCrossRef ? "†" : "*",
+  );
+}
+
+/** Show or hide a note's text under its verse. */
+function toggleNote(button, part, text) {
+  const verse = button.closest(".verse");
+  const open = button.getAttribute("aria-expanded") === "true";
+  for (const b of verse.querySelectorAll(".note-ref[aria-expanded='true']")) b.setAttribute("aria-expanded", "false");
+  verse.querySelector(".verse-note")?.remove();
+  if (open) return;
+  button.setAttribute("aria-expanded", "true");
+  const label = part.parts.find((p) => p.marker === "fr" || p.marker === "xo")?.text.trim();
+  const body = part.parts.filter((p) => p.marker !== "fr" && p.marker !== "xo");
+  verse.append(
+    h(
+      "p",
+      { class: "verse-note", role: "note" },
+      label ? h("span", { class: "verse-note-ref" }, label, " ") : null,
+      body.map((p) => (p.marker === "fq" || p.marker === "fqa" ? h("span", { class: "it" }, p.text) : p.text)),
+    ),
+  );
+  if (!text) verse.querySelector(".verse-note")?.remove();
+}
+
+/** The verse's text as lines: poetry and paragraph breaks start new lines. */
+function libraryLines(verse, number) {
+  const lines = [];
+  let line = h("span", { class: "line", "data-kind": verse.starts ?? "p" }, number);
+  for (const part of verse.parts) {
+    if (part.t === "break") {
+      lines.push(line);
+      line = h("span", { class: "line", "data-kind": part.kind });
+    } else if (part.t === "text") {
+      line.append(styled(part));
+    } else if (part.t === "note") {
+      line.append(noteButton(part, toggleNote));
+    }
+  }
+  lines.push(line);
+  return lines;
+}
+
+function libraryVerse(verse, selected) {
+  const isTitle = verse.number === "0";
+  const first = parseInt(verse.number, 10) || 0;
+  const label = verse.published ?? verse.number;
+  const number = isTitle ? null : h("span", { class: "vnum" }, label, verse.alternate ? h("span", { class: "valt" }, ` (${verse.alternate})`) : null, " ");
+  return [
+    verse.before.map(headingElement),
+    h(
+      "div",
+      {
+        class: isTitle ? "verse is-title" : "verse",
+        id: `v${first}`,
+        "data-verse": first,
+        "data-label": verse.number,
+        "aria-current": selected ? "true" : null,
+      },
+      h("p", { class: "verse-text library-text" }, libraryLines(verse, number)),
+    ),
+  ];
+}
+
+/** Render a chapter of a library translation (from the `bible_chapter` command). */
+export function renderLibraryChapter(container, chapter, { selectedVerse, nav }) {
+  const article = h(
+    "article",
+    { class: "chapter library", lang: "en" },
+    h("h1", { class: "chapter-heading" }, chapter.heading, h("span", { class: "chapter-translation" }, chapter.abbr)),
+    chapter.title ? libraryVerse(chapter.title, false) : null,
+    chapter.verses.map((v) => libraryVerse(v, (parseInt(v.number, 10) || 0) === selectedVerse)),
+    chapter.after.map(headingElement),
+    h(
+      "nav",
+      { class: "chapter-nav", "aria-label": "Chapters" },
+      nav.prevLabel
+        ? h("button", { type: "button", onclick: nav.onPrev, title: nav.prevLabel }, icon("chevronLeft"), h("span", { class: "nav-label" }, nav.prevLabel))
+        : h("span"),
+      nav.nextLabel
+        ? h("button", { type: "button", onclick: nav.onNext, title: nav.nextLabel }, h("span", { class: "nav-label" }, nav.nextLabel), icon("chevronRight"))
+        : h("span"),
+    ),
+  );
+  container.replaceChildren(article);
+}
