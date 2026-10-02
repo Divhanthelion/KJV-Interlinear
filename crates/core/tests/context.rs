@@ -96,7 +96,7 @@ fn whole_bible_has_every_verse_and_psalm_title() {
 
 #[test]
 fn original_words_follow_each_verse() {
-    let options = ContextOptions { original: true };
+    let options = ContextOptions { original: true, ..Default::default() };
     let c = context::build(data(), &verse("Genesis", 1, 1), &options).unwrap();
     let hebrew = c.text.lines().nth(3).unwrap();
     assert!(hebrew.starts_with("   Hebrew: "), "{}", hebrew);
@@ -105,6 +105,36 @@ fn original_words_follow_each_verse() {
 
     let c = context::build(data(), &verse("John", 1, 1), &options).unwrap();
     assert!(c.text.lines().nth(3).unwrap().starts_with("   Greek: "));
+}
+
+#[test]
+fn full_definitions_follow_the_text_once_each() {
+    let chapter = Scope::Chapter { book: "John".into(), chapter: 1 };
+    let words = context::build(data(), &chapter, &ContextOptions { original: true, ..Default::default() }).unwrap();
+    let full = context::build(data(), &chapter, &ContextOptions { original: true, definitions: true }).unwrap();
+    assert!(full.text.starts_with(&words.text), "the passage comes first, unchanged");
+    let defs = &full.text[words.text.len()..];
+    assert!(defs.starts_with("\n# Strong's definitions\n"), "{}", &defs[..80]);
+    // λόγος (John 1:1) once, with its whole entry
+    assert_eq!(defs.matches("\n## G3056 ").count(), 1);
+    let heading = defs.lines().find(|l| l.starts_with("## G3056 ")).unwrap_or("");
+    assert!(heading.ends_with(" · logos · G:N-M · word"), "{}", heading);
+    assert!(defs.contains("the Divine Word or Logos: Jhn.1:1, 14"));
+    // Every Strong's number in the passage has an entry
+    let used: std::collections::HashSet<&str> = words
+        .text
+        .split([' ', '|'])
+        .filter(|w| w.len() > 1 && w.starts_with('G') && w[1..].chars().all(|c| c.is_ascii_digit()))
+        .collect();
+    for s in &used {
+        assert!(defs.contains(&format!("\n## {} ", s)), "{} has no definition", s);
+    }
+    assert_eq!(defs.matches("\n## ").count(), used.len(), "one entry per number");
+    assert!(full.tokens > words.tokens * 2, "{} vs {}", full.tokens, words.tokens);
+
+    // Definitions need the original-language words to refer to
+    let alone = context::build(data(), &chapter, &ContextOptions { original: false, definitions: true }).unwrap();
+    assert!(!alone.text.contains("Strong's definitions"));
 }
 
 #[test]
@@ -129,7 +159,7 @@ fn dump() {
         ("john-original", Scope::Book { book: "John".into() }, true),
     ];
     for (name, scope, original) in cases {
-        let c = context::build(data(), &scope, &ContextOptions { original }).unwrap();
+        let c = context::build(data(), &scope, &ContextOptions { original, ..Default::default() }).unwrap();
         let path = Path::new(&dir).join(format!("{}.txt", name));
         std::fs::write(&path, &c.text).unwrap();
         println!("{} chars={} estimate={} -> {}", name, c.text.chars().count(), c.tokens, path.display());

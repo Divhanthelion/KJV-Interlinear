@@ -56,7 +56,7 @@ pub fn prepare(data: &DataBundle, args: &AskArgs, api_key: Option<String>) -> Re
     Ok(ChatRequest {
         endpoint: Endpoint { kind: args.kind, base_url: args.base_url.clone(), api_key },
         model: args.model.clone(),
-        instructions: instructions(&scripture.label, args.context_options.original),
+        instructions: instructions(&scripture.label, &args.context_options),
         context,
         messages: args.messages.clone(),
         max_tokens: args.max_tokens,
@@ -68,7 +68,7 @@ pub fn prepare(data: &DataBundle, args: &AskArgs, api_key: Option<String>) -> Re
 
 /// How the assistant should behave. Kept free of anything that changes from turn to
 /// turn so providers can cache it with the Scripture that follows.
-pub fn instructions(scope_label: &str, original: bool) -> String {
+pub fn instructions(scope_label: &str, options: &ContextOptions) -> String {
     let mut s = String::from(
         "You are the study assistant in KJV Interlinear, a Bible app built on the King James Version \
          (1769 Oxford text) with the Hebrew, Aramaic, and Greek beneath it.\n\n",
@@ -86,11 +86,18 @@ pub fn instructions(scope_label: &str, original: bool) -> String {
              give the reference (Book chapter:verse).",
             scope_label
         ));
-        if original {
+        if options.original {
             s.push_str(
                 " Each verse is followed by its original-language words, each with its Strong's number \
                  and a short English gloss; use them when the original language matters.",
             );
+            if options.definitions {
+                s.push_str(
+                    " After the passage, under \"# Strong's definitions\", is the full lexicon entry for \
+                     each of those Strong's numbers, once each. Use them for a word's range of meaning, \
+                     and say which sense you think fits a verse and why.",
+                );
+            }
         }
         s.push_str(
             " If a question needs passages that aren't attached, you may draw on your wider knowledge \
@@ -117,10 +124,14 @@ mod tests {
 
     #[test]
     fn instructions_name_the_scope_and_original_language_notes() {
-        let s = instructions("John 3", true);
+        let original = ContextOptions { original: true, ..Default::default() };
+        let s = instructions("John 3", &original);
         assert!(s.contains("attached John 3 below"));
         assert!(s.contains("Strong's number"));
-        let none = instructions("", false);
+        assert!(!s.contains("# Strong's definitions"));
+        let full = instructions("John 3", &ContextOptions { original: true, definitions: true });
+        assert!(full.contains("# Strong's definitions"));
+        let none = instructions("", &ContextOptions::default());
         assert!(none.contains("No passage is attached"));
         assert!(!none.contains("<scripture>"));
     }

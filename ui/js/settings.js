@@ -33,6 +33,7 @@ export const DEFAULTS = {
     scope: "chapter", // none | verse | chapter | book | books | bible
     books: [], // for scope "books"
     original: false, // attach Hebrew/Greek words
+    definitions: false, // and the full Strong's entry for each word (with original)
     think: true, // let a local reasoning model think before answering
     // Providers the reader agreed to send questions to (keyed by id)
     consent: {},
@@ -76,6 +77,7 @@ function sanitizeAi(raw) {
     scope: oneOf(a.scope, AI_SCOPES, DEFAULTS.ai.scope),
     books: (Array.isArray(a.books) ? a.books : []).filter((b) => typeof b === "string").slice(0, 66),
     original: typeof a.original === "boolean" ? a.original : false,
+    definitions: typeof a.definitions === "boolean" ? a.definitions : false,
     think: typeof a.think === "boolean" ? a.think : true,
     consent: flags(a.consent),
     calibration: Object.fromEntries(

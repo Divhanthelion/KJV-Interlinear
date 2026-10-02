@@ -2,6 +2,8 @@
 //! whole Bible) into plain text a language model can read, with a size estimate so
 //! the app can tell whether it fits the model's context window.
 
+use std::collections::HashSet;
+
 use serde::{Deserialize, Serialize};
 
 use crate::api::{chapter_heading, display_name, reference, strongs_display};
@@ -29,6 +31,9 @@ pub enum Scope {
 pub struct ContextOptions {
     /// Add each verse's Hebrew/Greek words with Strong's numbers and glosses
     pub original: bool,
+    /// With `original`, also add the full lexicon entry for every Strong's number
+    /// in the passage, once each, after the text
+    pub definitions: bool,
 }
 
 #[derive(Debug, Serialize)]
@@ -51,7 +56,7 @@ pub struct ContextSize {
 
 /// Build the text for `scope`. Errors name the book or chapter that doesn't exist.
 pub fn build(data: &DataBundle, scope: &Scope, options: &ContextOptions) -> Result<ContextText, String> {
-    let mut out = Writer { data, options, text: String::new(), verses: 0 };
+    let mut out = Writer { data, options, text: String::new(), verses: 0, strongs: Vec::new(), seen: HashSet::new() };
     let label = match scope {
         Scope::None => String::new(),
         Scope::Verse { book, chapter, verse } => {
@@ -108,6 +113,7 @@ pub fn build(data: &DataBundle, scope: &Scope, options: &ContextOptions) -> Resu
             "The whole Bible".to_string()
         }
     };
+    out.definitions();
     let tokens = estimate_tokens(&out.text);
     Ok(ContextText { label, verses: out.verses, tokens, text: out.text })
 }
@@ -194,9 +200,12 @@ struct Writer<'a> {
     options: &'a ContextOptions,
     text: String,
     verses: usize,
+    /// Strong's numbers in the order they first appear, for the definitions
+    strongs: Vec<&'a str>,
+    seen: HashSet<&'a str>,
 }
 
-impl Writer<'_> {
+impl<'a> Writer<'a> {
     fn book(&mut self, b: &Book) {
         self.book_heading(b);
         for ch in &b.chapters {
@@ -244,7 +253,8 @@ impl Writer<'_> {
 
     /// "   Hebrew: בְּרֵאשִׁית H7225 in beginning | בָּרָא H1254 created | …"
     fn original(&mut self, v: &Verse) {
-        let Some(iv) = self.data.extended.get_interlinear(&v.book, v.chapter, v.verse_number) else {
+        let data: &'a DataBundle = self.data;
+        let Some(iv) = data.extended.get_interlinear(&v.book, v.chapter, v.verse_number) else {
             return;
         };
         let language = match iv.language {
@@ -260,6 +270,9 @@ impl Writer<'_> {
                 if let Some(s) = &w.strongs_number {
                     word.push(' ');
                     word.push_str(&strongs_display(s));
+                    if self.seen.insert(s.as_str()) {
+                        self.strongs.push(s.as_str());
+                    }
                 }
                 let gloss = format_gloss(&w.english_gloss);
                 if !gloss.is_empty() {
@@ -275,6 +288,37 @@ impl Writer<'_> {
             self.text.push_str(": ");
             self.text.push_str(&words.join(" | "));
             self.text.push('\n');
+        }
+    }
+
+    /// "## H430 אֱלֹהִים · e.lo.him · H:N-M · God" and the entry, for each Strong's
+    /// number in the passage, once
+    fn definitions(&mut self) {
+        if !(self.options.original && self.options.definitions) || self.strongs.is_empty() {
+            return;
+        }
+        self.text.push_str(
+            "\n# Strong's definitions\n\
+             The full lexicon entry (from STEP Bible's Hebrew and Greek lexicons) for each Strong's \
+             number above, once each, in order of first appearance.\n",
+        );
+        let data: &'a DataBundle = self.data;
+        for key in &self.strongs {
+            let Some(e) = data.extended.get_lexicon_entry(key) else {
+                continue;
+            };
+            let head: Vec<&str> = [e.original_word.trim(), e.transliteration.trim(), e.morph.trim(), e.gloss.trim()]
+                .into_iter()
+                .filter(|x| !x.is_empty())
+                .collect();
+            self.text.push_str(&format!("\n## {} {}\n", strongs_display(key), head.join(" · ")));
+            for line in e.definition.lines() {
+                let line = line.split_whitespace().collect::<Vec<_>>().join(" ");
+                if !line.is_empty() {
+                    self.text.push_str(&line);
+                    self.text.push('\n');
+                }
+            }
         }
     }
 }

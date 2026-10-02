@@ -116,15 +116,21 @@ function scopeArgs(ctx) {
   }
 }
 
+/** What to attach besides the KJV text. */
+function contextOptions(ctx) {
+  const { original, definitions } = ctx.settings.ai;
+  return { original, definitions: original && definitions };
+}
+
 async function refreshSize(ctx) {
   const scope = scopeArgs(ctx);
-  const key = JSON.stringify([scope, ctx.settings.ai.original]);
+  const key = JSON.stringify([scope, contextOptions(ctx)]);
   if (chat.size?.key === key) return;
   if (scope.kind === "none") {
     chat.size = { key, label: "", tokens: 0, verses: 0 };
   } else {
     try {
-      const size = await call("context_size", { scope, options: { original: ctx.settings.ai.original } });
+      const size = await call("context_size", { scope, options: contextOptions(ctx) });
       chat.size = { key, ...size };
     } catch (error) {
       chat.size = { key, label: "", tokens: 0, verses: 0, error: String(error.message ?? error) };
@@ -527,6 +533,26 @@ function drawScopeEditor(ctx) {
         onclick: () => set((s) => { s.ai.original = !s.ai.original; }),
       }),
     ),
+    ai.original
+      ? h(
+          "div",
+          { class: "setting" },
+          h(
+            "span",
+            { class: "setting-label", id: "chat-definitions-label" },
+            "Include full Strong's definitions",
+            h("span", { class: "setting-hint" }, "The whole lexicon entry for every Strong's number in the passage, once each. Much larger."),
+          ),
+          h("button", {
+            class: "switch",
+            type: "button",
+            role: "switch",
+            "aria-checked": String(ai.definitions),
+            "aria-labelledby": "chat-definitions-label",
+            onclick: () => set((s) => { s.ai.definitions = !s.ai.definitions; }),
+          }),
+        )
+      : null,
   );
 }
 
@@ -919,7 +945,7 @@ async function sendNow(ctx) {
         baseUrl: p.baseUrl,
         model: ai.model,
         scope,
-        contextOptions: { original: ai.original },
+        contextOptions: contextOptions(ctx),
         messages: history,
         maxTokens: answerTokens(ctx),
         thinking: !!info?.adaptiveThinking,
