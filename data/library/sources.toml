@@ -667,3 +667,10 @@ url = "https://www.sermonindex.net/modules/sword/sigill.zip"
 size = 17759817
 sha256 = "17eac460993aa95239d8c3a598c612b3ffcbc3e9e102a51a0335159fbbb03ea2"
 retrieved = "2026-10-02"
+
+[[source]]
+path = "openbible/cross-references.zip"
+url = "https://a.openbible.info/data/cross-references.zip"
+size = 1982012
+sha256 = "224f28aae59812b7c0866534133578661fbcbcf04e432e24af8c47044e93782e"
+retrieved = "2026-10-02"

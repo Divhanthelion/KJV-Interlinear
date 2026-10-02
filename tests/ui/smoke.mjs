@@ -126,7 +126,7 @@ await test("Picker opens Romans 8", "book=Genesis&chapter=1", {}, `
 await test("Bookmark a verse and find it under Saved", "book=Romans&chapter=8", {}, `
   $("#v28").click();
   await until(() => !$("#verse-actions").hidden, "verse actions");
-  assert($("#verse-actions-ref").textContent === "Romans 8:28", "action bar reference");
+  assert($("#verse-actions-ref .ref-long").textContent === "Romans 8:28", "action bar reference");
   $('[data-action="bookmark"]').click();
   await until(() => $('[data-action="bookmark"]').getAttribute("aria-pressed") === "true", "bookmarked");
   $('[data-open-panel="saved"]').click();
@@ -496,6 +496,53 @@ await test("Commentary: choose commentaries and follow a reference", "book=John&
   await until(() => $("#panel").hidden, "panel closed");
   $('[data-action="notes"]').click();
   await until(() => !$("#panel").hidden && where() === "On Luke 2:14", "Notes from the verse bar");
+`);
+
+const XREF_HELPERS = `
+  const panel = $("#panel");
+  const where = () => panel.querySelector(".notes-where")?.textContent;
+  const collection = (id) => panel.querySelector('[data-collection="' + id + '"]');
+  const places = (id) => [...(collection(id)?.querySelectorAll(".xref") ?? [])];
+  const label = (x) => x.querySelector(".xref-ref").textContent;
+`;
+
+await test("Cross-references: the Treasury's keywords and OpenBible's ranked list, with their words", "book=John&chapter=3&tr=kjv&verse=16&select=1&panel=xrefs", {}, `${XREF_HELPERS}
+  await until(() => collection("tsk") && collection("openbible"), "both collections");
+  assert(where() === "From John 3:16" && !$(".notes-kjv"), "from John 3:16: " + where());
+  const first = collection("tsk").querySelector(".xref-line");
+  assert(first.querySelector(".xref-words").textContent === "God.", "the Treasury's first keyword");
+  assert(label(first.querySelector(".xref")) === "Luke 2:14", "under it, Luke 2:14");
+  assert(first.querySelector(".xref-text").textContent.startsWith("Glory to God in the highest"), "with its words");
+  const range = places("tsk").find((x) => label(x) === "2 Corinthians 5:19-21");
+  assert(range && [...range.querySelectorAll(".xref-num")].map((n) => n.textContent).join() === "19,20,21", "a range, verse by verse");
+  // OpenBible: most helpful first, twenty at first
+  assert(label(places("openbible")[0]) === "Romans 5:8", "OpenBible's first: " + label(places("openbible")[0]));
+  assert(places("openbible").length === 20, "twenty at first");
+  collection("openbible").querySelector(".xref-all").click();
+  await until(() => places("openbible").length === 23 && !collection("openbible").querySelector(".xref-all"), "all 23");
+  // A place opens, and the panel follows
+  places("tsk")[0].querySelector(".xref-ref").click();
+  await until(() => $("#ref-label").textContent === "Luke 2" && $("#reader").getAttribute("aria-busy") === "false", "Luke 2");
+  await until(() => $(".verse[aria-current='true']")?.id === "v14", "Luke 2:14 selected");
+  await until(() => where() === "From Luke 2:14", "cross-references from Luke 2:14");
+`);
+
+await test("Cross-references: in the translation being read, with the KJV's words where it hasn't the place", "book=Psalms&chapter=22&tr=brenton&verse=1&select=1&panel=xrefs", {}, `${XREF_HELPERS}
+  await until(() => collection("tsk") && collection("openbible"), "both collections");
+  assert($(".notes-kjv")?.textContent.includes("Psalm 23:1"), "numbered as the KJV's Psalm 23:1");
+  // Brenton numbers the Psalms as the Septuagint does: the KJV's 79:13 is its 78:13
+  assert(places("tsk").some((x) => label(x) === "Psalm 78:13"), "Psalm 78:13 in Brenton's numbering");
+  // Brenton has no New Testament: the KJV's words, marked
+  const john = places("openbible").find((x) => label(x) === "John 10:11");
+  assert(/^KJV · not in /.test(john?.querySelector(".xref-note")?.textContent ?? ""), "John 10:11 marked as the KJV's");
+  assert(john.querySelector(".xref-text").textContent.startsWith("I am the good shepherd"), "with the KJV's words");
+  assert(!john.querySelector("button"), "not a link: Brenton can't open it");
+  // Choosing collections
+  const chip = (name) => $$("#panel .chip").find((c) => c.textContent === name);
+  chip("Treasury").click();
+  await until(() => !collection("tsk") && collection("openbible"), "the Treasury turned off");
+  chip("Treasury").click();
+  await until(() => collection("tsk"), "the Treasury back");
 `);
 
 // Every verse of every translation on screen, compared with the data (whose text is

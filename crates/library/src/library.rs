@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::alignment::{Alignment, Ref};
 use crate::archive::Archive;
+use crate::crossrefs::{self, CrossrefInfo, Line, Target, Xref};
 use crate::notes::{self, CommentaryInfo, Note};
 use crate::usfm::{self, Options};
 use crate::view::{self, ChapterView};
@@ -48,6 +49,9 @@ pub struct BookEntry {
 /// Parsed books kept for reuse.
 const PARSED_BOOKS: usize = 64;
 
+/// Books' verse lists kept for reuse (cross-references read verses from many books).
+const VERSE_LISTS: usize = 96;
+
 pub struct Library {
     archive: Archive,
     bibles: Vec<BibleInfo>,
@@ -57,6 +61,22 @@ pub struct Library {
     /// (commentary, book) -> its notes
     notes: Mutex<HashMap<(String, String), Notes>>,
     verse_sets: Mutex<HashMap<(String, String), Arc<VerseSet>>>,
+    crossrefs: Vec<CrossrefInfo>,
+    /// (collection, book) -> its references
+    xrefs: Mutex<HashMap<(String, String), Xrefs>>,
+    verse_lists: Mutex<VerseLists>,
+}
+
+/// A list's references from one book, shared.
+type Xrefs = Arc<Vec<Xref>>;
+
+/// A book's verses, shared.
+type VerseList = Arc<Vec<usfm::VerseText>>;
+
+/// (translation, book) -> its verses, and when they were last used.
+struct VerseLists {
+    lists: HashMap<(String, String), (VerseList, u64)>,
+    clock: u64,
 }
 
 /// A commentary book's notes, shared.
@@ -80,10 +100,18 @@ impl Library {
         } else {
             Vec::new()
         };
+        let crossrefs: Vec<CrossrefInfo> = if archive.contains("crossrefs.json") {
+            serde_json::from_str(&archive.get_str("crossrefs.json")?).map_err(|e| format!("crossrefs.json: {}", e))?
+        } else {
+            Vec::new()
+        };
         Ok(Self {
             archive,
             bibles,
             commentaries,
+            crossrefs,
+            xrefs: Mutex::new(HashMap::new()),
+            verse_lists: Mutex::new(VerseLists { lists: HashMap::new(), clock: 0 }),
             notes: Mutex::new(HashMap::new()),
             parsed: Mutex::new(Parsed { books: HashMap::new(), clock: 0 }),
             alignments: Mutex::new(HashMap::new()),
@@ -215,6 +243,73 @@ impl Library {
         Ok(self.commentary_book(id, code)?.iter().filter(|n| n.covers(chapter, verse)).cloned().collect())
     }
 
+    /// Every verse of book `code` in translation `id`, in order, as plain text.
+    pub fn verses(&self, id: &str, code: &str) -> Result<VerseList, String> {
+        let key = (id.to_string(), code.to_string());
+        {
+            let mut cache = self.verse_lists.lock().unwrap();
+            cache.clock += 1;
+            let now = cache.clock;
+            if let Some((list, used)) = cache.lists.get_mut(&key) {
+                *used = now;
+                return Ok(list.clone());
+            }
+        }
+        let book = self.book(id, code)?;
+        let list = Arc::new(usfm::verses(&book));
+        let mut cache = self.verse_lists.lock().unwrap();
+        let now = cache.clock;
+        cache.lists.insert(key, (list.clone(), now));
+        if cache.lists.len() > VERSE_LISTS
+            && let Some(oldest) = cache.lists.iter().min_by_key(|(_, (_, used))| *used).map(|(k, _)| k.clone())
+        {
+            cache.lists.remove(&oldest);
+        }
+        Ok(list)
+    }
+
+    /// Every cross-reference collection, in the order the app lists them.
+    pub fn crossrefs(&self) -> &[CrossrefInfo] {
+        &self.crossrefs
+    }
+
+    /// Every reference of list `id` from book `code` (KJV numbering), in order.
+    pub fn crossref_book(&self, id: &str, code: &str) -> Result<Xrefs, String> {
+        let key = (id.to_string(), code.to_string());
+        if let Some(x) = self.xrefs.lock().unwrap().get(&key) {
+            return Ok(x.clone());
+        }
+        let info = self.crossrefs.iter().find(|c| c.id == id).ok_or_else(|| format!("no cross-references {:?}", id))?;
+        let parsed = if info.books.iter().any(|b| b == code) {
+            crossrefs::parse(&self.archive.get_str(&format!("xref/{}/{}.tsv", id, code))?).map_err(|e| format!("{} {}: {}", id, code, e))?
+        } else {
+            Vec::new()
+        };
+        let parsed = Arc::new(parsed);
+        let mut cache = self.xrefs.lock().unwrap();
+        if cache.len() >= 16 {
+            cache.clear();
+        }
+        cache.insert(key, parsed.clone());
+        Ok(parsed)
+    }
+
+    /// The references of collection `id` from KJV verse `chapter`:`verse` of `code`, as
+    /// lines (see [`crossrefs::lines`]); a list's are one line, most helpful first.
+    pub fn crossrefs_from(&self, id: &str, code: &str, chapter: u32, verse: u32) -> Result<Vec<Line>, String> {
+        let info = self.crossrefs.iter().find(|c| c.id == id).ok_or_else(|| format!("no cross-references {:?}", id))?;
+        if let Some(commentary) = &info.commentary {
+            return Ok(self.notes_on(commentary, code, chapter, verse)?.iter().flat_map(|n| crossrefs::lines(&n.body)).collect());
+        }
+        let refs: Vec<Target> = self
+            .crossref_book(id, code)?
+            .iter()
+            .filter(|x| x.from == (chapter, verse))
+            .map(|x| Target { to: x.to.clone(), votes: Some(x.votes) })
+            .collect();
+        Ok(if refs.is_empty() { Vec::new() } else { vec![Line { text: String::new(), refs }] })
+    }
+
     /// Chapter `chapter` of book `code` in translation `id`, ready to draw.
     pub fn chapter(&self, id: &str, code: &str, chapter: u32) -> Result<ChapterView, String> {
         let book = self.book(id, code)?;
@@ -260,6 +355,23 @@ pub mod build {
         licence: String,
         credit: String,
         about: String,
+    }
+
+    #[derive(Deserialize)]
+    struct CrossrefCatalogue {
+        crossrefs: Vec<CrossrefEntry>,
+    }
+
+    #[derive(Deserialize)]
+    struct CrossrefEntry {
+        id: String,
+        name: String,
+        short: String,
+        licence: String,
+        credit: String,
+        about: String,
+        #[serde(default)]
+        commentary: Option<String>,
     }
 
     #[derive(Deserialize)]
@@ -378,6 +490,46 @@ pub mod build {
                 });
             }
             entries.push(("commentaries.json".into(), serde_json::to_string(&infos).map_err(|e| e.to_string())?));
+        }
+        // Cross-references: the catalogue, and one entry per list and book (the Treasury's
+        // are its commentary notes, packed above)
+        let path = lib.join("crossrefs.toml");
+        if path.exists() {
+            let cat: CrossrefCatalogue = toml::from_str(&read_text(&path, &mut read)?).map_err(|e| format!("crossrefs.toml: {}", e))?;
+            let mut infos = Vec::new();
+            for c in cat.crossrefs {
+                let codes: Vec<String> = match &c.commentary {
+                    Some(comm) => {
+                        let key = format!("comm/{}/", comm);
+                        entries.iter().filter_map(|(k, _)| k.strip_prefix(&key)?.strip_suffix(".jsonl").map(str::to_string)).collect()
+                    }
+                    None => {
+                        let dir = lib.join("crossrefs").join(&c.id);
+                        let mut codes: Vec<String> = fs::read_dir(&dir)
+                            .map_err(|e| format!("{}: {}", dir.display(), e))?
+                            .flatten()
+                            .filter_map(|e| e.file_name().to_string_lossy().strip_suffix(".tsv").map(str::to_string))
+                            .collect();
+                        codes.sort_by_key(|code| books::order(code));
+                        for code in &codes {
+                            let text = read_text(&dir.join(format!("{}.tsv", code)), &mut read)?;
+                            entries.push((format!("xref/{}/{}.tsv", c.id, code), text));
+                        }
+                        codes
+                    }
+                };
+                infos.push(crate::crossrefs::CrossrefInfo {
+                    id: c.id,
+                    name: c.name,
+                    short: c.short,
+                    licence: c.licence,
+                    credit: c.credit,
+                    about: c.about,
+                    commentary: c.commentary,
+                    books: codes,
+                });
+            }
+            entries.push(("crossrefs.json".into(), serde_json::to_string(&infos).map_err(|e| e.to_string())?));
         }
         // Verse alignment tables, where made (data/library/alignment/<id>.tsv)
         for entry in &catalogue.bible {

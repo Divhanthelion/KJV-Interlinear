@@ -8,6 +8,7 @@ import { closePicker, initPicker, isPickerOpen, openPicker, setPickerBooks } fro
 import { libraryVerseText, markSelected, renderChapter, renderLibraryChapter } from "./reader.js";
 import { initTranslations, openTranslations } from "./translations.js";
 import { notesStale, renderNotes } from "./notes.js";
+import { renderXrefs, xrefsStale } from "./xrefs.js";
 import * as prefs from "./settings.js";
 
 const $ = (id) => document.getElementById(id);
@@ -22,7 +23,8 @@ const PANELS = {
   search: { title: "Search", render: renderSearch },
   strongs: { title: "Strong's & Lexicon", render: renderStrongs },
   saved: { title: "Saved", render: renderSaved },
-  notes: { title: "Commentary", render: renderNotes },
+  notes: { title: "Commentary", render: renderNotes, stale: notesStale },
+  xrefs: { title: "Cross-references", render: renderXrefs, stale: xrefsStale },
   chat: { title: "Ask", render: renderChat },
   settings: { title: "Settings", render: renderSettings },
 };
@@ -130,7 +132,7 @@ async function goTo(book, chapter, verse = 0, opts = {}) {
   reader.setAttribute("aria-busy", "false");
 
   if (opts.fromPanel && !desktop.matches) closePanel();
-  else if (state.panel === "notes" && notesStale(ctx)) refreshPanel();
+  else if (followsReader()) refreshPanel();
   chatScopeChanged(ctx);
 }
 
@@ -198,7 +200,7 @@ async function setHighlight(query) {
 function selectVerse(n) {
   state.selectedVerse = n;
   markSelected(reader, n);
-  if (state.panel === "notes" && notesStale(ctx)) refreshPanel();
+  if (followsReader()) refreshPanel();
   if (n) {
     settings.position = { ...settings.position, verse: n };
     prefs.save(settings);
@@ -212,7 +214,9 @@ function updateActions() {
   actions.hidden = !n;
   if (!n) return;
   const { book, chapter } = state.chapter;
-  $("verse-actions-ref").textContent = reference(book, chapter, n);
+  // Phones show the book's abbreviation ("2 Thess 3:18"), so the buttons keep their room
+  const abbr = state.bibles.find((b) => b.id === "kjv")?.books.find((b) => b.name === book)?.abbr ?? bookName(book);
+  replace($("verse-actions-ref"), h("span", { class: "ref-long" }, reference(book, chapter, n)), h("span", { class: "ref-short" }, `${abbr} ${chapter}:${n}`));
   const saved = prefs.isBookmarked(settings, book, chapter, n);
   const bookmark = actions.querySelector('[data-action="bookmark"]');
   bookmark.setAttribute("aria-pressed", String(saved));
@@ -290,6 +294,12 @@ function openPanel(name, { focus = true, section = null } = {}) {
   // On phones the panel covers the reader: let the system back gesture close it
   if (!desktop.matches && !wasOpen) history.pushState({ panel: name }, "");
   if (focus) (input ?? $("panel-close")).focus();
+}
+
+/** Whether the open panel shows the selected verse (commentary, cross-references) and
+ * the reader has moved since it was drawn. */
+function followsReader() {
+  return !!state.panel && !!PANELS[state.panel].stale?.(ctx);
 }
 
 function refreshPanel() {
@@ -556,7 +566,7 @@ function wireStaticControls() {
   $("panel-close").append(icon("close"));
   $("panel-close").addEventListener("click", () => closePanel());
 
-  const toolIcons = { notes: "notes", chat: "chat", search: "search", saved: "bookmark", settings: "settings" };
+  const toolIcons = { notes: "notes", xrefs: "link", chat: "chat", search: "search", saved: "bookmark", settings: "settings" };
   for (const b of document.querySelectorAll("[data-open-panel]")) {
     b.append(icon(toolIcons[b.dataset.openPanel]));
     b.addEventListener("click", () =>
@@ -571,17 +581,17 @@ function wireStaticControls() {
     tab.addEventListener("click", () => (tab.dataset.tab === "read" ? closePanel() : openPanel(tab.dataset.tab, { focus: false })));
   }
 
-  const actionIcons = { notes: ["notes", "Notes"], "copy-verse": ["copy", "Copy"], "copy-chapter": ["chapter", "Copy chapter"] };
+  const actionIcons = { notes: ["notes", "Notes"], xrefs: ["link", "Cross-refs"], "copy-verse": ["copy", "Copy"], "copy-chapter": ["chapter", "Copy chapter"] };
   for (const [action, [iconName, label]] of Object.entries(actionIcons)) {
     const b = actions.querySelector(`[data-action="${action}"]`);
     b.append(icon(iconName), h("span", { class: "action-label" }, label));
-    b.title = { notes: "Commentary on this verse", "copy-verse": "Copy verse (Ctrl+C)", "copy-chapter": "Copy chapter (Ctrl+Shift+C)" }[action];
+    b.title = { notes: "Commentary on this verse", xrefs: "Cross-references for this verse", "copy-verse": "Copy verse (Ctrl+C)", "copy-chapter": "Copy chapter (Ctrl+Shift+C)" }[action];
   }
   actions.querySelector('[data-action="deselect"]').append(icon("close"));
   actions.addEventListener("click", (event) => {
     const action = event.target.closest("[data-action]")?.dataset.action;
     if (action === "bookmark") toggleBookmark();
-    else if (action === "notes") openPanel("notes", { focus: false });
+    else if (action === "notes" || action === "xrefs") openPanel(action, { focus: false });
     else if (action === "copy-verse") copyVerse();
     else if (action === "copy-chapter") copyChapter();
     else if (action === "deselect") selectVerse(null);

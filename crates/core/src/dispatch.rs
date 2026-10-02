@@ -113,9 +113,14 @@ pub fn dispatch_all(
             to_json(crate::translations::chapter(library, &a.bible, &a.book, a.chapter)?)
         }
         "commentaries" => to_json(library.commentaries()),
+        "crossref_collections" => to_json(library.crossrefs()),
         "notes" => {
             let a: NotesArgs = parse(name, args)?;
             to_json(crate::translations::notes(library, &a.commentaries, &a.bible, &a.book, a.chapter, a.verse)?)
+        }
+        "crossrefs" => {
+            let a: CrossrefsArgs = parse(name, args)?;
+            to_json(crate::translations::crossrefs(data, library, &a.collections, &a.bible, &a.book, a.chapter, a.verse, a.limit)?)
         }
         "bible_map" => {
             let a: BibleMapArgs = parse(name, args)?;
@@ -143,4 +148,15 @@ struct NotesArgs {
     chapter: u32,
     #[serde(default)]
     verse: u32,
+}
+
+#[derive(Deserialize)]
+struct CrossrefsArgs {
+    collections: Vec<String>,
+    bible: String,
+    book: String,
+    chapter: u32,
+    verse: u32,
+    #[serde(default)]
+    limit: Option<usize>,
 }

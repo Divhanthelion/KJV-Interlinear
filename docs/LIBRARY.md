@@ -41,8 +41,8 @@ The interlinear stays, but it is no longer the centre of the app.
 | Commentary | John Gill | SermonIndex SWORD module `sigill` (keeps the Hebrew; HelloAO's copy strips it) | KJV | Public domain |
 | Commentary | Jamieson-Fausset-Brown (1871, unabridged) | CrossWire `JFB` | KJV | Public domain |
 | Commentary | Church Fathers | NPNF/ANF/Oxford translations (tertullian.org, Writings-Database), keyed by homily headings; filtered HCF index for the rest | verse ranges | Public domain translations only; no machine translations, no modern copyrighted excerpts |
-| Cross-references | Treasury of Scripture Knowledge | CrossWire `TSK` | KJV | Public domain |
-| Cross-references | OpenBible.info | openbible.info | KJV | CC BY |
+| Cross-references | Treasury of Scripture Knowledge | CrossWire `TSK` (the commentary above, read as references) | KJV | Public domain |
+| Cross-references | OpenBible.info | `cross-references.zip` from openbible.info (ESV numbering; 3 John 1:15 is the KJV's 1:14) | KJV | CC BY 4.0 |
 
 ## Data in the repository
 
@@ -56,7 +56,10 @@ data/library/
   commentaries/<id>/index.toml     generated: counts, orphans placed, ranges trimmed, references
   commentaries/<id>/<BOOK>.jsonl   one note per line: {"from":"3:16","to":"3:18","body":"…"}
                                    ("0" verse = chapter introduction, "0:0" = book introduction)
-  crossrefs/<id>.tsv
+  crossrefs.toml              the cross-reference collections: name, licence, credit; the
+                              Treasury names its commentary, the others a pinned source
+  crossrefs/<id>/index.toml   generated: counts, references left out or renumbered, source and SHA-256
+  crossrefs/<id>/<BOOK>.tsv   chapter:verse \t to \t votes, each verse's most helpful first
   alignment/<id>.tsv          generated: the verses whose KJV counterpart isn't the same-numbered verse
 ```
 
@@ -112,7 +115,10 @@ cargo run -p kjv-import -- check            # re-convert and compare with data/l
 ```
 
 Converted data is committed, so builds never need the network, and every change to
-a text shows up in review as a readable diff.
+a text shows up in review as a readable diff. `build crossrefs` converts the
+cross-reference collections; OpenBible.info's references with negative votes (more
+readers found them unhelpful than helpful) are left out, and every remaining reference
+must name verses the KJV has.
 
 ## In the app
 
@@ -136,6 +142,14 @@ a text shows up in review as a readable diff.
   opens its passage in the translation being read; where one reference lists
   several places (the Treasury's "Lu 2:14; Ro 5:8; 1Jo 4:9,10,19", Wesley's "Numb
   1:22 26:14") and its text has a part for each, in order, each part opens its own.
+- **Cross-references panel.** The chosen collections' references from the selected
+  verse, each place shown with its words in the translation being read, numbered as
+  that translation numbers it and opening there. The Treasury is shown line by line as
+  it prints them (a keyword such as "God.", a remark, a date, then its places), with
+  nothing left out; OpenBible.info's are one list, most helpful first, twenty at first
+  and the rest on request. A range shows its first three verses. Where the translation
+  hasn't a place (the New Testament in Brenton's Septuagint, a verse the BSB leaves
+  out), the KJV's words are shown and marked as the KJV's.
 
 ## Verse alignment
 
@@ -226,6 +240,10 @@ The same standard as the KJV today (`crates/core/tests/text_fidelity.rs`):
 - **Commentaries.** Every note in the source appears in the data, under the same verse,
   with the same text once markup is removed. Counts are checked per book. No unknown
   markup may remain. Spot checks pin known notes to known verses.
+- **Cross-references.** Every place in both collections names verses the KJV has
+  (`crates/library/tests/crossrefs.rs`); reading the Treasury's notes as lines keeps
+  every place and every word; a sweep asks for the references of thousands of verses
+  in every translation and checks every place has a label and words.
 - **Alignment.** Every row names verses that exist on both sides; the hard cases
   (the Vulgate Psalms, the Romans doxology, Susanna, Esther's additions, Hebrew
   numbering, omitted verses) have explicit tests; tables are reproducible byte for

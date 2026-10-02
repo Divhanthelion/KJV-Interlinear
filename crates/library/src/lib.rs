@@ -5,6 +5,7 @@ pub mod align;
 pub mod alignment;
 pub mod archive;
 pub mod books;
+pub mod crossrefs;
 pub mod library;
 pub mod notes;
 pub mod reference;

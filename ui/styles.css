@@ -804,14 +804,24 @@ input[readonly] { color: var(--muted); }
 
 .notes-where { font-weight: 650; margin: 0 0 10px; }
 .notes-kjv { font-size: 0.875rem; color: var(--muted); margin: -6px 0 10px; }
-.panel[data-panel="notes"] .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; }
-.panel[data-panel="notes"] .chip { min-height: 30px; padding: 0 10px; font-size: 0.8125rem; }
+:is(.panel[data-panel="notes"], .panel[data-panel="xrefs"]) .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; }
+:is(.panel[data-panel="notes"], .panel[data-panel="xrefs"]) .chip { min-height: 30px; padding: 0 10px; font-size: 0.8125rem; }
 .commentary { padding: 14px 0 6px; border-top: 1px solid var(--border); }
 .commentary-name { font-size: 1rem; font-weight: 700; margin: 0 0 8px; }
 .commentary-meta { font-weight: 400; color: var(--muted); font-size: 0.875rem; }
 .commentary-credit { font-size: 0.75rem; color: var(--muted); margin: 6px 0 0; }
 .notes-silent { padding-top: 10px; border-top: 1px solid var(--border); }
 .notes-silent .empty { font-size: 0.875rem; margin: 0 0 6px; }
+.xref-line { margin: 0 0 14px; }
+.xref-words { font-size: 0.875rem; font-weight: 650; color: var(--text-2); margin: 0 0 6px; }
+.xref-remark { font-family: var(--font-text); font-size: 0.9375rem; line-height: 1.55; color: var(--text-2); margin: 0 0 8px; overflow-wrap: anywhere; }
+.xref { margin: 0 0 10px; padding-inline-start: 10px; border-inline-start: 2px solid var(--border); }
+.xref-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.xref-ref { font-size: 0.875rem; font-weight: 650; }
+.xref-note { font-size: 0.75rem; color: var(--muted); }
+.xref-text { font-family: var(--font-text); font-size: 0.9375rem; line-height: 1.55; margin: 2px 0 0; overflow-wrap: anywhere; }
+.xref-num { font-family: var(--font-ui); font-size: 0.7em; font-weight: 700; color: var(--accent); margin-inline-end: 2px; }
+.xref-all { margin: 0 0 8px; }
 .note { margin: 0 0 12px; }
 .note-label { font-size: 0.8125rem; font-weight: 650; color: var(--text-2); margin: 0 0 4px; }
 details.note > summary { cursor: pointer; min-height: 32px; display: list-item; }
@@ -1074,7 +1084,9 @@ details.note > summary { cursor: pointer; min-height: 32px; display: list-item; 
 @media (max-width: 899px) {
   .verse-actions { bottom: calc(76px + var(--safe-bottom)); }
 }
-.verse-actions-ref { font-weight: 650; margin-inline-end: 6px; white-space: nowrap; }
+.verse-actions-ref { font-weight: 650; margin-inline-end: 6px; white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.verse-actions > :not(.verse-actions-ref) { flex-shrink: 0; }
+.verse-actions-ref .ref-short { display: none; }
 .action {
   display: inline-flex;
   align-items: center;
@@ -1090,7 +1102,25 @@ details.note > summary { cursor: pointer; min-height: 32px; display: list-item; 
 .action[aria-pressed="true"] { color: var(--accent); }
 @media (max-width: 520px) {
   .action .action-label { display: none; }
-  .verse-actions-ref { font-size: 0.9375rem; }
+  .verse-actions { gap: 2px; padding-inline-start: 10px; }
+  .verse-actions-ref { font-size: 0.8125rem; margin-inline-end: 2px; }
+  .verse-actions-ref .ref-long { display: none; }
+  .verse-actions-ref .ref-short { display: inline; }
+}
+/* The narrowest phones: the selected verse is marked in the text; the bar keeps its buttons */
+@media (max-width: 360px) {
+  .verse-actions-ref { display: none; }
+  .verse-actions { padding-inline-start: 6px; }
+}
+/* Beside an open panel: over the reader, not the panel */
+@media (min-width: 900px) {
+  .app[data-panel-open="true"] .verse-actions {
+    left: calc((100vw - var(--panel-w)) / 2);
+    max-width: calc(100vw - var(--panel-w) - 24px);
+  }
+}
+@media (min-width: 900px) and (max-width: 1099px) {
+  .app[data-panel-open="true"] .action .action-label { display: none; }
 }
 
 /* ------------------------------------------------------------------ tab bar (phones) */

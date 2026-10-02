@@ -27,3 +27,7 @@ required-features = ["build"]
 [[test]]
 name = "alignment"
 required-features = ["build"]
+
+[[test]]
+name = "crossrefs"
+required-features = ["build"]

@@ -7,7 +7,7 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-use crate::{bibles, cache, commentaries, library};
+use crate::{bibles, cache, commentaries, crossrefs, library};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Source {
@@ -60,6 +60,11 @@ fn wanted() -> Result<Vec<(String, String)>, String> {
     }
     for c in commentaries::catalogue()? {
         out.push((c.source, c.url));
+    }
+    for x in crossrefs::catalogue()? {
+        if let (Some(source), Some(url)) = (x.source, x.url) {
+            out.push((source, url));
+        }
     }
     Ok(out)
 }

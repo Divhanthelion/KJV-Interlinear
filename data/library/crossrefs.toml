@@ -1,0 +1,35 @@
+# The cross-reference collections in the library, in the order the app lists them.
+#
+# Every reference is keyed to the KJV's verse numbering, like the commentaries, and
+# shown in whatever translation is being read.
+#
+# Fields:
+#   id          our id, used in data/library/crossrefs/<id>/ and in the app
+#   name        the work as it is known
+#   short       a short name for buttons
+#   licence     pd (public domain) or cc-by-4.0
+#   credit      the credit line shown in the app and in NOTICE
+#   about       one or two sentences for the panel
+#   commentary  the references are this commentary's notes, read as references
+#               (the Treasury is one work: data/library/commentaries/tsk/)
+#   source      for a collection imported here: its file under .cache/sources/
+#   url         where `kjv-import fetch` downloads it
+
+[[crossrefs]]
+id = "tsk"
+name = "Treasury of Scripture Knowledge"
+short = "Treasury"
+licence = "pd"
+credit = "Public domain. Text: CrossWire Bible Society."
+about = "Some 387,000 cross-references set under each verse, grouped by the word or phrase they explain: the classic way to let Scripture interpret Scripture."
+commentary = "tsk"
+
+[[crossrefs]]
+id = "openbible"
+name = "OpenBible.info Cross References"
+short = "OpenBible"
+licence = "cc-by-4.0"
+credit = "Cross references from OpenBible.info (openbible.info/labs/cross-references), licensed under CC BY 4.0 (creativecommons.org/licenses/by/4.0). Adapted: references readers voted unhelpful are left out, and 3 John 1:15 is numbered 1:14 as in the KJV."
+about = "Some 343,000 cross-references drawn mainly from the Treasury and ranked by readers' votes, most helpful first."
+source = "openbible/cross-references.zip"
+url = "https://a.openbible.info/data/cross-references.zip"
