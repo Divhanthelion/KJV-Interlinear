@@ -205,7 +205,10 @@ impl Library {
         }
         let target = self.alignment(to)?;
         let mut out: Vec<Ref> = kjv.iter().flat_map(|k| target.from_kjv(k, &|x| self.has_verse(to, x))).collect();
-        out.sort();
+        // The same book first (Brenton prints Nehemiah both as Nehemiah and as Ezra
+        // 11-23), then in the app's order, verses by number ("9" before "10")
+        let number = |v: &str| v.split('-').next().and_then(|n| n.parse::<u32>().ok()).unwrap_or(0);
+        out.sort_by_key(|x| (x.0 != r.0, crate::books::order(&x.0), x.1, number(&x.2), x.2.clone()));
         out.dedup();
         Ok(out)
     }

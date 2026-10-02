@@ -3,7 +3,7 @@
 # book, chapter, and number, found by comparing the texts (crates/library/src/align.rs).
 # Every verse not listed corresponds to its same-numbered KJV verse, where the KJV has one.
 # Columns: book, verses here, KJV verses ("-": none), how matched, similarity (0-1).
-# 37977 verses, 1238 listed: content 125, framed 1, moved 14, unmatched 1098
+# 37977 verses, 1238 listed: content 137, framed 1, moved 2, unmatched 1098
 2ES	7:36	-	unmatched	0.00
 2ES	7:37	-	unmatched	0.00
 2ES	7:38	-	unmatched	0.00
@@ -188,15 +188,15 @@ ESG	8:12t	ESG 16:21	content	0.63
 ESG	8:12u	ESG 16:22+ESG 16:23	content	0.88
 ESG	8:12x	ESG 16:24	content	0.92
 ESG	10:3a	ESG 10:4	moved	0.35
-ESG	10:3b	ESG 10:5	moved	1.00
-ESG	10:3c	ESG 10:6	moved	1.00
-ESG	10:3d	ESG 10:7	moved	0.75
-ESG	10:3e	ESG 10:8	moved	1.00
-ESG	10:3f	ESG 10:9	moved	0.94
-ESG	10:3g	ESG 10:10	moved	0.78
-ESG	10:3h	ESG 10:11	moved	1.00
-ESG	10:3i	ESG 10:12	moved	1.00
-ESG	10:3k	ESG 10:13	moved	0.79
+ESG	10:3b	ESG 10:5	content	1.00
+ESG	10:3c	ESG 10:6	content	1.00
+ESG	10:3d	ESG 10:7	content	0.75
+ESG	10:3e	ESG 10:8	content	1.00
+ESG	10:3f	ESG 10:9	content	0.94
+ESG	10:3g	ESG 10:10	content	0.78
+ESG	10:3h	ESG 10:11	content	1.00
+ESG	10:3i	ESG 10:12	content	1.00
+ESG	10:3k	ESG 10:13	content	0.79
 ESG	10:3l	ESG 11:1	moved	0.85
 SIR	1:4	SIR 1:4+SIR 1:5	content	0.69
 SIR	1:6	SIR 1:6+SIR 1:7	content	0.63
@@ -1237,7 +1237,7 @@ PSS	18:12	-	unmatched	0.00
 MAT	23:13	MAT 23:14	content	0.85
 MAT	23:14	MAT 23:13	content	1.00
 LUK	17:35	LUK 17:35+LUK 17:36	content	0.93
-ROM	14:24	ROM 16:25	moved	0.48
-ROM	14:25	ROM 16:26	moved	0.86
-ROM	14:26	ROM 16:27	moved	0.72
+ROM	14:24	ROM 16:25	content	0.48
+ROM	14:25	ROM 16:26	content	0.86
+ROM	14:26	ROM 16:27	content	0.72
 3JN	1:14+1:15	3JN 1:14	content	0.79

@@ -166,20 +166,33 @@ numbers, rarer words), in two passes.
 
 1. An in-order sequence alignment of each book against the KJV's, allowing one-to-one
    matches, joins of two verses, swapped pairs, and verses with no counterpart, with a
-   small preference for verses carrying the same number.
+   small preference for verses carrying the same number. Then blocks: what no run of
+   strong, consecutive matches anchors is lined up again, in order, against the KJV
+   verses still free (the related books' too), as often as that finds runs of at least
+   three anchored matches. Each pass recovers text printed in another order: the
+   Septuagint's Jeremiah (the oracles against the nations after 25:13, the KJV's 26-45
+   as 33-51), its Exodus 35-40, Nehemiah printed as the Septuagint's Ezra 11-23 (2
+   Esdras), Greek Esther against the KJV's Esther and its Additions, the Song of the
+   Three Children. A block matched just where the first alignment had it changes
+   nothing; every first-alignment match no block touched is judged as before, so a
+   book with no block found aligns as it always has.
 2. A second pass keeps only matches the text (or strong matches on both sides)
    supports, splits joins whose halves don't both match, moves leftovers to a clearly
-   better match anywhere in the book or its related books (reordered chapters,
-   relocated additions), and pairs remaining leftovers by number only where the text
-   agrees a little, a neighbour is paired the same way, or the verse is empty here. A
-   bridged verse ("24-30") stands for its whole range.
+   better match anywhere in the book or its related books (a single verse printed
+   elsewhere, relocated additions), and pairs remaining leftovers by number only where
+   the text agrees a little, a neighbour is paired the same way, or the verse is empty
+   here. A bridged verse ("24-30") stands for its whole range.
+
+Mapping a verse from the KJV to a translation that has it twice (Brenton prints
+Nehemiah both on its own and as Ezra 11-23) opens it in the same book first.
 
 `kjv-import align` writes the result per translation to `data/library/alignment/<id>.tsv`:
 only the verses whose KJV counterpart isn't the same-numbered verse, each with how it
 was matched (content, framed, moved, number, unmatched) and its similarity, so every
 row can be reviewed. Without being told any mapping, it reproduces the Vulgate's Psalm
 numbering, Psalm titles counted as verses, the Romans doxology where the WEB prints it,
-and swapped verses; `crates/library/tests/alignment.rs` pins these hard cases.
+swapped verses, and the Septuagint's order; `crates/library/tests/alignment.rs` pins
+these hard cases.
 - **Reader.** Choose a translation, or read several in parallel. A notes panel shows
   the chosen commentaries and cross-references for the selected verse.
 

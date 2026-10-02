@@ -3,11 +3,11 @@
 # book, chapter, and number, found by comparing the texts (crates/library/src/align.rs).
 # Every verse not listed corresponds to its same-numbered KJV verse, where the KJV has one.
 # Columns: book, verses here, KJV verses ("-": none), how matched, similarity (0-1).
-# 7954 verses, 8 listed: content 5, moved 3
+# 7954 verses, 8 listed: content 8
 MAT	23:13	MAT 23:14	content	0.82
 MAT	23:14	MAT 23:13	content	0.71
 LUK	17:35	LUK 17:35+LUK 17:36	content	0.83
-ROM	14:24	ROM 16:25	moved	0.64
-ROM	14:25	ROM 16:26	moved	0.56
-ROM	14:26	ROM 16:27	moved	0.76
+ROM	14:24	ROM 16:25	content	0.64
+ROM	14:25	ROM 16:26	content	0.56
+ROM	14:26	ROM 16:27	content	0.76
 3JN	1:14+1:15	3JN 1:14	content	0.63

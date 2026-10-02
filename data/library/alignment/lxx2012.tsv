@@ -3,7 +3,7 @@
 # book, chapter, and number, found by comparing the texts (crates/library/src/align.rs).
 # Every verse not listed corresponds to its same-numbered KJV verse, where the KJV has one.
 # Columns: book, verses here, KJV verses ("-": none), how matched, similarity (0-1).
-# 28473 verses, 4746 listed: content 2755, framed 724, moved 307, unmatched 960
+# 28473 verses, 4803 listed: content 3352, framed 600, moved 52, unmatched 799
 GEN	3:1	GEN 2:25+GEN 3:1	content	0.55
 GEN	6:1	GEN 5:32+GEN 6:1	content	0.50
 GEN	8:3	GEN 8:3+GEN 8:4	content	0.69
@@ -50,15 +50,38 @@ EXO	35:12	-	unmatched	0.00
 EXO	35:13	-	unmatched	0.00
 EXO	35:14	EXO 35:15	content	0.55
 EXO	35:15	EXO 35:14	content	0.34
-EXO	36:38	EXO 37:11	framed	0.20
-EXO	36:39	EXO 37:13	framed	-0.00
-EXO	36:40	EXO 37:14	framed	0.17
+EXO	36:9	EXO 39:1+EXO 39:2	content	0.66
+EXO	36:10	EXO 39:3	content	0.40
+EXO	36:11	EXO 39:4	framed	0.08
+EXO	36:12	EXO 39:5	content	0.62
+EXO	36:13	EXO 39:6	content	0.30
+EXO	36:14	EXO 39:7	content	0.78
+EXO	36:15	EXO 39:8	content	0.61
+EXO	36:16	EXO 39:9	content	0.55
+EXO	36:17	EXO 39:10	content	0.64
+EXO	36:18	EXO 39:11	content	0.51
+EXO	36:19	EXO 39:12	content	1.00
+EXO	36:20	EXO 39:13	content	0.53
+EXO	36:21	EXO 39:14	content	0.62
+EXO	36:22	EXO 39:15	content	0.50
+EXO	36:28	EXO 39:20	content	0.47
+EXO	36:29	EXO 39:21	content	0.33
+EXO	36:30	EXO 39:22	content	0.66
+EXO	36:31	EXO 39:23	framed	0.17
+EXO	36:32	EXO 39:24	content	0.47
+EXO	36:33	EXO 39:25	content	0.61
+EXO	36:34	EXO 39:26	content	0.66
+EXO	36:35	EXO 39:27	content	0.65
+EXO	36:36	EXO 39:28	content	0.42
+EXO	36:37	EXO 39:29	content	0.66
+EXO	36:38+36:39	EXO 39:30	content	0.39
+EXO	36:40	EXO 39:31	content	0.37
 EXO	37:1	EXO 37:24	framed	-0.00
 EXO	37:2	EXO 37:25	content	0.32
-EXO	37:3	EXO 37:27	framed	-0.00
-EXO	37:4	EXO 37:28	content	0.37
-EXO	37:5	EXO 37:29	framed	0.05
-EXO	37:6	EXO 38:5	framed	0.18
+EXO	37:3	EXO 36:35	content	0.69
+EXO	37:4	EXO 36:36	content	0.53
+EXO	37:5	EXO 36:37	content	0.60
+EXO	37:6	EXO 36:38	content	0.32
 EXO	37:7	EXO 38:9	content	0.71
 EXO	37:8	EXO 38:10	content	0.39
 EXO	37:9	EXO 38:11	content	0.48
@@ -74,43 +97,42 @@ EXO	37:18	EXO 38:20	content	0.82
 EXO	37:19	EXO 38:21	content	0.49
 EXO	37:20	EXO 38:22	content	0.30
 EXO	37:21	EXO 38:23	content	0.37
-EXO	38:1	EXO 38:25	framed	-0.00
-EXO	38:2	EXO 38:26	framed	-0.00
-EXO	38:3	EXO 38:27	framed	0.13
-EXO	38:4	EXO 38:28	framed	-0.00
-EXO	38:5	EXO 38:29	framed	-0.00
-EXO	38:6	EXO 38:30	framed	-0.00
-EXO	38:7	EXO 38:31	framed	-0.00
-EXO	38:8	EXO 39:1	framed	-0.00
-EXO	38:9	EXO 39:2	framed	0.12
-EXO	38:10	EXO 39:4	framed	0.17
-EXO	38:11	EXO 39:5	framed	0.06
-EXO	38:12	EXO 39:6	framed	0.04
-EXO	38:13	EXO 39:7	framed	-0.00
-EXO	38:14	EXO 39:8	framed	-0.00
-EXO	38:15	EXO 39:9	framed	-0.00
-EXO	38:16	EXO 39:10	framed	-0.00
-EXO	38:17	EXO 39:11	framed	-0.00
-EXO	38:18	EXO 39:12	framed	-0.00
-EXO	38:19	EXO 39:13	framed	0.05
-EXO	38:20	EXO 39:14	framed	-0.00
-EXO	38:21	EXO 39:15	framed	-0.00
+EXO	38:1	-	unmatched	0.00
+EXO	38:2	EXO 37:2	content	0.79
+EXO	38:3	EXO 37:3	content	0.69
+EXO	38:4	EXO 37:5	content	0.48
+EXO	38:5	EXO 37:6	framed	0.22
+EXO	38:6	EXO 37:7	content	0.52
+EXO	38:7	EXO 37:8	content	0.57
+EXO	38:8	-	unmatched	0.00
+EXO	38:9	EXO 37:11	moved	0.32
+EXO	38:10	EXO 37:13	content	0.30
+EXO	38:11	EXO 37:14+EXO 37:15	content	0.31
+EXO	38:12	EXO 37:16	content	0.37
+EXO	38:13	-	unmatched	0.00
+EXO	38:14	-	unmatched	0.00
+EXO	38:15	EXO 37:18	moved	0.38
+EXO	38:16	-	unmatched	0.00
+EXO	38:17	EXO 37:23	moved	0.66
+EXO	38:18	EXO 36:34	moved	0.41
+EXO	38:19	-	unmatched	0.00
+EXO	38:20	-	unmatched	0.00
+EXO	38:21	EXO 39:40	moved	0.42
 EXO	38:22	EXO 39:16	framed	-0.00
 EXO	38:23	EXO 39:17	framed	-0.00
 EXO	38:24	EXO 39:18	framed	0.09
 EXO	38:25	EXO 39:19	framed	-0.00
-EXO	38:26	EXO 39:20	framed	-0.00
-EXO	38:27	EXO 39:21	framed	0.12
-EXO	39:1	EXO 39:22	framed	-0.00
-EXO	39:2	EXO 39:23	framed	-0.00
-EXO	39:3	EXO 39:24	framed	-0.00
-EXO	39:4	EXO 39:25	framed	-0.00
-EXO	39:5	EXO 39:26	framed	-0.00
-EXO	39:6	EXO 39:27	framed	-0.00
-EXO	39:7	EXO 39:28	framed	-0.00
-EXO	39:8	EXO 39:29	framed	-0.00
-EXO	39:9	EXO 39:30	framed	-0.00
-EXO	39:10	EXO 39:31	framed	-0.00
+EXO	38:26	-	unmatched	0.00
+EXO	38:27	EXO 40:31	moved	0.53
+EXO	39:1	EXO 38:24	content	0.56
+EXO	39:2	EXO 38:25	content	0.56
+EXO	39:3	EXO 38:26	content	0.73
+EXO	39:4+39:5	EXO 38:27	content	0.37
+EXO	39:6	EXO 38:28	content	0.54
+EXO	39:7	EXO 38:29	content	0.85
+EXO	39:8	EXO 38:30	framed	0.23
+EXO	39:9	EXO 38:31	content	0.80
+EXO	39:10	-	unmatched	0.00
 EXO	39:11	EXO 39:32	content	0.43
 EXO	39:12	EXO 39:33	framed	-0.00
 EXO	39:13	EXO 39:34	framed	-0.00
@@ -121,14 +143,14 @@ EXO	39:17	EXO 39:37	content	0.46
 EXO	39:18	-	unmatched	0.00
 EXO	39:19	EXO 39:41	moved	0.50
 EXO	39:20	EXO 40:28	moved	0.31
-EXO	39:21	-	unmatched	0.00
+EXO	39:21	EXO 36:19	moved	0.49
 EXO	39:22	-	unmatched	0.00
 EXO	39:23	EXO 39:43	content	0.55
 EXO	40:6-8	EXO 40:6+EXO 40:7+EXO 40:8	content	0.39
 EXO	40:10-11	EXO 40:10+EXO 40:11	content	0.68
 EXO	40:27-28	EXO 40:27	content	0.65
 EXO	40:29-30	EXO 40:29+EXO 40:30	content	0.50
-EXO	40:31-33	EXO 40:31+EXO 40:32+EXO 40:33	content	0.47
+EXO	40:31-33	EXO 40:33	content	0.47
 LEV	6:4	LEV 6:5	framed	0.21
 LEV	6:5	LEV 6:6	content	0.63
 LEV	6:6	LEV 6:7	content	0.85
@@ -372,31 +394,31 @@ JDG	5:31+5:32	JDG 5:31	content	0.75
 1KI	15:5-6	1KI 15:5	content	0.51
 1KI	15:7	1KI 15:6+1KI 15:7	content	0.57
 1KI	20:1	-	unmatched	0.00
-1KI	20:2	1KI 21:2	moved	0.61
-1KI	20:3	1KI 21:3	moved	0.73
-1KI	20:4	1KI 21:4	moved	0.27
-1KI	20:5	1KI 21:5	moved	0.43
-1KI	20:6	1KI 21:6	moved	0.46
-1KI	20:7	1KI 21:7	moved	0.34
-1KI	20:8	1KI 21:8	moved	0.63
-1KI	20:9	1KI 21:9	moved	0.64
-1KI	20:10	1KI 21:10	moved	0.38
-1KI	20:11	1KI 21:11	moved	0.68
-1KI	20:12	1KI 21:12	moved	0.67
-1KI	20:13	1KI 21:13	moved	0.45
-1KI	20:14	1KI 21:14	moved	0.54
-1KI	20:15	1KI 21:15	moved	0.46
-1KI	20:16	1KI 21:16	moved	0.47
-1KI	20:17	-	unmatched	0.00
-1KI	20:18	1KI 21:18	moved	0.72
-1KI	20:19	1KI 21:19	moved	0.59
-1KI	20:20	1KI 21:20	moved	0.57
-1KI	20:21	1KI 21:21	moved	0.33
-1KI	20:22	1KI 21:22	moved	0.40
-1KI	20:23	-	unmatched	0.00
-1KI	20:24	1KI 21:24	moved	0.40
-1KI	20:25	1KI 21:25	moved	0.30
-1KI	20:26	1KI 21:26	moved	0.70
+1KI	20:2	1KI 21:2	content	0.61
+1KI	20:3	1KI 21:3	content	0.73
+1KI	20:4	1KI 21:4	framed	0.27
+1KI	20:5	1KI 21:5	content	0.43
+1KI	20:6	1KI 21:6	content	0.46
+1KI	20:7	1KI 21:7	content	0.34
+1KI	20:8	1KI 21:8	content	0.63
+1KI	20:9	1KI 21:9	content	0.64
+1KI	20:10	1KI 21:10	content	0.38
+1KI	20:11	1KI 21:11	content	0.68
+1KI	20:12	1KI 21:12	content	0.67
+1KI	20:13	1KI 21:13	content	0.45
+1KI	20:14	1KI 21:14	content	0.54
+1KI	20:15	1KI 21:15	content	0.46
+1KI	20:16	1KI 21:16	content	0.47
+1KI	20:17	1KI 21:17	framed	0.12
+1KI	20:18	1KI 21:18	content	0.72
+1KI	20:19	1KI 21:19	content	0.59
+1KI	20:20	1KI 21:20	content	0.57
+1KI	20:21	1KI 21:21	content	0.33
+1KI	20:22	1KI 21:22	content	0.40
+1KI	20:23	1KI 21:23	framed	0.21
+1KI	20:24	1KI 21:24	content	0.40
+1KI	20:25	1KI 21:25	content	0.30
+1KI	20:26	1KI 21:26	content	0.70
 1KI	20:27	-	unmatched	0.00
 1KI	20:28	1KI 14:18	moved	0.29
 1KI	20:29	1KI 21:29	moved	0.43
@@ -3102,342 +3124,345 @@ ISA	40:6-7	ISA 40:6	content	0.66
 ISA	40:8	ISA 40:7+ISA 40:8	content	0.47
 JER	17:1	JER 17:5	content	0.63
 JER	25:13+25:34	JER 25:13	content	0.76
-JER	25:35	-	unmatched	0.00
-JER	25:36	-	unmatched	0.00
-JER	25:37	JER 34:21	moved	0.26
-JER	25:38	-	unmatched	0.00
-JER	25:39	JER 43:1	moved	0.32
-JER	26:3	-	unmatched	0.00
-JER	26:4	-	unmatched	0.00
-JER	26:5	-	unmatched	0.00
-JER	26:6	JER 46:6	moved	0.54
-JER	26:7	-	unmatched	0.00
-JER	26:8	-	unmatched	0.00
-JER	26:9	-	unmatched	0.00
-JER	26:10	-	unmatched	0.00
-JER	26:11	-	unmatched	0.00
-JER	26:12	JER 51:46	moved	0.37
-JER	26:13	-	unmatched	0.00
-JER	26:14	-	unmatched	0.00
-JER	26:15	-	unmatched	0.00
-JER	26:16	-	unmatched	0.00
-JER	26:17	-	unmatched	0.00
-JER	26:18	-	unmatched	0.00
-JER	26:19	-	unmatched	0.00
-JER	26:20	-	unmatched	0.00
-JER	26:21	-	unmatched	0.00
-JER	26:22	-	unmatched	0.00
-JER	26:23	JER 46:23	moved	0.35
-JER	26:24	JER 32:38	moved	0.26
-JER	26:25	-	unmatched	0.00
-JER	26:27	JER 30:10	moved	0.55
-JER	26:28	-	unmatched	0.00
-JER	27:1	JER 27:13	moved	0.37
+JER	25:35	JER 49:35	moved	0.42
+JER	25:36	JER 49:36	moved	0.60
+JER	25:37	JER 49:37	moved	0.48
+JER	25:38	JER 49:38	moved	0.47
+JER	25:39	JER 49:39	moved	0.35
+JER	26:1	JER 27:1	moved	0.48
+JER	26:2	JER 46:2	content	0.40
+JER	26:3	JER 46:3	content	0.43
+JER	26:4	JER 46:4	content	0.55
+JER	26:5	JER 46:5	framed	0.23
+JER	26:6	JER 46:6	content	0.54
+JER	26:7	JER 46:7	framed	0.23
+JER	26:8	JER 46:8	content	0.63
+JER	26:9	JER 46:9	content	0.71
+JER	26:10	JER 46:10	content	0.64
+JER	26:11	JER 46:11	content	0.57
+JER	26:12	JER 46:12	content	0.61
+JER	26:13	JER 46:13	framed	0.27
+JER	26:14	JER 46:14	content	0.31
+JER	26:15	JER 46:15	framed	-0.00
+JER	26:16	JER 46:16	framed	0.16
+JER	26:17	JER 46:17	framed	0.21
+JER	26:18	JER 46:18	content	0.56
+JER	26:19	JER 46:19	framed	0.23
+JER	26:20	JER 46:20	content	0.79
+JER	26:21	JER 46:21	content	0.48
+JER	26:22	JER 46:22	content	0.50
+JER	26:23	JER 46:23	content	0.35
+JER	26:24	JER 46:24	content	0.87
+JER	26:25	JER 46:25	content	0.37
+JER	26:27	JER 46:27	moved	0.66
+JER	26:28	JER 46:28	moved	0.33
+JER	27:1	JER 50:1	moved	0.42
 JER	27:2	-	unmatched	0.00
-JER	27:3	JER 42:13	moved	0.28
-JER	27:4	-	unmatched	0.00
-JER	27:5	JER 50:5	moved	0.29
-JER	27:6	-	unmatched	0.00
-JER	27:7	-	unmatched	0.00
-JER	27:8	-	unmatched	0.00
-JER	27:9	-	unmatched	0.00
-JER	27:10	JER 31:14	moved	0.30
-JER	27:11	-	unmatched	0.00
-JER	27:12	-	unmatched	0.00
-JER	27:13	JER 49:17	moved	0.39
-JER	27:14	-	unmatched	0.00
-JER	27:15	-	unmatched	0.00
-JER	27:16	-	unmatched	0.00
-JER	27:17	JER 50:17	moved	0.67
-JER	27:18	JER 38:3	moved	0.26
-JER	27:19	-	unmatched	0.00
-JER	27:20	-	unmatched	0.00
-JER	27:21	-	unmatched	0.00
-JER	27:22	JER 42:14	moved	0.33
-JER	27:23	JER 51:41	moved	0.43
-JER	27:24	-	unmatched	0.00
-JER	27:25	-	unmatched	0.00
-JER	27:26	-	unmatched	0.00
-JER	27:27	-	unmatched	0.00
-JER	27:28	-	unmatched	0.00
-JER	27:29	-	unmatched	0.00
-JER	27:30	JER 8:12	moved	0.28
-JER	27:31	-	unmatched	0.00
-JER	27:32	-	unmatched	0.00
-JER	27:33	-	unmatched	0.00
-JER	27:34	-	unmatched	0.00
-JER	27:35	-	unmatched	0.00
-JER	27:36	-	unmatched	0.00
-JER	27:37	-	unmatched	0.00
-JER	27:38	JER 51:52	moved	0.40
-JER	27:39	-	unmatched	0.00
-JER	27:40	-	unmatched	0.00
-JER	27:41	-	unmatched	0.00
-JER	27:42	-	unmatched	0.00
-JER	27:43	-	unmatched	0.00
-JER	27:44	-	unmatched	0.00
-JER	27:45	JER 50:45	moved	0.44
-JER	27:46	-	unmatched	0.00
-JER	28:1	-	unmatched	0.00
-JER	28:2	-	unmatched	0.00
-JER	28:3	-	unmatched	0.00
-JER	28:4	-	unmatched	0.00
-JER	28:5	-	unmatched	0.00
-JER	28:6	JER 51:45	moved	0.37
-JER	28:7	-	unmatched	0.00
-JER	28:8	-	unmatched	0.00
-JER	28:9	-	unmatched	0.00
-JER	28:10	-	unmatched	0.00
-JER	28:11	-	unmatched	0.00
-JER	28:12	-	unmatched	0.00
-JER	28:13	-	unmatched	0.00
-JER	28:14	-	unmatched	0.00
-JER	28:15	-	unmatched	0.00
-JER	28:16	-	unmatched	0.00
-JER	28:17	-	unmatched	0.00
-JER	28:18	-	unmatched	0.00
-JER	28:19	-	unmatched	0.00
-JER	28:20	-	unmatched	0.00
-JER	28:21	-	unmatched	0.00
-JER	28:22	-	unmatched	0.00
-JER	28:23	JER 25:35	moved	0.31
-JER	28:24	JER 52:2	moved	0.27
-JER	28:25	-	unmatched	0.00
-JER	28:26	-	unmatched	0.00
-JER	28:27	-	unmatched	0.00
-JER	28:28	-	unmatched	0.00
-JER	28:29	-	unmatched	0.00
-JER	28:30	-	unmatched	0.00
-JER	28:31	JER 51:31	moved	0.34
-JER	28:32	-	unmatched	0.00
-JER	28:33	JER 51:33	moved	0.66
-JER	28:34	JER 51:34	moved	0.56
-JER	28:35	JER 51:35	moved	0.33
-JER	28:36	JER 51:36	moved	0.44
-JER	28:37	JER 34:22	moved	0.32
-JER	28:38	JER 51:38	moved	0.60
-JER	28:39	JER 51:39	moved	0.36
-JER	28:40	JER 51:40	moved	0.69
-JER	28:41	-	unmatched	0.00
-JER	28:42	JER 51:42	moved	0.79
-JER	28:43	JER 51:43	moved	0.40
-JER	28:44	JER 51:44	moved	0.46
-JER	28:49	JER 51:49	moved	0.86
-JER	28:50	JER 51:50	moved	0.66
-JER	28:51	JER 51:51	moved	0.48
-JER	28:52	JER 51:47	moved	0.69
-JER	28:53	JER 51:53	moved	0.49
-JER	28:54	JER 51:54	moved	0.87
-JER	28:55	JER 51:55	moved	0.39
-JER	28:56	JER 51:56	moved	0.43
-JER	28:57	JER 51:57	moved	0.36
-JER	28:58	JER 51:58	moved	0.42
-JER	28:59	JER 36:1	moved	0.35
-JER	28:60	JER 36:4	moved	0.38
-JER	28:61	JER 29:29	moved	0.25
-JER	28:62	JER 35:6	moved	0.25
-JER	28:63	JER 36:8	moved	0.27
-JER	28:64	-	unmatched	0.00
-JER	29:1	-	unmatched	0.00
-JER	29:2	-	unmatched	0.00
-JER	29:3	-	unmatched	0.00
-JER	29:4	-	unmatched	0.00
-JER	29:5	-	unmatched	0.00
-JER	29:6	-	unmatched	0.00
+JER	27:3	JER 50:3	content	0.48
+JER	27:4	JER 50:4	content	0.54
+JER	27:5	JER 50:5	framed	0.29
+JER	27:6	JER 50:6	content	0.71
+JER	27:7	JER 50:7	framed	0.28
+JER	27:8	JER 50:8	content	0.43
+JER	27:9	JER 50:9	content	0.51
+JER	27:10	JER 50:10	content	1.00
+JER	27:11	JER 50:11	content	0.35
+JER	27:12	JER 50:12	content	0.31
+JER	27:13	JER 50:13	content	0.43
+JER	27:14	JER 50:14	content	0.91
+JER	27:15	JER 50:15	content	0.36
+JER	27:16	JER 50:16	content	0.54
+JER	27:17	JER 50:17	content	0.67
+JER	27:18	JER 50:18	content	0.60
+JER	27:19	JER 50:19	content	0.60
+JER	27:20	JER 50:20	content	0.51
+JER	27:21	JER 50:21	content	0.37
+JER	27:22	JER 50:22	content	0.62
+JER	27:23	JER 50:23	content	0.78
+JER	27:24	JER 50:24	framed	0.26
+JER	27:25	JER 50:25	content	0.66
+JER	27:26	JER 50:26	content	0.40
+JER	27:27	JER 50:27	content	0.49
+JER	27:28	JER 50:28	content	0.50
+JER	27:29	JER 50:29	content	0.47
+JER	27:30	JER 50:30	content	0.52
+JER	27:31	JER 50:31	content	0.38
+JER	27:32	JER 50:32	content	0.44
+JER	27:33	JER 50:33	content	0.49
+JER	27:34	JER 50:34	content	0.31
+JER	27:35	JER 50:35	content	0.60
+JER	27:36	JER 50:36	framed	0.08
+JER	27:37	JER 50:37	content	0.39
+JER	27:38	JER 50:38	content	0.31
+JER	27:39	JER 50:39	content	0.38
+JER	27:40	JER 50:40	content	0.63
+JER	27:41	JER 50:41	content	0.44
+JER	27:42	JER 50:42	content	0.45
+JER	27:43	JER 50:43	content	0.53
+JER	27:44	JER 50:44	content	0.38
+JER	27:45	JER 50:45	content	0.44
+JER	27:46	JER 50:46	content	0.66
+JER	28:1	JER 51:1	content	0.37
+JER	28:2	JER 51:2	content	0.38
+JER	28:3	JER 51:3	content	0.60
+JER	28:4	JER 51:4	content	0.54
+JER	28:5	JER 51:5	content	0.54
+JER	28:6	JER 51:6	content	0.74
+JER	28:7	JER 51:7	content	0.77
+JER	28:8	JER 51:8	content	0.55
+JER	28:9	JER 51:9	content	0.55
+JER	28:10	JER 51:10	content	0.42
+JER	28:11	JER 51:11	content	0.43
+JER	28:12	JER 51:12	framed	0.30
+JER	28:13	JER 51:13	content	0.53
+JER	28:14	JER 51:14	content	0.37
+JER	28:15	JER 51:15	content	0.85
+JER	28:16	JER 51:16	content	0.44
+JER	28:17	JER 51:17	content	0.48
+JER	28:18	JER 51:18	content	0.31
+JER	28:19	JER 51:19	content	0.70
+JER	28:20	JER 51:20	content	0.44
+JER	28:21	JER 51:21	content	0.65
+JER	28:22	JER 51:22	content	0.48
+JER	28:23	JER 51:23	content	0.48
+JER	28:24	JER 51:24	framed	0.23
+JER	28:25	JER 51:25	content	0.84
+JER	28:26	JER 51:26	content	0.95
+JER	28:27	JER 51:27	framed	0.24
+JER	28:28	JER 51:28	content	0.58
+JER	28:29	JER 51:29	framed	0.29
+JER	28:30	JER 51:30	content	0.40
+JER	28:31	JER 51:31	content	0.34
+JER	28:32	JER 51:32	framed	0.22
+JER	28:33	JER 51:33	content	0.66
+JER	28:34	JER 51:34	content	0.56
+JER	28:35	JER 51:35	content	0.33
+JER	28:36	JER 51:36	content	0.44
+JER	28:37	JER 51:37	framed	0.25
+JER	28:38	JER 51:38	content	0.60
+JER	28:39	JER 51:39	content	0.36
+JER	28:40	JER 51:40	content	0.69
+JER	28:41	JER 51:41	content	0.42
+JER	28:42	JER 51:42	content	0.79
+JER	28:43	JER 51:43	content	0.40
+JER	28:44	JER 51:44	content	0.46
+JER	28:49	JER 51:48+JER 51:49	content	0.58
+JER	28:50	JER 51:50	content	0.66
+JER	28:51	JER 51:51	content	0.48
+JER	28:52	JER 51:52	content	0.45
+JER	28:53	JER 51:53	content	0.49
+JER	28:54	JER 51:54	content	0.87
+JER	28:55	JER 51:55	content	0.39
+JER	28:56	JER 51:56	content	0.43
+JER	28:57	JER 51:57	content	0.36
+JER	28:58	JER 51:58	content	0.42
+JER	28:59	JER 51:59	content	0.50
+JER	28:60	JER 51:60	content	0.90
+JER	28:61	JER 51:61	content	0.53
+JER	28:62	JER 51:62	content	0.71
+JER	28:63	JER 51:63	content	0.84
+JER	28:64	JER 51:64	content	0.62
+JER	29:1	JER 47:1	content	0.45
+JER	29:2	JER 47:2	content	0.41
+JER	29:3	JER 47:3	content	0.55
+JER	29:4	JER 47:4	framed	0.18
+JER	29:5	JER 47:5	content	0.40
+JER	29:6	JER 47:6	content	0.56
 JER	29:7	-	unmatched	0.00
-JER	29:8	-	unmatched	0.00
-JER	29:9	-	unmatched	0.00
-JER	29:10	-	unmatched	0.00
-JER	29:11	-	unmatched	0.00
-JER	29:12	JER 49:12	moved	0.35
-JER	29:13	-	unmatched	0.00
-JER	29:14	-	unmatched	0.00
-JER	29:15	-	unmatched	0.00
-JER	29:16	-	unmatched	0.00
-JER	29:17	-	unmatched	0.00
-JER	29:18	-	unmatched	0.00
-JER	29:19	-	unmatched	0.00
-JER	29:20	JER 49:20	moved	0.35
-JER	29:21	JER 49:21	moved	0.46
-JER	29:22	JER 49:22	moved	0.67
-JER	30:1	-	unmatched	0.00
+JER	29:8	JER 49:8	content	0.31
+JER	29:9	JER 49:9	content	0.44
+JER	29:10	JER 49:10	content	0.47
+JER	29:11	JER 49:11	content	0.45
+JER	29:12	JER 49:12	content	0.35
+JER	29:13	JER 49:13	content	0.48
+JER	29:14	JER 49:14	framed	0.29
+JER	29:15	JER 49:15	content	0.38
+JER	29:16	JER 49:16	content	0.35
+JER	29:17	JER 49:17	framed	0.29
+JER	29:18	JER 49:18	content	0.56
+JER	29:19	JER 49:19	framed	0.28
+JER	29:20	JER 49:20	content	0.35
+JER	29:21	JER 49:21	content	0.46
+JER	29:22	JER 49:22	content	0.67
+JER	30:1	JER 49:1	moved	0.53
 JER	30:2	JER 49:2	moved	0.33
-JER	30:3	-	unmatched	0.00
-JER	30:4	-	unmatched	0.00
+JER	30:3	JER 49:3	moved	0.49
+JER	30:4	JER 49:4	moved	0.27
 JER	30:5	JER 49:5	moved	0.50
 JER	30:23	-	unmatched	0.00
 JER	30:24	-	unmatched	0.00
-JER	30:25	-	unmatched	0.00
-JER	30:26	JER 50:30	moved	0.60
-JER	30:27	-	unmatched	0.00
-JER	30:28	-	unmatched	0.00
-JER	30:29	-	unmatched	0.00
-JER	30:30	-	unmatched	0.00
-JER	30:31	-	unmatched	0.00
-JER	30:32	-	unmatched	0.00
-JER	30:33	-	unmatched	0.00
+JER	30:25	JER 49:25	content	0.44
+JER	30:26	JER 49:26	content	0.57
+JER	30:27	JER 49:27	content	0.43
+JER	30:28	JER 49:28	content	0.33
+JER	30:29	JER 49:29	content	0.50
+JER	30:30	JER 49:30	content	0.36
+JER	30:31	JER 49:31	content	0.34
+JER	30:32	JER 49:32	content	0.42
+JER	30:33	JER 49:33	content	0.44
 JER	31:1	-	unmatched	0.00
-JER	31:2	-	unmatched	0.00
-JER	31:3	-	unmatched	0.00
-JER	31:4	-	unmatched	0.00
-JER	31:5	-	unmatched	0.00
-JER	31:6	-	unmatched	0.00
-JER	31:7	-	unmatched	0.00
-JER	31:8	-	unmatched	0.00
-JER	31:9	-	unmatched	0.00
-JER	31:10	-	unmatched	0.00
-JER	31:11	-	unmatched	0.00
-JER	31:12	-	unmatched	0.00
-JER	31:13	-	unmatched	0.00
-JER	31:14	-	unmatched	0.00
-JER	31:15	-	unmatched	0.00
-JER	31:16	-	unmatched	0.00
-JER	31:17	-	unmatched	0.00
-JER	31:18	-	unmatched	0.00
-JER	31:19	-	unmatched	0.00
-JER	31:20	-	unmatched	0.00
-JER	31:21	-	unmatched	0.00
-JER	31:22	-	unmatched	0.00
-JER	31:23	-	unmatched	0.00
-JER	31:24	-	unmatched	0.00
-JER	31:25	-	unmatched	0.00
-JER	31:26	-	unmatched	0.00
-JER	31:27	-	unmatched	0.00
-JER	31:28	-	unmatched	0.00
-JER	31:29	-	unmatched	0.00
-JER	31:30	-	unmatched	0.00
-JER	31:31	-	unmatched	0.00
-JER	31:32	-	unmatched	0.00
-JER	31:33	-	unmatched	0.00
-JER	31:34	-	unmatched	0.00
-JER	31:35	-	unmatched	0.00
-JER	31:36	-	unmatched	0.00
-JER	31:37	-	unmatched	0.00
-JER	31:38	-	unmatched	0.00
-JER	31:39	-	unmatched	0.00
-JER	31:40	JER 27:4	moved	0.26
-JER	31:41	-	unmatched	0.00
-JER	31:42	-	unmatched	0.00
-JER	31:43	JER 48:43	moved	1.00
+JER	31:2	JER 48:2	content	0.37
+JER	31:3	JER 48:3	content	0.53
+JER	31:4	JER 48:4	framed	0.12
+JER	31:5	JER 48:5	framed	0.29
+JER	31:6	JER 48:6	content	0.48
+JER	31:7	JER 48:7	content	0.47
+JER	31:8	JER 48:8	content	0.71
+JER	31:9	JER 48:9	framed	0.17
+JER	31:10	JER 48:10	content	0.34
+JER	31:11	JER 48:11	content	0.38
+JER	31:12	JER 48:12	framed	0.24
+JER	31:13	JER 48:13	framed	0.24
+JER	31:14	JER 48:14	content	0.88
+JER	31:15	JER 48:15	content	0.47
+JER	31:16	JER 48:16	framed	0.23
+JER	31:17	JER 48:17	content	0.49
+JER	31:18	JER 48:18	content	0.34
+JER	31:19	JER 48:19	content	0.31
+JER	31:20	JER 48:20	content	0.59
+JER	31:21	JER 48:21	framed	0.07
+JER	31:22	JER 48:22	framed	-0.00
+JER	31:23	JER 48:23	framed	-0.00
+JER	31:24	JER 48:24	content	0.44
+JER	31:25	JER 48:25	content	0.74
+JER	31:26	JER 48:26	content	0.46
+JER	31:27	JER 48:27	framed	0.18
+JER	31:28	JER 48:28	framed	0.15
+JER	31:29	JER 48:29	content	0.47
+JER	31:30	JER 48:30	framed	0.13
+JER	31:31	JER 48:31	framed	0.29
+JER	31:32	JER 48:32	content	0.52
+JER	31:33	JER 48:33	framed	0.25
+JER	31:34	JER 48:34	content	0.38
+JER	31:35	JER 48:35	framed	0.27
+JER	31:36	JER 48:36	content	0.36
+JER	31:37	JER 48:37	content	0.42
+JER	31:38	JER 48:38	content	0.46
+JER	31:39	JER 48:39	content	0.40
+JER	31:40	JER 48:40	framed	0.18
+JER	31:41	JER 48:41	framed	0.22
+JER	31:42	JER 48:42	content	0.80
+JER	31:43	JER 48:43+JER 48:44	content	0.60
 JER	31:44	-	unmatched	0.00
-JER	32:15	JER 25:15	moved	0.81
-JER	32:16	JER 25:16	moved	0.74
-JER	32:17	JER 25:17	moved	0.95
-JER	32:18	JER 25:18	moved	0.54
-JER	32:19	JER 25:19	moved	0.76
-JER	32:20	JER 25:20	moved	0.33
-JER	32:21	JER 25:21	moved	0.60
-JER	32:22	JER 25:22	moved	0.38
-JER	32:23	-	unmatched	0.00
-JER	32:24	JER 25:24	moved	0.35
-JER	32:25	-	unmatched	0.00
-JER	32:26	JER 25:26	moved	0.59
-JER	32:27	JER 25:27	moved	0.55
-JER	32:28	JER 25:28	moved	0.68
-JER	32:29	JER 25:29	moved	0.33
-JER	32:30	JER 25:30	moved	0.35
-JER	32:31	JER 25:31	moved	0.56
-JER	32:32	JER 25:32	moved	0.49
-JER	32:33	JER 25:33	moved	0.75
-JER	32:34	JER 25:34	moved	0.45
-JER	32:35	-	unmatched	0.00
-JER	32:36	JER 25:36	moved	0.29
-JER	32:37	JER 25:37	moved	0.45
-JER	32:38	JER 25:38	moved	0.40
-JER	33:1	JER 27:1	moved	0.73
-JER	33:2	-	unmatched	0.00
-JER	33:3	JER 26:3	moved	0.48
-JER	33:4	JER 26:4	moved	0.48
-JER	33:5	JER 26:5	moved	0.47
-JER	33:6	JER 26:6	moved	0.58
-JER	33:7	JER 26:7	moved	0.90
-JER	33:8	JER 26:8	moved	0.51
-JER	33:9	JER 26:9	moved	0.35
-JER	33:10	JER 26:10	moved	0.64
-JER	33:11	JER 26:11	moved	0.49
-JER	33:12	JER 26:12	moved	0.86
-JER	33:13	JER 26:13	moved	0.51
-JER	33:14	-	unmatched	0.00
-JER	33:15	JER 26:15	moved	0.79
-JER	33:16	JER 26:16	moved	0.48
-JER	33:17	JER 26:17	moved	0.83
-JER	33:18	JER 26:18	moved	0.32
-JER	33:19	JER 36:7	moved	0.39
-JER	33:20	JER 26:20	moved	0.28
-JER	33:21	JER 26:21	moved	0.40
-JER	33:22	JER 26:22	moved	0.38
+JER	32:15	JER 25:15	content	0.81
+JER	32:16	JER 25:16	content	0.74
+JER	32:17	JER 25:17	content	0.95
+JER	32:18	JER 25:18	content	0.54
+JER	32:19	JER 25:19	content	0.76
+JER	32:20	JER 25:20	content	0.33
+JER	32:21	JER 25:21	content	0.60
+JER	32:22	JER 25:22	content	0.38
+JER	32:23	JER 25:23	framed	-0.00
+JER	32:24	JER 25:24	content	0.35
+JER	32:25	JER 25:25	framed	0.14
+JER	32:26	JER 25:26	content	0.59
+JER	32:27	JER 25:27	content	0.55
+JER	32:28	JER 25:28	content	0.68
+JER	32:29	JER 25:29	content	0.33
+JER	32:30	JER 25:30	content	0.35
+JER	32:31	JER 25:31	content	0.56
+JER	32:32	JER 25:32	content	0.49
+JER	32:33	JER 25:33	content	0.75
+JER	32:34	JER 25:34	content	0.45
+JER	32:35	JER 25:35	framed	0.26
+JER	32:36	JER 25:36	framed	0.29
+JER	32:37	JER 25:37	content	0.45
+JER	32:38	JER 25:38	content	0.40
+JER	33:1	JER 26:1	content	0.75
+JER	33:2	JER 26:2	content	0.64
+JER	33:3	JER 26:3	content	0.48
+JER	33:4	JER 26:4	content	0.48
+JER	33:5	JER 26:5	content	0.47
+JER	33:6	JER 26:6	content	0.58
+JER	33:7	JER 26:7	content	0.90
+JER	33:8	JER 26:8	content	0.51
+JER	33:9	JER 26:9	content	0.35
+JER	33:10	JER 26:10	content	0.64
+JER	33:11	JER 26:11	content	0.49
+JER	33:12	JER 26:12	content	0.86
+JER	33:13	JER 26:13	content	0.51
+JER	33:14	JER 26:14	framed	0.18
+JER	33:15	JER 26:15	content	0.79
+JER	33:16	JER 26:16	content	0.48
+JER	33:17	JER 26:17	content	0.83
+JER	33:18	JER 26:18	content	0.32
+JER	33:19	JER 26:19	framed	0.24
+JER	33:20	JER 26:20	framed	0.28
+JER	33:21	JER 26:21	content	0.40
+JER	33:22	JER 26:22	content	0.38
 JER	33:23	-	unmatched	0.00
 JER	33:24	JER 26:24	moved	0.29
-JER	34:1	JER 27:2	moved	0.88
-JER	34:3	JER 27:3	moved	0.39
-JER	34:4	-	unmatched	0.00
-JER	34:5	JER 27:5	moved	0.30
-JER	34:6	JER 27:6	moved	0.36
-JER	34:8	JER 27:8	moved	0.75
-JER	34:9	JER 27:9	moved	0.46
-JER	34:10	JER 27:10	moved	0.55
-JER	34:11	JER 27:11	moved	0.61
-JER	34:12	JER 27:12	moved	0.44
-JER	34:14	-	unmatched	0.00
-JER	34:15	JER 27:15	moved	0.43
-JER	34:16	JER 27:16	moved	0.51
+JER	34:1	JER 27:2	content	0.88
+JER	34:3	JER 27:3	content	0.39
+JER	34:4	JER 27:4	framed	0.18
+JER	34:5	JER 27:5	content	0.30
+JER	34:6	JER 27:6	content	0.36
+JER	34:8	JER 27:8	content	0.75
+JER	34:9	JER 27:9	content	0.46
+JER	34:10	JER 27:10	content	0.55
+JER	34:11	JER 27:11	content	0.61
+JER	34:12	JER 27:12+JER 27:13	content	0.41
+JER	34:14	JER 27:14	framed	0.24
+JER	34:15	JER 27:15	content	0.43
+JER	34:16	JER 27:16	content	0.51
 JER	34:17	JER 29:20	moved	0.39
-JER	34:18	JER 37:6	moved	0.41
+JER	34:18	JER 46:1	moved	0.31
 JER	34:19	JER 27:21	moved	0.52
 JER	34:20	JER 27:20	moved	0.38
 JER	34:22	JER 29:15	moved	0.38
-JER	35:1	JER 28:1	moved	0.42
-JER	35:2	JER 28:2	moved	0.76
-JER	35:3	JER 28:3	moved	0.59
-JER	35:4	JER 28:4	moved	0.49
-JER	35:5	JER 28:5	moved	0.49
-JER	35:6	JER 28:6	moved	0.38
-JER	35:7	JER 28:7	moved	0.91
-JER	35:8	JER 28:8	moved	0.63
-JER	35:9	JER 28:9	moved	0.53
-JER	35:10	JER 28:12	moved	0.29
-JER	35:11	JER 28:11	moved	0.45
-JER	35:13	JER 28:13	moved	0.62
-JER	35:14	JER 28:14	moved	0.77
-JER	35:15	JER 28:15	moved	0.34
-JER	35:16	JER 28:16	moved	0.75
-JER	35:17	JER 28:17	moved	0.69
-JER	36:1	JER 29:1	moved	0.51
-JER	36:2	JER 29:2	moved	0.40
-JER	36:3	JER 29:3	moved	0.26
-JER	36:4	JER 29:4	moved	0.77
-JER	36:5	JER 29:5	moved	0.89
-JER	36:6	JER 29:6	moved	0.83
-JER	36:7	JER 29:7	moved	0.72
-JER	36:8	JER 29:8	moved	0.43
-JER	36:9	JER 29:9	moved	0.55
-JER	36:10	JER 29:10	moved	0.46
+JER	35:1	JER 28:1	content	0.42
+JER	35:2	JER 28:2	content	0.76
+JER	35:3	JER 28:3	content	0.59
+JER	35:4	JER 28:4	content	0.49
+JER	35:5	JER 28:5	content	0.49
+JER	35:6	JER 28:6	content	0.38
+JER	35:7	JER 28:7	content	0.91
+JER	35:8	JER 28:8	content	0.63
+JER	35:9	JER 28:9	content	0.53
+JER	35:10	JER 28:10	framed	0.27
+JER	35:11	JER 28:11	content	0.45
+JER	35:12	JER 28:12	content	0.60
+JER	35:13	JER 28:13	content	0.62
+JER	35:14	JER 28:14	content	0.77
+JER	35:15	JER 28:15	content	0.34
+JER	35:16	JER 28:16	content	0.75
+JER	35:17	JER 28:17	content	0.69
+JER	36:1	JER 29:1	content	0.51
+JER	36:2	JER 29:2	content	0.40
+JER	36:3	JER 29:3	framed	0.26
+JER	36:4	JER 29:4	content	0.77
+JER	36:5	JER 29:5	content	0.89
+JER	36:6	JER 29:6	content	0.83
+JER	36:7	JER 29:7	content	0.72
+JER	36:8	JER 29:8	content	0.43
+JER	36:9	JER 29:9	content	0.55
+JER	36:10	JER 29:10	content	0.46
 JER	36:11	-	unmatched	0.00
 JER	36:12	-	unmatched	0.00
 JER	36:13	JER 29:13	moved	0.46
 JER	36:14	-	unmatched	0.00
-JER	36:15	JER 37:19	moved	0.47
+JER	36:15	JER 33:25	moved	0.28
 JER	36:21	-	unmatched	0.00
-JER	36:22	JER 29:22	moved	0.37
-JER	36:23	JER 29:23	moved	0.55
-JER	36:24	-	unmatched	0.00
-JER	36:25	JER 29:25	moved	0.30
-JER	36:26	JER 37:4	moved	0.26
-JER	36:27	JER 29:27	moved	0.39
-JER	36:28	JER 29:28	moved	0.61
-JER	36:29	JER 36:13	moved	0.46
-JER	36:30	JER 7:1	moved	1.00
-JER	36:31	JER 29:31	moved	0.46
-JER	36:32	-	unmatched	0.00
-JER	37:1	JER 29:30	moved	1.00
-JER	37:2	JER 30:2	moved	1.00
-JER	37:3	JER 30:3	moved	0.50
-JER	37:4	JER 30:4	moved	0.56
-JER	37:5	JER 30:5	moved	0.49
-JER	37:6	JER 30:6	moved	0.53
-JER	37:7	JER 30:7	moved	0.47
-JER	37:8	JER 30:8	moved	0.81
-JER	37:9	JER 30:9	moved	0.91
+JER	36:22	JER 29:22	content	0.37
+JER	36:23	JER 29:23	content	0.55
+JER	36:24	JER 29:24	framed	-0.00
+JER	36:25	JER 29:25	framed	0.30
+JER	36:26	JER 29:26	framed	0.25
+JER	36:27	JER 29:27	content	0.39
+JER	36:28	JER 29:28	content	0.61
+JER	36:29	JER 29:29	content	0.40
+JER	36:30	JER 29:30	content	1.00
+JER	36:31	JER 29:31	content	0.46
+JER	36:32	JER 29:32	framed	0.18
+JER	37:1	JER 30:1	content	1.00
+JER	37:2	JER 30:2	content	1.00
+JER	37:3	JER 30:3	content	0.50
+JER	37:4	JER 30:4	content	0.56
+JER	37:5	JER 30:5	content	0.49
+JER	37:6	JER 30:6	content	0.53
+JER	37:7	JER 30:7	content	0.47
+JER	37:8	JER 30:8	content	0.81
+JER	37:9	JER 30:9	content	0.91
 JER	37:12	-	unmatched	0.00
 JER	37:13	JER 30:13	moved	0.28
 JER	37:14	JER 30:14	moved	0.26
@@ -3449,308 +3474,338 @@ JER	37:19	-	unmatched	0.00
 JER	37:20	JER 30:20	moved	0.26
 JER	37:21	JER 30:21	moved	0.26
 JER	37:23	JER 30:23	moved	0.25
-JER	37:24	JER 30:24	moved	0.54
-JER	38:1	JER 31:1	moved	0.77
-JER	38:2	JER 31:2	moved	0.37
-JER	38:3	JER 31:3	moved	0.72
-JER	38:4	JER 31:4	moved	0.46
-JER	38:5	JER 31:5	moved	0.44
-JER	38:6	JER 31:6	moved	0.51
-JER	38:7	JER 31:7	moved	0.36
-JER	38:8	JER 31:8	moved	0.25
-JER	38:9	JER 31:9	moved	0.46
-JER	38:10	JER 31:10	moved	0.58
-JER	38:11	JER 31:11	moved	0.76
-JER	38:12	-	unmatched	0.00
-JER	38:13	JER 31:13	moved	0.53
-JER	38:14	-	unmatched	0.00
-JER	38:15	JER 31:15	moved	0.33
-JER	38:16	JER 31:16	moved	0.57
-JER	38:17	JER 39:14	moved	0.26
-JER	38:18	JER 31:18	moved	0.32
-JER	38:19	JER 31:19	moved	0.27
-JER	38:20	JER 31:20	moved	0.46
-JER	38:21	-	unmatched	0.00
-JER	38:22	JER 31:22	moved	0.54
-JER	38:23	JER 31:23	moved	0.41
-JER	38:24	JER 31:24	moved	0.65
-JER	38:25	-	unmatched	0.00
-JER	38:26	JER 31:26	moved	0.76
-JER	38:27	JER 31:27	moved	0.89
-JER	38:28	JER 31:28	moved	0.68
-JER	38:29	JER 31:29	moved	0.79
-JER	38:30	JER 31:30	moved	0.72
-JER	38:31	JER 31:31	moved	0.89
-JER	38:32	JER 31:32	moved	0.49
-JER	38:33	JER 31:33	moved	0.53
-JER	38:34	JER 31:34	moved	0.62
-JER	38:35	JER 31:35	moved	0.67
-JER	38:36	JER 31:36	moved	0.50
-JER	38:37	JER 31:37	moved	0.33
-JER	38:38	JER 31:38	moved	0.82
-JER	38:39	JER 31:39	moved	0.33
-JER	38:40	-	unmatched	0.00
-JER	39:1	JER 32:1	moved	0.68
-JER	39:2	JER 39:15	content	0.31
-JER	39:3	JER 32:3	moved	0.64
-JER	39:4	JER 32:4	moved	0.51
-JER	39:5	-	unmatched	0.00
-JER	39:6	JER 30:1	moved	1.00
-JER	39:7	JER 32:7	moved	0.39
-JER	39:8	JER 32:8	moved	0.50
-JER	39:9	JER 32:9	moved	0.66
-JER	39:10	JER 32:10	moved	0.71
-JER	39:11	JER 32:11	moved	0.51
-JER	39:12	JER 32:12	moved	0.50
-JER	39:13	JER 32:13	moved	0.65
-JER	39:14	JER 32:14	moved	0.52
-JER	39:15	JER 32:15	moved	0.54
-JER	39:16	JER 32:16	moved	0.72
-JER	39:17	JER 32:17	moved	0.41
-JER	39:18	JER 32:18	moved	0.57
-JER	39:19	JER 32:19	moved	0.53
-JER	39:20	JER 32:20	moved	0.74
-JER	39:21	JER 32:21	moved	0.63
-JER	39:22	JER 32:22	moved	0.81
-JER	39:23	JER 32:23	moved	0.29
-JER	39:24	JER 32:24	moved	0.57
-JER	39:25	JER 32:25	moved	0.66
-JER	39:26	JER 32:6	moved	0.82
-JER	39:27	JER 32:27	moved	0.29
-JER	39:28	JER 32:28	moved	0.45
-JER	39:29	JER 32:29	moved	0.79
-JER	39:30	JER 32:30	moved	0.36
-JER	39:31	JER 32:31	moved	0.54
-JER	39:32	JER 32:32	moved	0.64
-JER	39:33	JER 32:33	moved	0.64
-JER	39:34	JER 32:34	moved	0.47
-JER	39:35	JER 32:35	moved	0.59
-JER	39:36	JER 32:36	moved	0.64
-JER	39:37	JER 32:37	moved	0.71
-JER	39:38	JER 30:22	moved	1.00
-JER	39:39	JER 32:39	moved	0.74
-JER	39:40	JER 32:40	moved	0.88
-JER	39:41	JER 32:41	moved	0.47
-JER	39:42	JER 32:42	moved	0.51
-JER	39:43	JER 32:43	moved	0.53
-JER	39:44	JER 32:44	moved	0.66
-JER	40:1	JER 33:1	moved	0.68
-JER	40:2	JER 33:2	moved	0.70
-JER	40:3	JER 33:3	moved	0.49
-JER	40:4	JER 33:4	moved	0.30
-JER	40:5	JER 33:5	moved	0.44
-JER	40:6	JER 33:6	moved	0.33
-JER	40:7	JER 33:7	moved	0.45
-JER	40:8	JER 33:8	moved	0.57
-JER	40:9	JER 33:9	moved	0.42
-JER	40:10	JER 33:10	moved	0.45
-JER	40:11	JER 33:11	moved	0.59
-JER	40:12	JER 33:12	moved	0.68
-JER	40:13	JER 33:13	moved	0.48
-JER	41:1	JER 34:1	moved	0.57
-JER	41:2	JER 37:8	moved	0.45
-JER	41:3	JER 34:3	moved	0.43
-JER	41:4	JER 34:4	moved	0.39
-JER	41:5	JER 34:5	moved	0.43
-JER	41:6	JER 34:6	moved	0.43
-JER	41:7	JER 34:7	moved	0.36
-JER	41:8	JER 34:8	moved	0.51
-JER	41:9	JER 34:16	moved	0.42
+JER	37:24	JER 30:24	content	0.54
+JER	38:1	JER 31:1	content	0.77
+JER	38:2	JER 31:2	content	0.37
+JER	38:3	JER 31:3	content	0.72
+JER	38:4	JER 31:4	content	0.46
+JER	38:5	JER 31:5	content	0.44
+JER	38:6	JER 31:6	content	0.51
+JER	38:7	JER 31:7	content	0.36
+JER	38:8	JER 31:8	framed	0.25
+JER	38:9	JER 31:9	content	0.46
+JER	38:10	JER 31:10	content	0.58
+JER	38:11	JER 31:11	content	0.76
+JER	38:12	JER 31:12	framed	0.13
+JER	38:13	JER 31:13	content	0.53
+JER	38:14	JER 31:14	framed	0.29
+JER	38:15	JER 31:15	content	0.33
+JER	38:16	JER 31:16	content	0.57
+JER	38:17	JER 31:17	framed	0.14
+JER	38:18	JER 31:18	content	0.32
+JER	38:19	JER 31:19	framed	0.27
+JER	38:20	JER 31:20	content	0.46
+JER	38:21	JER 31:21	framed	0.20
+JER	38:22	JER 31:22	content	0.54
+JER	38:23	JER 31:23	content	0.41
+JER	38:24	JER 31:24	content	0.65
+JER	38:25	JER 31:25	framed	0.15
+JER	38:26	JER 31:26	content	0.76
+JER	38:27	JER 31:27	content	0.89
+JER	38:28	JER 31:28	content	0.68
+JER	38:29	JER 31:29	content	0.79
+JER	38:30	JER 31:30	content	0.72
+JER	38:31	JER 31:31	content	0.89
+JER	38:32	JER 31:32	content	0.49
+JER	38:33	JER 31:33	content	0.53
+JER	38:34	JER 31:34	content	0.62
+JER	38:35	JER 31:35	content	0.67
+JER	38:36	JER 31:36	content	0.50
+JER	38:37	JER 31:37	content	0.33
+JER	38:38	JER 31:38	content	0.82
+JER	38:39	JER 31:39	content	0.33
+JER	38:40	JER 31:40	framed	0.24
+JER	39:1	JER 32:1	content	0.68
+JER	39:2	JER 32:2	content	0.47
+JER	39:3	JER 32:3	content	0.64
+JER	39:4	JER 32:4	content	0.51
+JER	39:5	JER 32:5	framed	0.09
+JER	39:6	JER 32:6	content	1.00
+JER	39:7	JER 32:7	content	0.39
+JER	39:8	JER 32:8	content	0.50
+JER	39:9	JER 32:9	content	0.66
+JER	39:10	JER 32:10	content	0.71
+JER	39:11	JER 32:11	content	0.51
+JER	39:12	JER 32:12	content	0.50
+JER	39:13	JER 32:13	content	0.65
+JER	39:14	JER 32:14	content	0.52
+JER	39:15	JER 32:15	content	0.54
+JER	39:16	JER 32:16	content	0.72
+JER	39:17	JER 32:17	content	0.41
+JER	39:18	JER 32:18	content	0.57
+JER	39:19	JER 32:19	content	0.53
+JER	39:20	JER 32:20	content	0.74
+JER	39:21	JER 32:21	content	0.63
+JER	39:22	JER 32:22	content	0.81
+JER	39:23	JER 32:23	framed	0.29
+JER	39:24	JER 32:24	content	0.57
+JER	39:25	JER 32:25	content	0.66
+JER	39:26	JER 32:26	content	0.82
+JER	39:27	JER 32:27	framed	0.29
+JER	39:28	JER 32:28	content	0.45
+JER	39:29	JER 32:29	content	0.79
+JER	39:30	JER 32:30	content	0.36
+JER	39:31	JER 32:31	content	0.54
+JER	39:32	JER 32:32	content	0.64
+JER	39:33	JER 32:33	content	0.64
+JER	39:34	JER 32:34	content	0.47
+JER	39:35	JER 32:35	content	0.59
+JER	39:36	JER 32:36	content	0.64
+JER	39:37	JER 32:37	content	0.71
+JER	39:38	JER 32:38	content	1.00
+JER	39:39	JER 32:39	content	0.74
+JER	39:40	JER 32:40	content	0.88
+JER	39:41	JER 32:41	content	0.47
+JER	39:42	JER 32:42	content	0.51
+JER	39:43	JER 32:43	content	0.53
+JER	39:44	JER 32:44	content	0.66
+JER	40:1	JER 33:1	content	0.68
+JER	40:2	JER 33:2	content	0.70
+JER	40:3	JER 33:3	content	0.49
+JER	40:4	JER 33:4	content	0.30
+JER	40:5	JER 33:5	content	0.44
+JER	40:6	JER 33:6	content	0.33
+JER	40:7	JER 33:7	content	0.45
+JER	40:8	JER 33:8	content	0.57
+JER	40:9	JER 33:9	content	0.42
+JER	40:10	JER 33:10	content	0.45
+JER	40:11	JER 33:11	content	0.59
+JER	40:12	JER 33:12	content	0.68
+JER	40:13	JER 33:13	content	0.48
+JER	41:1	JER 34:1	content	0.57
+JER	41:2	JER 34:2	content	0.38
+JER	41:3	JER 34:3	content	0.43
+JER	41:4	JER 34:4	content	0.39
+JER	41:5	JER 34:5	content	0.43
+JER	41:6	JER 34:6	content	0.43
+JER	41:7	JER 34:7	content	0.36
+JER	41:8	JER 34:8	content	0.51
+JER	41:9	-	unmatched	0.00
 JER	41:10	JER 34:10	moved	0.31
 JER	41:11	-	unmatched	0.00
 JER	41:12	JER 43:8	content	0.65
-JER	41:13	JER 43:11	framed	0.11
-JER	41:14	JER 43:12	framed	-0.00
-JER	41:15	JER 43:13	framed	0.03
-JER	41:16	JER 44:1	framed	-0.00
-JER	41:17	JER 44:2	framed	0.10
-JER	41:18	JER 44:3	framed	-0.00
-JER	41:19	JER 44:4	framed	-0.00
-JER	41:20	JER 44:5	framed	-0.00
-JER	41:21	JER 44:6	framed	-0.00
-JER	41:22	JER 44:7	framed	0.03
-JER	42:1	JER 44:8	framed	-0.00
-JER	42:2	JER 44:9	framed	-0.00
-JER	42:3	JER 44:10	framed	-0.00
-JER	42:4	JER 44:11	framed	-0.00
-JER	42:5	JER 44:12	framed	0.06
-JER	42:6	JER 44:13	framed	-0.00
-JER	42:7	JER 44:14	framed	0.17
-JER	42:8	JER 44:15	framed	0.09
-JER	42:9	JER 44:16	framed	-0.00
-JER	42:10	JER 44:17	framed	0.09
-JER	42:11	JER 44:19	framed	-0.00
-JER	42:12	JER 44:20	framed	0.22
-JER	42:13	JER 44:21	framed	0.06
-JER	42:14	JER 44:22	framed	-0.00
-JER	42:15	JER 44:23	framed	0.03
-JER	42:16	JER 44:24	framed	0.05
-JER	42:17	JER 44:25	framed	0.03
-JER	42:18	JER 44:26	framed	0.04
-JER	42:19	JER 44:27	framed	-0.00
-JER	43:1	JER 44:28	framed	-0.00
-JER	43:2	JER 44:29	framed	0.09
-JER	43:3	JER 44:30	framed	-0.00
-JER	43:4	JER 45:1	content	0.46
-JER	43:5	JER 45:2	framed	0.25
-JER	43:6	JER 45:4	framed	-0.00
-JER	43:7	JER 45:5	framed	0.09
-JER	43:8	JER 46:1	framed	0.09
-JER	43:9	JER 46:2	framed	0.08
-JER	43:10	JER 46:3	framed	-0.00
-JER	43:11	JER 46:4	framed	-0.00
-JER	43:12	JER 46:5	framed	0.03
-JER	43:13	JER 46:7	framed	-0.00
-JER	43:14	JER 46:8	framed	-0.00
-JER	43:15	JER 46:9	framed	-0.00
-JER	43:16	JER 46:10	framed	-0.00
-JER	43:17	JER 46:11	framed	-0.00
-JER	43:18	JER 46:12	framed	-0.00
-JER	43:19	JER 46:13	framed	0.07
-JER	43:20	JER 46:14	framed	-0.00
-JER	43:21	JER 46:15	framed	0.10
-JER	43:22	JER 46:16	framed	-0.00
-JER	43:23	JER 46:17	framed	-0.00
-JER	43:24	JER 46:18	framed	0.03
-JER	43:25	JER 46:19	framed	-0.00
-JER	43:26	JER 46:20	framed	-0.00
-JER	43:27	JER 46:21	framed	-0.00
-JER	43:28	JER 46:22	framed	0.03
-JER	43:29	JER 46:24	framed	-0.00
-JER	43:30	JER 46:25	framed	-0.00
-JER	43:31	JER 46:26	framed	0.17
-JER	43:32	JER 46:27	framed	-0.00
-JER	44:1	JER 46:28	framed	-0.00
-JER	44:2	JER 47:1	framed	0.07
-JER	44:3	JER 47:2	framed	-0.00
-JER	44:4	JER 47:3	framed	-0.00
-JER	44:5	JER 47:4	framed	-0.00
-JER	44:6	JER 47:5	framed	-0.00
-JER	44:7	JER 47:6	framed	-0.00
-JER	44:8	JER 47:7	framed	0.03
-JER	44:9	JER 48:1	framed	0.03
-JER	44:10	JER 48:2	framed	0.02
-JER	44:11	JER 48:3	framed	-0.00
-JER	44:12	JER 48:4	framed	-0.00
-JER	44:13	JER 48:5	framed	-0.00
-JER	44:14	JER 48:6	framed	0.14
-JER	44:15	JER 48:7	framed	0.06
-JER	44:16	JER 48:8	framed	-0.00
-JER	44:17	JER 48:9	framed	-0.00
-JER	44:18	JER 48:10	framed	-0.00
-JER	44:19	JER 48:11	framed	-0.00
-JER	44:20	JER 48:12	framed	0.11
-JER	44:21	JER 48:13	framed	-0.00
-JER	45:1	JER 48:14	framed	-0.00
-JER	45:2	JER 48:15	framed	-0.00
-JER	45:3	JER 48:16	framed	-0.00
-JER	45:4	JER 48:17	framed	-0.00
-JER	45:5	JER 48:18	framed	-0.00
-JER	45:6	JER 48:19	framed	-0.00
-JER	45:7	JER 48:20	framed	-0.00
-JER	45:8	JER 48:21	framed	-0.00
-JER	45:9	JER 48:22	framed	-0.00
-JER	45:10	JER 48:23	framed	-0.00
-JER	45:11	JER 48:24	framed	-0.00
-JER	45:12	JER 48:25	framed	-0.00
-JER	45:13	JER 48:26	framed	-0.00
-JER	45:14	JER 48:27	framed	-0.00
-JER	45:15	JER 48:28	framed	-0.00
-JER	45:16	JER 48:29	framed	-0.00
-JER	45:17	JER 48:30	framed	-0.00
-JER	45:18	JER 48:31	framed	-0.00
-JER	45:19	JER 48:32	framed	0.11
-JER	45:20	JER 48:33	framed	-0.00
-JER	45:21	JER 48:34	framed	-0.00
-JER	45:22	JER 48:35	framed	0.05
-JER	45:23	JER 48:36	framed	-0.00
-JER	45:24	JER 48:37	framed	-0.00
-JER	45:25	JER 48:38	framed	-0.00
-JER	45:26	JER 48:39	framed	0.08
-JER	45:27	JER 48:40	framed	-0.00
-JER	45:28	JER 48:41	framed	0.09
-JER	46:1	JER 48:42	framed	0.04
-JER	46:2	JER 48:44	framed	0.08
+JER	41:13	JER 34:13	content	0.51
+JER	41:14	JER 34:14	content	0.76
+JER	41:15	JER 34:15	content	0.70
+JER	41:16	JER 34:16	content	0.32
+JER	41:17	JER 34:17	content	0.59
+JER	41:18	JER 34:18	content	0.44
+JER	41:19	JER 34:19	framed	0.28
+JER	41:20	JER 34:20	content	0.30
+JER	41:21	JER 34:21	content	0.32
+JER	41:22	JER 34:22	content	0.74
+JER	42:1	JER 35:1	content	0.49
+JER	42:2	JER 35:2	content	0.51
+JER	42:3	JER 35:3	framed	0.26
+JER	42:4	JER 35:4	framed	0.25
+JER	42:5	JER 35:5	content	0.54
+JER	42:6	JER 35:6	content	0.92
+JER	42:7	JER 35:7	content	0.84
+JER	42:8	JER 35:8	content	0.73
+JER	42:9	JER 35:9	content	0.95
+JER	42:10	JER 35:10	content	0.69
+JER	42:11	JER 35:11	content	0.30
+JER	42:12	JER 35:12	content	0.82
+JER	42:13	JER 35:13	content	0.37
+JER	42:14	JER 35:14	content	0.51
+JER	42:15	JER 35:15	content	0.62
+JER	42:16	JER 35:16	content	0.70
+JER	42:17	JER 35:17	content	0.55
+JER	42:18	JER 35:18	content	0.41
+JER	42:19	JER 35:19	content	0.42
+JER	43:1	JER 36:1	content	0.69
+JER	43:2	JER 36:2	content	0.83
+JER	43:3	JER 36:3	content	0.42
+JER	43:4	JER 36:4	content	1.00
+JER	43:5	JER 36:5	content	0.51
+JER	43:6	JER 36:6	content	0.54
+JER	43:7	JER 36:7	content	0.63
+JER	43:8	JER 36:8	content	0.88
+JER	43:9	JER 36:9	content	0.65
+JER	43:10	JER 36:10	content	0.57
+JER	43:11	JER 36:11	content	0.57
+JER	43:12	JER 36:12	framed	0.18
+JER	43:13	JER 36:13	content	0.61
+JER	43:14	JER 36:14	content	0.51
+JER	43:15	JER 36:15	content	0.75
+JER	43:16	JER 36:16	content	0.39
+JER	43:17	JER 36:17	content	0.66
+JER	43:18	JER 36:18	content	0.54
+JER	43:19	JER 36:19	content	0.92
+JER	43:20	JER 36:20	content	0.42
+JER	43:21	JER 36:21	content	0.55
+JER	43:22	JER 36:22	content	0.56
+JER	43:23	JER 36:23	content	0.83
+JER	43:24	JER 36:24	content	0.43
+JER	43:25	JER 36:25	content	0.38
+JER	43:26	JER 36:26	framed	0.25
+JER	43:27	JER 36:27	content	0.84
+JER	43:28	JER 36:28	content	0.60
+JER	43:29	JER 36:29	content	0.55
+JER	43:30	JER 36:30	content	0.67
+JER	43:31	JER 36:31	framed	0.29
+JER	43:32	JER 36:32	content	0.58
+JER	44:1	JER 37:1	content	0.45
+JER	44:2	JER 37:2	content	0.49
+JER	44:3	JER 37:3	content	0.32
+JER	44:4	JER 37:4	content	0.53
+JER	44:5	JER 37:5	content	0.50
+JER	44:6	JER 37:6	content	0.86
+JER	44:7	JER 37:7	content	0.74
+JER	44:8	JER 37:8	content	0.85
+JER	44:9	JER 37:9	content	0.41
+JER	44:10	JER 37:10	content	0.55
+JER	44:11	JER 37:11	content	0.63
+JER	44:12	JER 37:12	content	0.59
+JER	44:13	JER 37:13	framed	0.25
+JER	44:14	JER 37:14	content	0.37
+JER	44:15	JER 37:15	content	0.50
+JER	44:16	JER 37:16	content	0.57
+JER	44:17	JER 37:17	content	0.60
+JER	44:18	JER 37:18	content	0.52
+JER	44:19	JER 37:19	content	0.90
+JER	44:20	JER 37:20	content	0.51
+JER	44:21	JER 37:21	content	0.34
+JER	45:1	JER 38:1	framed	0.22
+JER	45:2	JER 38:2	content	0.51
+JER	45:3	JER 38:3	content	0.36
+JER	45:4	JER 38:4	framed	0.29
+JER	45:5	JER 38:5	framed	0.15
+JER	45:6	JER 38:6	content	0.56
+JER	45:7	JER 38:7	content	0.67
+JER	45:8	JER 38:8	framed	0.27
+JER	45:9	JER 38:9	content	0.60
+JER	45:10	JER 38:10	content	0.65
+JER	45:11	JER 38:11	content	0.44
+JER	45:12	JER 38:12	framed	0.22
+JER	45:13	JER 38:13	content	0.68
+JER	45:14	JER 38:14	content	0.39
+JER	45:15	JER 38:15	content	0.48
+JER	45:16	JER 38:16	framed	0.26
+JER	45:17	JER 38:17	content	0.47
+JER	45:18	JER 38:18	content	0.52
+JER	45:19	JER 38:19	content	0.61
+JER	45:20	JER 38:20	content	0.45
+JER	45:21	JER 38:21	framed	0.26
+JER	45:22	JER 38:22	content	0.49
+JER	45:23	JER 38:23	content	0.69
+JER	45:24	JER 38:24	content	0.50
+JER	45:25	JER 38:25	content	0.37
+JER	45:26	JER 38:26	content	0.71
+JER	45:27	JER 38:27	content	0.57
+JER	45:28	JER 38:28	content	0.69
+JER	46:1	JER 39:1	content	0.51
+JER	46:2	JER 39:2	content	0.90
 JER	46:3	JER 48:45	framed	-0.00
 JER	46:14	JER 48:46	framed	0.03
-JER	46:15	JER 48:47	framed	-0.00
-JER	46:16	JER 49:1	framed	0.07
-JER	46:17	JER 49:3	framed	-0.00
-JER	46:18	JER 49:4	framed	0.11
-JER	47:1	JER 49:6	framed	0.17
-JER	47:2	JER 49:8	framed	-0.00
-JER	47:3	JER 49:9	framed	-0.00
-JER	47:4	JER 49:10	framed	-0.00
-JER	47:5	JER 49:11	framed	0.08
-JER	47:6	JER 49:13	framed	-0.00
-JER	47:7	JER 49:14	framed	0.05
-JER	47:8	JER 49:15	framed	-0.00
-JER	47:9	JER 49:16	framed	0.03
-JER	47:10	JER 49:18	framed	0.09
-JER	47:11	JER 49:19	framed	0.11
-JER	47:12	JER 49:24	framed	-0.00
-JER	47:13	JER 49:25	framed	-0.00
-JER	47:14	JER 49:26	framed	-0.00
-JER	47:15	JER 49:27	framed	-0.00
-JER	47:16	JER 49:28	framed	0.08
-JER	48:1	JER 49:29	framed	-0.00
-JER	48:2	JER 49:30	framed	0.05
-JER	48:3	JER 49:31	framed	-0.00
-JER	48:4	JER 49:32	framed	-0.00
-JER	48:5	JER 49:33	framed	-0.00
-JER	48:6	JER 49:34	framed	-0.00
-JER	48:7	JER 49:35	framed	-0.00
-JER	48:8	JER 49:36	framed	-0.00
-JER	48:9	JER 49:37	framed	0.03
-JER	48:10	JER 49:38	framed	0.03
-JER	48:11	JER 49:39	framed	-0.00
-JER	48:12	JER 50:1	framed	0.05
-JER	48:13	JER 50:2	framed	-0.00
-JER	48:14	JER 50:3	framed	-0.00
-JER	48:15	JER 50:4	framed	0.09
-JER	48:16	JER 50:6	framed	0.02
-JER	48:17	JER 50:7	framed	-0.00
-JER	48:18	JER 50:8	framed	0.08
-JER	49:1	JER 50:9	framed	0.04
-JER	49:2	JER 50:10	framed	-0.00
-JER	49:3	JER 50:11	framed	-0.00
-JER	49:4	JER 50:12	framed	0.03
-JER	49:5	JER 50:13	framed	0.05
-JER	49:6	JER 50:14	framed	-0.00
-JER	49:7	JER 50:15	framed	-0.00
-JER	49:8	JER 50:16	framed	0.03
-JER	49:9	JER 50:18	framed	0.23
-JER	49:10	JER 50:19	framed	-0.00
-JER	49:11	JER 50:20	framed	0.08
-JER	49:12	JER 50:21	framed	0.03
-JER	49:13	JER 50:22	framed	0.10
-JER	49:14	JER 50:23	framed	-0.00
-JER	49:15	JER 50:24	framed	-0.00
-JER	49:16	JER 50:25	framed	0.02
-JER	49:17	JER 50:26	framed	-0.00
-JER	49:18	JER 50:27	framed	-0.00
-JER	49:19	JER 50:28	framed	-0.00
-JER	49:20	JER 50:29	framed	0.07
-JER	49:21	JER 50:31	framed	-0.00
-JER	49:22	JER 50:32	framed	-0.00
-JER	50:1	JER 50:33	framed	-0.00
-JER	50:2	JER 50:34	framed	-0.00
-JER	50:3	JER 50:35	framed	0.14
-JER	50:4	JER 50:36	framed	-0.00
-JER	50:5	JER 50:37	framed	-0.00
-JER	50:6	JER 50:38	framed	-0.00
-JER	50:7	JER 50:39	framed	-0.00
-JER	50:8	JER 50:40	framed	-0.00
-JER	50:9	JER 50:41	framed	0.06
-JER	50:10	JER 50:42	framed	0.04
-JER	50:11	JER 50:43	framed	-0.00
-JER	50:12	JER 50:44	framed	0.10
-JER	50:13	JER 50:46	framed	-0.00
-JER	51:31	JER 51:59+JER 51:60	content	0.49
-JER	51:32	JER 51:61	framed	-0.00
-JER	51:33	JER 51:62	framed	-0.00
-JER	51:34	JER 51:63	framed	-0.00
-JER	51:35	JER 51:64	framed	0.11
+JER	46:15	JER 39:14+JER 39:15	content	0.40
+JER	46:16	JER 39:16	content	0.55
+JER	46:17	JER 39:17	content	0.52
+JER	46:18	JER 39:18	content	0.56
+JER	47:1	JER 40:1	content	0.38
+JER	47:2	JER 40:2	content	0.72
+JER	47:3	JER 40:3	content	0.62
+JER	47:4	JER 40:4	content	0.35
+JER	47:5	JER 40:5	framed	0.25
+JER	47:6	JER 40:6	framed	0.21
+JER	47:7	JER 40:7	framed	0.27
+JER	47:8	JER 40:8	framed	0.14
+JER	47:9	JER 40:9	framed	0.30
+JER	47:10	JER 40:10	content	0.48
+JER	47:11	JER 40:11	content	0.45
+JER	47:12	JER 40:12	content	0.47
+JER	47:13	JER 40:13	framed	0.13
+JER	47:14	JER 40:14	content	0.35
+JER	47:15	JER 40:15	content	0.31
+JER	47:16	JER 40:16	framed	0.16
+JER	48:1	JER 41:1	content	0.49
+JER	48:2	JER 41:2	content	0.37
+JER	48:3	JER 41:3	content	0.43
+JER	48:4	JER 41:4	content	0.66
+JER	48:5	JER 41:5	content	0.38
+JER	48:6	JER 41:6	framed	0.16
+JER	48:7	JER 41:7	content	0.48
+JER	48:8	JER 41:8	content	0.72
+JER	48:9	JER 41:9	content	0.52
+JER	48:10	JER 41:10	content	0.36
+JER	48:11	JER 41:11	framed	0.24
+JER	48:12	JER 41:12	framed	0.29
+JER	48:13	JER 41:13	framed	0.27
+JER	48:14	JER 41:14	framed	0.15
+JER	48:15	JER 41:15	content	0.55
+JER	48:16	JER 41:16	content	0.35
+JER	48:17	JER 41:17	framed	0.14
+JER	48:18	JER 41:18	content	0.48
+JER	49:1	JER 42:1	framed	0.12
+JER	49:2	JER 42:2	content	0.72
+JER	49:3	JER 42:3	content	0.63
+JER	49:4	JER 42:4	content	0.52
+JER	49:5	JER 42:5	content	0.66
+JER	49:6	JER 42:6	content	0.83
+JER	49:7	JER 42:7	content	1.00
+JER	49:8	JER 42:8	content	0.46
+JER	49:9	JER 42:9	framed	0.25
+JER	49:10	JER 42:10	content	0.49
+JER	49:11	JER 42:11	content	1.00
+JER	49:12	JER 42:12	framed	0.22
+JER	49:13	JER 42:13	content	0.52
+JER	49:14	JER 42:14	content	0.92
+JER	49:15	JER 42:15	content	0.36
+JER	49:16	JER 42:16	content	0.36
+JER	49:17	JER 42:17	content	0.40
+JER	49:18	JER 42:18	content	0.43
+JER	49:19	JER 42:19	content	0.56
+JER	49:20	JER 42:20	content	0.53
+JER	49:21	JER 42:21	content	0.36
+JER	49:22	JER 42:22	content	0.53
+JER	50:1	JER 43:1	content	0.78
+JER	50:2	JER 43:2	content	0.40
+JER	50:3	JER 43:3	content	0.47
+JER	50:4	JER 43:4	framed	0.22
+JER	50:5	JER 43:5	content	0.35
+JER	50:6	JER 43:6	content	0.44
+JER	50:7	-	unmatched	0.00
+JER	50:8	JER 7:1	moved	0.65
+JER	50:9	JER 43:9	content	0.46
+JER	50:10	JER 43:10	content	0.32
+JER	50:11	JER 43:11	content	0.47
+JER	50:12	JER 43:12	content	0.75
+JER	50:13	JER 43:13	content	0.32
+JER	51:1	JER 44:1	content	0.30
+JER	51:2	JER 44:2	content	0.60
+JER	51:3	JER 44:3	content	0.68
+JER	51:4	JER 44:4	content	0.62
+JER	51:5	JER 44:5	content	0.76
+JER	51:6	JER 44:6	content	0.49
+JER	51:7	JER 44:7	content	0.55
+JER	51:8	JER 44:8	content	0.77
+JER	51:9	JER 44:9	content	0.61
+JER	51:10	JER 44:10	content	0.31
+JER	51:11	JER 44:11	content	0.66
+JER	51:12	JER 44:12	content	0.55
+JER	51:13	JER 44:13	content	0.68
+JER	51:14	JER 44:14	content	0.44
+JER	51:15	JER 44:15	content	0.66
+JER	51:16	JER 44:16	content	0.68
+JER	51:17	JER 44:17	content	0.60
+JER	51:18	JER 44:18	content	0.66
+JER	51:19	JER 44:19	content	0.88
+JER	51:20	JER 44:20	content	0.71
+JER	51:21	JER 44:21	content	0.84
+JER	51:22	JER 44:22	content	0.67
+JER	51:23	JER 44:23	content	0.51
+JER	51:24	JER 44:24	content	0.72
+JER	51:25	JER 44:25	content	0.75
+JER	51:26	JER 44:26	content	0.51
+JER	51:27	JER 44:27	content	0.67
+JER	51:28	JER 44:28	content	0.56
+JER	51:29	JER 44:29	content	0.50
+JER	51:30	JER 44:30	content	0.47
+JER	51:31	JER 45:1	content	0.70
+JER	51:32	JER 45:2	content	0.86
+JER	51:33	JER 45:3	framed	0.09
+JER	51:34	JER 45:4	content	0.63
+JER	51:35	JER 45:5	content	0.63
 JER	52:31	JER 52:30+JER 52:31	content	0.46
 EZK	1:13	EZK 1:13+EZK 1:14	content	0.72
 EZK	7:3	EZK 7:6	content	0.60

@@ -64,6 +64,20 @@ fn the_hard_cases() {
     assert_eq!(map("dra", "kjv", r("EST", 11, "2")), [r("ESG", 11, "2")]);
     // Hebrew numbering (the Orthodox Jewish Bible's Malachi 3:19 is the KJV's 4:1)
     assert_eq!(map("ojb", "kjv", r("MAL", 3, "19")), [r("MAL", 4, "1")]);
+    // The Septuagint's Jeremiah: the oracles against the nations (KJV 46-51) come after
+    // 25:13, and the KJV's 26-45 follow them as 33-51
+    assert_eq!(map("brenton", "kjv", r("JER", 27, "4")), [r("JER", 50, "4")]);
+    assert_eq!(map("kjv", "brenton", r("JER", 26, "1")), [r("JER", 33, "1")]);
+    assert_eq!(map("brenton", "kjv", r("JER", 25, "18")), [r("JER", 49, "38")]);
+    assert_eq!(map("lxx2012", "kjv", r("JER", 33, "1")), [r("JER", 26, "1")]);
+    // The Septuagint's Ezra goes on with Nehemiah (2 Esdras); Brenton also prints
+    // Nehemiah on its own, which is where the KJV's Nehemiah opens
+    assert_eq!(map("brenton", "kjv", r("EZR", 11, "1")), [r("NEH", 1, "1")]);
+    assert_eq!(map("brenton", "kjv", r("EZR", 16, "15")), [r("NEH", 6, "15")]);
+    assert_eq!(map("kjv", "brenton", r("NEH", 1, "1")), [r("NEH", 1, "1"), r("EZR", 11, "1")]);
+    // Greek Esther, whole, against the KJV's Esther and its Additions
+    assert_eq!(map("webu", "kjv", r("ESG", 2, "16")), [r("EST", 2, "16")]);
+    assert_eq!(map("dra", "kjv", r("EST", 13, "1")), [r("ESG", 13, "1")]);
     // A verse the BSB leaves out
     assert_eq!(map("kjv", "bsb", r("MAT", 17, "21")), Vec::<Ref>::new());
     // The same number everywhere else

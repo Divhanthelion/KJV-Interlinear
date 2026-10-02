@@ -83,7 +83,9 @@ impl Alignment {
         if !self.to_kjv.contains_key(kjv) && has(kjv) && !out.contains(kjv) {
             out.push(kjv.clone());
         }
-        out.sort();
+        // Verses by number ("9" before "10")
+        let number = |v: &str| v.split('-').next().and_then(|n| n.parse::<u32>().ok()).unwrap_or(0);
+        out.sort_by_key(|x| (x.0.clone(), x.1, number(&x.2), x.2.clone()));
         out
     }
 

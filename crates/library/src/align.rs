@@ -6,13 +6,17 @@
 //! text in the library is English, so a verse can be matched to its KJV counterpart
 //! by content: the distinctive words they share (names, numbers, rarer words).
 //!
-//! Two passes:
-//! 1. [`align`] lines the verses up in order (a sequence alignment allowing one-to-one
-//!    matches, joins of two verses, and verses with no counterpart), with a small
-//!    preference for verses that carry the same number.
+//! Two stages:
+//! 1. [`align_blocks`] lines the verses up in order (a sequence alignment allowing
+//!    one-to-one matches, joins of two verses, and verses with no counterpart, with a
+//!    small preference for verses that carry the same number: [`align`]), keeps what
+//!    strong, consecutive matches anchor, and lines up what is left again, as often as
+//!    that finds more: each pass recovers another block of text printed in another
+//!    order (the Septuagint's Jeremiah, Proverbs, and Exodus 35-40) or in a related
+//!    book (Nehemiah as the Septuagint's Ezra 11-23).
 //! 2. [`refine`] keeps the matches the content supports, splits joins whose halves
 //!    don't both match, and pairs whatever is left by best similarity anywhere in the
-//!    book and its related books (reordered chapters, additions printed elsewhere);
+//!    book and its related books (single verses moved, additions printed elsewhere);
 //!    last of all, leftovers with the same number on both sides are paired "by number".
 //!
 //! Every group carries how it was matched, so the alignment tables can be reviewed.
@@ -141,13 +145,17 @@ const MOVE_MARGIN: f32 = 0.15;
 /// Align `a` with `b` in order. `same(i, j)`: whether a[i] and b[j] carry the same
 /// verse number. Every index of each side appears in exactly one group.
 pub fn align(a: &[Weights], b: &[Weights], same: &dyn Fn(usize, usize) -> bool) -> Vec<Group> {
+    // A band around the diagonal keeps long books fast; generous enough for the drift
+    // between traditions (text printed far from its place is found by later passes)
+    align_within(a, b, same, 80 + a.len().abs_diff(b.len()))
+}
+
+/// [`align`], considering only pairs within `band` of the diagonal.
+fn align_within(a: &[Weights], b: &[Weights], same: &dyn Fn(usize, usize) -> bool, band: usize) -> Vec<Group> {
     let (n, m) = (a.len(), b.len());
     let mut score = vec![vec![f32::NEG_INFINITY; m + 1]; n + 1];
     let mut back = vec![vec![0u8; m + 1]; n + 1];
     score[0][0] = 0.0;
-    // A band around the diagonal keeps long books fast; generous enough for the
-    // largest drift between traditions
-    let band = 80 + n.abs_diff(m);
     let ratio = if n == 0 { 1.0 } else { m as f32 / n as f32 };
     for i in 0..=n {
         let centre = (i as f32 * ratio) as usize;
@@ -229,13 +237,86 @@ fn group(a: &[Weights], b: &[Weights], ga: Vec<usize>, gb: Vec<usize>, how: How)
     Group { a: ga, b: gb, score, how }
 }
 
-/// The second pass. `groups` aligned `a` with the first verses of `b`; `b` may
-/// continue with related books' verses (KJV Susanna for Douay-Rheims Daniel 13).
-/// Returns groups in `a`'s order, then `b`'s unmatched verses.
-/// `partners(i)`: the indexes in `b` that a[i]'s number stands for (one verse, a
-/// bridged verse's whole range, or none).
-pub fn refine(a: &[Weights], b: &[Weights], groups: Vec<Group>, partners: &dyn Fn(usize) -> Vec<usize>) -> Vec<Group> {
-    // Joins whose halves don't both match are split; the stray half is left over
+/// A match this similar is trusted alone; a weaker strong match needs a strong
+/// neighbour to anchor it.
+const ANCHOR_ALONE: f32 = 0.6;
+/// Weak matches between two anchors are kept when they are this many groups or fewer
+/// (and the same number of verses on both sides).
+const FRAME_MAX: usize = 12;
+/// A later pass takes only runs of at least this many consecutive anchored matches:
+/// text printed in another order moves in blocks; a stray verse is refine's to place.
+const BLOCK: usize = 3;
+/// At most this many passes.
+const PASSES: usize = 8;
+
+fn matched(g: &Group) -> bool {
+    !g.a.is_empty() && !g.b.is_empty()
+}
+
+/// The groups of an in-order alignment that the content anchors: strong matches with a
+/// strong neighbour (or very strong on their own), and the weak matches between two of
+/// them with the same number of verses on both sides. Text aligned in the wrong order
+/// matches strongly here and there by chance (a formula, a name), but seldom twice in
+/// a row. `at` gives each side's indexes in the whole book, when the alignment is of
+/// leftovers: then the weak matches must also fill the whole gap between their anchors
+/// in the book, on both sides (leftovers that are neighbours may be far apart there).
+fn anchored(groups: &[Group], at: Option<(&[usize], &[usize])>) -> Vec<bool> {
+    let strong: Vec<bool> = groups.iter().map(|g| matched(g) && g.score >= STRONG).collect();
+    let anchor: Vec<bool> = (0..groups.len())
+        .map(|k| {
+            strong[k] && (groups[k].score >= ANCHOR_ALONE || (k > 0 && strong[k - 1]) || (k + 1 < groups.len() && strong[k + 1]))
+        })
+        .collect();
+    let mut keep = anchor.clone();
+    let mut k = 0;
+    while k < groups.len() {
+        if anchor[k] {
+            k += 1;
+            continue;
+        }
+        // A run of groups between two anchors
+        let start = k;
+        while k < groups.len() && !anchor[k] {
+            k += 1;
+        }
+        let run = &groups[start..k];
+        let (na, nb) = (run.iter().map(|g| g.a.len()).sum::<usize>(), run.iter().map(|g| g.b.len()).sum::<usize>());
+        let whole = |(at_a, at_b): (&[usize], &[usize])| {
+            let (p, q) = (&groups[start - 1], &groups[k]);
+            let gap = |at: &[usize], before: &[usize], after: &[usize]| match (before.last(), after.first()) {
+                (Some(&x), Some(&y)) => at[y].checked_sub(at[x] + 1),
+                _ => None,
+            };
+            gap(at_a, &p.a, &q.a) == Some(na) && gap(at_b, &p.b, &q.b) == Some(nb)
+        };
+        if start > 0 && k < groups.len() && na == nb && run.len() <= FRAME_MAX && at.is_none_or(whole) {
+            for (x, g) in run.iter().enumerate() {
+                keep[start + x] = matched(g);
+            }
+        }
+    }
+    keep
+}
+
+/// Among `keep`, the runs of at least [`BLOCK`] consecutive matches.
+fn blocks(groups: &[Group], keep: &[bool]) -> Vec<bool> {
+    let mut out = vec![false; groups.len()];
+    let mut k = 0;
+    while k < groups.len() {
+        let start = k;
+        while k < groups.len() && keep[k] && matched(&groups[k]) {
+            k += 1;
+        }
+        if k - start >= BLOCK {
+            out[start..k].fill(true);
+        }
+        k = k.max(start + 1);
+    }
+    out
+}
+
+/// Joins whose halves don't both match are split; the stray half is left over.
+fn split_joins(a: &[Weights], b: &[Weights], groups: Vec<Group>) -> Vec<Group> {
     let mut split: Vec<Group> = Vec::new();
     for g in groups {
         match (g.a.as_slice(), g.b.as_slice()) {
@@ -243,7 +324,7 @@ pub fn refine(a: &[Weights], b: &[Weights], groups: Vec<Group>, partners: &dyn F
                 let (sj, sk) = (cosine(&a[*i], &b[*j]), cosine(&a[*i], &b[*k]));
                 if sj < JOIN_HALF || sk < JOIN_HALF {
                     let keep = if sj >= sk { *j } else { *k };
-                    split.push(group(a, b, vec![*i], vec![keep], How::Content));
+                    split.push(group(a, b, vec![*i], vec![keep], g.how));
                 } else {
                     split.push(g);
                 }
@@ -252,7 +333,7 @@ pub fn refine(a: &[Weights], b: &[Weights], groups: Vec<Group>, partners: &dyn F
                 let (si, sk) = (cosine(&a[*i], &b[*j]), cosine(&a[*k], &b[*j]));
                 if si < JOIN_HALF || sk < JOIN_HALF {
                     let (keep, stray) = if si >= sk { (*i, *k) } else { (*k, *i) };
-                    split.push(group(a, b, vec![keep], vec![*j], How::Content));
+                    split.push(group(a, b, vec![keep], vec![*j], g.how));
                     split.push(group(a, b, vec![stray], vec![], How::Unmatched));
                 } else {
                     split.push(g);
@@ -261,31 +342,125 @@ pub fn refine(a: &[Weights], b: &[Weights], groups: Vec<Group>, partners: &dyn F
             _ => split.push(g),
         }
     }
-    split.sort_by_key(|g| g.a.first().copied().unwrap_or(usize::MAX));
-    let groups = split;
+    split
+}
 
-    // Weak matches stay where strong matches (or the ends of the book) frame them with
-    // the same number of verses on both sides
-    let strong = |g: &Group| !g.a.is_empty() && !g.b.is_empty() && g.score >= STRONG;
-    let mut left_a: Vec<usize> = Vec::new();
-    let mut left_b: HashSet<usize> = (0..b.len()).collect();
-    let mut kept: Vec<Group> = Vec::new();
+/// What an in-order alignment's content supports: strong matches, and weak ones
+/// between strong matches (or the ends of the book) with the same number of verses on
+/// both sides, marked [`How::Framed`]; every other verse of `a` left over on its own.
+fn judge(a: &[Weights], b: &[Weights], groups: Vec<Group>) -> Vec<Group> {
+    let mut groups = split_joins(a, b, groups);
+    // In `a`'s order; `b`'s unmatched verses last, where they still count against a run
+    // after the last strong match
+    groups.sort_by_key(|g| g.a.first().copied().unwrap_or(usize::MAX));
+    let strong = |g: &Group| matched(g) && g.score >= STRONG;
+    let mut out: Vec<Group> = Vec::new();
     for (k, g) in groups.iter().enumerate() {
-        if g.a.is_empty() || g.b.is_empty() {
-            left_a.extend(g.a.iter().copied());
+        if g.a.is_empty() {
             continue;
         }
-        let framed = strong(g) || {
+        let framed = matched(g) && {
             let prev = groups[..k].iter().rposition(strong);
             let next = groups[k + 1..].iter().position(strong).map(|x| x + k + 1);
             let between = &groups[prev.map_or(0, |p| p + 1)..next.unwrap_or(groups.len())];
-            between.iter().map(|g| g.a.len()).sum::<usize>() == between.iter().map(|g| g.b.len()).sum::<usize>()
+            strong(g) || between.iter().map(|g| g.a.len()).sum::<usize>() == between.iter().map(|g| g.b.len()).sum::<usize>()
         };
         if framed {
             let mut g = g.clone();
             if !strong(&g) {
                 g.how = How::Framed;
             }
+            out.push(g);
+        } else {
+            out.extend(g.a.iter().map(|&i| Group { a: vec![i], b: vec![], score: 0.0, how: How::Unmatched }));
+        }
+    }
+    out
+}
+
+/// Align `a` with `b` (`b[..in_order]` the book itself, then related books) and judge
+/// what the content supports. The first pass lines the whole book up in order, as
+/// [`align`]. Each later pass lines up, in order and with no band, the verses on both
+/// sides that no anchored match has taken (the related books' too), and takes the
+/// blocks it finds: text printed in another order. The first pass is judged as it
+/// always has been ([`judge`]) and keeps every match no block touched, so a book in
+/// which no block is found aligns exactly as an in-order book does.
+///
+/// Returns the matches kept and every other verse of `a` on its own, for [`refine`].
+pub fn align_blocks(a: &[Weights], b: &[Weights], in_order: usize, same: &dyn Fn(usize, usize) -> bool) -> Vec<Group> {
+    let first = align(a, &b[..in_order], same);
+    let anchors = anchored(&first, None);
+    let mut rest_a: Vec<usize> = first.iter().zip(&anchors).filter(|(_, k)| !**k).flat_map(|(g, _)| g.a.clone()).collect();
+    let mut rest_b: Vec<usize> = first.iter().zip(&anchors).filter(|(_, k)| !**k).flat_map(|(g, _)| g.b.clone()).collect();
+    rest_a.sort_unstable();
+    rest_b.sort_unstable();
+    rest_b.extend(in_order..b.len());
+    let mut found: Vec<Group> = Vec::new();
+    for _ in 1..PASSES {
+        if rest_a.is_empty() || rest_b.is_empty() {
+            break;
+        }
+        let sa: Vec<Weights> = rest_a.iter().map(|&i| a[i].clone()).collect();
+        let sb: Vec<Weights> = rest_b.iter().map(|&j| b[j].clone()).collect();
+        let sub_same = |i: usize, j: usize| same(rest_a[i], rest_b[j]);
+        let groups = align_within(&sa, &sb, &sub_same, sa.len().max(sb.len()));
+        let keep = blocks(&groups, &anchored(&groups, Some((&rest_a, &rest_b))));
+        let (mut used_a, mut used_b) = (HashSet::new(), HashSet::new());
+        for (g, k) in groups.into_iter().zip(keep) {
+            if !k {
+                continue;
+            }
+            let ga: Vec<usize> = g.a.iter().map(|&i| rest_a[i]).collect();
+            let gb: Vec<usize> = g.b.iter().map(|&j| rest_b[j]).collect();
+            used_a.extend(ga.iter().copied());
+            used_b.extend(gb.iter().copied());
+            let how = if g.score >= STRONG { How::Content } else { How::Framed };
+            found.push(Group { a: ga, b: gb, how, ..g });
+        }
+        if used_a.is_empty() {
+            break;
+        }
+        rest_a.retain(|i| !used_a.contains(i));
+        rest_b.retain(|j| !used_b.contains(j));
+    }
+    // A block matched just as the first pass matched it isn't text found elsewhere:
+    // the first pass keeps it, for judging its neighbours
+    let in_place: HashSet<(Vec<usize>, Vec<usize>)> = first.iter().filter(|g| matched(g)).map(|g| (g.a.clone(), g.b.clone())).collect();
+    found.retain(|g| !in_place.contains(&(g.a.clone(), g.b.clone())));
+    // The first pass, judged as it always has been, less the matches that touch a verse
+    // a block took (whose other verses are left over)
+    let taken_a: HashSet<usize> = found.iter().flat_map(|g| g.a.iter().copied()).collect();
+    let taken_b: HashSet<usize> = found.iter().flat_map(|g| g.b.iter().copied()).collect();
+    let mut out: Vec<Group> = Vec::new();
+    for g in judge(a, b, first) {
+        if g.a.iter().any(|i| taken_a.contains(i)) || g.b.iter().any(|j| taken_b.contains(j)) {
+            out.extend(g.a.iter().filter(|i| !taken_a.contains(i)).map(|&i| Group { a: vec![i], b: vec![], score: 0.0, how: How::Unmatched }));
+        } else {
+            out.push(g);
+        }
+    }
+    out.extend(split_joins(a, b, found).into_iter().map(|g| match g.how {
+        // A stray half of a join is left over like any other verse
+        How::Unmatched => g,
+        _ if g.score < STRONG => Group { how: How::Framed, ..g },
+        _ => g,
+    }));
+    out.sort_by_key(|g| g.a.first().copied().unwrap_or(usize::MAX));
+    out
+}
+
+/// The second pass. `groups` are [`align_blocks`]'s: the matches kept, and every other
+/// verse of `a` on its own; `b` may continue with related books' verses (KJV Susanna
+/// for Douay-Rheims Daniel 13). Returns groups in `a`'s order, then `b`'s unmatched
+/// verses.
+/// `partners(i)`: the indexes in `b` that a[i]'s number stands for (one verse, a
+/// bridged verse's whole range, or none).
+pub fn refine(a: &[Weights], b: &[Weights], groups: Vec<Group>, partners: &dyn Fn(usize) -> Vec<usize>) -> Vec<Group> {
+    let mut left_a: Vec<usize> = Vec::new();
+    let mut left_b: HashSet<usize> = (0..b.len()).collect();
+    let mut kept: Vec<Group> = Vec::new();
+    for g in groups {
+        if matched(&g) {
             for j in &g.b {
                 left_b.remove(j);
             }
@@ -420,7 +595,36 @@ mod tests {
     fn run(other: &[String], kjv: &[String], same: &dyn Fn(usize, usize) -> bool) -> Vec<Group> {
         let (a, b) = weigh(other, kjv);
         let partners = |i: usize| (0..kjv.len()).filter(|&j| same(i, j)).collect::<Vec<_>>();
-        refine(&a, &b, align(&a, &b, same), &partners)
+        refine(&a, &b, align_blocks(&a, &b, kjv.len(), same), &partners)
+    }
+
+    #[test]
+    fn blocks_printed_in_another_order() {
+        // The Septuagint prints Jeremiah's oracles against the nations (KJV 46-51) after
+        // 25:13, and the KJV's 26-45 after them: two blocks, swapped
+        let first = [
+            "Thus saith the LORD of hosts; Behold, I will break the bow of Elam, the chief of their might.",
+            "And upon Elam will I bring the four winds from the four quarters of heaven, and will scatter them toward all those winds",
+            "For I will cause Elam to be dismayed before their enemies, and before them that seek their life",
+            "And I will set my throne in Elam, and will destroy from thence the king and the princes",
+            "But it shall come to pass in the latter days, that I will bring again the captivity of Elam",
+        ];
+        let second = [
+            "In the beginning of the reign of Jehoiakim the son of Josiah king of Judah came this word from the LORD",
+            "Stand in the court of the LORD's house, and speak unto all the cities of Judah, which come to worship",
+            "If so be they will hearken, and turn every man from his evil way, that I may repent me of the evil",
+            "And thou shalt say unto them, If ye will not hearken to me, to walk in my law, which I have set before you",
+            "To hearken to the words of my servants the prophets, whom I sent unto you, both rising up early",
+            "Then will I make this house like Shiloh, and will make this city a curse to all the nations of the earth.",
+        ];
+        let kjv: Vec<String> = second.iter().chain(&first).map(|x| x.to_string()).collect();
+        let other: Vec<String> = first.iter().chain(&second).map(|x| x.replace("LORD", "Lord").replace("thence", "there")).collect();
+        let g = run(&other, &kjv, &|i, j| i == j);
+        let mut got = pairs(&g);
+        got.sort();
+        let want: Vec<(Vec<usize>, Vec<usize>)> = (0..5).map(|i| (vec![i], vec![i + 6])).chain((0..6).map(|i| (vec![i + 5], vec![i]))).collect();
+        assert_eq!(got, want, "{:?}", g);
+        assert!(g.iter().all(|g| g.how == How::Content), "{:?}", g);
     }
 
     #[test]
@@ -564,9 +768,13 @@ impl Row {
 /// KJV verses (of the book itself and its related books) left without a counterpart.
 pub fn align_book(code: &str, native: &[Verse], kjv: &dyn Fn(&str) -> Option<Vec<Verse>>) -> Vec<Row> {
     let unmatched = |v: &Verse| Row { book: code.to_string(), native: vec![(v.chapter, v.number.clone())], kjv: vec![], how: How::Unmatched, score: 0.0 };
-    let Some((primary, related)) = kjv_books_for(code) else {
+    let Some((primary, mut related)) = kjv_books_for(code) else {
         return native.iter().map(unmatched).collect();
     };
+    // The Septuagint's Ezra (2 Esdras) goes on with Nehemiah as chapters 11-23
+    if code == "EZR" && native.iter().any(|v| v.chapter > 10) {
+        related = &["NEH"];
+    }
     let Some(first) = kjv(primary) else {
         return native.iter().map(unmatched).collect();
     };
@@ -594,7 +802,7 @@ pub fn align_book(code: &str, native: &[Verse], kjv: &dyn Fn(&str) -> Option<Vec
         .collect();
     let partners = |i: usize| -> Vec<usize> { lists[i].clone() };
     let same = |i: usize, j: usize| lists[i].contains(&j);
-    let groups = refine(&wa, &wk, align(&wa, &wk[..in_order], &same), &partners);
+    let groups = refine(&wa, &wk, align_blocks(&wa, &wk, in_order, &same), &partners);
     groups
         .into_iter()
         .map(|g| Row {
