@@ -47,7 +47,7 @@ pub fn catalogue() -> Result<Vec<Entry>, String> {
         if !b.id.chars().all(|ch| ch.is_ascii_lowercase() || ch.is_ascii_digit()) {
             return Err(format!("bibles.toml: id {:?} must be lowercase letters and digits", b.id));
         }
-        if !["pd", "cc-by-4.0", "cc-by-sa-4.0", "cc-by-nd-4.0", "cc-by-nc-nd-4.0", "net"].contains(&b.licence.as_str()) {
+        if !["pd", "cc-by-4.0", "cc-by-sa-4.0", "cc-by-nd-4.0", "cc-by-nc-nd-4.0"].contains(&b.licence.as_str()) {
             return Err(format!("bibles.toml: {} has unknown licence {:?}", b.id, b.licence));
         }
     }

@@ -35,7 +35,6 @@ The interlinear stays, but it is no longer the centre of the app.
 | Bibles | ~35 English translations (list in `data/library/bibles/`) | eBible.org USFM, cross-checked against eBible VPL | each translation's own numbering | per translation |
 | Commentary | Matthew Henry, Complete | CrossWire `MHC` | KJV | Public domain |
 | Commentary | Catena Aurea (Aquinas) | CrossWire `Catena` | KJV | Public domain |
-| Commentary | Haydock (1859) | volunteer USFM transcription (`cmahte/ENG-B-Haydock1883-pd-PSFM`) | Douay-Rheims | 1859 text public domain; *transcription's terms unconfirmed* |
 | Commentary | Tyndale Open Study Notes | `tyndale_open-studynotes.zip` from tyndaleopenresources.com | English (NLT wording) | CC BY-SA 4.0 |
 | Commentary | Wesley's Notes | CrossWire `Wesley` | KJV | Public domain |
 | Commentary | Keil & Delitzsch | CrossWire `KD` | KJV | Public domain |
@@ -54,6 +53,7 @@ data/library/
   bibles/<id>/<BOOK>.usfm     the source USFM, cleaned (see below), one file per book
   commentaries/<id>/meta.toml
   commentaries/<id>/<BOOK>.jsonl   one note per line: {"from":"3:16","to":"3:18","body":"…"}
+                                   ("0" verse = chapter introduction, "0:0" = book introduction)
   crossrefs/<id>.tsv
   versification/              mappings from each numbering scheme to the KJV's
 ```
@@ -66,11 +66,32 @@ automatic Strong's tags (`\w word|strong="…"\w*` becomes `word`), figures, and
 publishing metadata. The cleaning rule is simple enough to audit, and the plain
 text of every verse is checked against eBible's separately produced VPL edition.
 
-**Commentary notes** use a small, closed markup in `body`: paragraphs, italics,
-bold, Hebrew and Greek spans (with language), and Scripture references
-(`<ref to="JHN 3:16">John 3:16</ref>`). The importer turns each source format
-(OSIS, ThML, JSON, XML) into this one markup; anything it doesn't recognise is an
-import error, never silently dropped.
+**Commentary notes** use a small, closed markup in `body`, described below. The
+importer turns each source format (OSIS, ThML, JSON, XML) into this one markup;
+anything it doesn't recognise is an import error, never silently dropped.
+
+### Note markup
+
+A note body is a sequence of blocks. Text is plain Unicode with `&`, `<`, `>`
+escaped as `&amp;`, `&lt;`, `&gt;`, and nothing else escaped.
+
+| Element | Meaning |
+|---|---|
+| `<p>…</p>` | paragraph |
+| `<h>…</h>` | a heading inside a note ("The Case of Abraham") |
+| `<l>…</l>` | a line of verse (poetry quoted in a note); consecutive lines form a stanza |
+| `<li>…</li>` | a list item |
+| `<tr><td>…</td>…</tr>` | a table row (rare: TSK, KD) |
+| `<i>`, `<b>`, `<sup>`, `<sc>` (small caps) | inline styles, nestable |
+| `<lang code="he">…</lang>` | text in another language: `he`, `arc`, `grc`, `la`, `syr`, … |
+| `<ref to="JHN.3.16">John 3:16</ref>` | a Scripture reference; `to` is OSIS-style, `JHN.3.16-JHN.3.18` for ranges, book codes as in `books.rs` |
+| `<br/>` | a line break inside a block |
+
+Rules: blocks don't nest; inline elements nest only inside blocks; whitespace
+inside a block is collapsed by readers. The text content of a converted note (all
+text, entities decoded, markup removed) must equal the source's text content
+exactly, character for character, apart from whitespace collapsing; the importer
+checks this for every note.
 
 Books are identified by USFM codes (`GEN`, `1SA`, `TOB`, `1MA`) in data files and
 by the app's existing names in the interface. The deuterocanonical books, the

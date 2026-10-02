@@ -326,20 +326,6 @@ sha256 = "7a6aad55189886f5325481f6b82b5e43ae7c09b05f2259265f51ef0542265073"
 retrieved = "2026-10-02"
 
 [[source]]
-path = "ebible/engnet_usfm.zip"
-url = "https://ebible.org/Scriptures/engnet_usfm.zip"
-size = 2912943
-sha256 = "5cfbab9166bfc1d93f12a94dbe2bb97f29276e893f91b0747de1b77ca59b18b9"
-retrieved = "2026-10-02"
-
-[[source]]
-path = "ebible/engnet_vpl.zip"
-url = "https://ebible.org/Scriptures/engnet_vpl.zip"
-size = 4464387
-sha256 = "c62d20ced0957aac4e4bcf16d33934f53680c05e08cffd25f3dd51606b8be0f1"
-retrieved = "2026-10-02"
-
-[[source]]
 path = "ebible/engfbv_usfm.zip"
 url = "https://ebible.org/Scriptures/engfbv_usfm.zip"
 size = 3077646
@@ -379,20 +365,6 @@ path = "ebible/engoebcw_vpl.zip"
 url = "https://ebible.org/Scriptures/engoebcw_vpl.zip"
 size = 1973577
 sha256 = "31e3273200500d9272cd3ca7f43233b4e936ccee3e315f522293dad76753cba4"
-retrieved = "2026-10-02"
-
-[[source]]
-path = "ebible/engBBE_usfm.zip"
-url = "https://ebible.org/Scriptures/engBBE_usfm.zip"
-size = 2853316
-sha256 = "adfe61404bfe2a9f28428598c2f554060a6581a6c2b36c045a612d49af9d200d"
-retrieved = "2026-10-02"
-
-[[source]]
-path = "ebible/engBBE_vpl.zip"
-url = "https://ebible.org/Scriptures/engBBE_vpl.zip"
-size = 4211267
-sha256 = "9752f2ead93ba500182c071014d59131a5b61f98b8efd43789e9f6b1f2a77f86"
 retrieved = "2026-10-02"
 
 [[source]]

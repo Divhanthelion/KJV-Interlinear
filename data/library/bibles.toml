@@ -12,7 +12,7 @@
 #   name, year  as the translation is known
 #   group       how the picker groups translations
 #   ebible      eBible.org translation id (source: <ebible>_usfm.zip)
-#   licence     pd | cc-by-4.0 | cc-by-sa-4.0 | cc-by-nd-4.0 | cc-by-nc-nd-4.0 | net
+#   licence     pd | cc-by-4.0 | cc-by-sa-4.0 | cc-by-nd-4.0 | cc-by-nc-nd-4.0
 #   credit      the copyright / credit line the licence requires (shown in the app)
 #   about       one or two sentences for the picker
 #   heading_markers  paragraph markers this edition uses for headings (see usfm::Options)
@@ -272,17 +272,6 @@ credit = "Public domain. Produced in cooperation with Bible Hub, Discovery Bible
 about = "The Berean Standard Bible with its New Testament based on the Majority (Byzantine) Greek text."
 
 [[bible]]
-id = "net"
-abbr = "NET"
-name = "NET Bible"
-year = "2019"
-group = "Modern English"
-ebible = "engnet"
-licence = "net"
-credit = "Scripture quoted by permission. Quotations designated (NET) are from the NET Bible® copyright ©1996, 2019 by Biblical Studies Press, L.L.C. http://netbible.com All rights reserved."
-about = "The New English Translation by more than 25 scholars, here without its translators' notes."
-
-[[bible]]
 id = "fbv"
 abbr = "FBV"
 name = "Free Bible Version"
@@ -314,17 +303,6 @@ ebible = "engoebcw"
 licence = "pd"
 credit = "Public domain. Text: eBible.org."
 about = "The Open English Bible in Commonwealth spelling."
-
-[[bible]]
-id = "bbe"
-abbr = "BBE"
-name = "Bible in Basic English"
-year = "1965"
-group = "Modern English"
-ebible = "engBBE"
-licence = "pd"
-credit = "Public domain in the United States. Text: eBible.org."
-about = "A translation into Basic English, a vocabulary of about 1,000 words."
 
 [[bible]]
 id = "noyes"
