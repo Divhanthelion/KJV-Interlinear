@@ -236,31 +236,78 @@ Search must stay as fast as it is today (about 60 ms for the whole KJV, end to e
 
 ## Context engine
 
-The reader builds a **context set**: an ordered list of passages, each a verse,
-verse range, chapter, book, or several books, plus the sources to include:
-translations, Hebrew and Greek words, Strong's definitions, cross-references, and
-commentaries. Sources are chosen once for the whole set and can be overridden for
-any passage.
+What the study assistant reads with each question is the reader's to choose
+(`crates/core/src/context.rs` writes it; `ui/js/context.js` is the editor):
 
-- Passages are typed naturally ("Luke 2:14", "Rom 8:28-29", "Hab 3"), added from the
-  reader (this verse, this chapter, a selection), reordered, and removed.
-- The token meter shows each passage's share and the total against the model's window.
-- **Show exactly what is sent** opens the full text that will go to the model, with a
-  copy button. Nothing is hidden.
-- Sets can be saved, named, and reused. Each conversation keeps the set it was asked
-  with, so reopening it shows exactly what the model saw.
-- The text is deterministic and clearly delimited:
+- **Passages**, in order: typed naturally ("Luke 2:14; Rom 5:1-2; Micah 6" adds three;
+  "Gen 1:1, 3, 5-7" is one), or following the reader (this verse, this chapter, this
+  book, wherever they are), or the whole Bible or a Testament. A passage is kept in
+  the numbering of the translation it was chosen in, so "Psalm 22" chosen while
+  reading the Douay-Rheims is its Psalm 22 (the KJV's 23), labelled "Psalm 22 (DRA
+  numbering)".
+- **Sources**: any translations (by default the one being read), any commentaries,
+  OpenBible.info's or the Treasury's cross-references (5, 10, 25, or every place per
+  verse, or per word in the Treasury; with or without their words, in the passage's
+  first translation), and the KJV's Hebrew and Greek words with Strong's numbers
+  and, if wanted, the full lexicon entries. Chosen once for all the passages; any
+  passage can have its own.
+- **Sizes**: the meter shows the total against the model's window, and the editor
+  shows each passage's share and each source's within it. Sizing stops counting at
+  about 2.6M tokens, more than any model reads, so asking for everything stays quick.
+- **What's sent** shows the instructions and text exactly as the model gets them,
+  with Copy, to use with any assistant.
+- **Saved contexts** are named and used again. Each question keeps the context it was
+  asked with (passages fixed where they were); reopening a conversation sends its
+  follow-up questions with that context until a new conversation starts.
+
+Every other translation's text is found verse by verse through the verse alignment;
+commentaries and cross-references through the KJV's verses. A translation that leaves
+a verse out says so ("Not in this translation: Matthew 17:21 in the KJV"). The KJV's
+66 books come from the app's KJV, so they read exactly as the reader shows them.
+Commentaries give their notes on any of the passage's verses, and their chapter and
+book introductions with whole chapters (a book's with its first). A note reached from
+two passages is given once, and the second time names where it was given.
+
+The text is plain lines in a few XML-style elements, described to the model in the
+instructions (which also name each translation and commentary, with its author, date,
+and tradition):
 
 ```
-<passage ref="Luke 2:14">
-<text translation="KJV">Glory to God in the highest, and on earth peace, good will toward men.</text>
-<text translation="DRA" ref="Luke 2:14">Glory to God in the highest; and on earth peace to men of good will.</text>
-<notes source="Matthew Henry" ref="Luke 2:8-20">…</notes>
+<context>
+<passage ref="Psalm 22 (DRA numbering)" numbering="DRA">
+<bible translation="Douay-Rheims Bible" abbr="DRA" year="1899 (Challoner revision)" ref="Psalm 22">
+## Psalm 22
+1 A psalm for David. The Lord ruleth me: and I shall want nothing.
+…
+</bible>
+<bible translation="King James Version" abbr="KJV" year="1611 (1769 text)" ref="Psalm 23">
+## Psalm 23
+(title) A Psalm of David.
+   Hebrew: מִזְמ֥וֹר H4210 a psalm | לְדָוִ֑ד H1732 of David
+1 The LORD is my shepherd; I shall not want.
+…
+</bible>
+<commentary name="Matthew Henry's Complete Commentary" author="Matthew Henry" year="1706–1721">
+<note on="Psalm 23 (introduction)">
+Many of David's psalms are full of complaints, but this is full of comforts, and the expressions of delight in God's great goodness and dependence upon him. …
+…
+</note>
+</commentary>
+<crossrefs name="OpenBible.info Cross References" numbering="KJV">
+Psalm 23:1
+- Philippians 4:19: And may my God supply all your want, according to his riches in glory in Christ Jesus.
+…
+</crossrefs>
 </passage>
+<definitions>
+## H4210 מִזְמוֹר · miz.mor · H:N-M · melody
+…
+</definitions>
+</context>
 ```
 
-  A note covering several attached passages appears once. Strong's definitions are
-  listed once for the whole set.
+Notes are given as plain text: each block on its own line, headings marked "###",
+small capitals written as capitals ("LORD"), and footnotes in brackets where they stand.
 
 ## Verification
 

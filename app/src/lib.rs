@@ -115,7 +115,7 @@ async fn ai_chat(ai: State<'_, Ai>, id: String, args: AskArgs, on_event: Channel
     ai.running.lock().unwrap().insert(id.clone(), stop.clone());
     let result = async {
         let key = api_key(&ai, &args.provider_id)?;
-        let request = tauri::async_runtime::spawn_blocking(move || kjv_ai::assistant::prepare(data(), &args, key))
+        let request = tauri::async_runtime::spawn_blocking(move || kjv_ai::assistant::prepare(data(), library(), &args, key))
             .await
             .map_err(|e| e.to_string())??;
         let send = |event: Event| {

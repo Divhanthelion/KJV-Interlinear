@@ -218,7 +218,7 @@ pub struct NoteView {
     pub body: String,
 }
 
-fn note_label(display: &str, code: &str, from: (u32, u32), to: (u32, u32)) -> String {
+pub(crate) fn note_label(display: &str, code: &str, from: (u32, u32), to: (u32, u32)) -> String {
     let head = |c: u32| if code == "PSA" { format!("Psalm {}", c) } else { format!("{} {}", display, c) };
     match (from, to) {
         ((0, _), _) => format!("{} (introduction)", display),
@@ -453,7 +453,7 @@ fn verse_texts(data: &DataBundle, lib: &Library, bible: &str, code: &str, start:
 
 /// Place `to` (KJV numbering: "ROM.5.8", a range, or a whole chapter, "ECC.7") as
 /// translation `bible` has it.
-fn passage(data: &DataBundle, lib: &Library, bible: &str, to: &str, votes: Option<i32>) -> Result<Passage, String> {
+pub(crate) fn passage(data: &DataBundle, lib: &Library, bible: &str, to: &str, votes: Option<i32>) -> Result<Passage, String> {
     // A whole chapter: its verses from the first, shown and opened as the chapter
     if let [code, c] = to.split('.').collect::<Vec<_>>()[..]
         && let Ok(c) = c.parse::<u32>()

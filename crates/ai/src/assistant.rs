@@ -1,11 +1,12 @@
-//! The app's Bible-study assistant: what the page sends (a provider, a model, a
-//! Scripture scope, the conversation) becomes a provider request with the Scripture
-//! text and instructions attached. Shared by the app and the browser preview server.
+//! The app's Bible-study assistant: what the page sends (a provider, a model, the
+//! context the reader chose, the conversation) becomes a provider request with the
+//! context and instructions attached. Shared by the app and the browser preview server.
 
 use serde::Deserialize;
 
 use kjv_core::bundle::DataBundle;
-use kjv_core::context::{self, ContextOptions, Scope};
+use kjv_core::context::{self, Spec};
+use kjv_library::Library;
 
 use crate::{ChatRequest, Endpoint, Kind, Message};
 
@@ -17,9 +18,9 @@ pub struct AskArgs {
     pub kind: Kind,
     pub base_url: String,
     pub model: String,
-    pub scope: Scope,
+    /// What to attach: passages, translations, commentaries, cross-references
     #[serde(default)]
-    pub context_options: ContextOptions,
+    pub context: Spec,
     pub messages: Vec<Message>,
     #[serde(default)]
     pub max_tokens: Option<u32>,
@@ -45,19 +46,14 @@ impl ModelsArgs {
     }
 }
 
-/// Build the provider request for `args`, attaching the Scripture for its scope.
-pub fn prepare(data: &DataBundle, args: &AskArgs, api_key: Option<String>) -> Result<ChatRequest, String> {
-    let scripture = context::build(data, &args.scope, &args.context_options)?;
-    let context = if scripture.text.is_empty() {
-        String::new()
-    } else {
-        format!("<scripture scope=\"{}\">\n{}</scripture>", scripture.label, scripture.text)
-    };
+/// Build the provider request for `args`, attaching the context it asks for.
+pub fn prepare(data: &DataBundle, lib: &Library, args: &AskArgs, api_key: Option<String>) -> Result<ChatRequest, String> {
+    let built = context::build(data, lib, &args.context, None)?;
     Ok(ChatRequest {
         endpoint: Endpoint { kind: args.kind, base_url: args.base_url.clone(), api_key },
         model: args.model.clone(),
-        instructions: instructions(&scripture.label, &args.context_options),
-        context,
+        instructions: context::instructions(lib, &built),
+        context: built.text,
         messages: args.messages.clone(),
         max_tokens: args.max_tokens,
         effort: args.effort.clone(),
@@ -66,73 +62,31 @@ pub fn prepare(data: &DataBundle, args: &AskArgs, api_key: Option<String>) -> Re
     })
 }
 
-/// How the assistant should behave. Kept free of anything that changes from turn to
-/// turn so providers can cache it with the Scripture that follows.
-pub fn instructions(scope_label: &str, options: &ContextOptions) -> String {
-    let mut s = String::from(
-        "You are the study assistant in KJV Interlinear, a Bible app built on the King James Version \
-         (1769 Oxford text) with the Hebrew, Aramaic, and Greek beneath it.\n\n",
-    );
-    if scope_label.is_empty() {
-        s.push_str(
-            "No passage is attached to this conversation. Answer from your knowledge of the Bible, and \
-             give references (Book chapter:verse) the reader can check.\n\n",
-        );
-    } else {
-        s.push_str(&format!(
-            "The reader has attached {} below, inside <scripture>. It is the text under discussion. \
-             Headings mark books (#) and chapters (##); each line starts with its verse number, and \
-             \"(title)\" marks a psalm's title. When you quote Scripture, quote this text exactly and \
-             give the reference (Book chapter:verse).",
-            scope_label
-        ));
-        if options.original {
-            s.push_str(
-                " Each verse is followed by its original-language words, each with its Strong's number \
-                 and a short English gloss; use them when the original language matters.",
-            );
-            if options.definitions {
-                s.push_str(
-                    " After the passage, under \"# Strong's definitions\", is the full lexicon entry for \
-                     each of those Strong's numbers, once each. Use them for a word's range of meaning, \
-                     and say which sense you think fits a verse and why.",
-                );
-            }
-        }
-        s.push_str(
-            " If a question needs passages that aren't attached, you may draw on your wider knowledge \
-             of the Bible, but say which references you are citing from memory so the reader can \
-             check them.\n\n",
-        );
-    }
-    s.push_str(
-        "Guidelines:\n\
-         - Distinguish what the text says from how it has been interpreted. Where Christian traditions \
-         read a passage differently, say so briefly and fairly instead of presenting one view as the \
-         only one.\n\
-         - Be careful with the original languages: don't overstate what a word means, and say when a \
-         point goes beyond the glosses and standard lexicons.\n\
-         - If you are unsure of a fact, a date, or a reference, say so.\n\
-         - Answer the question asked. Use short paragraphs, and lists or headings only when they help.",
-    );
-    s
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn instructions_name_the_scope_and_original_language_notes() {
-        let original = ContextOptions { original: true, ..Default::default() };
-        let s = instructions("John 3", &original);
-        assert!(s.contains("attached John 3 below"));
-        assert!(s.contains("Strong's number"));
-        assert!(!s.contains("# Strong's definitions"));
-        let full = instructions("John 3", &ContextOptions { original: true, definitions: true });
-        assert!(full.contains("# Strong's definitions"));
-        let none = instructions("", &ContextOptions::default());
-        assert!(none.contains("No passage is attached"));
-        assert!(!none.contains("<scripture>"));
+    fn args_carry_the_context() {
+        let a: AskArgs = serde_json::from_value(serde_json::json!({
+            "providerId": "p", "kind": "anthropic", "baseUrl": "https://x", "model": "m",
+            "context": {
+                "passages": [{ "bible": "web", "refs": "ROM.14", "commentaries": ["mhc"] }],
+                "translations": ["web", "kjv"], "crossrefs": ["openbible"], "crossrefLimit": 5,
+                "crossrefText": true, "original": true
+            },
+            "messages": [{ "role": "user", "content": "Why?" }]
+        }))
+        .unwrap();
+        assert_eq!(a.context.passages[0].refs, "ROM.14");
+        assert_eq!(a.context.passages[0].commentaries.as_deref(), Some(&["mhc".to_string()][..]));
+        assert_eq!(a.context.passages[0].translations, None);
+        assert_eq!((a.context.crossref_limit, a.context.crossref_text, a.context.original), (5, true, true));
+        // No context: nothing attached
+        let none: AskArgs = serde_json::from_value(serde_json::json!({
+            "providerId": "p", "kind": "openai", "baseUrl": "x", "model": "m", "messages": []
+        }))
+        .unwrap();
+        assert!(none.context.passages.is_empty());
     }
 }

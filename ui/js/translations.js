@@ -5,6 +5,7 @@ import { h, icon, replace } from "./dom.js";
 
 let dialog, body;
 let onPick = () => {};
+let picking = onPick;
 
 export function initTranslations(pick) {
   onPick = pick;
@@ -18,8 +19,12 @@ export function initTranslations(pick) {
   });
 }
 
-/** Show the picker with `current` (a translation id) marked. */
-export function openTranslations(bibles, current) {
+/** Show the picker with `current` (a translation id) marked. A pick goes to `pick`
+ * when given (choosing a translation for something other than reading), else to the
+ * reader. `title` replaces the heading for the while. */
+export function openTranslations(bibles, current, { pick = null, title = "Translations" } = {}) {
+  picking = pick ?? onPick;
+  document.getElementById("translations-title").textContent = title;
   const filter = h("input", {
     type: "search",
     placeholder: "Find a translation",
@@ -69,7 +74,7 @@ function item(b, current) {
         "aria-current": b.id === current ? "true" : null,
         onclick: () => {
           dialog.close();
-          onPick(b.id);
+          picking(b.id);
         },
       },
       h("span", { class: "translation-abbr" }, b.abbr),

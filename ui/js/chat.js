@@ -1,6 +1,7 @@
-// The study assistant: chat with a language model about a verse, a chapter, some
-// books, or the whole Bible, using the reader's own AI provider (a local server or
-// their API key). Also the provider setup shown in Settings.
+// The study assistant: chat with a language model about passages the reader
+// chooses, in any translations, with commentaries and cross-references attached
+// (context.js), using the reader's own AI provider (a local server or their API
+// key). Also the provider setup shown in Settings.
 
 import {
   aiCancel,
@@ -16,8 +17,10 @@ import {
   copyText,
   openExternal,
 } from "./backend.js";
+import { compact, compactLimit, contextEditorMoved, fixed, loadCatalogues, openContextEditor, resolve, sizeOf } from "./context.js";
 import { h, icon, replace, timeAgo } from "./dom.js";
 import { referenceFinder, renderMarkdown } from "./markdown.js";
+import { sanitizeContext } from "./settings.js";
 
 export const PRESETS = [
   {
@@ -50,16 +53,21 @@ const presetOf = (p) => PRESETS.find((x) => x.id === p.preset) ?? PRESETS.at(-1)
 
 /** Longest answer to ask for, and the room kept free for it in the context window. */
 const ANSWER_TOKENS = 16000;
-/** Instructions and wrapping around the Scripture, in tokens (see crates/ai/src/assistant.rs). */
-const INSTRUCTION_TOKENS = 450;
+/** The instructions, in tokens, until Rust has counted them (crates/core/src/context.rs). */
+const INSTRUCTION_TOKENS = 600;
 
 const chat = {
-  messages: [], // { role, content, reasoning, scopeLabel, usage, error, reason, streaming }
+  // { role, content, reasoning, scopeLabel, context, usage, error, reason, streaming }: a
+  // question keeps the context it was asked with (every passage fixed where it was)
+  messages: [],
   requestId: null,
   pendingConsent: null, // text waiting for the reader to allow a provider
   models: new Map(), // providerId -> { list, error, loading }
-  size: null, // { key, label, tokens, verses } for the current scope
-  showScope: false,
+  size: null, // the context's size (context.js sizeOf)
+  sizing: 0, // which size request is the latest
+  // The open saved conversation's own context (as its last question was asked), used
+  // in place of the reader's usual one until a new conversation starts
+  override: null,
   draft: "",
   view: null, // current DOM references
   // The open conversation as saved: { id, title, created, starred }; null until the first question
@@ -93,57 +101,37 @@ function calibrationKey(ctx) {
   return `${ctx.settings.ai.providerId}|${ctx.settings.ai.model}`;
 }
 
-/** The scope as the Rust side takes it, following the reader's place. */
-function scopeArgs(ctx) {
-  const ai = ctx.settings.ai;
-  const ch = ctx.state.chapter;
-  if (!ch && ai.scope !== "bible" && ai.scope !== "books") return { kind: "none" };
-  switch (ai.scope) {
-    case "verse": {
-      const verse = ctx.state.selectedVerse ?? ctx.settings.position.verse ?? 1;
-      return { kind: "verse", book: ch.book, chapter: ch.chapter, verse };
-    }
-    case "chapter":
-      return { kind: "chapter", book: ch.book, chapter: ch.chapter };
-    case "book":
-      return { kind: "book", book: ch.book };
-    case "books":
-      return ai.books.length ? { kind: "books", books: ai.books } : { kind: "none" };
-    case "bible":
-      return { kind: "bible" };
-    default:
-      return { kind: "none" };
-  }
+/** The context the next question goes with: this conversation's, or the reader's. */
+function activeContext(ctx) {
+  return chat.override ?? ctx.settings.ai.context;
 }
 
-/** What to attach besides the KJV text. */
-function contextOptions(ctx) {
-  const { original, definitions } = ctx.settings.ai;
-  return { original, definitions: original && definitions };
+/** Change the context in use (the conversation's own, or the reader's saved one). */
+function changeContext(ctx, mutator) {
+  if (chat.override) mutator(chat.override);
+  else ctx.changeSettings((s) => mutator(s.ai.context));
 }
 
+/** Size the context in use again; the latest request wins. */
 async function refreshSize(ctx) {
-  const scope = scopeArgs(ctx);
-  const key = JSON.stringify([scope, contextOptions(ctx)]);
-  if (chat.size?.key === key) return;
-  if (scope.kind === "none") {
-    chat.size = { key, label: "", tokens: 0, verses: 0 };
-  } else {
-    try {
-      const size = await call("context_size", { scope, options: contextOptions(ctx) });
-      chat.size = { key, ...size };
-    } catch (error) {
-      chat.size = { key, label: "", tokens: 0, verses: 0, error: String(error.message ?? error) };
-    }
+  const seq = ++chat.sizing;
+  let size;
+  try {
+    size = await sizeOf(ctx, activeContext(ctx), chat.size);
+  } catch (error) {
+    size = { key: null, label: "", tokens: 0, verses: 0, passages: [], error: String(error.message ?? error) };
   }
+  if (seq !== chat.sizing) return;
+  chat.size = size;
   drawBudget(ctx);
 }
 
 /** Tokens the next request will use before the answer, corrected for this model. */
-function promptTokens(ctx, extraText = "") {
+function promptTokens(ctx, extraText = "", contextTokens = chat.size?.tokens ?? 0) {
   const factor = ctx.settings.ai.calibration[calibrationKey(ctx)] ?? 1;
   const history = chat.messages.reduce((n, m) => n + estimateTokens(m.content ?? ""), 0);
-  return Math.ceil(((chat.size?.tokens ?? 0) + INSTRUCTION_TOKENS + history + estimateTokens(extraText)) * factor);
+  const instructions = chat.size?.instructions ?? INSTRUCTION_TOKENS;
+  return Math.ceil((contextTokens + instructions + history + estimateTokens(extraText)) * factor);
 }
 
 function answerTokens(ctx) {
@@ -151,10 +139,6 @@ function answerTokens(ctx) {
   return max ? Math.min(max, ANSWER_TOKENS) : ANSWER_TOKENS;
 }
 
-/** 1,085,845 -> "1.09M", 13,939 -> "14k". Limits round down (never overstate the room). */
-const compact = (n, round = Math.round) =>
-  n >= 1e6 ? `${(round(n / 1e4) / 100).toFixed(2).replace(/\.?0+$/, "")}M` : n >= 1e3 ? `${round(n / 1e3)}k` : String(n);
-const compactLimit = (n) => compact(n, Math.floor);
 
 // ------------------------------------------------------------------ chat panel
 
@@ -168,7 +152,7 @@ export function renderChat(body, ctx) {
       h(
         "div",
         { class: "chat-empty" },
-        h("p", {}, "Ask questions about a verse, a chapter, whole books, or the entire Bible, with the text attached for the model to read."),
+        h("p", {}, "Ask questions about any passages, in any of the translations, with commentaries and cross-references attached for the model to read."),
         h("p", {}, "Use your own server (such as vLLM or Ollama on your network) or an API key from Anthropic, OpenAI, Google, DeepSeek, OpenRouter, or Groq. The app has no AI service of its own and never sees your questions."),
         h("button", { type: "button", class: "button primary", onclick: () => openProviderForm(ctx) }, "Set up an AI provider"),
       ),
@@ -206,10 +190,9 @@ export function renderChat(body, ctx) {
   const messages = h("div", { class: "chat-messages", role: "log", "aria-live": "polite", "aria-relevant": "additions" });
   const jump = h("button", { type: "button", class: "chat-jump", hidden: true }, icon("arrowDown"), "Latest");
   const budget = h("div", { class: "chat-budget" });
-  const scopeEditor = h("div", { class: "chat-scope", hidden: !chat.showScope });
   const consent = h("div", { class: "chat-consent", hidden: true });
 
-  chat.view = { body, input, sendButton, messages, jump, budget, scopeEditor, consent };
+  chat.view = { body, input, sendButton, messages, jump, budget, consent };
   chat.view.follow = follower(messages, drawJump);
   jump.addEventListener("click", () => chat.view.follow.resume());
 
@@ -221,7 +204,7 @@ export function renderChat(body, ctx) {
     h(
       "div",
       { class: "chat", "data-mode": chat.showHistory ? "history" : "chat" },
-      h("div", { class: "chat-top" }, modelPicker(ctx), budget, scopeEditor),
+      h("div", { class: "chat-top" }, modelPicker(ctx), budget),
       h("div", { class: "chat-scroll" }, messages, jump),
       history,
       consent,
@@ -229,7 +212,6 @@ export function renderChat(body, ctx) {
     ),
   );
   if (chat.showHistory) drawHistory(ctx);
-  drawScopeEditor(ctx);
   if (previous && !previous.following) chat.view.follow.following = false;
   drawMessages(ctx);
   if (previous && !previous.following) messages.scrollTop = previous.top;
@@ -243,9 +225,10 @@ export function renderChat(body, ctx) {
   return input;
 }
 
-/** The reader moved (new chapter or verse): the attached scope may have changed. */
+/** The reader moved (new chapter or verse): passages that follow them have changed. */
 export function chatScopeChanged(ctx) {
   if (chat.view) refreshSize(ctx);
+  contextEditorMoved(ctx);
 }
 
 function autosize(input) {
@@ -325,6 +308,7 @@ function modelPicker(ctx) {
         onclick: () => {
           chat.messages = [];
           chat.current = null;
+          chat.override = null;
           chat.showHistory = false;
           ctx.refreshPanel();
           chat.view?.input.focus();
@@ -384,38 +368,40 @@ function loadModels(ctx, { force = false, p = provider(ctx) } = {}) {
   return loading;
 }
 
-// ------------------------------------------------------------------ scope
+// ------------------------------------------------------------------ context
 
-const SCOPES = [
-  ["none", "Nothing"],
-  ["verse", "This verse"],
-  ["chapter", "This chapter"],
-  ["book", "This book"],
-  ["books", "Choose books"],
-  ["bible", "Whole Bible"],
-];
-
-function scopeName(ctx) {
-  const ai = ctx.settings.ai;
-  if (ai.scope === "none") return "No passage attached";
-  if (chat.size?.label) return chat.size.label;
-  return SCOPES.find(([id]) => id === ai.scope)[1];
+/** Open the context editor on the context in use. */
+function editContext(ctx) {
+  openContextEditor(ctx, {
+    get: () => activeContext(ctx),
+    set: (mutator) => changeContext(ctx, mutator),
+    conversation: !!chat.override,
+    budget: (tokens) => {
+      const limit = contextWindow(ctx);
+      const reserve = answerTokens(ctx);
+      return { limit, reserve, fits: !limit || promptTokens(ctx, chat.view?.input.value ?? "", tokens) + reserve <= limit };
+    },
+    onSize: (size) => {
+      chat.sizing++;
+      chat.size = size;
+      drawBudget(ctx);
+    },
+    onChange: () => refreshSize(ctx),
+  });
 }
 
 function drawBudget(ctx) {
   const v = chat.view;
   if (!v) return;
+  const size = chat.size;
+  const none = !activeContext(ctx).passages.length;
   const limit = contextWindow(ctx);
   const used = promptTokens(ctx, v.input.value);
   const fits = !limit || used + answerTokens(ctx) <= limit;
   // Share of the room left after the answer's reserve
   const fraction = limit ? Math.min(1, used / Math.max(1, limit - answerTokens(ctx))) : 0;
-  const detail =
-    ctx.settings.ai.scope === "none"
-      ? ""
-      : limit
-        ? `≈${compact(used)} of ${compactLimit(limit)} tokens`
-        : `≈${compact(used)} tokens`;
+  const label = none ? "Nothing attached" : size?.error ? "Couldn’t read the passages" : size?.label || (size ? "Nothing yet" : "…");
+  const detail = none || !size ? "" : limit ? `≈${compact(used)} of ${compactLimit(limit)} tokens` : `≈${compact(used)} tokens`;
   replace(
     v.budget,
     h(
@@ -423,18 +409,16 @@ function drawBudget(ctx) {
       {
         type: "button",
         class: "chat-scope-button",
-        "aria-expanded": String(chat.showScope),
-        onclick: () => {
-          chat.showScope = !chat.showScope;
-          v.scopeEditor.hidden = !chat.showScope;
-          drawBudget(ctx);
-        },
+        "aria-haspopup": "dialog",
+        title: "Choose what the assistant reads",
+        onclick: () => editContext(ctx),
       },
-      h("span", { class: "chat-scope-label" }, h("span", { class: "muted" }, "Attached: "), scopeName(ctx)),
+      h("span", { class: "chat-scope-label" }, h("span", { class: "muted" }, chat.override ? "This conversation reads: " : "Reads: "), label),
       h("span", { class: `chat-scope-size${fits ? "" : " over"}` }, detail),
-      h("span", { class: "ref-caret", "aria-hidden": "true" }),
+      h("span", { class: "chat-scope-edit" }, "Change"),
     ),
-    limit && ctx.settings.ai.scope !== "none" ? meter(fraction, fits) : null,
+    limit && !none ? meter(fraction, fits) : null,
+    size?.error ? h("p", { class: "chat-error small" }, size.error) : null,
     fits
       ? null
       : h(
@@ -451,109 +435,6 @@ function meter(fraction, fits) {
   const fill = h("span", {});
   fill.style.width = `${(fraction * 100).toFixed(1)}%`;
   return h("div", { class: `meter${fits ? "" : " over"}`, role: "presentation" }, fill);
-}
-
-function drawScopeEditor(ctx) {
-  const v = chat.view;
-  if (!v) return;
-  const ai = ctx.settings.ai;
-  const set = (mutator) => {
-    ctx.changeSettings(mutator);
-    drawScopeEditor(ctx);
-    refreshSize(ctx);
-    drawBudget(ctx);
-  };
-  const books = ctx.state.books;
-  const old = books.filter((b) => b.testament === "old").map((b) => b.name);
-  const nt = books.filter((b) => b.testament === "new").map((b) => b.name);
-  const chosen = new Set(ai.books);
-  const setBooks = (names) => set((s) => { s.ai.books = books.map((b) => b.name).filter((n) => names.has(n)); });
-  const all = (names) => names.every((n) => chosen.has(n));
-
-  replace(
-    v.scopeEditor,
-    h(
-      "div",
-      { class: "segmented wrap", role: "radiogroup", "aria-label": "Attach" },
-      SCOPES.map(([id, label]) =>
-        h("button", { type: "button", role: "radio", "aria-checked": String(ai.scope === id), onclick: () => set((s) => { s.ai.scope = id; }) }, label),
-      ),
-    ),
-    ai.scope === "books"
-      ? h(
-          "div",
-          { class: "book-choices" },
-          h(
-            "div",
-            { class: "book-choice-actions" },
-            h("button", { type: "button", class: "chip", "aria-pressed": String(all(old)), onclick: () => {
-              const next = new Set(chosen);
-              for (const n of old) all(old) ? next.delete(n) : next.add(n);
-              setBooks(next);
-            } }, "Old Testament"),
-            h("button", { type: "button", class: "chip", "aria-pressed": String(all(nt)), onclick: () => {
-              const next = new Set(chosen);
-              for (const n of nt) all(nt) ? next.delete(n) : next.add(n);
-              setBooks(next);
-            } }, "New Testament"),
-            h("button", { type: "button", class: "chip", disabled: !chosen.size, onclick: () => setBooks(new Set()) }, "Clear"),
-          ),
-          h(
-            "div",
-            { class: "book-checks" },
-            books.map((b) =>
-              h(
-                "button",
-                {
-                  type: "button",
-                  class: "chip",
-                  "aria-pressed": String(chosen.has(b.name)),
-                  onclick: () => {
-                    const next = new Set(chosen);
-                    next.has(b.name) ? next.delete(b.name) : next.add(b.name);
-                    setBooks(next);
-                  },
-                },
-                b.display,
-              ),
-            ),
-          ),
-        )
-      : null,
-    h(
-      "div",
-      { class: "setting" },
-      h("span", { class: "setting-label", id: "chat-original-label" }, "Include Hebrew & Greek", h("span", { class: "setting-hint" }, "Each verse's original words with Strong's numbers. About 3× larger.")),
-      h("button", {
-        class: "switch",
-        type: "button",
-        role: "switch",
-        "aria-checked": String(ai.original),
-        "aria-labelledby": "chat-original-label",
-        onclick: () => set((s) => { s.ai.original = !s.ai.original; }),
-      }),
-    ),
-    ai.original
-      ? h(
-          "div",
-          { class: "setting" },
-          h(
-            "span",
-            { class: "setting-label", id: "chat-definitions-label" },
-            "Include full Strong's definitions",
-            h("span", { class: "setting-hint" }, "The whole lexicon entry for every Strong's number in the passage, once each. Much larger."),
-          ),
-          h("button", {
-            class: "switch",
-            type: "button",
-            role: "switch",
-            "aria-checked": String(ai.definitions),
-            "aria-labelledby": "chat-definitions-label",
-            onclick: () => set((s) => { s.ai.definitions = !s.ai.definitions; }),
-          }),
-        )
-      : null,
-  );
 }
 
 // ------------------------------------------------------------------ scrolling
@@ -902,23 +783,29 @@ async function sendNow(ctx) {
   if (!v) return;
   const limit = contextWindow(ctx);
   if (limit && promptTokens(ctx, text) + answerTokens(ctx) > limit) {
-    chat.showScope = true;
-    v.scopeEditor.hidden = false;
     drawBudget(ctx);
     ctx.toast("Too large for this model: attach less");
+    editContext(ctx);
     return;
   }
+  const known = await loadCatalogues().catch(() => null);
+  const context = activeContext(ctx);
+  const spec = chat.size?.spec ?? resolve(ctx, context, known).spec;
 
   if (!chat.current) {
     const now = Date.now();
     chat.current = { id: `c${now.toString(36)}${Math.random().toString(36).slice(2, 8)}`, title: titleFor(text), created: now, starred: false };
   }
-  const scope = scopeArgs(ctx);
   const history = chat.messages
     .filter((m) => m.content && !m.error)
     .map((m) => ({ role: m.role, content: m.content }));
   history.push({ role: "user", content: text });
-  chat.messages.push({ role: "user", content: text, scopeLabel: scope.kind === "none" ? null : chat.size?.label });
+  chat.messages.push({
+    role: "user",
+    content: text,
+    scopeLabel: spec.passages.length ? (chat.size?.label ?? null) : null,
+    context: fixed(ctx, context, known, chat.size),
+  });
   const answer = { role: "assistant", content: "", reasoning: "", streaming: true };
   chat.messages.push(answer);
   v.input.value = "";
@@ -944,8 +831,7 @@ async function sendNow(ctx) {
         kind: p.kind,
         baseUrl: p.baseUrl,
         model: ai.model,
-        scope,
-        contextOptions: contextOptions(ctx),
+        context: spec,
         messages: history,
         maxTokens: answerTokens(ctx),
         thinking: !!info?.adaptiveThinking,
@@ -1052,6 +938,9 @@ async function openConversation(ctx, id) {
     const c = await conversationLoad(id);
     chat.messages = (c.messages ?? []).map((m) => ({ ...m, streaming: false }));
     chat.current = { id: c.id, title: c.title, created: c.created, starred: !!c.starred };
+    // Follow-up questions go with what the last one was asked with
+    const asked = chat.messages.findLast((m) => m.role === "user" && m.context);
+    chat.override = asked ? sanitizeContext(asked.context) : null;
     chat.showHistory = false;
     ctx.refreshPanel();
     chat.view?.follow.resume();
@@ -1158,6 +1047,7 @@ function row(ctx, c) {
           await conversationDelete(c.id);
           if (chat.current?.id === c.id) {
             chat.current = null;
+            chat.override = null;
             chat.messages = [];
           }
           drawHistory(ctx);
@@ -1184,6 +1074,7 @@ function clearButton(ctx, recent) {
         for (const c of recent) await conversationDelete(c.id);
         if (chat.current && recent.some((c) => c.id === chat.current.id)) {
           chat.current = null;
+          chat.override = null;
           chat.messages = [];
         }
         drawHistory(ctx);

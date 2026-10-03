@@ -244,10 +244,10 @@ fn chat(state: &State, args: Value) -> Receiver<Vec<u8>> {
     let key = state.keys.lock().unwrap().get(&a.args.provider_id).cloned();
     let stop = Arc::new(Notify::new());
     state.running.lock().unwrap().insert(a.id.clone(), stop.clone());
-    let (data, client, running) = (state.data.clone(), state.client.clone(), state.running.clone());
+    let (data, library, client, running) = (state.data.clone(), state.library.clone(), state.client.clone(), state.running.clone());
     state.runtime.spawn(async move {
         let result = async {
-            let request = tokio::task::spawn_blocking(move || kjv_ai::assistant::prepare(&data, &a.args, key))
+            let request = tokio::task::spawn_blocking(move || kjv_ai::assistant::prepare(&data, &library, &a.args, key))
                 .await
                 .map_err(|e| e.to_string())??;
             tokio::select! {

@@ -229,7 +229,7 @@ await aiSettings({});
 await test("Chat asks consent, then streams an answer about the attached chapter", "book=John&chapter=11&verse=35", {}, `${CHAT_HELPERS}
   $('[data-open-panel="chat"]').click();
   await until(() => $(".chat-model")?.value.endsWith("mock-model"), "model list");
-  assert($(".chat-scope-label").textContent === "Attached: John 11", "chapter attached: " + $(".chat-scope-label").textContent);
+  assert($(".chat-scope-label").textContent === "Reads: John 11", "chapter attached: " + $(".chat-scope-label").textContent);
   assert($(".chat-scope-size").textContent === "≈2k of 32k tokens", "budget: " + $(".chat-scope-size").textContent);
   await ask("Why did Jesus weep?");
   await until(() => !$(".chat-consent").hidden, "consent prompt");
@@ -245,7 +245,7 @@ await test("Chat asks consent, then streams an answer about the attached chapter
   assert(refs.join() === "John 11:35,Romans 12:15", "references linked: " + refs);
   refs && $$(".msg.assistant .ref-link")[1].click();
   await until(() => $("#ref-label").textContent === "Romans 12" && $("#v15")?.getAttribute("aria-current") === "true", "reference opens the verse");
-  await until(() => $(".chat-scope-label").textContent === "Attached: Romans 12", "scope follows the reader");
+  await until(() => $(".chat-scope-label").textContent === "Reads: Romans 12", "the passage follows the reader");
 `);
 
 await aiSettings({ consent: { mock: true } });
@@ -261,13 +261,101 @@ await test("Chat: Stop, errors, and a scope too large for the model", "book=John
   await until(() => finished() && lastAnswer().querySelector(".chat-error"), "error shown");
   assert(lastAnswer().querySelector(".chat-error").textContent === "The service had an error (500): mock failure", "error text");
   $(".chat-scope-button").click();
-  $$(".chat-scope [role=radio]").find((b) => b.textContent === "Whole Bible").click();
+  await until(() => $("#context-editor")?.open && $(".ctx-passage-size"), "context editor");
+  $('.ctx-passage .icon-btn[aria-label^="Remove"]').click();
+  await until(() => !$(".ctx-passage"), "passage removed");
+  $$(".ctx-quick .chip").find((b) => b.textContent === "Whole Bible").click();
+  await until(() => $(".ctx-size .meter.over"), "over budget in the editor");
+  assert($(".ctx-size-line").textContent.startsWith("≈1.12M tokens of 32k"), "whole Bible size: " + $(".ctx-size-line").textContent);
+  $("#context-editor .picker-header .icon-btn").click();
   await until(() => $(".chat-scope-size.over"), "over budget");
+  assert($(".chat-scope-label").textContent === "Reads: The whole Bible", "label: " + $(".chat-scope-label").textContent);
   assert($(".chat-scope-size").textContent === "≈1.12M of 32k tokens", "whole Bible size: " + $(".chat-scope-size").textContent);
   const before = $$(".msg").length;
   await ask("anything");
   await wait(400);
   assert($$(".msg").length === before, "nothing sent when it can't fit");
+  assert($("#context-editor").open, "the editor opens to make room");
+  $("#context-editor").close();
+`);
+await aiSettings({ consent: { mock: true }, context: { passages: [{ follow: "verse" }], translations: ["reading"] } });
+await test("Chat: choose passages, translations, commentaries, and cross-references, and see what is sent", "book=John&chapter=11&verse=35", {}, `${CHAT_HELPERS}
+  const section = (title) => $$(".ctx-section").find((s) => s.querySelector(".section-title").textContent === title);
+  const chip = (title, name) => [...section(title).querySelectorAll(".chip")].find((c) => c.textContent === name);
+  $('[data-open-panel="chat"]').click();
+  await until(() => $(".chat-model")?.value.endsWith("mock-model"), "model list");
+  await until(() => $(".chat-scope-label").textContent === "Reads: John 11:35", "this verse: " + $(".chat-scope-label").textContent);
+  $(".chat-scope-button").click();
+  await until(() => $("#context-editor")?.open && $(".ctx-passage-size"), "context editor");
+  assert($(".ctx-passage-label").textContent === "John 11:35This verse, as you read", "following passage: " + $(".ctx-passage-label").textContent);
+  // Typed passages: one per chapter, a bad one explained
+  const input = $(".ctx-add input");
+  input.value = "Hezekiah 4";
+  input.dispatchEvent(new Event("input"));
+  $$(".ctx-add .button").find((b) => b.textContent === "Add").click();
+  await until(() => $(".ctx-section .chat-error")?.textContent === "No book called “Hezekiah”", "bad reference explained");
+  $(".ctx-add input").value = "Luke 2:14; Rom 5:1-2";
+  $(".ctx-add input").dispatchEvent(new Event("input"));
+  $$(".ctx-add .button").find((b) => b.textContent === "Add").click();
+  await until(() => $$(".ctx-passage").length === 3, "two passages added");
+  // Sources: the WEB beside the KJV, two commentaries, OpenBible's top 5 with their words
+  chip("Commentaries", "Jamieson-Fausset-Brown").click();
+  chip("Commentaries", "Tyndale").click();
+  chip("Cross-references", "OpenBible").click();
+  await until(() => section("Cross-references").querySelector("[role=radiogroup]"), "limit choices");
+  [...section("Cross-references").querySelectorAll("[role=radio]")].find((b) => b.textContent === "5").click();
+  assert(!chip("Commentaries", "Treasury of Scripture Knowledge"), "the Treasury is offered as cross-references only");
+  $$(".chip").find((c) => c.textContent === "Add a translation").click();
+  await until(() => $("#translations").open, "translation picker");
+  assert($("#translations-title").textContent === "Add a translation", "picker titled for adding");
+  $$("#translations .translation-item").find((b) => b.querySelector(".translation-abbr").textContent === "WEB").click();
+  await until(() => $$(".ctx-chip-removable").length === 2, "WEB added");
+  await until(() => $$(".ctx-passage-size").length === 3 && $$(".ctx-parts").length === 3 && $(".ctx-parts").textContent.includes("WEB"), "sized");
+  const parts = $$(".ctx-parts")[1].textContent;
+  assert(/^KJV \\d+ · WEB \\d+ · Jamieson-Fausset-Brown \\d+ · Tyndale \\d+ · OpenBible \\d+/.test(parts), "parts of Luke 2:14: " + parts);
+  // Romans gets its own commentaries: none
+  $$(".ctx-options-button")[2].click();
+  const commentaryRow = await until(() => $$(".ctx-override").find((o) => o.textContent.startsWith("Commentaries")), "options");
+  [...commentaryRow.querySelectorAll("[role=radio]")].find((b) => b.textContent === "Its own").click();
+  await until(() => $$(".ctx-override").find((o) => o.textContent.startsWith("Commentaries"))?.querySelector(".chip[aria-pressed=true]"), "its own list, copied from the rest");
+  for (const c of $$(".ctx-override")[1].querySelectorAll(".chip[aria-pressed=true]")) c.click();
+  await until(() => !$$(".ctx-parts")[2]?.textContent.includes("Tyndale"), "Romans without commentaries: " + $$(".ctx-parts")[2]?.textContent);
+  // What's sent
+  $$(".button").find((b) => b.textContent === "Show what’s sent").click();
+  const pre = await until(() => $(".ctx-preview"), "preview");
+  const sent = pre.textContent;
+  assert(sent.startsWith("You are the study assistant"), "instructions first");
+  assert(sent.includes("The reader has attached John 11:35; Luke 2:14; Romans 5:1–2 below"), "label in the instructions");
+  assert(sent.includes('<passage ref="Luke 2:14">\\n<bible translation="King James Version" abbr="KJV"'), "passages in order");
+  assert(sent.includes('abbr="WEB" year="2020" ref="Luke 2:14">\\n## Luke 2\\n14 “Glory to God in the highest'), "the WEB's text");
+  assert(sent.includes('<commentary name="Jamieson-Fausset-Brown Commentary"'), "commentary notes");
+  const romans = sent.split('<passage ref="Romans 5:1–2">')[1];
+  assert(romans && !romans.includes("<commentary"), "Romans has its own (no) commentaries");
+  assert(romans.includes('<crossrefs name="OpenBible.info Cross References" numbering="KJV">\\nRomans 5:1\\n- '), "cross-references with words");
+  // Save it, then use it again after changing things
+  $$(".button").find((b) => b.textContent === "Save this context…").click();
+  const name = await until(() => $('[data-focus-key="name"]'), "name box");
+  name.value = "Christmas peace";
+  name.dispatchEvent(new Event("input"));
+  $$(".button").find((b) => b.textContent === "Save").click();
+  await until(() => $(".ctx-set-name")?.textContent === "Christmas peace", "saved");
+  $$('.ctx-passage .icon-btn[aria-label^="Remove"]')[1].click();
+  await until(() => $$(".ctx-passage").length === 2, "removed one");
+  $$(".ctx-set .button").find((b) => b.textContent === "Use").click();
+  await until(() => $$(".ctx-passage").length === 3, "the saved context back");
+  // Reorder: Romans before Luke, and back
+  const order = () => $$(".ctx-passage-label").map((l) => l.firstChild.textContent).join(" | ");
+  $$(".ctx-options-button")[2].click();
+  (await until(() => $$(".ctx-move .button").find((b) => b.textContent === "Move up"), "move buttons")).click();
+  await until(() => order() === "John 11:35 | Romans 5:1–2 | Luke 2:14", "moved up: " + order());
+  $$(".ctx-move .button").find((b) => b.textContent === "Move down").click();
+  await until(() => order() === "John 11:35 | Luke 2:14 | Romans 5:1–2", "moved back: " + order());
+  $("#context-editor").close();
+  await until(() => $(".chat-scope-label").textContent === "Reads: John 11:35; Luke 2:14; Romans 5:1–2", "bar: " + $(".chat-scope-label").textContent);
+  await ask("What peace is meant?");
+  await until(() => finished() && lastAnswer().querySelector(".msg-tools"), "answer");
+  assert(lastAnswer().querySelector(".msg-body strong")?.textContent === "John 11:35; Luke 2:14; Romans 5:1–2", "the model got all three: " + lastAnswer().textContent);
+  assert($(".msg-scope").textContent === "With John 11:35; Luke 2:14; Romans 5:1–2", "the question says what it went with");
 `);
 await aiSettings({ consent: { mock: true } });
 await test("Chat: scrolling stays with the reader while an answer streams", "book=John&chapter=11", {}, `${CHAT_HELPERS}
@@ -329,6 +417,7 @@ await test("Chat: conversations are saved, starred, renamed, reopened, and clear
   await until(() => $(".chat-model")?.value.endsWith("mock-model"), "model list");
   await ask("Why did Jesus weep at the tomb of Lazarus?");
   await until(() => finished() && lastAnswer().querySelector(".msg-tools"), "first answer");
+  assert($(".chat-scope-label").textContent === "Reads: John 11", "the usual context: " + $(".chat-scope-label").textContent);
   await wait(200);
   assert(!$("[data-new-conversation]").disabled, "New conversation is enabled once there's a conversation");
   $("[data-new-conversation]").click();
@@ -347,8 +436,11 @@ await test("Chat: conversations are saved, starred, renamed, reopened, and clear
   await until(() => rows().includes("The Word in John 1"), "renamed");
   $$(".conversation-row").find((r) => r.textContent.includes("Lazarus")).querySelector(".row-button").click();
   await until(() => $(".msg.user")?.textContent.includes("Lazarus"), "reopened");
+  // Follow-ups go with what the conversation was asked with, wherever the reader is
+  await until(() => $(".chat-scope-label").textContent === "This conversation reads: John 11", "its own context: " + $(".chat-scope-label").textContent);
   await ask("Where else did Jesus weep?");
   await until(() => finished() && $$(".msg-tools").length === 2, "continued");
+  assert(lastAnswer().querySelector(".msg-body strong")?.textContent === "John 11", "sent with John 11");
   await wait(200);
   historyView().click();
   await until(() => $$(".conversation-row .row-sub").some((e) => e.textContent.endsWith("2 questions")), "follow-up saved to the same conversation");

@@ -33,10 +33,18 @@ export const DEFAULTS = {
     providers: [], // { id, preset, name, kind, baseUrl, contextWindow }
     providerId: null,
     model: null,
-    scope: "chapter", // none | verse | chapter | book | books | bible
-    books: [], // for scope "books"
-    original: false, // attach Hebrew/Greek words
-    definitions: false, // and the full Strong's entry for each word (with original)
+    // What the assistant reads with each question (see context.js)
+    context: {
+      passages: [{ follow: "chapter" }],
+      translations: ["reading"],
+      commentaries: [],
+      crossrefs: [],
+      crossrefLimit: 10,
+      crossrefText: true,
+      original: false,
+      definitions: false,
+    },
+    sets: [], // saved contexts: { id, name, context }
     think: true, // let a local reasoning model think before answering
     // Providers the reader agreed to send questions to (keyed by id)
     consent: {},
@@ -48,6 +56,10 @@ export const DEFAULTS = {
 const HISTORY_LIMIT = 50;
 export const AI_KINDS = ["openai", "anthropic", "gemini"];
 export const AI_SCOPES = ["none", "verse", "chapter", "book", "books", "bible"];
+const ID = /^[a-z0-9]{1,20}$/;
+const FOLLOWS = ["verse", "chapter", "book"];
+const WHOLES = ["bible", "old", "new"];
+const CROSSREF_LIMITS = [0, 5, 10, 25];
 
 const isObject = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 const isRef = (v) =>
@@ -55,6 +67,64 @@ const isRef = (v) =>
 
 function oneOf(value, allowed, fallback) {
   return allowed.includes(value) ? value : fallback;
+}
+
+/** A list of ids ("kjv", "mhc"; "reading" for the translation being read), or null. */
+function idList(v, max = 60) {
+  return Array.isArray(v) ? [...new Set(v.filter((x) => typeof x === "string" && ID.test(x)))].slice(0, max) : null;
+}
+
+function sanitizePassage(p) {
+  if (!isObject(p)) return null;
+  let out;
+  if (FOLLOWS.includes(p.follow)) out = { follow: p.follow };
+  else if (WHOLES.includes(p.whole)) out = { whole: p.whole };
+  else if (Array.isArray(p.books)) {
+    const books = p.books.filter((b) => typeof b === "string" && b.length < 40).slice(0, 100);
+    if (!books.length) return null;
+    out = { books };
+  } else if (typeof p.refs === "string" && p.refs.trim() && p.refs.length < 4000 && typeof p.bible === "string" && ID.test(p.bible)) {
+    out = { bible: p.bible, refs: p.refs, label: typeof p.label === "string" ? p.label.slice(0, 300) : "" };
+  } else return null;
+  for (const key of ["translations", "commentaries", "crossrefs"]) {
+    const list = idList(p[key]);
+    if (list && (key !== "translations" || list.length)) out[key] = list;
+  }
+  if (typeof p.original === "boolean") out.original = p.original;
+  return out;
+}
+
+/** A saved context, or (with none saved) one made from the single scope earlier
+ * versions had: `legacy` is the old ai settings. */
+export function sanitizeContext(raw, legacy = {}) {
+  const d = DEFAULTS.ai.context;
+  if (!isObject(raw)) {
+    const scope = legacy.scope;
+    const books = Array.isArray(legacy.books) ? legacy.books.filter((b) => typeof b === "string") : [];
+    const passages =
+      FOLLOWS.includes(scope) ? [{ follow: scope }]
+      : scope === "bible" ? [{ whole: "bible" }]
+      : scope === "books" && books.length ? [{ books }]
+      : scope === "none" ? []
+      : structuredClone(d.passages);
+    return {
+      ...structuredClone(d),
+      passages,
+      original: legacy.original === true,
+      definitions: legacy.definitions === true,
+    };
+  }
+  const translations = idList(raw.translations);
+  return {
+    passages: (Array.isArray(raw.passages) ? raw.passages : []).map(sanitizePassage).filter(Boolean).slice(0, 100),
+    translations: translations?.length ? translations : [...d.translations],
+    commentaries: idList(raw.commentaries) ?? [],
+    crossrefs: idList(raw.crossrefs) ?? [],
+    crossrefLimit: oneOf(raw.crossrefLimit, CROSSREF_LIMITS, d.crossrefLimit),
+    crossrefText: typeof raw.crossrefText === "boolean" ? raw.crossrefText : d.crossrefText,
+    original: raw.original === true,
+    definitions: raw.definitions === true,
+  };
 }
 
 function sanitizeAi(raw) {
@@ -77,10 +147,11 @@ function sanitizeAi(raw) {
     providers,
     providerId: ids.has(a.providerId) ? a.providerId : (providers[0]?.id ?? null),
     model: typeof a.model === "string" && a.model ? a.model.slice(0, 200) : null,
-    scope: oneOf(a.scope, AI_SCOPES, DEFAULTS.ai.scope),
-    books: (Array.isArray(a.books) ? a.books : []).filter((b) => typeof b === "string").slice(0, 66),
-    original: typeof a.original === "boolean" ? a.original : false,
-    definitions: typeof a.definitions === "boolean" ? a.definitions : false,
+    context: sanitizeContext(a.context, { scope: oneOf(a.scope, AI_SCOPES, "chapter"), books: a.books, original: a.original, definitions: a.definitions }),
+    sets: (Array.isArray(a.sets) ? a.sets : [])
+      .filter((x) => isObject(x) && typeof x.id === "string" && x.id && typeof x.name === "string" && x.name.trim())
+      .slice(0, 50)
+      .map((x) => ({ id: x.id.slice(0, 40), name: x.name.trim().slice(0, 80), context: sanitizeContext(x.context) })),
     think: typeof a.think === "boolean" ? a.think : true,
     consent: flags(a.consent),
     calibration: Object.fromEntries(

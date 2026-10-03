@@ -11,7 +11,7 @@
 
 The study assistant is off until you set it up with an AI provider of your choice: a server you run yourself, or a service such as Anthropic, OpenAI, Google, DeepSeek, OpenRouter, or Groq, using your own API key. KJV Interlinear has no AI service of its own.
 
-- When you send a question, the app sends it, the rest of that conversation, and the Bible passages you chose to attach **directly to the provider you set up**, and nowhere else. The app asks for your permission the first time it sends anything to each provider.
+- When you send a question, the app sends it, the rest of that conversation, and what you chose to attach (Bible passages, commentary notes, cross-references, Hebrew and Greek words) **directly to the provider you set up**, and nowhere else. The app asks for your permission the first time it sends anything to each provider.
 - That provider's own terms and privacy policy apply to what you send. KJV Interlinear's developers never receive or see your questions, the answers, or your API keys.
 - API keys are stored in your device's secure credential store (Windows Credential Manager, the macOS or iOS Keychain, the Android Keystore, or the Linux Secret Service). If a Linux system has no credential store, the key is kept in a file in the app's private folder that only your user account can read.
 - Conversations are saved on your device only, in the app's own storage, so you can reopen them later. You can rename, star, or delete any of them, or clear your history, from the Conversations list. They are never sent anywhere except to the provider you set up, as part of continuing that conversation. Uninstalling the app deletes them.

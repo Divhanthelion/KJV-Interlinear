@@ -34,9 +34,22 @@ struct StrongsArgs {
 
 #[derive(Deserialize)]
 struct ContextArgs {
-    scope: context::Scope,
-    #[serde(default)]
-    options: context::ContextOptions,
+    context: context::Spec,
+}
+
+#[derive(Deserialize)]
+struct ContextParseArgs {
+    text: String,
+    bible: String,
+}
+
+/// The context's text and the instructions sent with it, as a provider gets them.
+#[derive(serde::Serialize)]
+struct ContextText {
+    label: String,
+    instructions: String,
+    text: String,
+    tokens: usize,
 }
 
 #[derive(Deserialize)]
@@ -84,10 +97,6 @@ pub fn dispatch(data: &DataBundle, name: &str, args: Value) -> Result<Value, Str
             text.map(|t| json!(t))
                 .ok_or_else(|| format!("no text for {} {}", a.book, a.chapter))
         }
-        "context_size" => {
-            let a: ContextArgs = parse(name, args)?;
-            to_json(context::size(data, &a.scope, &a.options)?)
-        }
         _ => Err(format!("unknown command {:?}", name)),
     }
 }
@@ -121,6 +130,21 @@ pub fn dispatch_all(
         "crossrefs" => {
             let a: CrossrefsArgs = parse(name, args)?;
             to_json(crate::translations::crossrefs(data, library, &a.collections, &a.bible, &a.book, a.chapter, a.verse, a.limit)?)
+        }
+        "context_size" => {
+            let a: ContextArgs = parse(name, args)?;
+            to_json(context::size(data, library, &a.context)?)
+        }
+        "context_text" => {
+            let a: ContextArgs = parse(name, args)?;
+            let built = context::build(data, library, &a.context, None)?;
+            let instructions = context::instructions(library, &built);
+            let tokens = context::estimate_tokens(&instructions) + built.tokens;
+            to_json(ContextText { label: built.label, instructions, text: built.text, tokens })
+        }
+        "context_parse" => {
+            let a: ContextParseArgs = parse(name, args)?;
+            to_json(context::parse(data, library, &a.text, &a.bible)?)
         }
         "bible_map" => {
             let a: BibleMapArgs = parse(name, args)?;

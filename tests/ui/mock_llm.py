@@ -11,6 +11,7 @@ chat_template_kwargs.enable_thinking false there is no reasoning, as with vLLM.
 """
 
 import json
+import re
 import sys
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -46,8 +47,8 @@ class Handler(BaseHTTPRequestHandler):
         question = body["messages"][-1]["content"]
         if "fail" in question:
             return self.send_json(500, {"error": {"message": "mock failure"}})
-        start = system.find('<scripture scope="')
-        scope = system[start + 18 : system.find('"', start + 18)] if start >= 0 else "nothing"
+        refs = re.findall(r'<passage ref="([^"]*)"', system)
+        scope = "; ".join(refs) if refs else "nothing"
         verses = sum(1 for line in system.splitlines() if line[:1].isdigit() or line.startswith("(title)"))
         answer = (
             f"You attached **{scope}** ({verses} verses).\n\n"
