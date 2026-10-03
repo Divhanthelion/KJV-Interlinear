@@ -2,7 +2,7 @@
 name = "kjv-ai"
 version = "0.1.0"
 edition = "2024"
-license = "MIT"
+license = "MIT-0"
 description = "Streaming chat client for OpenAI-compatible, Anthropic, and Gemini APIs"
 publish = false
 

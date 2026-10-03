@@ -1,32 +1,41 @@
-# KJV Interlinear
+# Scriptorium
 
-A King James Bible with the Hebrew and Greek behind every verse, for Windows, macOS, Linux, iPhone and iPad, and Android. Built with Rust and [Tauri](https://tauri.app/).
+A library for reading and studying the Bible: 44 English translations, commentaries from the Church Fathers to the Reformation and after, two collections of cross-references, and the Hebrew and Greek behind the King James Version, all on your device and all free. For Windows, macOS, Linux, iPhone and iPad, and Android. Built with Rust and [Tauri](https://tauri.app/).
 
-![John 11 with the study assistant open: a local Qwen model explains why Jesus wept, quoting the KJV, contrasting the Greek verbs δακρύω (G1145) and κλαίω (G2799), and linking every reference](assets/screenshots/study-assistant-john-11.jpg)
+![Psalm 23 in four columns: the KJV, its Hebrew, the World English Bible, and the Douay-Rheims, whose Psalm 22:1 sits beside the KJV's title and first verse](assets/screenshots/parallel-psalm-23.jpg)
 
-<img src="assets/screenshots/phone-psalm-23.jpg" alt="Psalm 23 in interlinear view on a phone" width="260" align="right">
+<img src="assets/screenshots/phone-parallel-john-3.jpg" alt="John 3 on a phone, each verse in the KJV, the Greek, the WEB, and the Douay-Rheims, one under another" width="260" align="right">
 
-## Features
+## What's in it
 
-- **KJV text**: all 66 books in the 1769 standard text, including the Psalm titles
-- **Hebrew & Greek interlinear**: every verse and Psalm title, word by word, with transliteration, Strong's number, grammar, and gloss
-- **Views**: the text; Parallel, up to four translations side by side (or beside the Hebrew and Greek), verse by verse in each one's own numbering; and for the KJV, Interlinear and Original only
-- **Strong's & lexicon**: tap any word for its Hebrew (TBESH) or Greek (TBESG) dictionary entry and every verse that uses it
-- **Red letter**: the words of Christ, taken span-for-span from the 1769 edition's own markup
-- **Search**: live search of the translation you're reading, or of chosen translations and commentaries, or of everything at once, with results grouped by source as they arrive; across all books, one book, or one testament, with matches highlighted; `Caesar's` finds `Cæsar’s`
-- **Study assistant (optional)**: ask about any passages you choose, a verse from Luke beside a chapter of Micah, or the verse or chapter you're reading, with their text attached in any of the translations, notes from any of the commentaries, cross-references with their words, and, if you like, every verse's Hebrew or Greek words with Strong's numbers. See exactly what's sent, copy it, and save contexts to use again. Use your own AI: a server on your network (vLLM, Ollama, LM Studio, llama.cpp) or your API key for Anthropic, OpenAI, Gemini, DeepSeek, OpenRouter, or Groq. It shows whether the passage fits the model's context window, streams the model's reasoning apart from the answer, links every reference it cites, and keeps keys in the system keychain. Conversations are saved on the device to reopen and continue later, with starred favourites and a history you can clear. Long answers never pull the page out from under you: it follows new text only while you're at the bottom
-- **Bookmarks & history**, **light and dark themes**, adjustable text size and font
-- **Private**: fully offline, no accounts, no tracking; the assistant talks only to the provider you set up ([privacy policy](PRIVACY.md))
+- **44 English translations**, from Wycliffe's and Tyndale's through the Geneva, the KJV, the Douay-Rheims, and Brenton's Septuagint to the World English Bible and the Berean Standard Bible, each checked character for character against its source
+- **Commentaries**: Matthew Henry, John Gill, Jamieson-Fausset-Brown, Keil & Delitzsch, Wesley's Notes, Aquinas's Catena Aurea, the Tyndale Open Study Notes with their profiles and articles, and the Fathers: Chrysostom's homilies and Augustine's expositions and tractates, each placed on the passage it expounds
+- **Cross-references**: the Treasury of Scripture Knowledge and OpenBible.info's, with each place's words in the translation you're reading
+- **The Hebrew, Aramaic, and Greek** behind the KJV, word by word, with transliteration, Strong's number, grammar, and gloss, and the lexicon entry for any word
 
 <br clear="right">
 
-![Interlinear view of Genesis 1: each Hebrew word with its transliteration, Strong's number, and English gloss](assets/screenshots/interlinear-genesis-1.jpg)
+## Reading and studying
 
-## Following the text the KJV translated
+- **Parallel**: up to four translations side by side, or beside the Hebrew and Greek, verse by verse. Translations number some verses differently (the Psalms in the Douay-Rheims and the Septuagint, Malachi 4 in the Hebrew, the end of Romans in the WEB); every column is lined up through a verse alignment made from what the verses say, and numbered as that translation numbers it
+- **Commentary and Cross-references panels** for the verse you select, in any translation
+- **Search** the translation you're reading, or chosen translations and commentaries, or everything at once, with results grouped by source as they arrive; `Caesar's` finds `Cæsar’s`
+- **Red letters**, the divine name in small capitals, poetry set in lines, and each translation's own notes
+- **Bookmarks and history**, light and dark themes, adjustable text size and font
 
-- **Greek** follows the Textus Receptus (Scrivener 1894). Words found only in modern editions are left out, TR readings replace differing words, and TR-only verses such as Acts 8:37 and 1 John 5:7 are included.
-- **Hebrew** follows the Masoretic text with the Qere readings, as the KJV does. Words reconstructed from the Septuagint are left out.
-- **Versification** matches the KJV, including Psalm titles (verse 0 in Hebrew), Malachi 4, and the New Testament verse-boundary differences.
+![Searching everything for Melchizedek: 422 results in 40 sources, grouped by translation and commentary, the WEB's Genesis 14 open with the name marked](assets/screenshots/search-everything.jpg)
+
+## The study assistant (optional)
+
+Ask about exactly what you choose: a verse from Luke, two from Romans, and a chapter of Micah, say, in any of the translations, with notes from any of the commentaries, cross-references with their words, and the Hebrew and Greek if you like. It shows how much that is against the model's window, shows exactly what is sent (and lets you copy it for any assistant), saves contexts to use again, and remembers what each conversation was asked with.
+
+Use your own AI: a server on your network (vLLM, Ollama, LM Studio, llama.cpp) or your API key for Anthropic, OpenAI, Gemini, DeepSeek, OpenRouter, or Groq. Keys stay in the system keychain; your questions go only to the provider you set up.
+
+![John 3:16 with the Commentary panel open: Matthew Henry, the Tyndale Open Study Notes, Chrysostom, and Augustine](assets/screenshots/commentary-john-3-16.jpg)
+
+## Free and private
+
+No ads, no account, nothing to buy, ever. Everything is on the device and works offline; nothing is collected ([privacy policy](PRIVACY.md)).
 
 ## Keyboard shortcuts (desktop)
 
@@ -48,10 +57,10 @@ Requires [Rust](https://rustup.rs/) and the [Tauri CLI](https://tauri.app/start/
 ```sh
 cargo tauri dev          # run the app (from the app/ directory)
 cargo tauri build        # installers for this platform
-cargo test --release -p kjv-core -p kjv-ai   # data, API, and assistant tests
+cargo test --release -p kjv-core -p kjv-ai   # text, library, search, assistant, and parallel tests
 ```
 
-The app's build script compiles all the text and Hebrew/Greek data into one compressed bundle (about 6.6 MB) that is embedded in the app, so it needs no data files at runtime.
+The build compiles the KJV, its Hebrew and Greek, and the whole library into compressed bundles embedded in the app, so it needs no data files or network at runtime.
 
 To work on the interface in a browser with the real data:
 
@@ -59,31 +68,22 @@ To work on the interface in a browser with the real data:
 cargo run --release -p kjv-devserver   # then open http://localhost:1420
 ```
 
-Release builds for every platform (Windows, macOS universal, Linux, Android, iOS) run in GitHub Actions when a `v*` tag is pushed; see [docs/RELEASING.md](docs/RELEASING.md).
+The library (`data/library/`) is converted from pinned sources by `cargo run -p kjv-import -- build`, and `-- check` proves the conversion reproduces it byte for byte; see [docs/LIBRARY.md](docs/LIBRARY.md). Release builds for every platform run in GitHub Actions when a `v*` tag is pushed; see [docs/RELEASING.md](docs/RELEASING.md).
 
 ## Project structure
 
 ```
-crates/core/      Text, Hebrew/Greek loader, search, red letter, and the app's API (Rust)
-  tests/          Data checks over every verse, word, lexicon link, and red-letter span
+crates/core/      The KJV, Hebrew/Greek, search, parallel reading, the assistant's context, and the app's API
+crates/library/   The library: translations, commentaries, cross-references, verse alignment, search index
+crates/import/    Converts the pinned sources into data/library/, and writes the notices
 crates/ai/        Study assistant: streaming client for OpenAI-compatible, Anthropic, and Gemini APIs
 crates/devserver/ Browser preview server for UI work
-app/              Tauri app: embeds the data bundle and serves the UI
+app/              Tauri app: embeds the data and serves the UI
 ui/               The interface: HTML, CSS, and JavaScript modules (no build step)
-tests/ui/         Headless-Chrome UI test and a stand-in model server for it
-old_testament/    KJV text, one file per book, "chapter:verse text" (Psalm titles are verse 0)
-new_testament/
-data/             STEP Bible Hebrew/Greek files, lexicons, and the words of Christ
+tests/ui/         Headless UI tests and a stand-in model server for them
+data/             STEP Bible Hebrew/Greek, lexicons, the words of Christ, and data/library/
 ```
 
-## Data sources
+## Licences
 
-See [NOTICE](NOTICE) for full attribution.
-
-- **KJV text and words of Christ**: the 1769 standard text, public domain, via [CrossWire](https://crosswire.org/) / [eBible.org](https://ebible.org/find/details.php?id=eng-kjv)
-- **Hebrew OT, Greek NT, lexicons**: [STEP Bible](https://www.STEPBible.org/) (TAHOT, TAGNT, TBESH, TBESG), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Source: [STEPBible-Data](https://github.com/STEPBible/STEPBible-Data)
-- **Fonts**: Noto Sans and Noto Sans Hebrew (SIL Open Font License)
-
-## License
-
-Application source code is licensed under the [MIT License](LICENSE). Bundled data remains under its own terms as described in [NOTICE](NOTICE).
+The app's own code is free for anyone to use for anything: [MIT No Attribution](LICENSE). Everything it carries keeps its own terms: 31 of the 44 translations and nine of the commentaries are in the public domain; the rest are under Creative Commons licences (CC BY, BY-SA, BY-ND, and BY-NC-ND), each credited as it asks. [NOTICE](NOTICE) lists every work with its licence and credit, and [THIRD-PARTY-SOFTWARE.md](THIRD-PARTY-SOFTWARE.md) the open-source software the app is built from; the app shows both under Settings, Licences.

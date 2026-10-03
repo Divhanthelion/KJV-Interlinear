@@ -17,6 +17,7 @@ import {
   copyText,
   openExternal,
 } from "./backend.js";
+import { APP } from "./brand.js";
 import { compact, compactLimit, contextEditorMoved, fixed, loadCatalogues, openContextEditor, resolve, sizeOf } from "./context.js";
 import { h, icon, replace, timeAgo } from "./dom.js";
 import { referenceFinder, renderMarkdown } from "./markdown.js";
@@ -898,7 +899,7 @@ function report(ctx, m) {
     "",
     clip(m.content, 2500).replace(/^/gm, "> "),
   ].join("\n");
-  const url = `https://github.com/Divhanthelion/KJV-Interlinear/issues/new?labels=ai-report&title=${encodeURIComponent("AI answer report")}&body=${encodeURIComponent(body)}`;
+  const url = `${APP.issues}/new?labels=ai-report&title=${encodeURIComponent("AI answer report")}&body=${encodeURIComponent(body)}`;
   openExternal(url);
 }
 

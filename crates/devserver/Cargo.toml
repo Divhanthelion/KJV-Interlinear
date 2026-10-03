@@ -2,7 +2,7 @@
 name = "kjv-devserver"
 version = "0.1.0"
 edition = "2024"
-license = "MIT"
+license = "MIT-0"
 description = "Serves the UI and the app commands over HTTP for previewing in a browser"
 publish = false
 

@@ -2,7 +2,7 @@
 name = "kjv-library"
 version = "0.1.0"
 edition = "2024"
-license = "MIT"
+license = "MIT-0"
 description = "Translations, commentaries, and cross-references for KJV Interlinear: parsing, storage, and lookup"
 publish = false
 

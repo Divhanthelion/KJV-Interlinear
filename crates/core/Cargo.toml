@@ -2,7 +2,7 @@
 name = "kjv-core"
 version = "0.1.0"
 edition = "2024"
-license = "MIT"
+license = "MIT-0"
 description = "KJV text, Hebrew/Greek interlinear data, and search for KJV Interlinear"
 publish = false
 

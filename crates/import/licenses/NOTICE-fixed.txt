@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+The King James Version the reader shows (1769 standard text)
+---------------------------------------------------------------------------
+Source: "King James Version + Apocrypha" (eng-kjv), the standardized text of
+1769, courtesy of the CrossWire Bible Society and eBible.org
+https://ebible.org/find/details.php?id=eng-kjv
+Licence: Public domain (outside the United Kingdom, where the King James
+Version is subject to Crown letters patent)
+
+The files under old_testament/ and new_testament/ hold the 66 canonical books,
+one verse per line. The italic markers for supplied words and the paragraph
+marks were removed, and Psalm superscriptions are stored as verse 0.
+
+---------------------------------------------------------------------------
+Words of Christ (red letter)
+---------------------------------------------------------------------------
+File: data/words_of_jesus.json
+Source: the words-of-Jesus markup (\wj) in the same 1769 KJV edition from
+CrossWire / eBible.org (https://ebible.org/Scriptures/eng-kjv_usfm.zip)
+Licence: Public domain (see above). Extracted as the exact spoken substrings of
+each verse and verified to occur character for character in the text.
+
+---------------------------------------------------------------------------
+Hebrew, Aramaic, and Greek texts and lexicons (STEP Bible)
+---------------------------------------------------------------------------
+Datasets: TAHOT, TAGNT, TBESH, TBESG
+Source: STEP Bible (https://www.STEPBible.org/),
+https://github.com/STEPBible/STEPBible-Data
+Licence: Creative Commons Attribution 4.0 International (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/
+Credit: STEP Bible (www.STEPBible.org). Data created initially by Tyndale
+House Cambridge, now curated by STEP Bible.
+
+The files under data/ (TAHOT_*.txt, TAGNT_*.txt, TBESH.txt, TBESG.txt) are
+unchanged from STEP Bible's beyond their file names. When loading, the app reads
+them as follows: words are keyed to the KJV's verse numbering; the Greek follows
+the Textus Receptus behind the KJV (its readings from the variants column replace
+differing words, and words absent from it are left out); Hebrew words
+reconstructed from the Septuagint and empty Ketiv placeholders are left out; and
+a verse is named Aramaic where most of its words are (by the morphology codes).
+
+---------------------------------------------------------------------------
+Fonts
+---------------------------------------------------------------------------
+Noto Sans (ui/fonts/NotoSans-Regular.ttf):
+  Copyright 2015-2021 Google LLC. All Rights Reserved.
+Noto Sans Hebrew (ui/fonts/NotoSansHebrew-Regular.ttf):
+  Copyright 2019 Google Inc. All Rights Reserved.
+Licence: SIL Open Font License 1.1 (the text is in ui/fonts/OFL.txt)
+Source: https://github.com/notofonts

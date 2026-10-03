@@ -800,6 +800,39 @@ input[type="number"]:focus, select:focus, .chat-input:focus {
 .about { font-size: 0.875rem; color: var(--text-2); }
 .about p { margin: 0 0 10px; }
 .about a { color: var(--accent); }
+.about-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+
+/* Licences (licences.js) */
+.licences-body { padding-top: 6px; }
+.licence-section { padding: 14px 0 6px; border-top: 1px solid var(--border); }
+.licence-section:first-child { border-top: 0; }
+.licence-section .section-title { margin: 0 0 8px; }
+.licence-section > p { margin: 0 0 10px; line-height: 1.55; }
+.licence-group { margin: 0 0 14px; }
+.licence-name { font-size: 0.9375rem; font-weight: 700; margin: 0 0 2px; }
+.licence-name .muted { font-weight: 400; }
+.licence-asks { font-size: 0.8125rem; color: var(--muted); margin: 0 0 6px; }
+.licence-works, .licence-packages { list-style: none; margin: 0; padding: 0; }
+.licence-works li { padding: 6px 0; border-bottom: 1px solid var(--border); }
+.licence-work { display: block; font-weight: 600; font-size: 0.9375rem; }
+.licence-credit { display: block; font-size: 0.8125rem; color: var(--text-2); line-height: 1.5; overflow-wrap: anywhere; }
+.licence-text, .licence-package { margin: 6px 0; }
+.licence-text summary, .licence-package summary { cursor: pointer; min-height: 32px; }
+.licence-package summary { display: list-item; font-size: 0.875rem; }
+.licence-package .licence-work { display: inline; font-size: 0.875rem; }
+:is(.licence-text, .licence-package) pre {
+  max-height: 40vh;
+  overflow: auto;
+  margin: 6px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 
 .button {
   display: inline-flex;

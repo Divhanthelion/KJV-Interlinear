@@ -6,13 +6,14 @@
 //!                                               commentaries, "commentaries", "crossrefs")
 //!     cargo run -p kjv-import -- check          rebuild in memory and compare with data/library/
 //!     cargo run -p kjv-import -- inventory      list every markup element each commentary source uses
+//!     cargo run -p kjv-import -- notices        write the app's third-party software notices
 //!
 //! Sources live in `.cache/sources/` (git-ignored); `data/library/sources.toml` pins
 //! each one by URL, size, and SHA-256 so every build converts exactly the same bytes.
 
 use std::process::ExitCode;
 
-use kjv_import::{align, bibles, commentaries, crossrefs, sources};
+use kjv_import::{align, bibles, commentaries, crossrefs, notices, sources};
 
 /// `build` with no ids converts everything, then aligns every translation with the KJV;
 /// each id names a translation or a commentary ("commentaries" means all of them, and
@@ -57,7 +58,8 @@ fn main() -> ExitCode {
         Some("check") => sources::verify().and_then(|_| build(&[], bibles::Mode::Check)),
         Some("align") => align::build(&args[1..], bibles::Mode::Write),
         Some("inventory") => commentaries::inventory(&args[1..]),
-        _ => Err("usage: kjv-import pin | fetch | build [ids…] | check | inventory [commentary ids…]".to_string()),
+        Some("notices") => notices::run(&args[1..]),
+        _ => Err("usage: kjv-import pin | fetch | build [ids…] | check | inventory [commentary ids…] | notices [check]".to_string()),
     };
     match result {
         Ok(()) => ExitCode::SUCCESS,

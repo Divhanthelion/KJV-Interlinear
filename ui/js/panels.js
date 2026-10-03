@@ -3,6 +3,8 @@
 import { call, openExternal } from "./backend.js";
 import { h, icon, plural, replace, timeAgo } from "./dom.js";
 import { renderAiSettings } from "./chat.js";
+import { APP } from "./brand.js";
+import { openLicences } from "./licences.js";
 import { ORIG_SCALES, TEXT_SCALES } from "./settings.js";
 
 /**
@@ -278,9 +280,6 @@ function stepperRow(label, values, value, format, onChange) {
   );
 }
 
-function link(text, url) {
-  return h("a", { href: url, onclick: (e) => { e.preventDefault(); openExternal(url); } }, text);
-}
 
 export function renderSettings(body, ctx) {
   const s = ctx.settings;
@@ -312,12 +311,20 @@ export function renderSettings(body, ctx) {
     h(
       "div",
       { class: "about" },
-      h("p", {}, h("strong", {}, "KJV Interlinear"), ` ${ctx.version ?? ""}`),
-      h("p", {}, "King James Version: the 1769 standard text (public domain), via ", link("eBible.org", "https://ebible.org/find/details.php?id=eng-kjv"), "."),
-      h("p", {}, "Hebrew, Greek, and lexicons: ", link("STEP Bible", "https://www.stepbible.org/"), " data (TAHOT, TAGNT, TBESH, TBESG), CC BY 4.0. The Greek follows the Textus Receptus the KJV was translated from."),
-      h("p", {}, "Words of Christ: the red-letter markup of the same 1769 edition."),
-      h("p", {}, "Fonts: Noto Sans and Noto Sans Hebrew (SIL Open Font License)."),
-      h("p", {}, "This app collects no data. Your settings and bookmarks stay on this device. If you set up an AI provider, your questions and the passages you attach go only to that provider."),
+      h("p", {}, h("strong", {}, APP.name), ` ${ctx.version ?? ""}`),
+      h(
+        "p",
+        {},
+        `A library for reading and studying the Bible: ${ctx.state.bibles.length || "many"} English translations, commentaries from the Church Fathers to the Reformation and after, cross-references, and the Hebrew and Greek, all on this device.`,
+      ),
+      h("p", {}, "Free, and always will be: no ads, no account, nothing to buy. Nothing is collected; your settings, bookmarks, and conversations stay on this device. If you set up an AI provider, your questions and what you attach go only to that provider."),
+      h(
+        "div",
+        { class: "about-actions" },
+        h("button", { type: "button", class: "button", onclick: () => openLicences(ctx) }, "Licences"),
+        APP.source ? h("button", { type: "button", class: "button", onclick: () => openExternal(`${APP.source}/blob/main/PRIVACY.md`) }, "Privacy policy") : null,
+        APP.source ? h("button", { type: "button", class: "button", onclick: () => openExternal(APP.source) }, "Source code") : null,
+      ),
     ),
   );
 }

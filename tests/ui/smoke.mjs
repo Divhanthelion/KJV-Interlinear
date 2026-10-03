@@ -280,6 +280,47 @@ await test("Parallel on a phone: the columns stack, each named", "book=John&chap
   await until(() => !$(".parallel-reading"), "plain text");
 `);
 
+await test("About and Licences: every work's licence and credit, and every package's notice", "book=John&chapter=1&tr=kjv", {}, `
+  $('[data-open-panel="settings"]').click();
+  const about = await until(() => $(".about"), "about");
+  assert(about.querySelector("strong").textContent === "Scriptorium", "the app's name");
+  assert(about.textContent.includes("44 English translations"), "what it is: " + about.textContent.slice(0, 200));
+  $$(".about-actions .button").find((b) => b.textContent === "Licences").click();
+  await until(() => $("#licences")?.open && $$(".licence-group").length, "licences");
+  const sections = $$(".licence-section .section-title").map((t) => t.textContent);
+  assert(sections.join() === "Scriptorium,Bible translations,Commentaries,Cross-references,Hebrew, Aramaic, Greek, and the KJV,Fonts,Open-source software", "sections: " + sections);
+  // Every translation, commentary, and collection appears once, under its licence
+  const works = (title) => [...$$(".licence-section").find((s) => s.querySelector(".section-title").textContent === title).querySelectorAll(".licence-works li")];
+  assert(works("Bible translations").length === 44, "44 translations: " + works("Bible translations").length);
+  assert(works("Commentaries").length === 11, "11 commentaries: " + works("Commentaries").length);
+  assert(works("Cross-references").length === 2, "2 collections");
+  const nc = $$(".licence-group").find((g) => g.querySelector(".licence-name").textContent.startsWith("CC BY-NC-ND 4.0"));
+  assert(nc.querySelector(".licence-asks").textContent.includes("not for commercial use"), "what NC-ND asks");
+  assert([...nc.querySelectorAll(".licence-work")].some((w) => w.textContent.startsWith("WYC ")), "Wycliffe under NC-ND");
+  const tyndale = works("Commentaries").find((li) => li.textContent.startsWith("Tyndale Open Study Notes"));
+  assert(tyndale.textContent.includes("CC BY-SA 4.0") && tyndale.textContent.includes("Changes:"), "the Tyndale credit, with its changes");
+  // The app's own licence, and the font licence, shown on request
+  const own = $$(".licence-text").find((d) => d.querySelector("summary").textContent === "The licence");
+  own.open = true;
+  assert(own.querySelector("pre").textContent.startsWith("MIT No Attribution"), "MIT-0");
+  const ofl = $$(".licence-text").find((d) => d.querySelector("summary").textContent.includes("Open Font"));
+  ofl.open = true;
+  await until(() => ofl.querySelector("pre"), "the OFL");
+  assert(ofl.querySelector("pre").textContent.includes("SIL OPEN FONT LICENSE Version 1.1"), "OFL text");
+  // The open-source packages, each with its texts
+  $$(".licence-software .button")[0].click();
+  await until(() => $$(".licence-package").length > 500, "packages", 20000);
+  const tauri = $$(".licence-package").find((d) => d.querySelector("summary").textContent.startsWith("tauri "));
+  tauri.open = true;
+  await until(() => tauri.querySelector("pre"), "tauri's licence texts");
+  assert(tauri.querySelector("pre").textContent.includes("Apache License") || tauri.querySelector("pre").textContent.includes("MIT"), "a licence text");
+  const box = $(".licence-software input");
+  box.value = "objc2-foundation";
+  box.dispatchEvent(new Event("input"));
+  await until(() => $$(".licence-package").length === 1, "filtered");
+  $("#licences").close();
+`);
+
 await test("Keyboard: arrows change chapter and view", "book=Genesis&chapter=50", {}, `
   document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
   await until(() => $("#ref-label").textContent === "Exodus 1", "Exodus 1");

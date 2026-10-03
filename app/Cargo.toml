@@ -2,7 +2,7 @@
 name = "kjv-interlinear"
 version = "0.2.1"
 edition = "2024"
-license = "MIT"
+license = "MIT-0"
 description = "KJV Bible study app with Hebrew and Greek interlinear"
 repository = "https://github.com/Divhanthelion/KJV-Interlinear"
 publish = false
