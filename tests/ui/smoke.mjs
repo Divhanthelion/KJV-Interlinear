@@ -6,7 +6,7 @@
 //   node tests/ui/smoke.mjs [path-to-chrome]
 
 import { spawn } from "node:child_process";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -369,6 +369,37 @@ for (const width of [320, 768, 1440]) {
       assert(reader.scrollWidth <= reader.clientWidth + 1, "reader scrolls sideways: " + reader.scrollWidth + " > " + reader.clientWidth);
     `);
       }
+    }
+  }
+}
+
+// ------------------------------------------------------------------ every verse on screen
+
+// Every chapter as drawn, compared with old_testament/ and new_testament/ character by
+// character (crates/core/tests/text_fidelity.rs checks those files against the source)
+{
+  const books = await (await fetch(`${BASE}/api/books`, { method: "POST", body: "{}" })).json();
+  const chapters = [];
+  for (const b of books) {
+    const dir = b.testament === "old" ? "old_testament" : "new_testament";
+    const raw = readFileSync(new URL(`../../${dir}/${b.name}.txt`, import.meta.url), "utf8");
+    for (const line of raw.split(/\r?\n/).filter(Boolean)) {
+      const [, c, v, text] = /^(\d+):(\d+) (.*)$/.exec(line);
+      if (chapters.at(-1)?.book !== b.name || chapters.at(-1).chapter !== Number(c)) {
+        chapters.push({ book: b.name, chapter: Number(c), label: `${b.name} ${c}`, lines: [] });
+      }
+      chapters.at(-1).lines.push([Number(v), text]);
+    }
+  }
+  const sweep = readFileSync(new URL("./every_verse.js", import.meta.url), "utf8");
+  for (const view of ["kjv", "interlinear"]) {
+    const name = `Every verse on screen matches the text, character for character (${chapters.length} chapters, ${view} view)`;
+    try {
+      await open(`book=Genesis&chapter=1&view=${view}`);
+      const problems = await run(`async () => (${sweep})(${JSON.stringify(chapters)}, ${JSON.stringify(view)})`);
+      results.push([name, problems.length ? `FAIL: ${problems.length} problems\n      ${problems.join("\n      ")}` : "ok"]);
+    } catch (error) {
+      results.push([name, `FAIL: ${error.message}`]);
     }
   }
 }

@@ -3,6 +3,9 @@ on:
   push:
     branches: [main, master]
   pull_request:
+  # Weekly, so a correction published upstream at eBible.org shows up here
+  schedule:
+    - cron: "0 12 * * 1"
 
 jobs:
   test:
@@ -12,8 +15,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      # Checks every verse, original-language word, lexicon link, and red-letter span
+      # The 1769 text the KJV files were made from, to compare every character with
+      - name: Fetch the eBible.org source text
+        run: |
+          curl -fsSL --retry 3 https://ebible.org/Scriptures/eng-kjv_vpl.zip -o "$RUNNER_TEMP/eng-kjv_vpl.zip"
+          sha256sum "$RUNNER_TEMP/eng-kjv_vpl.zip"
+          unzip -o "$RUNNER_TEMP/eng-kjv_vpl.zip" eng-kjv_vpl.txt -d "$RUNNER_TEMP"
+      # Checks every character of the KJV, every original-language word, lexicon link, and red-letter span
       - run: cargo test --release -p kjv-core
+        env:
+          KJV_SOURCE: ${{ runner.temp }}/eng-kjv_vpl.txt
 
   ui:
     name: UI script syntax

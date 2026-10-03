@@ -9,7 +9,7 @@
 @font-face {
   font-family: "Noto Sans Greek";
   src: url("fonts/NotoSans-Regular.ttf") format("truetype");
-  unicode-range: U+0370-03FF, U+1F00-1FFF, U+0300-036F;
+  unicode-range: U+0370-03FF, U+1F00-1FFF, U+0300-036F, U+002C, U+002E; /* commas and periods in the Greek text */
   font-display: swap;
 }
 

@@ -61,11 +61,27 @@ cargo run --release -p kjv-devserver   # then open http://localhost:1420
 
 Release builds for every platform (Windows, macOS universal, Linux, Android, iOS) run in GitHub Actions when a `v*` tag is pushed; see [docs/RELEASING.md](docs/RELEASING.md).
 
+## Text accuracy
+
+Every character of the KJV is checked automatically, on every change and weekly in CI:
+
+- **Against the source.** All 31,102 verses and 116 Psalm titles are compared character for character with the eBible.org 1769 text they came from. Any difference is reported by verse and character position.
+- **Against a reviewed fingerprint.** [`kjv-text.lock`](crates/core/tests/kjv-text.lock) records a SHA-256 for every chapter and the count of each of the text's 65 distinct characters. Changing a single comma fails the tests until the change is reviewed and the lock rewritten.
+- **Typography.** Spacing, punctuation, capitals, apostrophes, hyphens, and parentheses are checked in every verse.
+- **Through the app.** Every verse is checked in the embedded data, the reader, search results, and copied text.
+- **On screen.** The UI test turns every page of all 1,189 chapters in a real browser and compares what is drawn, after CSS, with the text files. It also checks every Hebrew and Greek word card.
+- **Hebrew and Greek glyphs.** Every letter, vowel point, accent, and breathing mark in the original-language text has a glyph in the font the app ships for it.
+
+```sh
+# Compare with the source (download https://ebible.org/Scriptures/eng-kjv_vpl.zip and unzip it first)
+KJV_SOURCE=path/to/eng-kjv_vpl.txt cargo test --release -p kjv-core --test text_fidelity
+```
+
 ## Project structure
 
 ```
 crates/core/      Text, Hebrew/Greek loader, search, red letter, and the app's API (Rust)
-  tests/          Data checks over every verse, word, lexicon link, and red-letter span
+  tests/          Data checks over every character, verse, word, lexicon link, and red-letter span
 crates/ai/        Study assistant: streaming client for OpenAI-compatible, Anthropic, and Gemini APIs
 crates/devserver/ Browser preview server for UI work
 app/              Tauri app: embeds the data bundle and serves the UI

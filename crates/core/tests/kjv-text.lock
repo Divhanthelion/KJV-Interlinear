@@ -1,0 +1,1261 @@
+# KJV text fingerprint, checked by crates/core/tests/text_fidelity.rs.
+# Any change to any character of old_testament/ or new_testament/ fails the tests
+# until this file is rewritten (KJV_UPDATE_LOCK=1) and the change reviewed.
+
+all	31102 verses	116 titles	4112680 chars	fc21bf1144562061b3a9cb8ee69dc121c68cc6570b0cfcdbd0a9cb93bfb76acb
+
+char	U+0020	space	759458
+char	U+0021	!	313
+char	U+0028	(	222
+char	U+0029	)	222
+char	U+002C	,	70782
+char	U+002D	-	808
+char	U+002E	.	26254
+char	U+003A	:	12718
+char	U+003B	;	10155
+char	U+003F	?	3298
+char	U+0041	A	17944
+char	U+0042	B	4644
+char	U+0043	C	1647
+char	U+0044	D	8745
+char	U+0045	E	2561
+char	U+0046	F	2313
+char	U+0047	G	6084
+char	U+0048	H	3176
+char	U+0049	I	13201
+char	U+004A	J	6354
+char	U+004B	K	538
+char	U+004C	L	9174
+char	U+004D	M	3098
+char	U+004E	N	1840
+char	U+004F	O	8766
+char	U+0050	P	1834
+char	U+0051	Q	5
+char	U+0052	R	7417
+char	U+0053	S	4879
+char	U+0054	T	7649
+char	U+0055	U	290
+char	U+0056	V	98
+char	U+0057	W	2395
+char	U+0059	Y	541
+char	U+005A	Z	903
+char	U+0061	a	257074
+char	U+0062	b	43930
+char	U+0063	c	52935
+char	U+0064	d	149023
+char	U+0065	e	407816
+char	U+0066	f	80992
+char	U+0067	g	48835
+char	U+0068	h	279150
+char	U+0069	i	179893
+char	U+006A	j	2432
+char	U+006B	k	21590
+char	U+006C	l	120316
+char	U+006D	m	76653
+char	U+006E	n	222341
+char	U+006F	o	233243
+char	U+0070	p	41030
+char	U+0071	q	948
+char	U+0072	r	161801
+char	U+0073	s	184551
+char	U+0074	t	308635
+char	U+0075	u	82756
+char	U+0076	v	30238
+char	U+0077	w	62846
+char	U+0078	x	1449
+char	U+0079	y	57717
+char	U+007A	z	2066
+char	U+00C6	Æ	3
+char	U+00E6	æ	93
+char	U+2014	—	1
+char	U+2019	’	1997
+
+Genesis 1	31 verses	4057 chars	2aa95022ca71d5a7
+Genesis 2	25 verses	3071 chars	53882003550aeedd
+Genesis 3	24 verses	3389 chars	e3da0b225e0d7c05
+Genesis 4	26 verses	3187 chars	ab5981554fd88154
+Genesis 5	32 verses	2716 chars	9d1f798d152658f4
+Genesis 6	22 verses	2908 chars	dd741b6cf966fd87
+Genesis 7	24 verses	2979 chars	e2595bffd59f3edc
+Genesis 8	22 verses	2980 chars	adff0466d93edf35
+Genesis 9	29 verses	3323 chars	ca07c193aacdc067
+Genesis 10	32 verses	2736 chars	5f0e369716921449
+Genesis 11	32 verses	3193 chars	b9d562e4acb62976
+Genesis 12	20 verses	2713 chars	fb0d5621b030cf9b
+Genesis 13	18 verses	2306 chars	2697cd608a259b3c
+Genesis 14	24 verses	3217 chars	1c48d6dc3b913814
+Genesis 15	21 verses	2401 chars	b55cf41b27bd8ccf
+Genesis 16	16 verses	2112 chars	b61d134a294bffb9
+Genesis 17	27 verses	3521 chars	c23938f044673b44
+Genesis 18	33 verses	4376 chars	af5ba0346aa6803a
+Genesis 19	38 verses	5556 chars	19ef1323b767f068
+Genesis 20	18 verses	2583 chars	90613e3407576f50
+Genesis 21	34 verses	3932 chars	d0acf7a9e3dcc49f
+Genesis 22	24 verses	3188 chars	7f0e6e06d6abf352
+Genesis 23	20 verses	2720 chars	1b83484beaf0d4ea
+Genesis 24	67 verses	9114 chars	ebce2384335fd312
+Genesis 25	34 verses	3760 chars	529542db7c5d12b4
+Genesis 26	35 verses	4579 chars	4ec773aaf87da4a5
+Genesis 27	46 verses	6238 chars	b6fda50383a73532
+Genesis 28	22 verses	3095 chars	d89025f162d2748f
+Genesis 29	35 verses	4231 chars	c792de49deffb7b1
+Genesis 30	43 verses	5289 chars	999b9a74ef0cb723
+Genesis 31	55 verses	7298 chars	722c4e20c58d38e5
+Genesis 32	32 verses	4064 chars	a8a55fbefa2521ef
+Genesis 33	20 verses	2611 chars	2e8a929f02cf271e
+Genesis 34	31 verses	4053 chars	956a5246d3ddcf10
+Genesis 35	29 verses	3423 chars	7c7d29e7b3eb2a54
+Genesis 36	43 verses	4509 chars	00d7bd42a48f082a
+Genesis 37	36 verses	4813 chars	9c2c37154934f8d6
+Genesis 38	30 verses	4094 chars	a847223518cefaff
+Genesis 39	23 verses	3247 chars	fd6e2b54c97ae29f
+Genesis 40	23 verses	3006 chars	932d7018a999d892
+Genesis 41	57 verses	7172 chars	1ad3253b337ed4fa
+Genesis 42	38 verses	4915 chars	d8e95f0bce06e8c3
+Genesis 43	34 verses	4761 chars	e2c4963d89a43f10
+Genesis 44	34 verses	4292 chars	075c3f017f9946d4
+Genesis 45	28 verses	3705 chars	2d7f3986c2a0ddac
+Genesis 46	34 verses	4027 chars	d219b8c5934e3346
+Genesis 47	31 verses	4963 chars	1a22a83d6ac04c36
+Genesis 48	22 verses	3307 chars	4a997bec3c73cca0
+Genesis 49	33 verses	4003 chars	69beb0fd376c46ef
+Genesis 50	26 verses	3607 chars	85d30920a4a0db93
+Exodus 1	22 verses	2457 chars	c5fbdd93cc38f16b
+Exodus 2	25 verses	3294 chars	9634d4add4ab4479
+Exodus 3	22 verses	3933 chars	29357d7c027d812c
+Exodus 4	31 verses	4360 chars	e4b2472f1bbc5d6d
+Exodus 5	23 verses	3110 chars	d21b4f7c9a26c335
+Exodus 6	30 verses	3914 chars	9117662941656b4f
+Exodus 7	25 verses	3596 chars	58192f6253dd9b7c
+Exodus 8	32 verses	4801 chars	260c7037ecc94342
+Exodus 9	35 verses	4959 chars	aa992244aabf93bb
+Exodus 10	29 verses	4521 chars	87695dae45d11538
+Exodus 11	10 verses	1672 chars	4c4f9d3771887a37
+Exodus 12	51 verses	7636 chars	dbcaee21cbdb50a1
+Exodus 13	22 verses	3435 chars	ff68ca98e2e44419
+Exodus 14	31 verses	4865 chars	ac1e16aa11067a0d
+Exodus 15	27 verses	3737 chars	2b9d45ef53a7308c
+Exodus 16	36 verses	5356 chars	d51c70dbf3d278ae
+Exodus 17	16 verses	2394 chars	1562bda0b0a56e4d
+Exodus 18	27 verses	3883 chars	493df83a53ca529e
+Exodus 19	25 verses	3610 chars	0a568b0f76cc49ea
+Exodus 20	26 verses	2871 chars	7c42834a2ae389e1
+Exodus 21	36 verses	4321 chars	23f1f2d50da66bc9
+Exodus 22	31 verses	3888 chars	cdaa351333570ba3
+Exodus 23	33 verses	4278 chars	3d1df0de3d5d7766
+Exodus 24	18 verses	2448 chars	d2f81ecb27ad5680
+Exodus 25	40 verses	4762 chars	c4680ea30c4fa254
+Exodus 26	37 verses	4995 chars	6d745524c063850c
+Exodus 27	21 verses	2977 chars	149c5012db69ad2d
+Exodus 28	43 verses	6435 chars	18d740f31ce6f16e
+Exodus 29	46 verses	6881 chars	15948d783cefdbc4
+Exodus 30	38 verses	5220 chars	97451f5e249e33fe
+Exodus 31	18 verses	2301 chars	f901d1be29406ae9
+Exodus 32	35 verses	5511 chars	71875a5d4f7c5c86
+Exodus 33	23 verses	3521 chars	68e06ca79f096bd1
+Exodus 34	35 verses	5215 chars	cc4cdcd9a8c8050c
+Exodus 35	35 verses	4360 chars	6092dd00abfd7b4e
+Exodus 36	38 verses	4771 chars	4ad54a35dfe1a7e1
+Exodus 37	29 verses	3689 chars	44d1b20644464cd0
+Exodus 38	31 verses	4485 chars	1f7baa3fbc44c49d
+Exodus 39	43 verses	5396 chars	dbbf394f88715ef5
+Exodus 40	38 verses	4310 chars	f47deee163883a00
+Leviticus 1	17 verses	2632 chars	2963125d7856e1a8
+Leviticus 2	16 verses	2492 chars	3fccad8238250609
+Leviticus 3	17 verses	2585 chars	bfbf60abb8b9cd74
+Leviticus 4	35 verses	5966 chars	7a6ca1db7dfada71
+Leviticus 5	19 verses	3650 chars	472fb8a9c23b078c
+Leviticus 6	30 verses	4598 chars	d1cff65bec0647bf
+Leviticus 7	38 verses	5529 chars	dd1230dd8abb3182
+Leviticus 8	36 verses	5106 chars	769386b6972631a2
+Leviticus 9	24 verses	3290 chars	22974991e768d132
+Leviticus 10	20 verses	3282 chars	a25b251ebf221077
+Leviticus 11	47 verses	5896 chars	4a776200149e953a
+Leviticus 12	8 verses	1359 chars	e72210937e085a7c
+Leviticus 13	59 verses	9197 chars	be898ff96f794cbb
+Leviticus 14	57 verses	8493 chars	680f517bc92e79f6
+Leviticus 15	33 verses	4796 chars	c1e4cab72759bebf
+Leviticus 16	34 verses	5966 chars	e5d180b89e9e3ae1
+Leviticus 17	16 verses	2867 chars	d236263cc8012dc7
+Leviticus 18	30 verses	3666 chars	5e14fea4f41b62a2
+Leviticus 19	37 verses	4631 chars	da0f8023e0ae71fa
+Leviticus 20	27 verses	4358 chars	1dc0b06b4aab20c7
+Leviticus 21	24 verses	2947 chars	e0ca3625f2688bad
+Leviticus 22	33 verses	4489 chars	88860a9b57ffdd2e
+Leviticus 23	44 verses	6359 chars	5425e37e5f634da8
+Leviticus 24	23 verses	2838 chars	f76788ba9b981965
+Leviticus 25	55 verses	7768 chars	b66940e8d4bd6168
+Leviticus 26	46 verses	6403 chars	bcd47eec451a97eb
+Leviticus 27	34 verses	4842 chars	2ed8b57266b8cc17
+Numbers 1	54 verses	7290 chars	2af42faead587084
+Numbers 2	34 verses	4494 chars	0a1b1f0d4b0902b8
+Numbers 3	51 verses	7015 chars	2d4e25816569c198
+Numbers 4	49 verses	7680 chars	b73cc9fd243557bc
+Numbers 5	31 verses	4679 chars	f6b21d7713758c13
+Numbers 6	27 verses	3902 chars	0c9f066ad0c87237
+Numbers 7	89 verses	10394 chars	526a10c3358d30ec
+Numbers 8	26 verses	3767 chars	657d1c1b32c7675e
+Numbers 9	23 verses	3790 chars	28227ffccfafc60f
+Numbers 10	36 verses	4595 chars	f286d25decc3b8ae
+Numbers 11	35 verses	5408 chars	144174da29fb064b
+Numbers 12	16 verses	1993 chars	7a1313cb5d7236ef
+Numbers 13	33 verses	3746 chars	951d9ca37711e740
+Numbers 14	45 verses	6212 chars	e03a1a0f7a960404
+Numbers 15	41 verses	5551 chars	613e38f9780a3e86
+Numbers 16	50 verses	7055 chars	837f3f7944dda73e
+Numbers 17	13 verses	1773 chars	4a53f9b30411b852
+Numbers 18	32 verses	5868 chars	3d3d5d0020c95a3d
+Numbers 19	22 verses	3567 chars	9a3ac9885d4c2643
+Numbers 20	29 verses	4148 chars	e36d4bbc932adea2
+Numbers 21	35 verses	4851 chars	1945bf531978dac1
+Numbers 22	41 verses	5963 chars	2a4138c5b3783a99
+Numbers 23	30 verses	3756 chars	1a4f925be781f9e2
+Numbers 24	25 verses	3411 chars	db42d4442f416476
+Numbers 25	18 verses	2350 chars	7dcecc7599a60c31
+Numbers 26	65 verses	8068 chars	98198172a11067c8
+Numbers 27	23 verses	3225 chars	4054d410218c0633
+Numbers 28	31 verses	4071 chars	b720937b8bbcdda2
+Numbers 29	40 verses	5251 chars	2a4fdc5962cca141
+Numbers 30	16 verses	2571 chars	6890d80a230d337f
+Numbers 31	54 verses	6533 chars	c43c7e1ca7d34882
+Numbers 32	42 verses	5391 chars	e67a3520e18e1963
+Numbers 33	56 verses	5249 chars	b9d1d3eb59fae75c
+Numbers 34	29 verses	3283 chars	f5e72d395368795e
+Numbers 35	34 verses	5012 chars	213d593f2e6e99c8
+Numbers 36	13 verses	2450 chars	4513b5fd61a71fa8
+Deuteronomy 1	46 verses	6391 chars	2256612194943d2b
+Deuteronomy 2	37 verses	5259 chars	57a176624c021faa
+Deuteronomy 3	29 verses	4217 chars	66e3f8f0e35aaa85
+Deuteronomy 4	49 verses	7766 chars	e23f744075562b80
+Deuteronomy 5	33 verses	4591 chars	11325dd2ebef6885
+Deuteronomy 6	25 verses	3301 chars	e52a59d5351a3d2b
+Deuteronomy 7	26 verses	4437 chars	528340c217762a99
+Deuteronomy 8	20 verses	2955 chars	0511f62a6cac83b1
+Deuteronomy 9	29 verses	5036 chars	a3830e7fda002837
+Deuteronomy 10	22 verses	3068 chars	9fd54a4976deef40
+Deuteronomy 11	32 verses	4798 chars	802f97b515950598
+Deuteronomy 12	32 verses	5449 chars	ee539933f061a291
+Deuteronomy 13	18 verses	3193 chars	77678081a695cbdc
+Deuteronomy 14	29 verses	3566 chars	51c48b92a36582a6
+Deuteronomy 15	23 verses	3608 chars	a65ce95b5c4b211e
+Deuteronomy 16	22 verses	3726 chars	b13c87db543fb113
+Deuteronomy 17	20 verses	3679 chars	86392426833e2ede
+Deuteronomy 18	22 verses	3108 chars	21b20ba02600974b
+Deuteronomy 19	21 verses	3155 chars	83eafa023013ddb5
+Deuteronomy 20	20 verses	3331 chars	db0fad2a9d9778b2
+Deuteronomy 21	23 verses	3675 chars	5646e90997e04cc5
+Deuteronomy 22	30 verses	4452 chars	03bcf2d75198a84d
+Deuteronomy 23	25 verses	3558 chars	04a8b23ef8198eb3
+Deuteronomy 24	22 verses	3436 chars	9aed4f365be845c1
+Deuteronomy 25	19 verses	2858 chars	17696cd47079c3f6
+Deuteronomy 26	19 verses	3465 chars	f31542336997ec0a
+Deuteronomy 27	26 verses	3152 chars	d9b6a01fb44d819c
+Deuteronomy 28	68 verses	10805 chars	7dcfcdecb4ecdb64
+Deuteronomy 29	29 verses	4327 chars	f9b98a519355b3f1
+Deuteronomy 30	20 verses	3341 chars	88a00b9f7fe79a49
+Deuteronomy 31	30 verses	5279 chars	49aa1b1a78ba16c8
+Deuteronomy 32	52 verses	6760 chars	c88c1fbe78b76e12
+Deuteronomy 33	29 verses	4168 chars	79d07dc4e07bf368
+Deuteronomy 34	12 verses	1581 chars	d2a1a36a3dd8db19
+Joshua 1	18 verses	3028 chars	be0c5b7f20afc8ba
+Joshua 2	24 verses	3868 chars	a1c46026cf936140
+Joshua 3	17 verses	2906 chars	d128d9b9dc827d49
+Joshua 4	24 verses	3654 chars	41b4d2db37cefffa
+Joshua 5	15 verses	2846 chars	488b2392d05928d9
+Joshua 6	27 verses	4682 chars	22397432cccdb739
+Joshua 7	26 verses	4826 chars	9bc2d532a2ebe837
+Joshua 8	35 verses	6133 chars	58717c231678288b
+Joshua 9	27 verses	4124 chars	b6b13855e4b86153
+Joshua 10	43 verses	7244 chars	ae77c0afd4cae7b4
+Joshua 11	23 verses	3799 chars	f2c93f70d6ee3182
+Joshua 12	24 verses	2526 chars	1920d1479129a142
+Joshua 13	33 verses	4638 chars	e6c6fb13faa84c6d
+Joshua 14	15 verses	2549 chars	af3d3ac1b4519bb4
+Joshua 15	63 verses	5743 chars	4d85f606c1e29e87
+Joshua 16	10 verses	1412 chars	0184212112919f62
+Joshua 17	18 verses	3559 chars	66f3a0e4e97a883f
+Joshua 18	28 verses	4218 chars	3b54c361e095892f
+Joshua 19	51 verses	5489 chars	326a53b729fae835
+Joshua 20	9 verses	1658 chars	2aaf547848418a1b
+Joshua 21	45 verses	5515 chars	9f14c024abf5b4fd
+Joshua 22	34 verses	6934 chars	359fbf35305b3bee
+Joshua 23	16 verses	2899 chars	f917a6e2f157f4af
+Joshua 24	33 verses	5348 chars	98ffca1f7a2d258e
+Judges 1	36 verses	5220 chars	fc8cc346553d0d3b
+Judges 2	23 verses	3650 chars	d4838a5925e8ee96
+Judges 3	31 verses	4458 chars	42405b95f571ef6c
+Judges 4	24 verses	3905 chars	bae2771fb6a22e53
+Judges 5	31 verses	4052 chars	3be37daddae13ad6
+Judges 6	40 verses	6496 chars	c5ff02e4d6eb3cc6
+Judges 7	25 verses	4988 chars	ab3ab2bb45edfecd
+Judges 8	35 verses	5140 chars	2dc1283481641b42
+Judges 9	57 verses	8616 chars	b5542c269acf5f95
+Judges 10	18 verses	2534 chars	ba5adc1e8cb4ddf0
+Judges 11	40 verses	6466 chars	fcd7f35337d95b0b
+Judges 12	15 verses	2178 chars	689cf2d646003777
+Judges 13	25 verses	3751 chars	4b1f069e6e7728dd
+Judges 14	20 verses	3507 chars	a1fffdda193b6f68
+Judges 15	20 verses	3284 chars	2bf6b2b1c4abe115
+Judges 16	31 verses	5620 chars	9bbc0a9b87457864
+Judges 17	13 verses	1924 chars	7ee124f1b3455386
+Judges 18	31 verses	5233 chars	a3653dc60a1143a8
+Judges 19	30 verses	5523 chars	15c7a37ba3153f26
+Judges 20	48 verses	7698 chars	0b35e899f2564d49
+Judges 21	25 verses	3886 chars	a60eaeea728da4cc
+Ruth 1	22 verses	3268 chars	412d3a0c0af5dcf4
+Ruth 2	23 verses	3849 chars	1c9ffc5db231b385
+Ruth 3	18 verses	2657 chars	ca894d7baa3cb3bd
+Ruth 4	22 verses	3154 chars	a8ae0d72e89723b6
+First Samuel 1	28 verses	3925 chars	ef497f9ebaf83a64
+First Samuel 2	36 verses	5598 chars	986a971e52eb8354
+First Samuel 3	21 verses	2712 chars	4a406369e3f9cf46
+First Samuel 4	22 verses	3733 chars	3ca44f1ef06cad46
+First Samuel 5	12 verses	2186 chars	a4ac86569fe2ed6b
+First Samuel 6	21 verses	3872 chars	9531dfe293828135
+First Samuel 7	17 verses	2728 chars	80ecd96fd6c19a34
+First Samuel 8	22 verses	2779 chars	3cb4e700ac87ddf7
+First Samuel 9	27 verses	4825 chars	4e6c327b340bee62
+First Samuel 10	27 verses	4431 chars	ea8c06381d47acca
+First Samuel 11	15 verses	2578 chars	0107b3cf2482c0d8
+First Samuel 12	25 verses	3914 chars	49cff0a2b824822c
+First Samuel 13	23 verses	3807 chars	1a24eb0606108427
+First Samuel 14	52 verses	8428 chars	875d21420e5ed30f
+First Samuel 15	35 verses	5102 chars	929e554f35a34d07
+First Samuel 16	23 verses	3486 chars	27feb76c5e61b32e
+First Samuel 17	58 verses	8809 chars	926812847c34afa5
+First Samuel 18	30 verses	4340 chars	43efa7e0d7e0e4e4
+First Samuel 19	24 verses	3624 chars	71937b54fb1c4c1f
+First Samuel 20	42 verses	6495 chars	15e8eec25e33fb62
+First Samuel 21	15 verses	2558 chars	78c835c9ba68936f
+First Samuel 22	23 verses	3866 chars	3525de66303b83fd
+First Samuel 23	29 verses	4318 chars	f2f7cc92b3972992
+First Samuel 24	22 verses	3345 chars	888cc0434032d3fc
+First Samuel 25	44 verses	7370 chars	0f33903611e6c601
+First Samuel 26	25 verses	4340 chars	d32edc14f3461411
+First Samuel 27	12 verses	2000 chars	a1dff7398cfb4eb7
+First Samuel 28	25 verses	4323 chars	38720f3dc3c3534d
+First Samuel 29	11 verses	2172 chars	31caebd664c2c3a7
+First Samuel 30	31 verses	4964 chars	cb0d10ac32ebcadc
+First Samuel 31	13 verses	1871 chars	60a3d6d9559d489d
+Second Samuel 1	27 verses	3644 chars	854281588c822aa5
+Second Samuel 2	32 verses	4787 chars	8f1c794d9b37310c
+Second Samuel 3	39 verses	5811 chars	40353f7155880a87
+Second Samuel 4	12 verses	2253 chars	fcfc2be5ae7f08f5
+Second Samuel 5	25 verses	3349 chars	05c74974b55b77d3
+Second Samuel 6	23 verses	3633 chars	c84f064e5d0bea58
+Second Samuel 7	29 verses	4331 chars	6ea2ad590108225c
+Second Samuel 8	18 verses	2488 chars	e705a6ac4a053225
+Second Samuel 9	13 verses	2095 chars	3c319ae6f50afa4f
+Second Samuel 10	19 verses	3229 chars	ad2a0f0bb1df281f
+Second Samuel 11	27 verses	4130 chars	e0682254c064bd29
+Second Samuel 12	31 verses	5048 chars	fdc1a6151d8e420d
+Second Samuel 13	39 verses	5832 chars	f73b46284bf770b0
+Second Samuel 14	33 verses	5582 chars	94640d239bffa0cc
+Second Samuel 15	37 verses	5748 chars	b2729c92ea0f5a76
+Second Samuel 16	23 verses	3761 chars	d43fc18d87526e66
+Second Samuel 17	29 verses	4895 chars	7df2a70ad6d8c590
+Second Samuel 18	33 verses	5592 chars	8e4a5dfdb7b94f00
+Second Samuel 19	43 verses	7342 chars	e702e01e0b77b4e6
+Second Samuel 20	26 verses	4268 chars	7f7cb59cb95291f2
+Second Samuel 21	22 verses	4073 chars	d524e579f84063fd
+Second Samuel 22	51 verses	4845 chars	8bfba9d286af0dd4
+Second Samuel 23	39 verses	4602 chars	4fb5d273d9478849
+Second Samuel 24	25 verses	4403 chars	0152ae7b59ce130b
+First Kings 1	53 verses	7824 chars	4cd773b2f3a7ad6a
+First Kings 2	46 verses	7712 chars	9393bb28c33f1791
+First Kings 3	28 verses	4319 chars	0f0616eadee494c4
+First Kings 4	34 verses	3840 chars	b8139a7a64fbe53f
+First Kings 5	18 verses	2810 chars	4991d2a64ec92ece
+First Kings 6	38 verses	5290 chars	992b2c0129032a39
+First Kings 7	51 verses	7764 chars	6cf7759113c6a614
+First Kings 8	66 verses	11306 chars	1867e2458c6a69c8
+First Kings 9	28 verses	4354 chars	b7e71933458d7a46
+First Kings 10	29 verses	4366 chars	6a895b1b041ac232
+First Kings 11	43 verses	6548 chars	2fcc164280cf94cc
+First Kings 12	33 verses	5436 chars	0aaf77b1114c0ae4
+First Kings 13	34 verses	5516 chars	e438f079ed0ab1b5
+First Kings 14	31 verses	5042 chars	35bfa167dbf02ca5
+First Kings 15	34 verses	4903 chars	c741adfb66106dcc
+First Kings 16	34 verses	5171 chars	46f9691ce588721f
+First Kings 17	24 verses	3296 chars	37274baa449aed29
+First Kings 18	46 verses	6976 chars	c7b55c193ad100a5
+First Kings 19	21 verses	3671 chars	77d18877be8ea523
+First Kings 20	43 verses	7612 chars	69246a860b5123dd
+First Kings 21	29 verses	4675 chars	2c546ea36017fe0a
+First Kings 22	53 verses	7789 chars	87a91dc4e64ca69e
+Second Kings 1	18 verses	3322 chars	cbd7d22d5eb2ad22
+Second Kings 2	25 verses	4221 chars	4abaef61f9c51700
+Second Kings 3	27 verses	4353 chars	ecd41fc4610ac759
+Second Kings 4	44 verses	6610 chars	c02cbc1db2a93945
+Second Kings 5	27 verses	4929 chars	cd6c92974d6ea051
+Second Kings 6	33 verses	5029 chars	105f84888f6d5f29
+Second Kings 7	20 verses	4079 chars	38574aff4d5ade71
+Second Kings 8	29 verses	4807 chars	3cef12e27138176b
+Second Kings 9	37 verses	6015 chars	d499702449382bf4
+Second Kings 10	36 verses	6104 chars	cbf54dcfdefaf4a0
+Second Kings 11	21 verses	3743 chars	b4b349b0e4d3b68c
+Second Kings 12	21 verses	3564 chars	5f5540f90f7275ae
+Second Kings 13	25 verses	4041 chars	b050b49a06dd2a67
+Second Kings 14	29 verses	4542 chars	ef9d3321a3f7869d
+Second Kings 15	38 verses	5567 chars	57c179dd7581194f
+Second Kings 16	20 verses	3411 chars	052bb78dfa96125d
+Second Kings 17	41 verses	6630 chars	d1bfa81580b25de6
+Second Kings 18	37 verses	6288 chars	4012fe4bcc55fbb9
+Second Kings 19	37 verses	5993 chars	f0682bb4d9b934a4
+Second Kings 20	21 verses	3367 chars	f9ade7a2e834ef46
+Second Kings 21	26 verses	3835 chars	5a1276b07d22013b
+Second Kings 22	20 verses	3706 chars	eb7d4069546a0a49
+Second Kings 23	37 verses	7671 chars	8e711108a1f76410
+Second Kings 24	20 verses	3131 chars	f400053f73d605db
+Second Kings 25	30 verses	5102 chars	32111e688819e2b1
+First Chronicles 1	54 verses	3796 chars	db1d420331c5476d
+First Chronicles 2	55 verses	4761 chars	73f6bf938d4d22c7
+First Chronicles 3	24 verses	2043 chars	9cfaa490a5326926
+First Chronicles 4	43 verses	4692 chars	75cbf0d842553a7f
+First Chronicles 5	26 verses	3593 chars	b9cd7d0e91484010
+First Chronicles 6	81 verses	7188 chars	492127a3d1fc9415
+First Chronicles 7	40 verses	4609 chars	b952adcc14468cac
+First Chronicles 8	40 verses	2763 chars	16bf04ff0c01eb7e
+First Chronicles 9	44 verses	5254 chars	9cd4754f1f084b9a
+First Chronicles 10	14 verses	1947 chars	04900631313b3323
+First Chronicles 11	47 verses	5104 chars	678ce9a6d7653477
+First Chronicles 12	40 verses	5314 chars	ce26f3e44fb32de2
+First Chronicles 13	14 verses	1993 chars	ccdd0096fc17d654
+First Chronicles 14	17 verses	1948 chars	6d3af7d3c2981174
+First Chronicles 15	29 verses	3870 chars	71cf2a3568033a97
+First Chronicles 16	43 verses	4474 chars	8c02ac18ad12e588
+First Chronicles 17	27 verses	3960 chars	693783e308afc0af
+First Chronicles 18	17 verses	2275 chars	664b828ccc27386c
+First Chronicles 19	19 verses	3364 chars	cfa695ab65ef2f78
+First Chronicles 20	8 verses	1481 chars	c923d23b4f36c8cc
+First Chronicles 21	30 verses	4738 chars	85b207c59e652a9a
+First Chronicles 22	19 verses	3106 chars	42faaa9a6bd73fa4
+First Chronicles 23	32 verses	3631 chars	8df8d8486994650b
+First Chronicles 24	31 verses	3026 chars	40e1f29dd10fb595
+First Chronicles 25	31 verses	3113 chars	ea9d91a58f534b2c
+First Chronicles 26	32 verses	4023 chars	95d001b14a3d4cf6
+First Chronicles 27	34 verses	4414 chars	7647e98c1da75e59
+First Chronicles 28	21 verses	4415 chars	2ae6388dfbd0f38c
+First Chronicles 29	30 verses	5201 chars	6e6f37feec41676b
+Second Chronicles 1	17 verses	2841 chars	0bd734a791f79a05
+Second Chronicles 2	18 verses	3360 chars	6de2e80f6d2b18b6
+Second Chronicles 3	17 verses	2551 chars	1dac98dfb25ef156
+Second Chronicles 4	22 verses	3094 chars	44b40b82072ac6e9
+Second Chronicles 5	14 verses	2615 chars	fad6741f1ad8f261
+Second Chronicles 6	42 verses	7384 chars	c2791cdc0579fe89
+Second Chronicles 7	22 verses	3937 chars	f5e04b69b4274a77
+Second Chronicles 8	18 verses	2886 chars	819fa9136a606b30
+Second Chronicles 9	31 verses	4641 chars	1e08ab72dc17e397
+Second Chronicles 10	19 verses	2943 chars	7db344d194d39c75
+Second Chronicles 11	23 verses	2688 chars	a8e09e59aaaed5eb
+Second Chronicles 12	16 verses	2676 chars	afae94758b5bc423
+Second Chronicles 13	22 verses	3484 chars	163178da320f8737
+Second Chronicles 14	15 verses	2330 chars	ea73211a3fc33709
+Second Chronicles 15	19 verses	2643 chars	e160bc299f87b2cc
+Second Chronicles 16	14 verses	2459 chars	8a8ad20d8f5f01b3
+Second Chronicles 17	19 verses	2552 chars	8ac579d80463133f
+Second Chronicles 18	34 verses	5416 chars	ea35e5f782b837f0
+Second Chronicles 19	11 verses	1876 chars	5abf577c0b16b320
+Second Chronicles 20	37 verses	6170 chars	bff4b97d97753cb4
+Second Chronicles 21	20 verses	3296 chars	6c46f6170eaebad6
+Second Chronicles 22	12 verses	2303 chars	e799b052479c3814
+Second Chronicles 23	21 verses	4066 chars	9cc89d91f60cb38f
+Second Chronicles 24	27 verses	4862 chars	3f4c723013d9ea3a
+Second Chronicles 25	28 verses	5094 chars	8d5774c856859484
+Second Chronicles 26	23 verses	3845 chars	03e8a751a8dab33d
+Second Chronicles 27	9 verses	1263 chars	3a0e37282a36bd1e
+Second Chronicles 28	27 verses	4729 chars	36caff19719a2399
+Second Chronicles 29	36 verses	6259 chars	48aa733daa4c1ada
+Second Chronicles 30	27 verses	4824 chars	ced593becbc80f28
+Second Chronicles 31	21 verses	4152 chars	519d195acba705a3
+Second Chronicles 32	33 verses	5750 chars	faa7a8233c02933c
+Second Chronicles 33	25 verses	4034 chars	a482a3ed26c9bab4
+Second Chronicles 34	33 verses	6382 chars	b4f9717f86730fd3
+Second Chronicles 35	27 verses	4947 chars	e06961eea1d83b14
+Second Chronicles 36	23 verses	3915 chars	2d82680bde8171cb
+Ezra 1	11 verses	1972 chars	ddd0347aaa10acf3
+Ezra 2	70 verses	5790 chars	9628c99d7799f38a
+Ezra 3	13 verses	2934 chars	47e7d0296a9a7a04
+Ezra 4	24 verses	4132 chars	270c83eec8eadc61
+Ezra 5	17 verses	3065 chars	3a5bba697ff907b2
+Ezra 6	22 verses	4164 chars	0f0072c822c617b8
+Ezra 7	28 verses	4440 chars	b23c7bf82c934565
+Ezra 8	36 verses	5178 chars	6cfffa87d5654df3
+Ezra 9	15 verses	3252 chars	56a7833da7fc5fe8
+Ezra 10	44 verses	5194 chars	75ac08bd24f88067
+Nehemiah 1	11 verses	2087 chars	59ba35806fb3339a
+Nehemiah 2	20 verses	3571 chars	78e14ca9381f8531
+Nehemiah 3	32 verses	4860 chars	9766643a4615874f
+Nehemiah 4	23 verses	3665 chars	3e2f5fa2bc94d21e
+Nehemiah 5	19 verses	3311 chars	b2573b97aa4ce480
+Nehemiah 6	19 verses	3080 chars	50ee91b27386b81e
+Nehemiah 7	73 verses	6738 chars	b622390ddceb0c64
+Nehemiah 8	18 verses	3662 chars	9a96601b9250f451
+Nehemiah 9	38 verses	7391 chars	ac39fbe8b9089451
+Nehemiah 10	39 verses	3627 chars	c903582435434d0a
+Nehemiah 11	36 verses	4271 chars	cdbab4e189b1dec2
+Nehemiah 12	47 verses	5348 chars	5e497e5fe3daf6f0
+Nehemiah 13	31 verses	5120 chars	8d4fadd97c731125
+Esther 1	22 verses	3893 chars	3ad738441a281865
+Esther 2	23 verses	4365 chars	5ebfbc8970fec9e7
+Esther 3	15 verses	2994 chars	6e11e5c654bd9254
+Esther 4	17 verses	2761 chars	137fc4cc797f8a1a
+Esther 5	14 verses	2505 chars	8567818fb4f5f333
+Esther 6	14 verses	2507 chars	7190fc9bca143de1
+Esther 7	10 verses	1783 chars	3d442ad01d29664c
+Esther 8	17 verses	3446 chars	5247358e19153e35
+Esther 9	32 verses	5319 chars	1aba61d8659d088d
+Esther 10	3 verses	491 chars	876911f295dbb558
+Job 1	22 verses	3322 chars	b8cd274f555c1c4c
+Job 2	13 verses	1987 chars	86bdfac3f4ba5a23
+Job 3	26 verses	2164 chars	3b07e10f6682c9df
+Job 4	21 verses	1804 chars	2b29709fce74d645
+Job 5	27 verses	2359 chars	839d7616cf78e025
+Job 6	30 verses	2454 chars	23e9aa5ee3a61f98
+Job 7	21 verses	1947 chars	4b28ef12b1848f52
+Job 8	22 verses	1806 chars	7a6937df0b6530a1
+Job 9	35 verses	2735 chars	3cbf9276d8702ed3
+Job 10	22 verses	2052 chars	b4d5c14c59157ea1
+Job 11	20 verses	1771 chars	29534e08a6f2f59a
+Job 12	25 verses	2122 chars	384a305275abd4a2
+Job 13	28 verses	2071 chars	679e5e09662ece0c
+Job 14	22 verses	2074 chars	0c43645ff8ee5bd5
+Job 15	35 verses	2975 chars	fb6556406fe18264
+Job 16	22 verses	1891 chars	3adb6d723c6d04da
+Job 17	16 verses	1305 chars	8d0d0b48104e143a
+Job 18	21 verses	1767 chars	56dcf41f86880911
+Job 19	29 verses	2372 chars	1a7259121d3dc6a5
+Job 20	29 verses	2661 chars	d59b25c0e7cc9e37
+Job 21	34 verses	2708 chars	a362597666b66fa9
+Job 22	30 verses	2520 chars	b3e4e531eafc7cf6
+Job 23	17 verses	1406 chars	f773c02f8a4761cd
+Job 24	25 verses	2470 chars	983c5e7114760bd5
+Job 25	6 verses	428 chars	d03b40fec4ea0110
+Job 26	14 verses	1110 chars	c097cf1b507ef1ee
+Job 27	23 verses	1878 chars	3d21e83d137c20b5
+Job 28	28 verses	2325 chars	5baeae2bdda15ca6
+Job 29	25 verses	1953 chars	ea8eff500bb4e270
+Job 30	31 verses	2594 chars	b3e86f35b7c44589
+Job 31	40 verses	3431 chars	3ecc3b9f0306aaed
+Job 32	22 verses	1974 chars	38ae986610ea9d45
+Job 33	33 verses	2695 chars	12bba02487ca4903
+Job 34	37 verses	3227 chars	ae4e1769c47290e8
+Job 35	16 verses	1356 chars	09c89916f9b14cf8
+Job 36	33 verses	2682 chars	14112cab4e29e07d
+Job 37	24 verses	2090 chars	e62b14e5521350c2
+Job 38	41 verses	3427 chars	3579ea3a2b2a3d51
+Job 39	30 verses	2541 chars	57f19994d1f2d884
+Job 40	24 verses	1846 chars	0f7153cf98703897
+Job 41	34 verses	2585 chars	3a8d413b95da9a83
+Job 42	17 verses	2282 chars	7f98c014fc357f13
+Psalms 1	6 verses	673 chars	7c647d638d937838
+Psalms 2	12 verses	1065 chars	0b947a6dd7615ec5
+Psalms 3	8 verses +title	741 chars	8874493c3329a857
+Psalms 4	8 verses +title	873 chars	cbb99bba93b4fb78
+Psalms 5	12 verses +title	1356 chars	2ac051bf40abb1f6
+Psalms 6	10 verses +title	864 chars	4397c498ac9f15c4
+Psalms 7	17 verses +title	1792 chars	8acb88257aca32a9
+Psalms 8	9 verses +title	901 chars	071c86b52197d4bc
+Psalms 9	20 verses +title	1985 chars	3f5df71638229d08
+Psalms 10	18 verses	1825 chars	a569e2a75651c0bf
+Psalms 11	7 verses +title	731 chars	b4e0e6c5f3018d76
+Psalms 12	8 verses +title	826 chars	d5eda8e53c998c0b
+Psalms 13	6 verses +title	580 chars	09d078465e224e41
+Psalms 14	7 verses +title	814 chars	d754131b1e8ca2d9
+Psalms 15	5 verses +title	568 chars	a7d6cddc42f88bc0
+Psalms 16	11 verses +title	1056 chars	1f0a1cf95e2a971f
+Psalms 17	15 verses +title	1621 chars	9ded560fc840c832
+Psalms 18	50 verses +title	4927 chars	a08c2df01b03b5fc
+Psalms 19	14 verses +title	1494 chars	8b299371007c26a3
+Psalms 20	9 verses +title	784 chars	eaed55e0d2c0a094
+Psalms 21	13 verses +title	1344 chars	f66f6c0d84b201f7
+Psalms 22	31 verses +title	2947 chars	15fe1c6a8ee9c412
+Psalms 23	6 verses +title	607 chars	795e9438742aba0b
+Psalms 24	10 verses +title	921 chars	d4e32774fd571059
+Psalms 25	22 verses +title	1720 chars	b3bc0932e6a8b4c0
+Psalms 26	12 verses +title	956 chars	88ab5097a8ce0431
+Psalms 27	14 verses +title	1675 chars	cbc6694d96f69eeb
+Psalms 28	9 verses +title	1067 chars	9f86f0a9c3349086
+Psalms 29	11 verses +title	948 chars	d75332b471341bf5
+Psalms 30	12 verses +title	1177 chars	77b81642ed2a18fc
+Psalms 31	24 verses +title	2558 chars	21a10a7f2c864794
+Psalms 32	11 verses +title	1278 chars	2e1428e7e48a10b7
+Psalms 33	22 verses	1780 chars	1ce18fbf004c4775
+Psalms 34	22 verses +title	1852 chars	1a1ce087e44a9593
+Psalms 35	28 verses +title	2982 chars	72dbefa0fa05444c
+Psalms 36	12 verses +title	1245 chars	d92852a8134898bb
+Psalms 37	40 verses +title	3660 chars	1dca87750957531e
+Psalms 38	22 verses +title	1843 chars	d892c328f5eabec7
+Psalms 39	13 verses +title	1388 chars	5b9a1f8bfdbd114c
+Psalms 40	17 verses +title	2107 chars	522250a6c09a306d
+Psalms 41	13 verses +title	1278 chars	de3c8cd269ee6c1c
+Psalms 42	11 verses +title	1433 chars	64c74f8b0774fe86
+Psalms 43	5 verses	626 chars	a3bc3b451d56d285
+Psalms 44	26 verses +title	2378 chars	64778951cce1b3cd
+Psalms 45	17 verses +title	1901 chars	88c671b88aa1cc2f
+Psalms 46	11 verses +title	1110 chars	52e2e92540052d92
+Psalms 47	9 verses +title	801 chars	c42d11368672ddbf
+Psalms 48	14 verses +title	1200 chars	17f422003727b9cf
+Psalms 49	20 verses +title	1861 chars	4a66adff4cc42964
+Psalms 50	23 verses +title	2138 chars	a9e942ab6c8e0084
+Psalms 51	19 verses +title	1865 chars	5003c493eb97f6e1
+Psalms 52	9 verses +title	1038 chars	df9362bc8bdf61c2
+Psalms 53	6 verses +title	869 chars	7ed669c75747970c
+Psalms 54	7 verses +title	683 chars	423215db8db51dfd
+Psalms 55	23 verses +title	2288 chars	cb61a58f8cb5978d
+Psalms 56	13 verses +title	1204 chars	ae40db5055d52df5
+Psalms 57	11 verses +title	1249 chars	9335a8e61c8eaa40
+Psalms 58	11 verses +title	1171 chars	861be4ebd3c7d591
+Psalms 59	17 verses +title	1804 chars	ff0e8f59b95052b6
+Psalms 60	12 verses +title	1286 chars	87317302187fa0d3
+Psalms 61	8 verses +title	705 chars	afb23be9be4b70ad
+Psalms 62	12 verses +title	1214 chars	61b9d62aef66c849
+Psalms 63	11 verses +title	1034 chars	44c5fd2493ebab96
+Psalms 64	10 verses +title	1022 chars	23d4b5c7532f9d80
+Psalms 65	13 verses +title	1540 chars	7dd2b6c33a5ccb83
+Psalms 66	20 verses +title	1711 chars	726c809108fb9dff
+Psalms 67	7 verses +title	617 chars	81dd20d15d712853
+Psalms 68	35 verses +title	3753 chars	48a069547f536c7e
+Psalms 69	36 verses +title	3473 chars	6f0e70194385aba2
+Psalms 70	5 verses +title	574 chars	661b14880c9e4c1e
+Psalms 71	24 verses	2390 chars	72bcc0127fc015a3
+Psalms 72	20 verses +title	1966 chars	e83f4680b93065b1
+Psalms 73	28 verses +title	2231 chars	0931ac920b319d7b
+Psalms 74	23 verses +title	2262 chars	7b824f81b984472a
+Psalms 75	10 verses +title	997 chars	9d64277bc456be6a
+Psalms 76	12 verses +title	1049 chars	7dd38482b8aa5cae
+Psalms 77	20 verses +title	1734 chars	5e0e1dd223d09af1
+Psalms 78	72 verses +title	6543 chars	d79cb3ba0d19a3f3
+Psalms 79	13 verses +title	1509 chars	201b6d4e4437d35a
+Psalms 80	19 verses +title	1759 chars	828d11bfb50481a9
+Psalms 81	16 verses +title	1540 chars	f227406c0929e828
+Psalms 82	8 verses +title	624 chars	9e8ea789bd499ec4
+Psalms 83	18 verses +title	1469 chars	e5eb916ac8519876
+Psalms 84	12 verses +title	1197 chars	1d8e71b4722a71b9
+Psalms 85	13 verses +title	1154 chars	9c87de271c4eb8bd
+Psalms 86	17 verses +title	1575 chars	b9f8da8efd7f69fe
+Psalms 87	7 verses +title	627 chars	0f0ff82c9a7cdeeb
+Psalms 88	18 verses +title	1645 chars	e46f61a6c8a05fef
+Psalms 89	52 verses +title	4587 chars	5edd18da8022b320
+Psalms 90	17 verses +title	1682 chars	7c00cfb5a73f3814
+Psalms 91	16 verses	1475 chars	0e8b0ad783362dee
+Psalms 92	15 verses +title	1376 chars	fe1d86af462f281c
+Psalms 93	5 verses	512 chars	f8a2bcbcb60d3724
+Psalms 94	23 verses	1911 chars	aab64e6fa159f130
+Psalms 95	11 verses	952 chars	a19dc2ce665472d7
+Psalms 96	13 verses	1176 chars	349eed6d109871f7
+Psalms 97	12 verses	1052 chars	9906e57ec2041ecb
+Psalms 98	9 verses +title	901 chars	b24743893a6606e1
+Psalms 99	9 verses	858 chars	3e69bcb188409d72
+Psalms 100	5 verses +title	469 chars	2e871523a563e112
+Psalms 101	8 verses +title	861 chars	653b7cf3186c2178
+Psalms 102	28 verses +title	2409 chars	ccc1fe5ce339021d
+Psalms 103	22 verses +title	1840 chars	ee22b92abef9bfb6
+Psalms 104	35 verses	3106 chars	4fec3c74c6e56041
+Psalms 105	45 verses	3311 chars	403336c94eae4790
+Psalms 106	48 verses	4179 chars	4ca474465bc8d6b8
+Psalms 107	43 verses	3717 chars	1f4592f667ab9c6c
+Psalms 108	13 verses +title	1070 chars	63cbe8d2e05f8d30
+Psalms 109	31 verses +title	2773 chars	6d9c0ae1164a3756
+Psalms 110	7 verses +title	732 chars	cc97aa1226b8a1a2
+Psalms 111	10 verses	956 chars	b454dee1a0c8ce7e
+Psalms 112	10 verses	968 chars	de1046bb385f39af
+Psalms 113	9 verses	700 chars	39d28d130c904fa5
+Psalms 114	8 verses	576 chars	e12e0741afe8cbe5
+Psalms 115	18 verses	1384 chars	56f0249a9414cfa8
+Psalms 116	19 verses	1421 chars	d09aca65006bcff9
+Psalms 117	2 verses	171 chars	620ba4bac3ad620a
+Psalms 118	29 verses	2296 chars	cdccc0c231514476
+Psalms 119	176 verses	12816 chars	6db035332243c304
+Psalms 120	7 verses +title	448 chars	43e24180a4b1a6cf
+Psalms 121	8 verses +title	582 chars	010d4b5b4f369c80
+Psalms 122	9 verses +title	666 chars	e602d5a375b45b5d
+Psalms 123	4 verses +title	489 chars	bdb559eae645ee43
+Psalms 124	8 verses +title	598 chars	c3524b98a5bb499b
+Psalms 125	5 verses +title	585 chars	562d7294466dbbe0
+Psalms 126	6 verses +title	534 chars	9c73636831d67fc5
+Psalms 127	5 verses +title	561 chars	b6aabd618c4cabf9
+Psalms 128	6 verses +title	541 chars	679c23be4d3e3222
+Psalms 129	8 verses +title	632 chars	a0a152a08f51e5ec
+Psalms 130	8 verses +title	616 chars	8cac00103bdec118
+Psalms 131	3 verses +title	329 chars	0332e75667989f0c
+Psalms 132	18 verses +title	1424 chars	98e29e909af3dda9
+Psalms 133	3 verses +title	396 chars	86659cd7019c8748
+Psalms 134	3 verses +title	235 chars	d8f27b9bcca5e3bb
+Psalms 135	21 verses	1698 chars	1f25c0f6d778462d
+Psalms 136	26 verses	1837 chars	f7e22752dcae5110
+Psalms 137	9 verses	844 chars	66621143bf2433de
+Psalms 138	8 verses +title	905 chars	90df6492af12baee
+Psalms 139	24 verses +title	2129 chars	976e71ead52b3141
+Psalms 140	13 verses +title	1306 chars	abd708ae081c062b
+Psalms 141	10 verses +title	1045 chars	6cad4aaf7f9633ed
+Psalms 142	7 verses +title	808 chars	268cebb670a8ce30
+Psalms 143	12 verses +title	1285 chars	10a05929d164ff7e
+Psalms 144	15 verses +title	1611 chars	d3d51663c087772a
+Psalms 145	21 verses +title	1736 chars	a2c56620e77d7d69
+Psalms 146	10 verses	924 chars	0d8b63fc3ecb3a17
+Psalms 147	20 verses	1592 chars	0f30a58f60715b53
+Psalms 148	14 verses	1069 chars	c29bbd49e69b3b47
+Psalms 149	9 verses	757 chars	7977c2bcaa9e541b
+Psalms 150	6 verses	482 chars	3548c09d19c3fc54
+Proverbs 1	33 verses	2743 chars	114fcba4a527f23b
+Proverbs 2	22 verses	1713 chars	26e831fa304cb070
+Proverbs 3	35 verses	2802 chars	c22b353e326e1f55
+Proverbs 4	27 verses	2145 chars	0e33aeea95d8c4ce
+Proverbs 5	23 verses	1838 chars	b46b245d91137350
+Proverbs 6	35 verses	2892 chars	2cd17fac9344ab46
+Proverbs 7	27 verses	2098 chars	d1766564bd982c03
+Proverbs 8	36 verses	2946 chars	5d1f05d6091f451e
+Proverbs 9	18 verses	1493 chars	d3758ee5014d092e
+Proverbs 10	32 verses	2795 chars	1d8b6a4bd326516b
+Proverbs 11	31 verses	2915 chars	eb3185f078375b4f
+Proverbs 12	28 verses	2546 chars	5acc81aa587fc2db
+Proverbs 13	25 verses	2215 chars	a9e6f2ea30026ded
+Proverbs 14	35 verses	3009 chars	94c7074cf1892574
+Proverbs 15	33 verses	2920 chars	6c247378b71d0235
+Proverbs 16	33 verses	2813 chars	ff524468a221f1ff
+Proverbs 17	28 verses	2540 chars	4e7e1ef813f500ad
+Proverbs 18	24 verses	2037 chars	d6cd4ebda9d881a7
+Proverbs 19	29 verses	2689 chars	fa7e05c85f6e999a
+Proverbs 20	30 verses	2574 chars	ef21bbe612d91404
+Proverbs 21	31 verses	2676 chars	1fc153a651bed4fd
+Proverbs 22	29 verses	2514 chars	815aef532f4069f7
+Proverbs 23	35 verses	2903 chars	dfe45f837852f190
+Proverbs 24	34 verses	3032 chars	738c338b4799d764
+Proverbs 25	28 verses	2641 chars	07d8698f0e193e0a
+Proverbs 26	28 verses	2311 chars	0c65bb72b4e7b8ba
+Proverbs 27	27 verses	2416 chars	70566b6d687de6a3
+Proverbs 28	28 verses	2814 chars	989b4fdd6927a828
+Proverbs 29	27 verses	2323 chars	922deae97a906506
+Proverbs 30	33 verses	3244 chars	d2880fc8e7de4a9e
+Proverbs 31	31 verses	2458 chars	02e34f07776e3cdd
+Ecclesiastes 1	18 verses	2028 chars	da62cb3f625d21e8
+Ecclesiastes 2	26 verses	3662 chars	7cb7e9a365657397
+Ecclesiastes 3	22 verses	2478 chars	348c913e7b9b4f95
+Ecclesiastes 4	16 verses	1948 chars	e974bf99997453d8
+Ecclesiastes 5	20 verses	2689 chars	e931e21a07a667d9
+Ecclesiastes 6	12 verses	1481 chars	5f35228764186521
+Ecclesiastes 7	29 verses	3141 chars	aff280f8ebe86381
+Ecclesiastes 8	17 verses	2570 chars	957617fdfa08b27b
+Ecclesiastes 9	18 verses	2762 chars	c035fc4b34798c73
+Ecclesiastes 10	20 verses	2072 chars	f8be90d3f30419d2
+Ecclesiastes 11	10 verses	1372 chars	8c26a24b79238c2f
+Ecclesiastes 12	14 verses	1938 chars	34ff80b29314f683
+Song of Solomon 1	17 verses	1686 chars	ad6ce03e5ce2be4d
+Song of Solomon 2	17 verses	1745 chars	f32f1279d01ddda3
+Song of Solomon 3	11 verses	1441 chars	f4c7589aef451008
+Song of Solomon 4	16 verses	1931 chars	f0258e4e547891fc
+Song of Solomon 5	16 verses	1998 chars	8bee56355854fa94
+Song of Solomon 6	13 verses	1472 chars	34883cdc56b51697
+Song of Solomon 7	13 verses	1473 chars	e8196b1c175e4d51
+Song of Solomon 8	14 verses	1826 chars	14f7eb8d268c4249
+Isaiah 1	31 verses	4013 chars	655561ff0ca7caaf
+Isaiah 2	22 verses	2883 chars	ac4d04fbd08aab4d
+Isaiah 3	26 verses	3119 chars	2f55c296a2dabf96
+Isaiah 4	6 verses	1059 chars	993b1fcd176443a9
+Isaiah 5	30 verses	4546 chars	ae95e493983e50d5
+Isaiah 6	13 verses	1814 chars	e2a7f592431194db
+Isaiah 7	25 verses	3484 chars	e94b52a18ffe36cf
+Isaiah 8	22 verses	2928 chars	d1c4fea46e888ddb
+Isaiah 9	21 verses	3176 chars	f185fff87cb4c45e
+Isaiah 10	34 verses	4728 chars	92fa0f233259c4c6
+Isaiah 11	16 verses	2656 chars	cef5a3070938f08d
+Isaiah 12	6 verses	684 chars	3e71d0a629ef9be8
+Isaiah 13	22 verses	3033 chars	3c38ac92c9689225
+Isaiah 14	32 verses	4425 chars	7aa166bd43b7ccd8
+Isaiah 15	9 verses	1408 chars	8d9b1b084467c6d4
+Isaiah 16	14 verses	2228 chars	1ba65d4cee2c45a0
+Isaiah 17	14 verses	2222 chars	7cbddc2c917e9c68
+Isaiah 18	7 verses	1345 chars	4f3e680341ad0187
+Isaiah 19	25 verses	3767 chars	e559f174a06438de
+Isaiah 20	6 verses	914 chars	28a1a13d7ad54d1d
+Isaiah 21	17 verses	2196 chars	e188983e55f8b022
+Isaiah 22	25 verses	3442 chars	50f6e3bd4159d03e
+Isaiah 23	18 verses	2509 chars	ad7762086240de31
+Isaiah 24	23 verses	3150 chars	3d9ddc2be23fa9bc
+Isaiah 25	12 verses	1889 chars	9a3806388126f895
+Isaiah 26	21 verses	2841 chars	f98f1ce362dfb578
+Isaiah 27	13 verses	2040 chars	da8955bce6d1f748
+Isaiah 28	29 verses	4269 chars	19a8bbe3d3b06c1a
+Isaiah 29	24 verses	3842 chars	7cca777adefd376a
+Isaiah 30	33 verses	5415 chars	63b9f6485badd100
+Isaiah 31	9 verses	1647 chars	80badd5e77d0c8e3
+Isaiah 32	20 verses	2325 chars	38d91209c9d54237
+Isaiah 33	24 verses	3240 chars	c47eb6fc57b4a20a
+Isaiah 34	17 verses	2733 chars	dc56592fcd3fae08
+Isaiah 35	10 verses	1471 chars	5646c83985a234cc
+Isaiah 36	22 verses	3541 chars	b98617170a176ace
+Isaiah 37	38 verses	5911 chars	130c37a5216fa819
+Isaiah 38	22 verses	2886 chars	22be8c5826fdcf04
+Isaiah 39	8 verses	1414 chars	551bdfee33bd5409
+Isaiah 40	31 verses	4199 chars	221b24116cf7a334
+Isaiah 41	29 verses	4179 chars	d3216c3be235e746
+Isaiah 42	25 verses	3434 chars	53721bfe329b10d5
+Isaiah 43	28 verses	3664 chars	dd78acc78a575dc3
+Isaiah 44	28 verses	4663 chars	5f1d9e7fd5e3747d
+Isaiah 45	25 verses	3981 chars	efba5ed11326e06a
+Isaiah 46	13 verses	1745 chars	66d12e874fd749e5
+Isaiah 47	15 verses	2531 chars	89326182802b5b5e
+Isaiah 48	22 verses	3196 chars	c02147899af24ec8
+Isaiah 49	26 verses	4445 chars	57cb94f3f3a5089f
+Isaiah 50	11 verses	1849 chars	20ef9856412e9d54
+Isaiah 51	23 verses	3932 chars	cae50260397c6c5c
+Isaiah 52	15 verses	2164 chars	5bf41df037803db4
+Isaiah 53	12 verses	1986 chars	aa67d201ae1467ef
+Isaiah 54	17 verses	2638 chars	e6546b5fde942a78
+Isaiah 55	13 verses	2031 chars	56ba9d8ac04f3be7
+Isaiah 56	12 verses	1901 chars	ba7e912d64a5ee13
+Isaiah 57	21 verses	2978 chars	71e53c614a118893
+Isaiah 58	14 verses	2693 chars	1e1b14e3d37f8844
+Isaiah 59	21 verses	3240 chars	c2b20333c954b876
+Isaiah 60	22 verses	3503 chars	8816cefda2d1b132
+Isaiah 61	11 verses	2064 chars	beef64317476ad56
+Isaiah 62	12 verses	1879 chars	8ab2e3bf69fb34ed
+Isaiah 63	19 verses	2861 chars	440de9acbbc5bbe6
+Isaiah 64	12 verses	1660 chars	1b57a2a99ab6c2c4
+Isaiah 65	25 verses	3907 chars	80a0ef729d2345ab
+Isaiah 66	24 verses	4186 chars	de03c23176a56baf
+Jeremiah 1	19 verses	2668 chars	835cf015ac90f137
+Jeremiah 2	37 verses	5342 chars	2ccca8354ecb2e22
+Jeremiah 3	25 verses	4272 chars	cc9780401ca6c9e5
+Jeremiah 4	31 verses	4602 chars	3bd2790c99e3e217
+Jeremiah 5	31 verses	4594 chars	45c53626f9fddc2c
+Jeremiah 6	30 verses	4402 chars	71c94a747ebda1f2
+Jeremiah 7	34 verses	4976 chars	91ac92308fe7077f
+Jeremiah 8	22 verses	3672 chars	cbfc7102287fd91c
+Jeremiah 9	26 verses	4105 chars	3574f2947bda980d
+Jeremiah 10	25 verses	3440 chars	8389188eb77231df
+Jeremiah 11	23 verses	3851 chars	a827697f59a26cf6
+Jeremiah 12	17 verses	2886 chars	473d80829042c1ae
+Jeremiah 13	27 verses	3825 chars	39d7e27e5c4e59f3
+Jeremiah 14	22 verses	3623 chars	48f45175e1c24dc4
+Jeremiah 15	21 verses	3521 chars	1288fdff9e72068b
+Jeremiah 16	21 verses	3678 chars	2e99efc910c3e3e5
+Jeremiah 17	27 verses	4286 chars	c7365af2ba7b6f84
+Jeremiah 18	23 verses	3338 chars	eb2979b1d1b25476
+Jeremiah 19	15 verses	2821 chars	43e0574321c88703
+Jeremiah 20	18 verses	3085 chars	9fc0c3195b4d1de4
+Jeremiah 21	14 verses	2552 chars	63f6178c60e72ff5
+Jeremiah 22	30 verses	4390 chars	f39181dbde460d25
+Jeremiah 23	40 verses	6200 chars	a68286bb968cf1d6
+Jeremiah 24	10 verses	1823 chars	7e648172e8ba6454
+Jeremiah 25	38 verses	5930 chars	342ecfad4951dea4
+Jeremiah 26	24 verses	4090 chars	936cf98067238bc8
+Jeremiah 27	22 verses	3934 chars	97f4bf7539daf01e
+Jeremiah 28	17 verses	2862 chars	2f32e7f4022ea95a
+Jeremiah 29	32 verses	5331 chars	1f7ded46d8b65d6c
+Jeremiah 30	24 verses	3735 chars	905cc6ba2168ae90
+Jeremiah 31	40 verses	6684 chars	97342001ca44d47f
+Jeremiah 32	44 verses	7417 chars	a4de8005824eb0f4
+Jeremiah 33	26 verses	4369 chars	c585ecba16757294
+Jeremiah 34	22 verses	4363 chars	4fc74435eb8a68e3
+Jeremiah 35	19 verses	3409 chars	02e309af4502f6bb
+Jeremiah 36	32 verses	5668 chars	f9d8f62cc5798ecc
+Jeremiah 37	21 verses	3285 chars	c34dc42c678dafda
+Jeremiah 38	28 verses	5079 chars	fc1d3e8b77a4a45c
+Jeremiah 39	18 verses	2890 chars	ef6e28cddc087506
+Jeremiah 40	16 verses	3562 chars	6378938acfd4a1e2
+Jeremiah 41	18 verses	3474 chars	f5e1f9ad3e694ccf
+Jeremiah 42	22 verses	3790 chars	135ffd05af94a986
+Jeremiah 43	13 verses	2352 chars	e9c1a87993de1c94
+Jeremiah 44	30 verses	6353 chars	7a3cd7427ee2bb04
+Jeremiah 45	5 verses	761 chars	d6a60ee58d6ee4ff
+Jeremiah 46	28 verses	4324 chars	9bac8705de9044bf
+Jeremiah 47	7 verses	1145 chars	0fb815bed390f3c8
+Jeremiah 48	47 verses	6156 chars	102884ec2af95a0b
+Jeremiah 49	39 verses	6258 chars	bdfe99ffa07b85a8
+Jeremiah 50	46 verses	7736 chars	61e37b7724ba3dc6
+Jeremiah 51	64 verses	9802 chars	0ba871f3e131625e
+Jeremiah 52	34 verses	5668 chars	08371c8f8764bed2
+Lamentations 1	22 verses	4129 chars	1005f8fe56ccec3c
+Lamentations 2	22 verses	4603 chars	6aa04ba3a8ab377c
+Lamentations 3	66 verses	4439 chars	85ac86641817953b
+Lamentations 4	22 verses	3204 chars	f8f746185e25a038
+Lamentations 5	22 verses	1555 chars	c4699f8721f12137
+Ezekiel 1	28 verses	4499 chars	feae2c787fe896be
+Ezekiel 2	10 verses	1424 chars	82e53dae2aa91e4f
+Ezekiel 3	27 verses	4071 chars	2614cab10cb06f5d
+Ezekiel 4	17 verses	2687 chars	b3f209591701389e
+Ezekiel 5	17 verses	3242 chars	f50a1846f9e1cf0d
+Ezekiel 6	14 verses	2443 chars	f01a741f9c469ee5
+Ezekiel 7	27 verses	4024 chars	cda434320085cea6
+Ezekiel 8	18 verses	3282 chars	46622615995fb0fa
+Ezekiel 9	11 verses	2038 chars	b75a67f65a6f587e
+Ezekiel 10	22 verses	3393 chars	2f48e3333976306b
+Ezekiel 11	25 verses	3643 chars	008f39376b2e9dbf
+Ezekiel 12	28 verses	4038 chars	ff4f03fb35fd5bd4
+Ezekiel 13	23 verses	3810 chars	304bac87dc60c7ad
+Ezekiel 14	23 verses	3873 chars	69076bef49f83722
+Ezekiel 15	8 verses	982 chars	39f4ccb5dbb0e31a
+Ezekiel 16	63 verses	9874 chars	24fb421f06706467
+Ezekiel 17	24 verses	3975 chars	b34d6113a8f31f8e
+Ezekiel 18	32 verses	4912 chars	28c6ce3f8228d7f2
+Ezekiel 19	14 verses	1816 chars	881e97fe6c60f940
+Ezekiel 20	49 verses	8172 chars	9578be8a75e56033
+Ezekiel 21	32 verses	4852 chars	5234a6a93dd79255
+Ezekiel 22	31 verses	4440 chars	ed79b641537c4474
+Ezekiel 23	49 verses	7250 chars	e8416db010f3d4a3
+Ezekiel 24	27 verses	3784 chars	12cca8ac93010baf
+Ezekiel 25	17 verses	2702 chars	e94719643844c7db
+Ezekiel 26	21 verses	3658 chars	62d59905038c3e69
+Ezekiel 27	36 verses	4829 chars	f26bfd0c0349b455
+Ezekiel 28	26 verses	4172 chars	caaef7a297f5f36e
+Ezekiel 29	21 verses	3633 chars	926e83bd0e26e0d8
+Ezekiel 30	26 verses	3780 chars	94034526209d0f3a
+Ezekiel 31	18 verses	3445 chars	6aaeecdd39899b01
+Ezekiel 32	32 verses	5513 chars	62a5da80a4bdf2ee
+Ezekiel 33	33 verses	5429 chars	198fb095488b5dc7
+Ezekiel 34	31 verses	4892 chars	4ac3707196c26bb7
+Ezekiel 35	15 verses	2083 chars	be29b52250e6d140
+Ezekiel 36	38 verses	6063 chars	55ac6db3215c7941
+Ezekiel 37	28 verses	4418 chars	604b5a4b59b81223
+Ezekiel 38	23 verses	3973 chars	25470e389d6ce5ec
+Ezekiel 39	29 verses	4724 chars	24ba77a4493745e6
+Ezekiel 40	49 verses	8048 chars	ba2271104b002374
+Ezekiel 41	26 verses	4231 chars	617ba3155202fb74
+Ezekiel 42	20 verses	3124 chars	d64d715641829761
+Ezekiel 43	27 verses	4652 chars	e5145028bea86ee0
+Ezekiel 44	31 verses	5433 chars	127d0c0330b60bc9
+Ezekiel 45	25 verses	4619 chars	e53880ed721a9e4c
+Ezekiel 46	24 verses	4453 chars	939c2490d536a289
+Ezekiel 47	23 verses	4116 chars	50afbb3e5617c266
+Ezekiel 48	35 verses	5485 chars	ba700a57e41b4170
+Daniel 1	21 verses	3187 chars	014c077efaa31363
+Daniel 2	49 verses	7997 chars	4a0937cab2544c90
+Daniel 3	30 verses	5559 chars	6e71d516230ab2b1
+Daniel 4	37 verses	6754 chars	60979609b499f027
+Daniel 5	31 verses	5421 chars	99cf929b1ece4aa5
+Daniel 6	28 verses	4860 chars	4bfd4458ccfc668c
+Daniel 7	28 verses	4808 chars	35ae07faad748b1d
+Daniel 8	27 verses	4335 chars	3269d6da8416c2b1
+Daniel 9	27 verses	5219 chars	f9190b1310e01a88
+Daniel 10	21 verses	3283 chars	443128821388eb5e
+Daniel 11	45 verses	8034 chars	2e8cfa2fa5d38048
+Daniel 12	13 verses	2072 chars	f46a96cd7fd57c27
+Hosea 1	11 verses	1771 chars	fb2a2d7a51479178
+Hosea 2	23 verses	3374 chars	1bd7acede359ac9e
+Hosea 3	5 verses	802 chars	e9138f31cae39c88
+Hosea 4	19 verses	2578 chars	1d5830e906cd9e95
+Hosea 5	15 verses	1935 chars	076cd90488d4fbec
+Hosea 6	11 verses	1273 chars	526dbc1120f8cf70
+Hosea 7	16 verses	2144 chars	9b8743c426a4a84f
+Hosea 8	14 verses	1723 chars	cc0e6bbe3e92d729
+Hosea 9	17 verses	2500 chars	c4d9a33cc1a91b4a
+Hosea 10	15 verses	2294 chars	43ff0a13c98970f3
+Hosea 11	12 verses	1555 chars	19e84c5501d1cfb9
+Hosea 12	14 verses	1635 chars	5f0a17383f40cdd6
+Hosea 13	16 verses	2168 chars	11c2332c126811c4
+Hosea 14	9 verses	1177 chars	cbaf2a7f714e939a
+Joel 1	20 verses	2653 chars	505e32eabb98f3c2
+Joel 2	32 verses	4983 chars	51e71d44f07ea141
+Joel 3	21 verses	3007 chars	a544fe2200b8dc3c
+Amos 1	15 verses	2473 chars	3c7f16f64e01fa05
+Amos 2	16 verses	2325 chars	4dd38fc2e05f2bc7
+Amos 3	15 verses	2004 chars	bee3ca6b10886433
+Amos 4	13 verses	2297 chars	3b7e65b45b23d317
+Amos 5	27 verses	3391 chars	5cdfa13b31804640
+Amos 6	14 verses	2055 chars	7c7d5f5ff3c09ad6
+Amos 7	17 verses	2396 chars	16f0c7de85547171
+Amos 8	14 verses	2025 chars	a504bb6d4980817d
+Amos 9	15 verses	2757 chars	8f0a51f707e213a0
+Obadiah 1	21 verses	3557 chars	99649881c40d87d8
+Jonah 1	17 verses	2527 chars	9fa9077e0f0bab43
+Jonah 2	10 verses	1076 chars	3e5d49360ffb7be2
+Jonah 3	10 verses	1338 chars	4dc5fb2724554ca4
+Jonah 4	11 verses	1640 chars	331bbd0b755e0432
+Micah 1	16 verses	2373 chars	4d2d91b10143a950
+Micah 2	13 verses	2053 chars	95e47f055774fe4b
+Micah 3	12 verses	1814 chars	c11cb73fd55bc606
+Micah 4	13 verses	2404 chars	ca704fce14a17346
+Micah 5	15 verses	2278 chars	3ad31fadc6d75fb8
+Micah 6	16 verses	2312 chars	c764fea4a0c8f370
+Micah 7	20 verses	2993 chars	cd36c9b819a61a09
+Nahum 1	15 verses	2072 chars	bf63fe764df687a7
+Nahum 2	13 verses	1976 chars	ac9a209f85360834
+Nahum 3	19 verses	2817 chars	c21287ea12023e51
+Habakkuk 1	17 verses	2344 chars	2a605eaae17e517e
+Habakkuk 2	20 verses	2898 chars	79423a6187062427
+Habakkuk 3	19 verses	2625 chars	3358efd126b6223e
+Zephaniah 1	18 verses	2844 chars	200cc06aeb015aee
+Zephaniah 2	15 verses	2504 chars	86c367705d05cf37
+Zephaniah 3	20 verses	3099 chars	37cc453d7c2045f3
+Haggai 1	15 verses	2284 chars	e91e86a16a373135
+Haggai 2	23 verses	3413 chars	b3c192cc2211388a
+Zechariah 1	21 verses	3232 chars	3abf8bc0f0a9739a
+Zechariah 2	13 verses	1593 chars	7f34fd030a84f404
+Zechariah 3	10 verses	1522 chars	051ac423a43ce71d
+Zechariah 4	14 verses	1868 chars	07919fd64e1ffe4b
+Zechariah 5	11 verses	1671 chars	8cbc2e3f26799720
+Zechariah 6	15 verses	2164 chars	a47c3cd6eae66217
+Zechariah 7	14 verses	1989 chars	d9a6e5726b2b7327
+Zechariah 8	23 verses	3497 chars	bfb47877f007ecec
+Zechariah 9	17 verses	2706 chars	aa9139bbc7612e8c
+Zechariah 10	12 verses	2070 chars	88046803fca8ffe8
+Zechariah 11	17 verses	2473 chars	2c319dcf57c42432
+Zechariah 12	14 verses	2441 chars	06e784454436049c
+Zechariah 13	9 verses	1678 chars	76b0d494fe380cfd
+Zechariah 14	21 verses	3840 chars	368ede6d68c3315d
+Malachi 1	14 verses	2479 chars	64a0bf27ed5e808d
+Malachi 2	17 verses	2830 chars	440ff7e4422af7fa
+Malachi 3	18 verses	2906 chars	4f6a636158512acc
+Malachi 4	6 verses	923 chars	6f08c4ad0675626c
+Matthew 1	25 verses	2614 chars	c88551fa47687d0f
+Matthew 2	23 verses	3259 chars	f6afd3f48791cf12
+Matthew 3	17 verses	2013 chars	b8bf1051dc7c0922
+Matthew 4	25 verses	2970 chars	fe9fb6c6bb065f61
+Matthew 5	48 verses	5579 chars	34ae1413b990cb91
+Matthew 6	34 verses	4154 chars	8f1101803a3016ec
+Matthew 7	29 verses	3176 chars	51bae6a097e844ab
+Matthew 8	34 verses	4011 chars	ef28d61524d25d69
+Matthew 9	38 verses	4404 chars	432bc2e6b2c13670
+Matthew 10	42 verses	4699 chars	d40efa6bcbca6656
+Matthew 11	30 verses	3429 chars	08bc39bdcfbe8a00
+Matthew 12	50 verses	6069 chars	467a9ddec7d3261c
+Matthew 13	58 verses	7169 chars	18aac0b2a3cba74f
+Matthew 14	36 verses	3742 chars	61dcc978cb056e69
+Matthew 15	39 verses	4193 chars	bc47269013821224
+Matthew 16	28 verses	3521 chars	054fe36e94deabfe
+Matthew 17	27 verses	3244 chars	a56bbcbcb0705b65
+Matthew 18	35 verses	4432 chars	8555bd1c403b50ea
+Matthew 19	30 verses	3792 chars	97745a8cd59ea417
+Matthew 20	34 verses	3972 chars	090a522c2ce214a9
+Matthew 21	46 verses	5852 chars	7c43b821a6412b26
+Matthew 22	46 verses	4376 chars	f39135ee8159848d
+Matthew 23	39 verses	4554 chars	5f7f453ff0758eba
+Matthew 24	51 verses	5364 chars	e2268a4fd4cf81cc
+Matthew 25	46 verses	5124 chars	14ffa0d2304f3048
+Matthew 26	75 verses	8290 chars	25908cb5cbf514a7
+Matthew 27	66 verses	7158 chars	70a9a2fd6b248bed
+Matthew 28	20 verses	2187 chars	d183fb272dff6d34
+Mark 1	45 verses	4911 chars	4ed90ab4878b7521
+Mark 2	28 verses	3682 chars	f5ffcc0be0dbe9b2
+Mark 3	35 verses	3542 chars	c2c62c1894f8ffc4
+Mark 4	41 verses	4651 chars	9e6e2973f98da01f
+Mark 5	43 verses	4891 chars	08fafddec2237d58
+Mark 6	56 verses	6804 chars	66b57821869c630b
+Mark 7	37 verses	4270 chars	0e8f6a874d443a8c
+Mark 8	38 verses	4303 chars	0438cf0baf3d07c4
+Mark 9	50 verses	5958 chars	8ffd32965224b214
+Mark 10	52 verses	6275 chars	c477f5382d315244
+Mark 11	33 verses	4027 chars	879279bc35053efe
+Mark 12	44 verses	5519 chars	b3227469ba51376a
+Mark 13	37 verses	4271 chars	5110673c01687cd0
+Mark 14	72 verses	8091 chars	868e31892e7d9dbb
+Mark 15	47 verses	4874 chars	998a6d3a154d363c
+Mark 16	20 verses	2359 chars	d4100ed2015a729f
+Luke 1	80 verses	8244 chars	940395a3a41ebcfe
+Luke 2	52 verses	5722 chars	b02f31eef02d21ed
+Luke 3	38 verses	5127 chars	df7bbc6b22a86a13
+Luke 4	44 verses	5189 chars	a9002166a23a6ed1
+Luke 5	39 verses	4917 chars	7d83a6ff3aaf7bff
+Luke 6	49 verses	6219 chars	79fbe67ee9129480
+Luke 7	50 verses	6206 chars	a0095acd4fb69e8f
+Luke 8	56 verses	7380 chars	d85d7c02f4e33b73
+Luke 9	62 verses	7439 chars	7178095235dae274
+Luke 10	42 verses	5142 chars	efb1b3beb24c2298
+Luke 11	54 verses	6793 chars	4b625b6fb99f7414
+Luke 12	59 verses	7218 chars	097007873afc6f24
+Luke 13	35 verses	4464 chars	2af9e5aeaf1dc0ab
+Luke 14	35 verses	4126 chars	d2b95a02a026f6bf
+Luke 15	32 verses	3655 chars	b1af348c3b4e1e31
+Luke 16	31 verses	3953 chars	8501e478d4ce0d6a
+Luke 17	37 verses	4101 chars	27dead5561a61b3d
+Luke 18	43 verses	4510 chars	e6b974072e7ba6e0
+Luke 19	48 verses	5328 chars	2e20631d7be949b7
+Luke 20	47 verses	5021 chars	f621a7f04e5f341a
+Luke 21	38 verses	4207 chars	c0bb52681b7f09bc
+Luke 22	71 verses	7115 chars	5f5ee106ec84ee5f
+Luke 23	56 verses	5914 chars	969ed3ca1c074cd2
+Luke 24	53 verses	5508 chars	3951ba8096a4078b
+John 1	51 verses	5146 chars	d7fe6421eb0fcccf
+John 2	25 verses	2669 chars	e46520de07f2efb3
+John 3	36 verses	3967 chars	5bf89089c9ed9f47
+John 4	54 verses	5678 chars	b81c5a23be3a56cf
+John 5	47 verses	5074 chars	40a81bb80683e80a
+John 6	71 verses	7661 chars	f4f3b4bdd3665b04
+John 7	53 verses	5087 chars	0963a83c9b41f768
+John 8	59 verses	6420 chars	c2753076a1fca29f
+John 9	41 verses	4333 chars	0b683359aa6d05a2
+John 10	42 verses	4053 chars	28985a2e2d341e14
+John 11	57 verses	5994 chars	4659b6d2509d813c
+John 12	50 verses	5508 chars	88cd21b957247ed6
+John 13	38 verses	4136 chars	06b98966800ad148
+John 14	31 verses	3513 chars	26291457424a610d
+John 15	27 verses	3001 chars	87a853565bd65d6d
+John 16	33 verses	3931 chars	9d4fc2f478a3ab25
+John 17	26 verses	3102 chars	8f841216ed7c7914
+John 18	40 verses	4951 chars	4230e0e7ae55c31b
+John 19	42 verses	5369 chars	d31877c71398e21f
+John 20	31 verses	3913 chars	1196a0c5ad0b3706
+John 21	25 verses	3636 chars	51d5961d5b984e0a
+Acts 1	26 verses	3560 chars	6a80ffd2395b41d9
+Acts 2	47 verses	5406 chars	d7d77064bb474b5c
+Acts 3	26 verses	3294 chars	ffa5add562bab78e
+Acts 4	37 verses	4583 chars	7b915209eed8236a
+Acts 5	42 verses	5366 chars	4d355d51c0d2529f
+Acts 6	15 verses	1981 chars	1aa63ee85954672b
+Acts 7	60 verses	7364 chars	ca575d9000c001a6
+Acts 8	40 verses	4757 chars	6d031165babd9891
+Acts 9	43 verses	5441 chars	759941ec290ec0ba
+Acts 10	48 verses	5755 chars	38613969367722c0
+Acts 11	30 verses	3539 chars	1f9e5b803380aba6
+Acts 12	25 verses	3462 chars	7e441db278580adc
+Acts 13	52 verses	6714 chars	338013a42f282267
+Acts 14	28 verses	3442 chars	469d33cea658a6be
+Acts 15	41 verses	5102 chars	3fdf2793bbb0c51a
+Acts 16	40 verses	5051 chars	387cd327cafc9060
+Acts 17	34 verses	4634 chars	bb4f14eb9d491d94
+Acts 18	28 verses	3587 chars	af07c552d91f22a4
+Acts 19	41 verses	5324 chars	1890263c8d9e8f52
+Acts 20	38 verses	4635 chars	f36b23375ced26ca
+Acts 21	40 verses	5672 chars	7ea0f48d40035322
+Acts 22	30 verses	3950 chars	e8a2a04ebde98ebe
+Acts 23	35 verses	4871 chars	24c6299f957e3c38
+Acts 24	27 verses	3490 chars	ac83d27e2b6cf970
+Acts 25	27 verses	3830 chars	19a439317420de25
+Acts 26	32 verses	4178 chars	64a1bed81fb33286
+Acts 27	44 verses	5451 chars	a2608ff6e9cd6495
+Acts 28	31 verses	4351 chars	5388e0757ab8b2bc
+Romans 1	32 verses	3931 chars	af785d20cde0ee11
+Romans 2	29 verses	3349 chars	76c2ecfc3cc61da5
+Romans 3	31 verses	2968 chars	7fb6816f129396ae
+Romans 4	25 verses	2948 chars	670e361602d47a71
+Romans 5	21 verses	2534 chars	1a229b5a4241ad0b
+Romans 6	23 verses	2552 chars	b797796a149efcc6
+Romans 7	25 verses	2899 chars	3a147e3a91fd524a
+Romans 8	39 verses	4667 chars	008c385dac983bf3
+Romans 9	33 verses	3757 chars	73d84171fffd54d5
+Romans 10	21 verses	2430 chars	4d7c92025ae2c67d
+Romans 11	36 verses	4261 chars	8f810f07bd3171a7
+Romans 12	21 verses	2197 chars	3ef85d5d31a084fe
+Romans 13	14 verses	1911 chars	a1deb36f1f9b413b
+Romans 14	23 verses	2698 chars	17587c005f504cca
+Romans 15	33 verses	3893 chars	5437ae2419c02acf
+Romans 16	27 verses	2794 chars	c22fa373a0139b67
+First Corinthians 1	31 verses	3342 chars	55a754cd3b160f28
+First Corinthians 2	16 verses	1924 chars	e0a2a39fe21cf92c
+First Corinthians 3	23 verses	2364 chars	bd8c5486e908ca5e
+First Corinthians 4	21 verses	2558 chars	56df0e7087066125
+First Corinthians 5	13 verses	1687 chars	94f130efc70f4e5f
+First Corinthians 6	20 verses	2395 chars	15fd382c3e8c7364
+First Corinthians 7	40 verses	4918 chars	530094ae75ff1d23
+First Corinthians 8	13 verses	1593 chars	f59d753c5caf5fd9
+First Corinthians 9	27 verses	3275 chars	6f29010d9ad8ed86
+First Corinthians 10	33 verses	3434 chars	324c7217387fd04c
+First Corinthians 11	34 verses	3549 chars	2946aa6fa5b6f112
+First Corinthians 12	31 verses	3119 chars	87ab40461158b60f
+First Corinthians 13	13 verses	1439 chars	16dfbcd47981155b
+First Corinthians 14	40 verses	4693 chars	97540e75947e71e9
+First Corinthians 15	58 verses	5933 chars	ec8f432ffe163a6b
+First Corinthians 16	24 verses	2267 chars	b443207ca35ff9d2
+Second Corinthians 1	24 verses	3014 chars	a2cadee2c8434629
+Second Corinthians 2	17 verses	1986 chars	4a3eb97026502871
+Second Corinthians 3	18 verses	2069 chars	90a02b0c32529635
+Second Corinthians 4	18 verses	2145 chars	345c2c64858bfd5a
+Second Corinthians 5	21 verses	2548 chars	7f2e63d2e20f1233
+Second Corinthians 6	18 verses	1945 chars	2bc7ed5482312dcc
+Second Corinthians 7	16 verses	2422 chars	a5e52a7d41e63651
+Second Corinthians 8	24 verses	2939 chars	2822f9aa7b6f6214
+Second Corinthians 9	15 verses	1960 chars	582cbb868560d20d
+Second Corinthians 10	18 verses	2359 chars	7e0e970a4522d221
+Second Corinthians 11	33 verses	3749 chars	b83e9a2f3734ded7
+Second Corinthians 12	21 verses	3013 chars	e51ecc819f91dd28
+Second Corinthians 13	14 verses	1597 chars	10c8fb834c8860b2
+Galatians 1	24 verses	2338 chars	fb7175df12d57206
+Galatians 2	21 verses	3019 chars	5dbe34f9b2abe489
+Galatians 3	29 verses	3354 chars	311ca14cf3e2416b
+Galatians 4	31 verses	3076 chars	e8336e2aab92dba0
+Galatians 5	26 verses	2455 chars	5a6a7a07388b9430
+Galatians 6	18 verses	1842 chars	b68ade1c3d00ae9c
+Ephesians 1	23 verses	2682 chars	e919ce8cbca5422d
+Ephesians 2	22 verses	2427 chars	79aa832f75c54f59
+Ephesians 3	21 verses	2137 chars	427d5e2167bbbbf6
+Ephesians 4	32 verses	3312 chars	c39b7ada5e82def2
+Ephesians 5	33 verses	3033 chars	f93a5d70d0cbb26a
+Ephesians 6	24 verses	2538 chars	c6df47c135d0720a
+Philippians 1	30 verses	3236 chars	0af373388602fe2f
+Philippians 2	30 verses	3070 chars	053a179d93aa0613
+Philippians 3	21 verses	2586 chars	35be59118c2c4ed2
+Philippians 4	23 verses	2562 chars	a74bb006380427e6
+Colossians 1	29 verses	3458 chars	59e811546b74eb54
+Colossians 2	23 verses	2700 chars	8d910946c416d516
+Colossians 3	25 verses	2504 chars	b95c2a4a40225337
+Colossians 4	18 verses	1965 chars	117510ac828abdf4
+First Thessalonians 1	10 verses	1296 chars	d9c5531ad0cda849
+First Thessalonians 2	20 verses	2505 chars	1c021024137ee8e2
+First Thessalonians 3	13 verses	1554 chars	fb51b69a97883ba7
+First Thessalonians 4	18 verses	2048 chars	5898f54c8d600e6c
+First Thessalonians 5	28 verses	2171 chars	1a245e455905cbc8
+Second Thessalonians 1	12 verses	1549 chars	b2a18908af35f7c9
+Second Thessalonians 2	17 verses	2041 chars	335df62ae2a98f93
+Second Thessalonians 3	18 verses	1805 chars	c702ef6373a0ea76
+First Timothy 1	20 verses	2436 chars	c83a1abd41e3ca42
+First Timothy 2	15 verses	1367 chars	6737439c8387c4c4
+First Timothy 3	16 verses	1732 chars	96a0e4471559c095
+First Timothy 4	16 verses	1756 chars	817277e097d5d8f7
+First Timothy 5	25 verses	2636 chars	0113526cfbca66a3
+First Timothy 6	21 verses	2661 chars	b61de5755c0c3eba
+Second Timothy 1	18 verses	2276 chars	64814789e2cb1d64
+Second Timothy 2	26 verses	2757 chars	e5b7b9e76787eced
+Second Timothy 3	17 verses	1778 chars	5b8fe1cef2615776
+Second Timothy 4	22 verses	2298 chars	3a82b0a0d36514f2
+Titus 1	16 verses	1894 chars	230dfc30c54e7f82
+Titus 2	15 verses	1525 chars	c5b8746c796203ed
+Titus 3	15 verses	1665 chars	6308f03b48b6db2e
+Philemon 1	25 verses	2295 chars	4e50177ab856ceb9
+Hebrews 1	14 verses	1729 chars	046fe93ce3164885
+Hebrews 2	18 verses	2462 chars	517ff7c811513ed6
+Hebrews 3	19 verses	1888 chars	5a2ff044a5baac89
+Hebrews 4	16 verses	2049 chars	786433d2d2094763
+Hebrews 5	14 verses	1630 chars	49aaa6ae945cb8db
+Hebrews 6	20 verses	2295 chars	fcc0cdcd0b7c4a6d
+Hebrews 7	28 verses	3331 chars	f5b7695d0c2f2553
+Hebrews 8	13 verses	1995 chars	cedd68cb84e0f470
+Hebrews 9	28 verses	3760 chars	2bbd5329bc211e7b
+Hebrews 10	39 verses	4230 chars	b8838187dc9e1295
+Hebrews 11	40 verses	5067 chars	9561295bb979020c
+Hebrews 12	29 verses	3778 chars	f1a0ebf5eda22c23
+Hebrews 13	25 verses	2693 chars	37f9f0eab47a5c63
+James 1	27 verses	2857 chars	8217673711ba9fb6
+James 2	26 verses	2735 chars	800164957b1c45ec
+James 3	18 verses	2015 chars	13ddedb63b30fbf9
+James 4	17 verses	1878 chars	bca583151221476a
+James 5	20 verses	2544 chars	e9215580d4c05461
+First Peter 1	25 verses	3308 chars	1828add348384065
+First Peter 2	25 verses	3017 chars	18f1ca246614c47c
+First Peter 3	22 verses	2916 chars	d32dd0b2c1b7ad7f
+First Peter 4	19 verses	2475 chars	26e19f54ae6d464b
+First Peter 5	14 verses	1642 chars	e3aa78996827bdab
+Second Peter 1	21 verses	2656 chars	b479bce57b5708e5
+Second Peter 2	22 verses	3345 chars	747da087a4a543b9
+Second Peter 3	18 verses	2638 chars	a2959597a01e6358
+First John 1	10 verses	1211 chars	1021bee504361619
+First John 2	29 verses	3738 chars	061fb7632699af3a
+First John 3	24 verses	2790 chars	0de2417111b34c90
+First John 4	21 verses	2352 chars	0a5de1b632e6bad4
+First John 5	21 verses	2561 chars	b95a256219a3be12
+Second John 1	13 verses	1540 chars	babc0dada8df71f1
+Third John 1	14 verses	1579 chars	4995188f359520d6
+Jude 1	25 verses	3498 chars	a7c92a6cde6e4ec1
+Revelation 1	20 verses	3010 chars	46b77de98ccbe711
+Revelation 2	29 verses	4188 chars	a92a56b1ecc00c9f
+Revelation 3	22 verses	3288 chars	aba38e127550edfb
+Revelation 4	11 verses	1784 chars	7a1604be97815061
+Revelation 5	14 verses	2193 chars	ca252f202316c4a8
+Revelation 6	17 verses	2648 chars	3ed538d83b933092
+Revelation 7	17 verses	2628 chars	6e38616f1ccc27dd
+Revelation 8	13 verses	2054 chars	adaa8a90befede46
+Revelation 9	21 verses	3028 chars	d5730361b750d3be
+Revelation 10	11 verses	1737 chars	ba9baeb510dd5cfb
+Revelation 11	19 verses	3104 chars	19aba59956195b06
+Revelation 12	17 verses	2558 chars	b43f01a81153211d
+Revelation 13	18 verses	2685 chars	017e747f05e91941
+Revelation 14	20 verses	3364 chars	35c38bebea24a652
+Revelation 15	8 verses	1302 chars	6364de2648f7e50b
+Revelation 16	21 verses	2926 chars	ca267a97ff57d68f
+Revelation 17	18 verses	2752 chars	37a143872de5d828
+Revelation 18	24 verses	3978 chars	9e7a100fb972c4ad
+Revelation 19	21 verses	3248 chars	2d681e4a0e6bda03
+Revelation 20	15 verses	2433 chars	b257d95a5ca7739c
+Revelation 21	27 verses	3880 chars	0e98a7316e8195a1
+Revelation 22	21 verses	2880 chars	41ed682510e5854c
