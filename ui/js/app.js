@@ -3,7 +3,8 @@
 import { call, copyText } from "./backend.js";
 import { h, icon, replace } from "./dom.js";
 import { chatScopeChanged, renderChat } from "./chat.js";
-import { renderSaved, renderSearch, renderSettings, renderStrongs } from "./panels.js";
+import { renderSaved, renderSettings, renderStrongs } from "./panels.js";
+import { renderSearch } from "./search.js";
 import { closePicker, initPicker, isPickerOpen, openPicker, setPickerBooks } from "./picker.js";
 import { libraryVerseText, markSelected, renderChapter, renderLibraryChapter } from "./reader.js";
 import { initTranslations, openTranslations } from "./translations.js";
@@ -152,7 +153,7 @@ function render() {
   // The interlinear and parallel layouts are the KJV's; other translations read plainly
   app.dataset.view = view.library ? "kjv" : settings.view;
   app.dataset.reading = view.library ? "library" : "kjv";
-  if (view.library) renderLibraryChapter(reader, view, { selectedVerse: state.selectedVerse, nav });
+  if (view.library) renderLibraryChapter(reader, view, { selectedVerse: state.selectedVerse, nav, highlight: state.highlight });
   else renderChapter(reader, view, { view: settings.view, selectedVerse: state.selectedVerse, nav });
   $("ref-label").textContent = view.heading;
   $("prev-chapter").disabled = !view.prev;
@@ -348,6 +349,7 @@ const ctx = {
   heading,
   reference,
   goTo,
+  openIn,
   setHighlight,
   refreshPanel,
   openPanel,
@@ -398,6 +400,20 @@ function useBooks(id) {
   app.dataset.translation = id;
   $("translation-label").textContent = translationAbbr();
   $("translation-button").title = state.bibles.find((b) => b.id === id)?.name ?? "King James Version";
+  // Search names the translation being read
+  if (state.panel === "search") refreshPanel();
+}
+
+/** Open a place in translation `id` (a search result in another translation), reading
+ * that translation from there on. */
+async function openIn(id, book, chapter, verse = 0, opts = {}) {
+  if (id !== settings.translation && state.bibles.some((b) => b.id === id)) {
+    settings.translation = id;
+    prefs.save(settings);
+    useBooks(id);
+    cache.clear();
+  }
+  await goTo(book, chapter, verse, opts);
 }
 
 /** Read translation `id`, at the verse that corresponds to where the reader is (the

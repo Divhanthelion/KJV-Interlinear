@@ -147,6 +147,50 @@ await test("Search result opens the verse with the match highlighted", "book=Rom
   assert($("#v43 .red")?.textContent === "Lazarus, come forth.", "only the spoken words are red");
 `);
 
+await test("Search everything: grouped by source, each opening where it is", "book=John&chapter=11&tr=kjv", {}, `
+  $('[data-open-panel="search"]').click();
+  const input = await until(() => $("#search-input"), "search input");
+  assert(input.placeholder === "Search the KJV", "the translation being read by default: " + input.placeholder);
+  $$(".search-choices [role=radio]").find((b) => b.textContent === "Everything").click();
+  const box = await until(() => $("#search-input")?.placeholder === "Search everything" && $("#search-input"), "everything");
+  box.value = "Melchizedek";
+  box.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+  await until(() => $(".result-summary") && !$(".result-summary").textContent.includes("searching"), "every source searched", 60000);
+  assert($(".result-summary").textContent.startsWith("422 results in 40 sources"), "summary: " + $(".result-summary").textContent);
+  // The translation being read first, then the rest, then the commentaries
+  const groups = $$(".search-group").map((g) => g.dataset.group);
+  assert(groups[0] === "bible:kjv" && groups.indexOf("commentary:mhc") > groups.indexOf("bible:web"), "order: " + groups.join());
+  assert($(".search-none").textContent.includes("DRA"), "sources without it listed: the Douay-Rheims spells it Melchisedec");
+  // Tyndale's Bible and the Tyndale notes are two sources
+  assert(!groups.includes("bible:tyndale") && groups.includes("commentary:tyndale"), "the notes, not the Bible: " + groups.join());
+  const gill = $('[data-group="commentary:gill"]');
+  assert(gill.querySelector(".search-group-name").textContent.endsWith("59 notes"), "Gill: " + gill.querySelector(".search-group-name").textContent);
+  assert(gill.querySelectorAll(".result").length === 20 && gill.querySelector(".search-more").textContent === "Show all 59", "the first 20, then the rest");
+  gill.querySelector(".search-more").click();
+  await until(() => $('[data-group="commentary:gill"]').querySelectorAll(".result").length === 59, "all of Gill's");
+  // A note opens in the Commentary panel, shown and opened even if not chosen
+  const mhc = $('[data-group="commentary:mhc"] .result');
+  assert(mhc.querySelector(".result-ref").textContent === "Genesis 14:17-20", "Henry's first: " + mhc.querySelector(".result-ref").textContent);
+  assert(mhc.querySelector("mark.hit").textContent === "Melchizedek", "the match marked in the snippet");
+  mhc.click();
+  await until(() => $("#panel-title").textContent === "Commentary" && $(".note.is-focus"), "the note, in the Commentary panel");
+  assert($(".note.is-focus").open, "opened");
+  assert($(".note.is-focus").closest("[data-commentary]").dataset.commentary === "mhc", "Henry's");
+  // A verse in another translation opens in that translation, with the match marked
+  $('[data-open-panel="search"]').click();
+  const web = await until(() => $('[data-group="bible:web"] .result'), "results kept");
+  web.click();
+  await until(() => $("#translation-label").textContent === "WEB" && $(".chapter.library mark.hit"), "the WEB, with the match marked");
+  assert($$(".chapter.library mark.hit").map((m) => m.textContent).join() === "Melchizedek", "marked: " + $$(".chapter.library mark.hit").map((m) => m.textContent));
+  assert($$(".search-choices [role=radio]")[0].textContent === "WEB", "Search names the translation now being read");
+  // Back to searching the translation being read, and to the KJV (settings persist between tests)
+  $$(".search-choices [role=radio]")[0].click();
+  await until(() => $("#search-input")?.placeholder === "Search the WEB", "the translation being read again");
+  $("#translation-button").click();
+  await until(() => $("#translations").open, "translation picker");
+  $$(".translation-item").find((b) => b.querySelector(".translation-abbr").textContent === "KJV").click();
+  await until(() => $("#translation-label").textContent === "KJV" && $("#reader").getAttribute("aria-busy") === "false", "back to the KJV");
+`);
 await test("Typography-insensitive search", "book=Genesis&chapter=1", {}, `
   $('[data-open-panel="search"]').click();
   const input = await until(() => $("#search-input"), "search input");

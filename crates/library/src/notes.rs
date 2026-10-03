@@ -73,9 +73,114 @@ pub fn parse(jsonl: &str) -> Result<Vec<Note>, String> {
         .collect()
 }
 
+/// A note's body (in the library's note markup, docs/LIBRARY.md) as plain text: each block
+/// on its own line (headings marked "###", list items "-", table cells "|"), inline
+/// styles dropped except small capitals, written as capitals ("LORD"), footnotes in
+/// brackets where they stand, references as printed.
+pub fn text(body: &str) -> String {
+    let mut out: Vec<String> = Vec::new();
+    let mut block = String::new();
+    let mut prefix = String::new();
+    let mut small_caps = 0usize;
+    let mut footnote = 0usize;
+    let mut cells = 0usize;
+    let flush = |block: &mut String, prefix: &str, out: &mut Vec<String>| {
+        let lines: Vec<String> =
+            block.split('\n').map(|l| l.split_whitespace().collect::<Vec<_>>().join(" ")).filter(|l| !l.is_empty()).collect();
+        if !lines.is_empty() {
+            out.push(format!("{}{}", prefix, lines.join("\n")));
+        }
+        block.clear();
+    };
+    let mut rest = body;
+    while !rest.is_empty() {
+        if let Some(tag_on) = rest.strip_prefix('<')
+            && let Some(end) = tag_on.find('>')
+        {
+            let tag = &tag_on[..end];
+            rest = &tag_on[end + 1..];
+            let closing = tag.starts_with('/');
+            let inner = tag.trim_start_matches('/').trim_end_matches('/');
+            let name = inner.split_whitespace().next().unwrap_or("");
+            let level = inner
+                .split_once("level=\"")
+                .and_then(|(_, v)| v.split('"').next())
+                .and_then(|v| v.parse::<usize>().ok())
+                .unwrap_or(1)
+                .clamp(1, 3);
+            match (name, closing) {
+                ("p" | "h" | "l" | "li" | "tr", false) => {
+                    flush(&mut block, &prefix, &mut out);
+                    cells = 0;
+                    let indent = "  ".repeat(level - 1);
+                    prefix = match name {
+                        "h" => "### ".to_string(),
+                        "l" => indent,
+                        "li" => format!("{}- ", indent),
+                        _ => String::new(),
+                    };
+                }
+                ("p" | "h" | "l" | "li" | "tr", true) => {
+                    flush(&mut block, &prefix, &mut out);
+                    prefix.clear();
+                }
+                ("td", false) => {
+                    if cells > 0 {
+                        block.push_str(" | ");
+                    }
+                    cells += 1;
+                }
+                ("sc", false) => small_caps += 1,
+                ("sc", true) => small_caps = small_caps.saturating_sub(1),
+                ("fn", false) => {
+                    footnote += 1;
+                    block.push_str(" [");
+                }
+                ("fn", true) => {
+                    footnote = footnote.saturating_sub(1);
+                    block.push(']');
+                }
+                ("br", _) => block.push(if footnote > 0 { ' ' } else { '\n' }),
+                _ => {}
+            }
+            continue;
+        }
+        let first = rest.chars().next().map_or(1, char::len_utf8);
+        let end = rest[first..].find('<').map_or(rest.len(), |i| i + first);
+        let raw = &rest[..end];
+        rest = &rest[end..];
+        let text = raw.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&");
+        if small_caps > 0 {
+            block.push_str(&text.to_uppercase());
+        } else {
+            block.push_str(&text);
+        }
+    }
+    flush(&mut block, &prefix, &mut out);
+    // A footnote that starts or ends with a line break: no space inside its brackets
+    out.join("\n").replace("[ ", "[").replace(" ]", "]")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn notes_as_plain_text() {
+        assert_eq!(
+            text("<p>The <sc>Lord</sc> is <i>my</i> shepherd.</p><p>Second &amp; last.</p>"),
+            "The LORD is my shepherd.\nSecond & last."
+        );
+        assert_eq!(
+            text("<h>The Case</h><p>See <ref to=\"JHN.3.16\">John iii. 16</ref>.<fn>Gr. <lang code=\"grc\">ἀγάπη</lang>.</fn></p>"),
+            "### The Case\nSee John iii. 16. [Gr. ἀγάπη.]"
+        );
+        assert_eq!(
+            text("<l>Line one,</l><l level=\"2\">indented.</l><li>item</li><li level=\"2\">sub</li>"),
+            "Line one,\n  indented.\n- item\n  - sub"
+        );
+        assert_eq!(text("<tr><td>a</td><td>b</td></tr><p>x<br/>y</p><p>z<fn><br/>note</fn></p>"), "a | b\nx\ny\nz [note]");
+    }
 
     #[test]
     fn notes_and_what_they_cover() {

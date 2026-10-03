@@ -131,6 +131,10 @@ pub fn dispatch_all(
             let a: CrossrefsArgs = parse(name, args)?;
             to_json(crate::translations::crossrefs(data, library, &a.collections, &a.bible, &a.book, a.chapter, a.verse, a.limit)?)
         }
+        "search_source" => {
+            let a: crate::search::SearchArgs = parse(name, args)?;
+            to_json(crate::search::search(data, library, &a)?)
+        }
         "context_size" => {
             let a: ContextArgs = parse(name, args)?;
             to_json(context::size(data, library, &a.context)?)

@@ -32,7 +32,15 @@ static LIBRARY: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/library.bin"))
 static LIBRARY_DATA: OnceLock<Library> = OnceLock::new();
 
 fn library() -> &'static Library {
-    LIBRARY_DATA.get_or_init(|| Library::open(LIBRARY).expect("embedded library matches this build"))
+    LIBRARY_DATA.get_or_init(|| {
+        let lib = Library::open(LIBRARY).expect("embedded library matches this build");
+        // Phones keep less folded text for searching again (a search of everything
+        // then reads more books afresh)
+        if cfg!(any(target_os = "android", target_os = "ios")) {
+            lib.set_search_cache_limit(64 * 1024 * 1024);
+        }
+        lib
+    })
 }
 
 fn data() -> &'static DataBundle {

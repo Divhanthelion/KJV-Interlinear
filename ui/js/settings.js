@@ -20,6 +20,9 @@ export const DEFAULTS = {
   translation: "kjv", // the library translation being read ("kjv" is the KJV with its interlinear)
   commentaries: null, // ids shown in the Commentary panel; null: all of them
   crossrefs: null, // ids shown in the Cross-references panel; null: all of them
+  // Where Search looks: the translation being read, the chosen translations and
+  // commentaries, or everything
+  search: { in: "reading", translations: [], commentaries: [] },
   verseNumbers: true,
   redLetter: true,
   translit: true,
@@ -182,6 +185,11 @@ export function sanitize(raw) {
     translation: typeof s.translation === "string" && /^[a-z0-9]{1,20}$/.test(s.translation) ? s.translation : DEFAULTS.translation,
     commentaries: Array.isArray(s.commentaries) ? s.commentaries.filter((c) => typeof c === "string" && /^[a-z0-9]{1,20}$/.test(c)).slice(0, 40) : null,
     crossrefs: Array.isArray(s.crossrefs) ? s.crossrefs.filter((c) => typeof c === "string" && /^[a-z0-9]{1,20}$/.test(c)).slice(0, 40) : null,
+    search: {
+      in: oneOf(s.search?.in, ["reading", "chosen", "everything"], DEFAULTS.search.in),
+      translations: idList(s.search?.translations) ?? [],
+      commentaries: idList(s.search?.commentaries) ?? [],
+    },
     verseNumbers: bool("verseNumbers"),
     redLetter: bool("redLetter"),
     translit: bool("translit"),

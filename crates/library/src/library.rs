@@ -3,7 +3,7 @@
 
 use std::borrow::Cow;
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, OnceLock};
 
 use serde::{Deserialize, Serialize};
 
@@ -11,6 +11,7 @@ use crate::alignment::{Alignment, Ref};
 use crate::archive::Archive;
 use crate::crossrefs::{self, CrossrefInfo, Line, Target, Xref};
 use crate::notes::{self, CommentaryInfo, Note};
+use crate::search::{Corpora, Corpus, INDEX_KEY, Index};
 use crate::usfm::{self, Options};
 use crate::view::{self, ChapterView};
 
@@ -65,6 +66,10 @@ pub struct Library {
     /// (collection, book) -> its references
     xrefs: Mutex<HashMap<(String, String), Xrefs>>,
     verse_lists: Mutex<VerseLists>,
+    /// Books folded for searching
+    corpora: Corpora,
+    /// The search index, read on first use (None if the archive has none)
+    index: OnceLock<Option<Arc<Index>>>,
 }
 
 /// A list's references from one book, shared.
@@ -116,7 +121,43 @@ impl Library {
             parsed: Mutex::new(Parsed { books: HashMap::new(), clock: 0 }),
             alignments: Mutex::new(HashMap::new()),
             verse_sets: Mutex::new(HashMap::new()),
+            corpora: Corpora::default(),
+            index: OnceLock::new(),
         })
+    }
+
+    /// Book `code` of translation `id`, folded for searching: one document per verse,
+    /// in the order of [`Library::verses`].
+    pub fn bible_corpus(&self, id: &str, code: &str) -> Result<Arc<Corpus>, String> {
+        self.corpora.get_or(&format!("bible/{id}/{code}"), || Ok(Corpus::new(self.verses(id, code)?.iter().map(|v| &v.text))))
+    }
+
+    /// Commentary `id`'s notes on book `code`, folded for searching: one document per
+    /// note, in the order of [`Library::commentary_book`], as [`notes::text`] gives it.
+    pub fn commentary_corpus(&self, id: &str, code: &str) -> Result<Arc<Corpus>, String> {
+        self.corpora.get_or(&format!("comm/{id}/{code}"), || Ok(Corpus::new(self.commentary_book(id, code)?.iter().map(|n| notes::text(&n.body)))))
+    }
+
+    /// Other text to search (the app's own KJV), kept with the library's.
+    pub fn corpus(&self, key: &str, make: impl FnOnce() -> Result<Corpus, String>) -> Result<Arc<Corpus>, String> {
+        self.corpora.get_or(key, make)
+    }
+
+    /// How much folded text to keep for searching again (phones keep less).
+    pub fn set_search_cache_limit(&self, bytes: usize) {
+        self.corpora.set_limit(bytes);
+    }
+
+    /// The word index, if the archive has one that can be read.
+    pub fn search_index(&self) -> Option<Arc<Index>> {
+        self.index
+            .get_or_init(|| {
+                if !self.archive.contains(INDEX_KEY) {
+                    return None;
+                }
+                self.archive.get(INDEX_KEY).ok().and_then(|b| Index::parse(&b).ok()).map(Arc::new)
+            })
+            .clone()
     }
 
     /// Every translation, in the order the app lists them.
@@ -545,27 +586,70 @@ pub mod build {
             }
         }
 
+        // The search index: every book's words, from the same text searches read
+        let markers: std::collections::HashMap<&str, &Vec<String>> = bibles.iter().map(|b| (b.id.as_str(), &b.heading_markers)).collect();
+        let books: Vec<(String, &str, Option<&Vec<String>>)> = entries
+            .iter()
+            .filter_map(|(key, text)| {
+                let (kind, rest) = key.split_once('/')?;
+                let (id, file) = rest.split_once('/')?;
+                match kind {
+                    "bible" => Some((format!("bible/{id}/{}", file.strip_suffix(".usfm")?), text.as_str(), Some(*markers.get(id)?))),
+                    "comm" => Some((format!("comm/{id}/{}", file.strip_suffix(".jsonl")?), text.as_str(), None)),
+                    _ => None,
+                }
+            })
+            .collect();
+        let words = parallel(books.len(), |i| {
+            let (name, text, markers) = &books[i];
+            match markers {
+                Some(markers) => {
+                    let options = crate::usfm::Options { heading_markers: (*markers).clone() };
+                    let book = crate::usfm::parse(text, &options).map_err(|e| format!("{name}: {e}"))?;
+                    Ok(crate::search::chunk_words(crate::usfm::verses(&book).iter().map(|v| &v.text)))
+                }
+                None => {
+                    let notes = crate::notes::parse(text).map_err(|e| format!("{name}: {e}"))?;
+                    Ok(crate::search::chunk_words(notes.iter().map(|n| crate::notes::text(&n.body))))
+                }
+            }
+        })
+        .into_iter()
+        .collect::<Result<Vec<_>, String>>()?;
+        let chunks: Vec<(String, Vec<String>)> = books.iter().map(|(name, _, _)| name.clone()).zip(words).collect();
+        let index = crate::search::encode_index(&chunks);
+
+        let mut blobs: Vec<(String, Vec<u8>)> = entries.into_iter().map(|(key, text)| (key, text.into_bytes())).collect();
+        blobs.push((crate::search::INDEX_KEY.to_string(), index));
+        let frames = parallel(blobs.len(), |i| compress(&blobs[i].1));
+        let mut w = Writer::new();
+        for ((key, bytes), frame) in blobs.iter().zip(frames) {
+            w.add(key, frame, bytes.len());
+        }
+        Ok((w.finish(), read))
+    }
+
+    /// `f(0)`, `f(1)`, … `f(n - 1)` on every core, in order.
+    fn parallel<T: Send>(n: usize, f: impl Fn(usize) -> T + Sync) -> Vec<T> {
         let threads = std::thread::available_parallelism().map_or(4, |n| n.get());
         let next = std::sync::atomic::AtomicUsize::new(0);
-        let done: std::sync::Mutex<Vec<(usize, Vec<u8>)>> = std::sync::Mutex::new(Vec::with_capacity(entries.len()));
+        let done: std::sync::Mutex<Vec<(usize, T)>> = std::sync::Mutex::new(Vec::with_capacity(n));
         std::thread::scope(|s| {
             for _ in 0..threads {
                 s.spawn(|| {
                     loop {
                         let i = next.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-                        let Some((_, text)) = entries.get(i) else { break };
-                        let frame = compress(text.as_bytes());
-                        done.lock().unwrap().push((i, frame));
+                        if i >= n {
+                            break;
+                        }
+                        let out = f(i);
+                        done.lock().unwrap().push((i, out));
                     }
                 });
             }
         });
-        let mut frames = done.into_inner().unwrap();
-        frames.sort_by_key(|(i, _)| *i);
-        let mut w = Writer::new();
-        for ((key, text), (_, frame)) in entries.iter().zip(frames) {
-            w.add(key, frame, text.len());
-        }
-        Ok((w.finish(), read))
+        let mut out = done.into_inner().unwrap();
+        out.sort_by_key(|(i, _)| *i);
+        out.into_iter().map(|(_, x)| x).collect()
     }
 }

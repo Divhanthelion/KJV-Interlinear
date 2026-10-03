@@ -636,6 +636,19 @@ input[type="number"]:focus, select:focus, .chat-input:focus {
 }
 
 .result-list { list-style: none; margin: 0; padding: 0; }
+.search-choices .chips, .search-jump { display: flex; flex-wrap: wrap; gap: 6px; }
+.search-choices .chip, .search-jump .chip { min-height: 30px; padding: 0 10px; font-size: 0.8125rem; }
+.search-sources { margin-top: 10px; }
+.search-sources .field-label { margin: 10px 0 6px; }
+.search-jump { margin: 0 0 12px; }
+.search-count { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+.search-group { padding-top: 10px; border-top: 1px solid var(--border); margin-bottom: 8px; scroll-margin-top: 8px; }
+.search-group-name { font-size: 0.9375rem; font-weight: 700; margin: 0 0 4px; }
+.search-group-name .muted { font-weight: 400; }
+.search-more { min-height: 36px; margin: 2px 8px 6px; font-size: 0.875rem; color: var(--accent); font-weight: 600; }
+.search-none { font-size: 0.875rem; }
+.search-status { font-size: 0.875rem; margin: 4px 0 10px; }
+.result.is-note .result-text { font-size: calc(0.9375rem * var(--text-scale)); -webkit-line-clamp: 4; }
 .result-list li + li { border-top: 1px solid var(--border); }
 .result {
   display: block;
@@ -826,6 +839,7 @@ input[readonly] { color: var(--muted); }
 .xref-all { margin: 0 0 8px; }
 .note { margin: 0 0 12px; }
 .note-label { font-size: 0.8125rem; font-weight: 650; color: var(--text-2); margin: 0 0 4px; }
+.note.is-focus { box-shadow: inset 3px 0 0 var(--accent); padding-inline-start: 10px; }
 details.note > summary { cursor: pointer; min-height: 32px; display: list-item; }
 .note-body { font-family: var(--font-text); font-size: 1rem; line-height: 1.6; overflow-wrap: anywhere; }
 .note-body p { margin: 0 0 0.6em; }

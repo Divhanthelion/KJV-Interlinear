@@ -219,20 +219,44 @@ these hard cases.
 
 ## Search
 
-Search must stay as fast as it is today (about 60 ms for the whole KJV, end to end).
+Search finds what it always has (case, curly quotes, dashes, and "æ" set aside,
+anywhere in a verse, across words), now in any source
+(`crates/core/src/search.rs`, `ui/js/search.js`):
 
-- **By default it searches the translation being read**, at today's speed: a straight
-  scan of one Bible, with the folded (case- and accent-insensitive) text prepared
-  once per translation instead of on every query.
-- **The scope is configurable**: the current translation, chosen translations, chosen
-  commentaries, or everything. The choice is remembered.
-- **Wider scopes use a word index** built when the app is compiled: for each word, the
-  verses and notes that contain it. A query intersects the lists for its words and then
-  confirms each candidate against the real text, so results are exact. Target: under
-  200 ms for everything, on a phone.
-- **Results are grouped by source** ("KJV 12 · DRA 9 · Matthew Henry 31"), each group
-  expandable.
-- **Speed is tested**: a benchmark in CI fails if search exceeds its budget.
+- **By default it searches the translation being read.** The other choices are
+  chosen translations and commentaries, or everything. The choice is remembered.
+- **Each source is searched on its own**, a few at once, and its results shown as they
+  arrive, grouped by source ("KJV 2 · WEB 11 · Matthew Henry 14 …"): the translation
+  being read first, then the other translations, then the commentaries. With several
+  sources, each shows its first 20 results, and all of them on request. A commentary
+  result shows the words around the match and opens the note in the Commentary
+  panel; a verse in another translation opens in that translation with the match
+  marked.
+- **Each book is folded once** (`crates/library/src/search.rs`) and kept for searching
+  again, up to 256 MB of folded text on a computer and 64 MB on a phone; a search
+  scans the folded text, so results are exact.
+- **A word index**, made with the archive, lists for every word the books it occurs in
+  (200,000 words, 2,989 books, 8 MB before compression). A book is read only if, for
+  each run of letters and digits in the query, it holds a word containing it; so a
+  rare word reads only the books it is in, and no book with a match is ever ruled out
+  (`crates/core/tests/search.rs` checks 1,100 searches and over 600 random pieces of
+  real text against reading every book).
+
+Speed is the goal, not a promise for every scope. Measured on a desktop (release
+build, one source after another):
+
+| Search | First time | Again |
+|---|---|---|
+| The KJV, "love" (the old search: about 60 ms) | 84 ms | 5 ms |
+| The WEB, "love" | 26 ms | 4 ms |
+| Matthew Henry, "love" | 290 ms | 135 ms |
+| Everything, "melchizedek" (127 of 2,989 books read) | 1.1 s | 0.25 s |
+| Everything, "love" (nearly every book) | 2.2 s | 2.3 s |
+
+A common word across everything reads nearly all 325 MB of text, more than is kept,
+so it costs about the same each time; results arrive source by source meanwhile.
+`crates/core/tests/search.rs` fails if searching the translation being read again
+takes 100 ms or more.
 
 ## Context engine
 

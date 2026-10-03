@@ -8,5 +8,6 @@ pub mod models;
 pub mod original_languages;
 pub mod parsing;
 pub mod red_letter;
+pub mod search;
 pub mod text;
 pub mod translations;

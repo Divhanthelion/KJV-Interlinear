@@ -9,6 +9,8 @@ pub mod crossrefs;
 pub mod library;
 pub mod notes;
 pub mod reference;
+pub mod search;
+pub mod text;
 pub mod usfm;
 pub mod view;
 

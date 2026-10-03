@@ -259,8 +259,78 @@ function libraryVerse(verse, selected) {
   ];
 }
 
+/** One character folded as the search folds it (crates/library/src/text.rs): curly
+ * quotes straight, dashes plain, "æ" as "ae", spaces as spaces, lower case. */
+function foldChar(c) {
+  if (c === "\u2018" || c === "\u2019" || c === "\u201B" || c === "\u02BC") return "'";
+  if (c === "\u201C" || c === "\u201D") return '"';
+  const code = c.codePointAt(0);
+  if (code >= 0x2010 && code <= 0x2014) return "-";
+  if (c === "æ" || c === "Æ") return "ae";
+  if (/\s/u.test(c)) return " ";
+  return c.toLowerCase();
+}
+
+/**
+ * Mark every match of `query` in a library chapter's verses, as the search finds them
+ * (the KJV's own chapters come from Rust with their matches marked). A verse's lines
+ * are joined with a space, as the search reads them; verse numbers and note markers
+ * aren't part of the text.
+ */
+function markMatches(container, query) {
+  let needle = "";
+  for (const c of query.trim()) needle += foldChar(c);
+  if (!needle) return;
+  for (const verse of container.querySelectorAll(".verse-text")) {
+    const nodes = [];
+    let text = "";
+    let lastLine = null;
+    const walker = document.createTreeWalker(verse, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (n.parentElement.closest(".vnum, .note-ref, .verse-note") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      const line = n.parentElement.closest(".line");
+      if (lastLine && line !== lastLine) text += " ";
+      lastLine = line;
+      nodes.push({ node: n, start: text.length });
+      text += n.nodeValue;
+    }
+    // The folded text, and for each of its code units where it came from in `text`
+    let folded = "";
+    const from = [];
+    for (let i = 0; i < text.length; ) {
+      const ch = String.fromCodePoint(text.codePointAt(i));
+      const f = foldChar(ch);
+      for (let k = 0; k < f.length; k++) from.push(i);
+      folded += f;
+      i += ch.length;
+    }
+    from.push(text.length);
+    const ranges = [];
+    for (let at = folded.indexOf(needle); at >= 0; at = folded.indexOf(needle, at + needle.length)) {
+      const end = at + needle.length;
+      // To the end of the last character matched
+      let e = from[end];
+      if (e === from[end - 1]) e = from.find((x, k) => k > end && x > from[end - 1]) ?? text.length;
+      ranges.push([from[at], e]);
+    }
+    // Last first, so the earlier text nodes and offsets stay as they were
+    for (const [s, e] of ranges.reverse()) {
+      for (const { node, start } of [...nodes].reverse()) {
+        const a = Math.max(s, start);
+        const b = Math.min(e, start + node.nodeValue.length);
+        if (a >= b) continue;
+        const range = document.createRange();
+        range.setStart(node, a - start);
+        range.setEnd(node, b - start);
+        range.surroundContents(h("mark", { class: "hit" }));
+      }
+    }
+  }
+}
+
 /** Render a chapter of a library translation (from the `bible_chapter` command). */
-export function renderLibraryChapter(container, chapter, { selectedVerse, nav }) {
+export function renderLibraryChapter(container, chapter, { selectedVerse, nav, highlight = null }) {
   const article = h(
     "article",
     { class: "chapter library", lang: "en" },
@@ -279,5 +349,6 @@ export function renderLibraryChapter(container, chapter, { selectedVerse, nav })
         : h("span"),
     ),
   );
+  if (highlight) markMatches(article, highlight);
   container.replaceChildren(article);
 }

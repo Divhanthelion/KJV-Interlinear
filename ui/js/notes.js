@@ -8,6 +8,9 @@ import { h, replace } from "./dom.js";
 let catalogue = null; // [{ id, name, author, year, tradition, coverage, credit, about }]
 let seq = 0;
 let shown = null; // the place the panel shows (see place())
+// A note to show and open (from a search result): { id, label, query, at }; `at` is
+// the place it was shown at, so it's let go once the reader moves on
+let focus = null;
 
 /** Notes longer than this many characters start folded. */
 const FOLD = 2400;
@@ -179,6 +182,29 @@ export function renderMarkup(body, ctx) {
 
 // ------------------------------------------------------------------ panel
 
+/**
+ * Show commentary `id`'s note labelled `label` (as a search result gives it), placed in
+ * the KJV's numbering at `book` `chapter`:`verse` (chapter 0: the book's introduction;
+ * verse 0: the chapter's), in the translation being read, with the Commentary panel open.
+ */
+export async function openNote(ctx, { id, label, book, chapter, verse }) {
+  focus = { id, label, at: null };
+  const c = chapter || 1;
+  const v = chapter ? verse : 0;
+  let at = { book, chapter: c, verse: v };
+  const translation = ctx.settings.translation;
+  if (translation !== "kjv") {
+    try {
+      const mapped = await call("bible_map", { from: "kjv", to: translation, book, chapter: c, verse: v });
+      if (mapped) at = { book: mapped.book, chapter: mapped.chapter, verse: v ? parseInt(mapped.verse, 10) || 0 : 0 };
+    } catch {
+      // the same numbers
+    }
+  }
+  await ctx.goTo(at.book, at.chapter, at.verse, { fromPanel: true });
+  ctx.openPanel("notes", { focus: false });
+}
+
 function place(ctx) {
   const view = ctx.state.chapter;
   return view ? [ctx.settings.translation, view.book, view.chapter, ctx.state.selectedVerse ?? 0].join("/") : null;
@@ -219,14 +245,15 @@ function chooser(ctx, all) {
 
 function note(n, ctx) {
   const long = n.body.length > FOLD;
+  const label = n.label;
   const content = h("div", { class: "note-body" }, renderMarkup(n.body, ctx));
   const place = h("span", { class: "note-place" }, n.label);
-  if (!long) return h("section", { class: "note" }, h("h4", { class: "note-label" }, place), content);
+  if (!long) return h("section", { class: "note", "data-label": label }, h("h4", { class: "note-label" }, place), content);
   // A folded article is named by its title ("Adam and Eve"), where it opens with one
-  const title = /^<h>(.*?)<\/h>/.exec(n.body)?.[1].replace(/<br\/>/g, " ").replace(/<[^>]*>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+  const title = /^<h>(.*?)<\/h>/.exec(n.body)?.[1].replace(/<br\/>/g, " ").replace(/<sc>(.*?)<\/sc>/g, (_, x) => x.toUpperCase()).replace(/<[^>]*>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
   return h(
     "details",
-    { class: "note" },
+    { class: "note", "data-label": label },
     h("summary", { class: "note-label" }, title ? `${title} · ` : null, place, h("span", { class: "muted" }, ` · ${Math.round(n.body.length / 1000)}k characters`)),
     content,
   );
@@ -245,9 +272,12 @@ export async function renderNotes(body, ctx) {
   }, 150);
   let all;
   let found; // { kjv, same, commentaries }
+  if (focus?.at && focus.at !== shown) focus = null;
   try {
     all = await commentaries();
     const ids = chosen(ctx, all).map((c) => c.id);
+    // A note opened from a search result shows even if its commentary isn't chosen
+    if (focus && !ids.includes(focus.id)) ids.push(focus.id);
     found = ids.length
       ? await call("notes", { commentaries: ids, bible: ctx.settings.translation, book: view.book, chapter: view.chapter, verse })
       : { kjv: "", same: true, commentaries: [] };
@@ -264,7 +294,7 @@ export async function renderNotes(body, ctx) {
     .map((c) =>
       h(
         "section",
-        { class: "commentary" },
+        { class: "commentary", "data-commentary": c.id },
         h("h3", { class: "commentary-name" }, c.name, h("span", { class: "commentary-meta" }, ` · ${c.author} · ${c.tradition}`)),
         c.notes.map((n) => note(n, ctx)),
         h("p", { class: "commentary-credit" }, c.credit),
@@ -298,4 +328,13 @@ export async function renderNotes(body, ctx) {
     chooser(ctx, all),
     results.length ? [sections, nothing.length ? h("div", { class: "notes-silent" }, nothing) : null] : h("p", { class: "empty" }, "Choose a commentary above."),
   );
+  if (focus) {
+    focus.at = shown;
+    const target = [...body.querySelectorAll(`[data-commentary="${CSS.escape(focus.id)}"] .note`)].find((n) => n.dataset.label === focus.label);
+    if (target) {
+      if (target.tagName === "DETAILS") target.open = true;
+      target.classList.add("is-focus");
+      target.scrollIntoView({ block: "start" });
+    }
+  }
 }
