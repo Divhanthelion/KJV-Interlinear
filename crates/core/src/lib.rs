@@ -6,6 +6,7 @@ pub mod context;
 pub mod dispatch;
 pub mod models;
 pub mod original_languages;
+pub mod parallel;
 pub mod parsing;
 pub mod red_letter;
 pub mod search;

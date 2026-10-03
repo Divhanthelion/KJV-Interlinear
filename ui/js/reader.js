@@ -61,13 +61,6 @@ function wordCard(word, lang) {
 function verseBody(verse, view) {
   const original = verse.original;
   switch (view) {
-    case "parallel":
-      return h(
-        "div",
-        { class: "parallel" },
-        kjvText(verse),
-        original ? originalParagraph(original, null) : noOriginal(),
-      );
     case "interlinear":
       return [
         kjvText(verse),
@@ -349,6 +342,78 @@ export function renderLibraryChapter(container, chapter, { selectedVerse, nav, h
         : h("span"),
     ),
   );
+  if (highlight) markMatches(article, highlight);
+  container.replaceChildren(article);
+}
+
+// ------------------------------------------------------------------ translations side by side
+
+/** One column's verses for one row: its text as the reader draws it, numbered as that
+ * translation numbers it (with the chapter where it differs from the row's). */
+function parallelCell(column, cell) {
+  // Named on phones, where the columns stack (drawn from data-name, so it isn't text)
+  const attrs = (cls) => ({ class: cls, "data-name": column.abbr });
+  if (cell.above) return h("div", attrs("pr-cell is-above"), h("p", { class: "pr-note" }, "With the verse above"));
+  if (!cell.verses.length) return h("div", attrs("pr-cell is-empty"), h("p", { class: "pr-note" }, "Not in this translation"));
+  return h(
+    "div",
+    attrs("pr-cell"),
+    cell.verses.map((v) => {
+      const number = v.label === "title" ? null : h("span", { class: "vnum" }, v.label, " ");
+      if (v.original) {
+        const rtl = RTL.has(v.original.lang);
+        return h("p", { class: "orig-text", lang: v.original.lang, dir: rtl ? "rtl" : "ltr" }, number, v.original.words.map((w) => w.text).join(" "));
+      }
+      return h("p", { class: `verse-text library-text${v.label === "title" ? " is-title" : ""}` }, libraryLines({ parts: v.parts ?? [], starts: null }, number));
+    }),
+  );
+}
+
+/**
+ * Render translations side by side (from the `parallel` command): a row for each verse
+ * of the leading translation, a column for each translation (and the Hebrew or Greek).
+ * `bar` is the strip for choosing the columns.
+ */
+export function renderParallel(container, chapter, { selectedVerse, nav, highlight = null, bar = null }) {
+  const rows = [];
+  for (const row of chapter.rows) {
+    rows.push(row.before.map(headingElement));
+    const first = parseInt(row.number, 10) || 0;
+    const isTitle = row.number === "0";
+    rows.push(
+      h(
+        "div",
+        {
+          class: isTitle ? "verse pr-row is-title" : "verse pr-row",
+          id: `v${first}`,
+          "data-verse": first,
+          "data-label": row.number,
+          "aria-current": !isTitle && first === selectedVerse ? "true" : null,
+        },
+        row.cells.map((cell, i) => parallelCell(chapter.columns[i], cell)),
+      ),
+    );
+  }
+  const article = h(
+    "article",
+    { class: "chapter parallel-reading", lang: "en" },
+    h("h1", { class: "chapter-heading" }, chapter.heading),
+    bar,
+    h("div", { class: "pr-columns", "aria-hidden": "true" }, chapter.columns.map((c) => h("div", { class: "pr-column-name", title: c.name }, c.abbr))),
+    rows,
+    chapter.after.map(headingElement),
+    h(
+      "nav",
+      { class: "chapter-nav", "aria-label": "Chapters" },
+      nav.prevLabel
+        ? h("button", { type: "button", onclick: nav.onPrev, title: nav.prevLabel }, icon("chevronLeft"), h("span", { class: "nav-label" }, nav.prevLabel))
+        : h("span"),
+      nav.nextLabel
+        ? h("button", { type: "button", onclick: nav.onNext, title: nav.nextLabel }, h("span", { class: "nav-label" }, nav.nextLabel), icon("chevronRight"))
+        : h("span"),
+    ),
+  );
+  article.style.setProperty("--columns", String(chapter.columns.length));
   if (highlight) markMatches(article, highlight);
   container.replaceChildren(article);
 }

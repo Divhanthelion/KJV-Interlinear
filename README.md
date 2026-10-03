@@ -10,7 +10,7 @@ A King James Bible with the Hebrew and Greek behind every verse, for Windows, ma
 
 - **KJV text**: all 66 books in the 1769 standard text, including the Psalm titles
 - **Hebrew & Greek interlinear**: every verse and Psalm title, word by word, with transliteration, Strong's number, grammar, and gloss
-- **Four views**: KJV, Parallel (KJV beside the original), Interlinear, and Original only
+- **Views**: the text; Parallel, up to four translations side by side (or beside the Hebrew and Greek), verse by verse in each one's own numbering; and for the KJV, Interlinear and Original only
 - **Strong's & lexicon**: tap any word for its Hebrew (TBESH) or Greek (TBESG) dictionary entry and every verse that uses it
 - **Red letter**: the words of Christ, taken span-for-span from the 1769 edition's own markup
 - **Search**: live search of the translation you're reading, or of chosen translations and commentaries, or of everything at once, with results grouped by source as they arrive; across all books, one book, or one testament, with matches highlighted; `Caesar's` finds `Cæsar’s`

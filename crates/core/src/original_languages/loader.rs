@@ -605,6 +605,20 @@ pub fn load_lexicon(path: &Path) -> Result<HashMap<String, LexiconEntry>, String
     Ok(lexicon)
 }
 
+/// The Old Testament's Aramaic verses (most of Daniel 2:4-7:28 and Ezra 4:8-6:18 and
+/// 7:12-26, Jeremiah 10:11, and two words of Genesis 31:47): those whose words are
+/// mostly Aramaic. TAHOT's morphology codes begin "H" for a Hebrew word and "A" for an
+/// Aramaic one; a verse where the language changes (Daniel 2:4) takes the language of
+/// most of its words.
+fn mark_aramaic(verses: &mut HashMap<VerseRef, InterlinearVerse>) {
+    for v in verses.values_mut() {
+        let lang = |c: char| v.original_words.iter().filter(|w| w.morphology.as_deref().is_some_and(|m| m.starts_with(c))).count();
+        if lang('A') > lang('H') {
+            v.language = OriginalLanguage::Aramaic;
+        }
+    }
+}
+
 /// Load all original language data from the data directory
 pub fn load_extended_bible(data_dir: &Path) -> Result<ExtendedBible, String> {
     let mut extended = ExtendedBible::new();
@@ -630,6 +644,8 @@ pub fn load_extended_bible(data_dir: &Path) -> Result<ExtendedBible, String> {
             }
         }
     }
+
+    mark_aramaic(&mut extended.interlinear_ot);
 
     // Load Greek NT files
     let greek_files = ["TAGNT_Mat-Jhn.txt", "TAGNT_Act-Rev.txt"];

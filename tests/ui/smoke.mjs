@@ -225,6 +225,61 @@ await test("Psalm title shows above verse 1", "book=Psalms&chapter=51&view=paral
   assert($("#v0 .orig-text[lang=he]"), "Hebrew title");
 `);
 
+await test("Parallel: translations side by side, verse by verse in each one's numbering", "book=Psalms&chapter=23&tr=kjv", {}, `
+  const switchButtons = () => [...$$("[data-view-switch]").find((g) => g.offsetParent !== null).querySelectorAll("button")].filter((b) => b.offsetParent !== null);
+  switchButtons().find((b) => b.textContent === "Parallel").click();
+  await until(() => $(".parallel-reading"), "parallel");
+  const names = () => $$(".pr-column-name").map((c) => c.textContent).join(",");
+  assert(names() === "KJV,Hebrew", "the KJV beside its Hebrew: " + names());
+  const add = async (abbr) => {
+    $$(".pr-bar .chip").find((b) => b.textContent === "Translation").click();
+    await until(() => $("#translations").open && $("#translations-title").textContent === "Read beside", "picker");
+    $$("#translations .translation-item").find((b) => b.querySelector(".translation-abbr").textContent === abbr).click();
+    await until(() => names().endsWith(abbr), abbr);
+  };
+  await add("WEB");
+  await add("DRA");
+  assert(names() === "KJV,Hebrew,WEB,DRA", names());
+  assert($$(".pr-bar .chip").find((b) => b.textContent === "Translation").disabled, "four columns at most");
+  // The Douay-Rheims' Psalm 22:1 holds the KJV's title and verse 1: given once
+  const cells = (id) => [...$(id).querySelectorAll(".pr-cell")];
+  assert(cells("#v0")[3].textContent.startsWith("22:1 A psalm for David. The Lord ruleth me"), "DRA 22:1 beside the title: " + cells("#v0")[3].textContent);
+  assert(cells("#v1")[3].textContent === "With the verse above", "then above: " + cells("#v1")[3].textContent);
+  assert(cells("#v1")[1].querySelector(".orig-text[lang=he][dir=rtl]"), "Hebrew, right to left");
+  assert(cells("#v1")[2].textContent.startsWith("1 The LORD is my shepherd;"), "WEB: " + cells("#v1")[2].textContent);
+  // Remove a column
+  $$(".pr-chip").find((c) => c.textContent.startsWith("Hebrew/Greek")).querySelector("button").click();
+  await until(() => names() === "KJV,WEB,DRA", "Hebrew removed: " + names());
+  // Read the WEB beside the others: it leads, in its own numbering
+  $("#translation-button").click();
+  await until(() => $("#translations").open, "translation picker");
+  $$(".translation-item").find((b) => b.querySelector(".translation-abbr").textContent === "DRA").click();
+  await until(() => $("#translation-label").textContent === "DRA" && $(".chapter-heading")?.textContent === "Psalm 22" && names().startsWith("DRA"), "the DRA leads: " + names());
+  assert(names() === "DRA,WEB", "the others follow: " + names());
+  assert(switchButtons().map((b) => b.textContent).join() === "DRA,Parallel", "the KJV's own views aren't offered: " + switchButtons().map((b) => b.textContent));
+  assert(cells("#v1")[1].textContent.startsWith("title A Psalm by David.") || cells("#v1")[1].textContent.includes("23 (title)"), "the WEB's title and verse 1 beside DRA 22:1: " + cells("#v1")[1].textContent);
+  // Back to the KJV, plain text, and the usual columns (settings persist between tests)
+  switchButtons()[0].click();
+  await until(() => !$(".parallel-reading"), "plain text");
+  $("#translation-button").click();
+  await until(() => $("#translations").open, "translation picker");
+  $$(".translation-item").find((b) => b.querySelector(".translation-abbr").textContent === "KJV").click();
+  await until(() => $("#translation-label").textContent === "KJV" && $("#reader").getAttribute("aria-busy") === "false", "back to the KJV");
+`);
+
+await test("Parallel on a phone: the columns stack, each named", "book=John&chapter=3&view=parallel&tr=kjv", { width: 390, height: 844, mobile: true }, `
+  await until(() => $(".parallel-reading"), "parallel");
+  const cell = $("#v16 .pr-cell");
+  assert(getComputedStyle(cell, "::before").content === '"KJV"', "named: " + getComputedStyle(cell, "::before").content);
+  assert(cell.textContent.startsWith("16 For God so loved"), "the name isn't part of the text: " + cell.textContent);
+  const [a, b] = $("#v16").querySelectorAll(".pr-cell");
+  assert(b.getBoundingClientRect().top >= a.getBoundingClientRect().bottom - 1, "stacked");
+  assert(document.documentElement.scrollWidth <= document.documentElement.clientWidth, "no sideways scrolling");
+  // Back to the plain text (settings persist between tests)
+  [...$$("[data-view-switch] button")].filter(visible)[0].click();
+  await until(() => !$(".parallel-reading"), "plain text");
+`);
+
 await test("Keyboard: arrows change chapter and view", "book=Genesis&chapter=50", {}, `
   document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
   await until(() => $("#ref-label").textContent === "Exodus 1", "Exodus 1");
@@ -526,7 +581,8 @@ await test("Translations: pick one, read it, keep the place", "book=John&chapter
   $(".translation-item").click();
   await until(() => $("#translation-label").textContent === "BSB" && $("#ref-label").textContent === "John 3" && $("#reader").getAttribute("aria-busy") === "false", "BSB John 3");
   assert($("#v16").textContent.includes("For God so loved the world"), "John 3:16 in the BSB");
-  assert(!visible($("[data-view-switch]")), "the view switch is the KJV's only");
+  const offered = $$("[data-view-switch] button").filter(visible).map((b) => b.textContent).join();
+  assert(offered === "BSB,Parallel", "the text and Parallel, not the KJV's own views: " + offered);
   // Footnotes open under their verse
   const note = $("#reader .note-ref");
   note.click();
@@ -572,7 +628,8 @@ await test("Translations: the divine name in small capitals, poetry in lines", "
 await test("Translations: the KJV keeps its interlinear and gains the Apocrypha", "book=Tobit&chapter=1&tr=kjv", {}, `
   assert($("#ref-label").textContent === "Tobit 1", "KJV Tobit 1 opens");
   assert($("#v1").textContent.includes("The book of the words of Tobit"), "Tobit 1:1");
-  assert(!visible($("[data-view-switch]")), "no interlinear for the Apocrypha");
+  const offered = $$("[data-view-switch] button").filter(visible).map((b) => b.textContent).join();
+  assert(offered === "KJV,Parallel", "no interlinear for the Apocrypha: " + offered);
   $("#ref-button").click();
   await until(() => $("#picker").open, "book picker");
   assert($$(".picker .section-title").map((e) => e.textContent).join() === "Old Testament,Apocrypha,New Testament", "three sections");

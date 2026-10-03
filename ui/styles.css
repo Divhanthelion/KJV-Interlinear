@@ -357,10 +357,9 @@ mark.hit {
 }
 .translation-button:hover { background: var(--surface-2); }
 
-/* The view switch (interlinear, parallel) belongs to the KJV's own reader. Specific enough
-   to beat the layout's !important display rules for the switch. */
-.app[data-reading="library"] .topbar .topbar-row .view-switch[data-view-switch] { display: none !important; }
-.app[data-reading="library"] .topbar .topbar-row.mobile-only:has(.view-switch) { display: none !important; }
+/* The interlinear and original-language views belong to the KJV's own reader; any
+   translation can be read plainly or beside others */
+.app[data-reading="library"] .view-switch button:is([data-view="interlinear"], [data-view="original"]) { display: none; }
 
 .translation-list { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: 2px; }
 .translation-item {
@@ -455,13 +454,6 @@ mark.hit {
 .orig-text:lang(grc) { color: var(--greek); line-height: 1.7; }
 .orig-text .vnum { font-size: 0.6em; }
 
-/* Parallel: KJV | original */
-.parallel {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 28px;
-  align-items: start;
-}
 .app[data-view="parallel"] .verse {
   padding-top: 12px;
   padding-bottom: 12px;
@@ -470,8 +462,37 @@ mark.hit {
   margin-bottom: 0;
 }
 .app[data-view="parallel"] .verse[aria-current="true"] { border-radius: 8px; }
+
+/* Translations side by side: a row per verse of the translation being read */
+.parallel-reading { max-width: min(96rem, 100%); }
+.pr-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -0.5rem 0 1rem; }
+.pr-bar-label { font-size: 0.875rem; color: var(--muted); margin-inline-end: 2px; }
+.pr-bar .chip { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 10px; font-size: 0.8125rem; }
+.pr-bar .chip svg.icon { width: 14px; height: 14px; }
+.pr-bar .pr-chip { padding-inline-end: 3px; cursor: default; }
+.pr-chip-remove { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 13px; color: inherit; }
+.pr-chip-remove:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+.pr-columns, .pr-row { display: grid; grid-template-columns: repeat(var(--columns, 2), minmax(0, 1fr)); gap: 0 24px; }
+.pr-columns {
+  position: sticky;
+  top: -24px;
+  z-index: 1;
+  padding: 8px 12px;
+  margin: 0 -12px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.pr-column-name { font-size: 0.8125rem; font-weight: 700; color: var(--accent); }
+.app[data-view="parallel"] .pr-row { padding-top: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); border-radius: 0; margin-bottom: 0; }
+.app[data-view="parallel"] .pr-row[aria-current="true"] { border-radius: 8px; }
+.pr-cell > p { margin: 0; }
+.pr-cell > p + p { margin-top: 0.4em; }
+.pr-note { font-size: 0.8125rem; color: var(--muted); font-style: italic; }
+.pr-cell .verse-text.is-title { font-style: italic; color: var(--text-2); }
 @media (max-width: 640px) {
-  .parallel { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .pr-columns { display: none; }
+  .pr-row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .pr-cell::before { content: attr(data-name); display: block; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.04em; color: var(--accent); margin-bottom: 1px; }
 }
 
 /* Interlinear word cards */

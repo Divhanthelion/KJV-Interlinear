@@ -6,7 +6,7 @@ import { chatScopeChanged, renderChat } from "./chat.js";
 import { renderSaved, renderSettings, renderStrongs } from "./panels.js";
 import { renderSearch } from "./search.js";
 import { closePicker, initPicker, isPickerOpen, openPicker, setPickerBooks } from "./picker.js";
-import { libraryVerseText, markSelected, renderChapter, renderLibraryChapter } from "./reader.js";
+import { libraryVerseText, markSelected, renderChapter, renderLibraryChapter, renderParallel } from "./reader.js";
 import { initTranslations, openTranslations } from "./translations.js";
 import { notesStale, renderNotes } from "./notes.js";
 import { renderXrefs, xrefsStale } from "./xrefs.js";
@@ -58,8 +58,23 @@ const reference = (book, chapter, verse) =>
 const cache = new Map();
 const CACHE_SIZE = 16;
 
+/** The columns read side by side: the translation being read, then the others chosen. */
+function parallelColumns() {
+  const known = (id) => id === "original" || state.bibles.some((b) => b.id === id);
+  return [settings.translation, ...settings.parallel.filter((id) => id !== settings.translation && known(id))];
+}
+
 async function fetchChapter(book, chapter) {
   const translation = settings.translation;
+  if (settings.view === "parallel") {
+    const columns = parallelColumns();
+    const key = `parallel|${columns.join(",")}|${book}|${chapter}`;
+    if (cache.has(key)) return cache.get(key);
+    const view = { ...(await call("parallel", { columns, book, chapter })), parallel: true };
+    cache.set(key, view);
+    if (cache.size > CACHE_SIZE) cache.delete(cache.keys().next().value);
+    return view;
+  }
   const key = `${translation}|${book}|${chapter}|${state.highlight ?? ""}`;
   if (cache.has(key)) {
     const hit = cache.get(key);
@@ -138,6 +153,7 @@ async function goTo(book, chapter, verse = 0, opts = {}) {
 }
 
 function hasVerse(view, n) {
+  if (view.parallel) return view.rows.some((r) => r.number !== "0" && parseInt(r.number, 10) === n);
   return view.library ? view.verses.some((v) => parseInt(v.number, 10) === n) : n <= view.verses.length;
 }
 
@@ -150,11 +166,14 @@ function render() {
     onPrev: () => step(-1),
     onNext: () => step(1),
   };
-  // The interlinear and parallel layouts are the KJV's; other translations read plainly
-  app.dataset.view = view.library ? "kjv" : settings.view;
-  app.dataset.reading = view.library ? "library" : "kjv";
-  if (view.library) renderLibraryChapter(reader, view, { selectedVerse: state.selectedVerse, nav, highlight: state.highlight });
+  // The interlinear and original-language layouts are the KJV's; any translation can be
+  // read beside others
+  app.dataset.view = view.parallel ? "parallel" : view.library ? "kjv" : settings.view;
+  app.dataset.reading = fromLibrary(view.book) ? "library" : "kjv";
+  if (view.parallel) renderParallel(reader, view, { selectedVerse: state.selectedVerse, nav, highlight: state.highlight, bar: parallelBar() });
+  else if (view.library) renderLibraryChapter(reader, view, { selectedVerse: state.selectedVerse, nav, highlight: state.highlight });
   else renderChapter(reader, view, { view: settings.view, selectedVerse: state.selectedVerse, nav });
+  syncViewSwitch();
   $("ref-label").textContent = view.heading;
   $("prev-chapter").disabled = !view.prev;
   $("next-chapter").disabled = !view.next;
@@ -182,6 +201,12 @@ function firstVisibleVerse() {
 
 /** Re-render in place (view change), keeping the reader on the same verse. */
 function rerender() {
+  // Into or out of the parallel view: a different chapter to fetch
+  const parallel = settings.view === "parallel";
+  if (state.chapter && !!state.chapter.parallel !== parallel) {
+    goTo(state.chapter.book, state.chapter.chapter, state.selectedVerse ?? 0, { keepScroll: true });
+    return;
+  }
   const anchor = firstVisibleVerse();
   render();
   if (anchor !== null) scrollToVerse(anchor);
@@ -468,11 +493,64 @@ function buildViewSwitches() {
   syncViewSwitch();
 }
 
+/** The view as drawn: the interlinear and original-language views are the KJV's own,
+ * so another translation reads as plain text in them. */
+function shownView() {
+  return app.dataset.reading === "library" && (settings.view === "interlinear" || settings.view === "original") ? "kjv" : settings.view;
+}
+
 function syncViewSwitch() {
+  const shown = shownView();
   for (const b of document.querySelectorAll("[data-view-switch] button")) {
-    b.setAttribute("aria-checked", String(b.dataset.view === settings.view));
-    b.tabIndex = b.dataset.view === settings.view ? 0 : -1;
+    b.setAttribute("aria-checked", String(b.dataset.view === shown));
+    b.tabIndex = b.dataset.view === shown ? 0 : -1;
+    // The plain text is named for the translation being read
+    if (b.dataset.view === "kjv") b.textContent = translationAbbr();
   }
+}
+
+/** The strip above translations read side by side: the columns, to remove or add to. */
+function parallelBar() {
+  const extra = parallelColumns().slice(1);
+  const name = (id) => (id === "original" ? "Hebrew/Greek" : state.bibles.find((b) => b.id === id)?.abbr ?? id);
+  const change = (list) => {
+    settings.parallel = list;
+    prefs.save(settings);
+    goTo(state.chapter.book, state.chapter.chapter, state.selectedVerse ?? 0, { keepScroll: true });
+  };
+  const full = extra.length >= 3;
+  return h(
+    "div",
+    { class: "pr-bar", role: "group", "aria-label": "Translations side by side" },
+    h("span", { class: "pr-bar-label" }, `${translationAbbr()} beside`),
+    extra.map((id) =>
+      h(
+        "span",
+        { class: "chip is-on pr-chip" },
+        name(id),
+        h("button", { type: "button", class: "pr-chip-remove", "aria-label": `Stop showing ${name(id)}`, onclick: () => change(extra.filter((x) => x !== id)) }, icon("close")),
+      ),
+    ),
+    h(
+      "button",
+      {
+        type: "button",
+        class: "chip",
+        disabled: full,
+        title: full ? "Up to four columns" : null,
+        onclick: () =>
+          openTranslations(state.bibles, null, {
+            title: "Read beside",
+            pick: (id) => {
+              if (id !== settings.translation && !extra.includes(id)) change([...extra, id]);
+            },
+          }),
+      },
+      icon("plus"),
+      "Translation",
+    ),
+    extra.includes("original") ? null : h("button", { type: "button", class: "chip", disabled: full, onclick: () => change([...extra, "original"]) }, icon("plus"), "Hebrew/Greek"),
+  );
 }
 
 // ------------------------------------------------------------------ input
@@ -525,7 +603,7 @@ function onKeydown(event) {
   const group = event.target.closest?.("[role=radiogroup]");
   if (group && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) {
     event.preventDefault();
-    const radios = [...group.querySelectorAll("[role=radio]")];
+    const radios = [...group.querySelectorAll("[role=radio]")].filter((r) => r.offsetParent !== null);
     const i = radios.indexOf(event.target);
     const step = event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 1;
     const next = radios[(i + step + radios.length) % radios.length];

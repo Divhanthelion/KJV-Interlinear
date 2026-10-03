@@ -214,8 +214,16 @@ row can be reviewed. Without being told any mapping, it reproduces the Vulgate's
 numbering, Psalm titles counted as verses, the Romans doxology where the WEB prints it,
 swapped verses, and the Septuagint's order; `crates/library/tests/alignment.rs` pins
 these hard cases.
-- **Reader.** Choose a translation, or read several in parallel. A notes panel shows
-  the chosen commentaries and cross-references for the selected verse.
+- **Reader.** Choose a translation, or read up to four columns side by side
+  (`crates/core/src/parallel.rs`): the translation being read leads, a row for each of
+  its verses, and every other column gives what it has for that verse, found through
+  the verse alignment and numbered as that translation numbers it, so the
+  Douay-Rheims' Psalm 22:1 sits beside the KJV's Psalm 23 title and verse 1, given
+  once, with "With the verse above" where a column's verse spans two rows. A column can
+  be the Hebrew, Aramaic, or Greek behind the KJV's verses, named for the languages in
+  the chapter (Daniel 2: "Hebrew & Aramaic"). On a phone the columns stack under each
+  verse, each named. Panels show the chosen commentaries and cross-references for the
+  selected verse.
 
 ## Search
 

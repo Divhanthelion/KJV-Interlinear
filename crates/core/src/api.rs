@@ -282,36 +282,35 @@ fn verse_view(
 ) -> VerseView {
     let red = if options.red_letter { red_ranges(data, verse) } else { Vec::new() };
     let hits = query.map(|q| find_folded_ranges(&verse.text, q)).unwrap_or_default();
-    let original = if options.original {
-        data.extended
-            .get_interlinear(&verse.book, verse.chapter, verse.verse_number)
-            .map(|iv| OriginalView {
-                lang: match iv.language {
-                    OriginalLanguage::Hebrew => "he",
-                    OriginalLanguage::Aramaic => "arc",
-                    OriginalLanguage::Greek => "grc",
-                },
-                words: iv
-                    .original_words
-                    .iter()
-                    .map(|w| WordView {
-                        text: w.original_text.trim().to_string(),
-                        translit: w.transliteration.clone(),
-                        gloss: format_gloss(&w.english_gloss),
-                        strongs: w.strongs_number.as_deref().map(strongs_display),
-                        key: w.strongs_number.clone(),
-                        morph: w.morphology.clone(),
-                    })
-                    .collect(),
-            })
-    } else {
-        None
-    };
+    let original = if options.original { original_view(data, &verse.book, verse.chapter, verse.verse_number) } else { None };
     VerseView {
         number: verse.verse_number,
         segments: segments(&verse.text, &red, &hits),
         original,
     }
+}
+
+/// The Hebrew, Aramaic, or Greek words of KJV verse `book` `chapter`:`verse`.
+pub fn original_view(data: &DataBundle, book: &str, chapter: u32, verse: u32) -> Option<OriginalView> {
+    data.extended.get_interlinear(book, chapter, verse).map(|iv| OriginalView {
+        lang: match iv.language {
+            OriginalLanguage::Hebrew => "he",
+            OriginalLanguage::Aramaic => "arc",
+            OriginalLanguage::Greek => "grc",
+        },
+        words: iv
+            .original_words
+            .iter()
+            .map(|w| WordView {
+                text: w.original_text.trim().to_string(),
+                translit: w.transliteration.clone(),
+                gloss: format_gloss(&w.english_gloss),
+                strongs: w.strongs_number.as_deref().map(strongs_display),
+                key: w.strongs_number.clone(),
+                morph: w.morphology.clone(),
+            })
+            .collect(),
+    })
 }
 
 /// Byte ranges spoken by Christ.
