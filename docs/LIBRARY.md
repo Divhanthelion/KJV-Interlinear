@@ -236,7 +236,7 @@ anywhere in a verse, across words), now in any source
   again, up to 256 MB of folded text on a computer and 64 MB on a phone; a search
   scans the folded text, so results are exact.
 - **A word index**, made with the archive, lists for every word the books it occurs in
-  (200,000 words, 2,989 books, 8 MB before compression). A book is read only if, for
+  (200,000 words, 2,989 books: 8 MB, 2.9 MB compressed in the app). A book is read only if, for
   each run of letters and digits in the query, it holds a word containing it; so a
   rare word reads only the books it is in, and no book with a match is ever ruled out
   (`crates/core/tests/search.rs` checks 1,100 searches and over 600 random pieces of
