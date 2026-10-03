@@ -21,7 +21,6 @@
 //! open the passage that item is about; a book's introduction, and an article on a whole
 //! book, are about its first chapter (where the app shows a book's introduction).
 
-use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::Read;
 
@@ -154,7 +153,8 @@ pub fn convert(entry: &Entry, pinned: &[sources::Source]) -> Result<Built, Strin
 
     // Where every item is, for links to it
     let mut report = Report::default();
-    let mut links: BTreeMap<String, String> = BTreeMap::new();
+    let mut lookups = markup::Lookups::default();
+    let links = &mut lookups.links;
     let mut ignore = 0;
     for (_, _, list) in &files {
         for item in list {
@@ -196,7 +196,7 @@ pub fn convert(entry: &Entry, pinned: &[sources::Source]) -> Result<Built, Strin
                 *report.stats.ignored.entry("item <title> (the book's name, or the title its body opens with)".into()).or_default() += 1;
             }
             let options = Options { dialect: Dialect::Tyndale, jud_is_judges: false, context: Some((range.book, range.start.0)) };
-            let (body, stats) = markup::convert_linked(item.body, options, &links).map_err(|m| ctx(&m))?;
+            let (body, stats) = markup::convert_with(item.body, options, &lookups).map_err(|m| ctx(&m))?;
             report.stats.add(stats);
             let proof = markup::prove(item.body, &body, Dialect::Tyndale).map_err(|m| ctx(&format!("the converted note's text differs from the source's: {m}")))?;
             if body.is_empty() {

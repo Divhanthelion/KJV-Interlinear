@@ -52,8 +52,9 @@ pub struct Entry {
     /// Scripture references with no book are in the note's own book (TSK, Wesley)
     #[serde(default)]
     pub relative_refs: bool,
-    /// How the source is read: a SWORD module (the default), or "tyndale" (the Tyndale
-    /// Open Study Notes' XML, see [`crate::tyndale`])
+    /// How the source is read: a SWORD module (the default), "tyndale" (the Tyndale Open
+    /// Study Notes' XML, see [`crate::tyndale`]), or "ccel" (the Fathers in the Christian
+    /// Classics Ethereal Library's editions, see [`crate::fathers`])
     #[serde(default)]
     pub format: Option<String>,
     /// Which works of a source holding several this entry is: Tyndale "notes" (study
@@ -82,6 +83,7 @@ pub fn catalogue() -> Result<Vec<Entry>, String> {
         let licence = match b.format.as_deref() {
             None => "pd",
             Some("tyndale") => "cc-by-sa-4.0",
+            Some("ccel") => "pd",
             Some(other) => return Err(format!("commentaries.toml: {} has unknown format {:?}", b.id, other)),
         };
         if b.licence != licence {
@@ -411,8 +413,10 @@ pub struct SourceInfo {
 }
 
 pub fn convert(entry: &Entry, pinned: &[sources::Source]) -> Result<Built, String> {
-    if entry.format.as_deref() == Some("tyndale") {
-        return crate::tyndale::convert(entry, pinned);
+    match entry.format.as_deref() {
+        Some("tyndale") => return crate::tyndale::convert(entry, pinned),
+        Some("ccel") => return crate::fathers::convert(entry, pinned),
+        _ => {}
     }
     let source = pinned.iter().find(|s| s.path == entry.source).ok_or_else(|| format!("{} is not pinned", entry.source))?;
     let module = Module::open_zip(&cache().join(&entry.source)).map_err(|e| format!("{}: {}", entry.source, e))?;
@@ -431,7 +435,7 @@ pub fn convert(entry: &Entry, pinned: &[sources::Source]) -> Result<Built, Strin
         markup: match dialect {
             Dialect::Osis => "OSIS".into(),
             Dialect::Thml => "ThML".into(),
-            Dialect::Tyndale => unreachable!("a SWORD module"),
+            Dialect::Tyndale | Dialect::Ccel => unreachable!("a SWORD module"),
         },
         encoding: match ex.encoding {
             Encoding::Utf8 => "UTF-8".into(),

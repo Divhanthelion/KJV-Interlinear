@@ -7,7 +7,7 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-use crate::{bibles, cache, commentaries, crossrefs, library};
+use crate::{bibles, cache, commentaries, crossrefs, fathers, library};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Source {
@@ -59,9 +59,13 @@ fn wanted() -> Result<Vec<(String, String)>, String> {
         }
     }
     for c in commentaries::catalogue()? {
-        // (the Tyndale Open Study Notes are two entries from one download)
-        if !out.iter().any(|(path, _)| *path == c.source) {
-            out.push((c.source, c.url));
+        // The Fathers: each volume their series are read from
+        let from = if c.format.as_deref() == Some("ccel") { fathers::volumes(&c.id)? } else { vec![(c.source, c.url)] };
+        for (path, url) in from {
+            // (the Tyndale Open Study Notes are two entries from one download)
+            if !out.iter().any(|(p, _)| *p == path) {
+                out.push((path, url));
+            }
         }
     }
     for x in crossrefs::catalogue()? {

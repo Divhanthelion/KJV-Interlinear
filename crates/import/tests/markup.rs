@@ -646,11 +646,11 @@ fn tyndale_opts() -> Options {
 
 #[track_caller]
 fn tyndale(raw: &str) -> (String, Stats) {
-    let mut links = std::collections::BTreeMap::new();
-    links.insert("Blessing_ThemeNote".to_string(), "GEN.12.1-GEN.12.3".to_string());
-    links.insert("title:The Messianic Banquet_ThemeNote".to_string(), "ISA.25.6".to_string());
-    links.insert("Gen.7.11-12_StudyNote".to_string(), "GEN.7.11-GEN.7.12".to_string());
-    let (body, stats) = kjv_import::markup::convert_linked(raw, tyndale_opts(), &links).unwrap_or_else(|e| panic!("{raw:?}: {e}"));
+    let mut lookups = kjv_import::markup::Lookups::default();
+    lookups.links.insert("Blessing_ThemeNote".to_string(), "GEN.12.1-GEN.12.3".to_string());
+    lookups.links.insert("title:The Messianic Banquet_ThemeNote".to_string(), "ISA.25.6".to_string());
+    lookups.links.insert("Gen.7.11-12_StudyNote".to_string(), "GEN.7.11-GEN.7.12".to_string());
+    let (body, stats) = kjv_import::markup::convert_with(raw, tyndale_opts(), &lookups).unwrap_or_else(|e| panic!("{raw:?}: {e}"));
     prove(raw, &body, Dialect::Tyndale).unwrap_or_else(|e| panic!("{raw:?} -> {body:?}: {e}"));
     (body, stats)
 }
@@ -713,4 +713,62 @@ fn tyndale_links() {
     assert_eq!(stats.refs_corrected.len(), 1);
     // An item no one has: the text kept, no `to`
     assert_eq!(link(r#"<a href="?item=Nobody_Profile_Filament">Nobody</a>"#).0, r#"<p><ref>Nobody</ref></p>"#);
+}
+
+// ------------------------------------------------------------------ the Fathers (CCEL ThML)
+
+#[track_caller]
+fn ccel(raw: &str) -> (String, Stats) {
+    let lookups = kjv_import::markup::Lookups {
+        styles: kjv_import::markup::ccel_styles(
+            "p.c24 { margin-top:.5in; text-align:center }\np.c48 { font-style:italic; margin-left:.25in }\np.c13 { text-indent:.25in }\nspan.c11 { font-variant:small-caps }\nspan.c9 { font-size:x-large }",
+        ),
+        ..Default::default()
+    };
+    let opts = Options { dialect: Dialect::Ccel, jud_is_judges: false, context: None };
+    let (body, stats) = kjv_import::markup::convert_with(raw, opts, &lookups).unwrap_or_else(|e| panic!("{raw:?}: {e}"));
+    prove(raw, &body, Dialect::Ccel).unwrap_or_else(|e| panic!("{raw:?} -> {body:?}: {e}"));
+    (body, stats)
+}
+
+#[test]
+fn ccel_paragraphs_spans_and_notes() {
+    // A homily's opening: its key (dropped), a page break, a centred heading, the passage
+    // in italic, and a paragraph with small capitals and a two-paragraph footnote
+    let (b, stats) = ccel(concat!(
+        r#"<scripCom type="Sermon" passage="Matt. 5:1,2" osisRef="Bible:Matt.5.1-Matt.5.2" /><pb n="88" />"#,
+        r#"<p class="c24"><span class="c9">Homily XV.</span></p>"#,
+        r#"<p class="c48">“And Jesus seeing the multitudes.”</p>"#,
+        r#"<p class="c13"><span class="c11">See</span> how unambitious He was,<note n="581"><p class="endnote"><span lang="EL" class="Greek">θορύβων</span>.</p><p class="endnote">Or, tumults.</p></note> and void.</p>"#,
+        r#"<!-- an editing leftover -->"#
+    ));
+    assert_eq!(
+        b,
+        r#"<h>Homily XV.</h><p><i>“And Jesus seeing the multitudes.”</i></p><p><sc>See</sc> how unambitious He was,<fn><lang code="grc">θορύβων</lang>.<br/>Or, tumults.</fn> and void.</p>"#
+    );
+    assert_eq!(stats.footnotes, 1);
+    // Unknown elements and classes are errors
+    let opts = Options { dialect: Dialect::Ccel, jud_is_judges: false, context: None };
+    assert!(convert(r#"<p class="c13"><blink>x</blink></p>"#, opts).is_err());
+}
+
+#[test]
+fn ccel_references() {
+    let r = |s: &str| ccel(&format!(r#"<p class="c13">{s}</p>"#));
+    // The edition's reference
+    assert_eq!(r(r#"<scripRef passage="Matt. v. 3" osisRef="Bible:Matt.5.3">Matt. v. 3</scripRef>"#).0, r#"<p><ref to="MAT.5.3">Matt. v. 3</ref></p>"#);
+    // A Psalm above a hundred whose reference dropped the C: the printed number
+    let (b, stats) = r(r#"<scripRef passage="Ps. cii. 27" osisRef="Bible:Ps.2.27">Ps. cii. 27</scripRef>"#);
+    assert_eq!(b, r#"<p><ref to="PSA.102.27">Ps. cii. 27</ref></p>"#);
+    assert_eq!(stats.refs_corrected.len(), 1);
+    // The editors' conversion of Augustine's Latin Psalm number to the English: kept
+    assert_eq!(r(r#"<scripRef passage="Ps. xxvi. 9" osisRef="Bible:Ps.27.9">Ps. xxvi. 9</scripRef>"#).0, r#"<p><ref to="PSA.27.9">Ps. xxvi. 9</ref></p>"#);
+    // A reference naming verses the KJV hasn't, and no reading of the text: no `to`
+    let (b, stats) = r(r#"<scripRef passage="1 Cor. i. 55" osisRef="Bible:1Cor.1.55">1 Cor. i. 55</scripRef>"#);
+    assert_eq!(b, r#"<p><ref>1 Cor. i. 55</ref></p>"#);
+    assert_eq!(stats.refs_impossible.len(), 1);
+    // The Septuagint's Psalms: their numbering differs, so no `to`
+    assert_eq!(r(r#"<scripRef passage="Ps. xxxi. 22" osisRef="Bible.lxx:Ps.31.22">Ps. xxxi. 22</scripRef>"#).0, r#"<p><ref>Ps. xxxi. 22</ref></p>"#);
+    // No reference at all: the printed passage
+    assert_eq!(r(r#"<scripRef passage="1 Cor. i. 10">1 Cor. i. 10</scripRef>"#).0, r#"<p><ref to="1CO.1.10">1 Cor. i. 10</ref></p>"#);
 }

@@ -5,6 +5,7 @@
 pub mod align;
 pub mod bibles;
 pub mod commentaries;
+pub mod fathers;
 pub mod crossrefs;
 pub mod markup;
 pub mod sources;

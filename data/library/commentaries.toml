@@ -27,6 +27,9 @@
 #   format    "tyndale" for the Tyndale Open Study Notes' XML (otherwise a SWORD module)
 #   part      which of the Tyndale works: "notes" (study notes and book introductions) or
 #             "articles" (profiles of people and theme articles)
+#   format "ccel": a Church Father's homilies and commentaries, series by series as
+#             data/library/fathers.toml lists them (`source` and `url` name the library they
+#             come from; each volume is pinned in sources.toml)
 
 [[commentary]]
 id = "mhc"
@@ -163,3 +166,33 @@ source = "tyndale/tyndale_open-studynotes.zip"
 url = "https://tyndaleopenresources.com/wp-content/themes/tyndale-openresources/files/tyndale_open-studynotes.zip"
 format = "tyndale"
 part = "articles"
+
+[[commentary]]
+id = "chrysostom"
+name = "John Chrysostom: Homilies on the New Testament"
+short = "Chrysostom"
+author = "John Chrysostom"
+year = "c. 386–404"
+tradition = "Church Father (Antioch and Constantinople)"
+coverage = "Matthew, John, Acts, and the epistles of Paul with Hebrews"
+licence = "pd"
+credit = "Public domain. The translations in the Nicene and Post-Nicene Fathers, First Series, vols. 10–14, ed. Philip Schaff (1886–1890), most first made for the Oxford Library of the Fathers and revised. Text: Christian Classics Ethereal Library (ccel.org)."
+about = "The preacher of Antioch and Constantinople, homily by homily through Matthew, John, Acts, and every epistle of Paul: plain, historical exposition, each homily closing in moral exhortation."
+source = "ccel"
+url = "https://www.ccel.org/ccel/schaff/"
+format = "ccel"
+
+[[commentary]]
+id = "augustine"
+name = "Augustine: Expositions, Tractates, and Sermons"
+short = "Augustine"
+author = "Augustine of Hippo"
+year = "c. 392–420"
+tradition = "Church Father (North Africa)"
+coverage = "Psalms, Matthew 5–7, John, 1 John, and lessons from the Gospels and Epistles"
+licence = "pd"
+credit = "Public domain. The translations in the Nicene and Post-Nicene Fathers, First Series, vols. 6–8, ed. Philip Schaff (1886–1888). Text: Christian Classics Ethereal Library (ccel.org)."
+about = "Augustine's expositions of all 150 Psalms, his tractates on the Gospel of John and homilies on its First Epistle, his reading of the Sermon on the Mount, and sermons on lessons from the Gospels and Epistles."
+source = "ccel"
+url = "https://www.ccel.org/ccel/schaff/"
+format = "ccel"

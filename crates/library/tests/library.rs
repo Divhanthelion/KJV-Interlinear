@@ -132,3 +132,38 @@ fn the_tyndale_open_study_notes() {
     let adam = lib.notes_on("tyndalearticles", "GEN", 3, 1).unwrap();
     assert!(adam.iter().any(|n| n.from == (2, 7) && n.to == (4, 2) && n.body.starts_with("<h>Adam and Eve</h>")));
 }
+
+#[test]
+fn the_church_fathers() {
+    let lib = library();
+    let on = |id: &str, code: &str, c: u32, v: u32| lib.notes_on(id, code, c, v).unwrap();
+    let opens = |n: &kjv_library::notes::Note, text: &str| n.body.starts_with(text);
+    for id in ["chrysostom", "augustine"] {
+        let info = lib.commentaries().iter().find(|c| c.id == id).unwrap();
+        assert_eq!(info.licence, "pd");
+        assert!(info.credit.contains("Nicene and Post-Nicene Fathers"), "{id}");
+    }
+    // Chrysostom's homilies run from where each begins to where the next does
+    let m = on("chrysostom", "MAT", 5, 3);
+    assert_eq!(m.len(), 1);
+    assert_eq!((m[0].from, m[0].to), ((5, 1), (5, 16)));
+    assert!(opens(&m[0], "<h>Homily XV.</h>"));
+    // The edition keys Homily LXIX to Matthew 21:1-14; it is on the wedding feast, 22:1-14
+    assert!(on("chrysostom", "MAT", 22, 2).iter().any(|n| n.from == (22, 1) && opens(n, "<h>Homily LXIX.</h>")));
+    // The Argument to Romans is its introduction
+    assert!(on("chrysostom", "ROM", 0, 0).iter().any(|n| n.body.contains("Argument")));
+    // Augustine's tractates name their passages
+    assert!(on("augustine", "JHN", 3, 16).iter().any(|n| (n.from, n.to) == ((3, 6), (3, 21)) && opens(n, "<h>Tractate XII.</h>")));
+    // His Psalms are the English numbering (Lat. XXII is Psalm 23), and the one the edition
+    // keys as Psalm 12 is on 13, "How long, O Lord"
+    assert!(on("augustine", "PSA", 23, 1).iter().any(|n| (n.from, n.to) == ((23, 1), (23, 6)) && n.body.contains("Lat. XXII.")));
+    assert!(on("augustine", "PSA", 13, 1).iter().any(|n| n.body.contains("How long, O Lord, wilt Thou forget me")));
+    // Psalm 119 section by section: Beth is 9-16
+    let beth = on("augustine", "PSA", 119, 12);
+    assert_eq!(beth.len(), 1);
+    assert_eq!((beth[0].from, beth[0].to), ((119, 9), (119, 16)));
+    // Every Psalm has its exposition
+    for p in 1..=150 {
+        assert!(!on("augustine", "PSA", p, 1).is_empty(), "Psalm {p}");
+    }
+}

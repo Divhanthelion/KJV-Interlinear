@@ -531,6 +531,36 @@ await test("Commentary: the Tyndale notes, book introductions, and articles", "b
   assert(titles.some((t) => t.startsWith("Adam and Eve · Genesis 2:7-4:2")), "Adam and Eve, folded: " + titles.join(" | "));
 `);
 
+await test("Commentary: the Church Fathers, homily by homily", "book=Matthew&chapter=5&tr=kjv&verse=3&select=1&panel=notes", {}, `${NOTES_HELPERS}
+  await until(() => section("John Chrysostom") && section("Augustine"), "Chrysostom and Augustine");
+  // Homily XV runs from 5:1 to the next homily's 5:17, folded under its own heading
+  const homily = [...section("John Chrysostom").querySelectorAll("summary")].map((x) => x.textContent);
+  assert(homily.some((t) => t.startsWith("Homily XV. · Matthew 5:1-16")), "Homily XV: " + homily.join(" | "));
+  assert(section("John Chrysostom").querySelector(".commentary-credit").textContent.includes("Nicene and Post-Nicene Fathers"), "credited");
+  // A heading the edition prints in capitals keeps its letters, drawn in small capitals
+  const sermon = section("Augustine").querySelector("summary");
+  assert(sermon && /sermon on the mount/i.test(sermon.textContent), "Augustine on the Sermon on the Mount");
+  assert(getComputedStyle(section("Augustine").querySelector(".note-body .sc") ?? document.body).fontVariantCaps === "small-caps", "capitals as small capitals");
+  // In the Douay-Rheims, its Psalm 22 is Augustine's Psalm XXIII (Lat. XXII)
+  $("#translation-button").click();
+  await until(() => $("#translations").open, "translation picker");
+  $$(".translation-item").find((b) => b.querySelector(".translation-abbr").textContent === "DRA").click();
+  await until(() => $("#translation-label").textContent === "DRA" && $("#reader").getAttribute("aria-busy") === "false", "Douay-Rheims");
+  $("#ref-button").click();
+  await until(() => $("#picker").open, "book picker");
+  $$(".book-grid button").find((b) => b.textContent === "Psalms").click();
+  await until(() => $(".chapter-grid"), "chapters");
+  $$(".chapter-grid button").find((b) => b.textContent === "22").click();
+  await until(() => $("#ref-label").textContent === "Psalm 22" && $("#reader").getAttribute("aria-busy") === "false", "Psalm 22");
+  $("#v1").click();
+  await until(() => [...(section("Augustine")?.querySelectorAll("summary") ?? [])].some((x) => x.textContent.startsWith("Psalm XXIII. Lat. XXII. · Psalm 23:1-6")), "Augustine on Psalm 23");
+  // Back to the KJV for the tests that follow
+  $("#translation-button").click();
+  await until(() => $("#translations").open, "translation picker again");
+  $$(".translation-item").find((b) => b.querySelector(".translation-abbr").textContent === "KJV").click();
+  await until(() => $("#translation-label").textContent === "KJV", "back to the KJV");
+`);
+
 const XREF_HELPERS = `
   const panel = $("#panel");
   const where = () => panel.querySelector(".notes-where")?.textContent;

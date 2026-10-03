@@ -1,0 +1,273 @@
+# The Church Fathers' homilies and commentaries in the library: which series of which
+# volume, and how each unit (a homily, a tractate, an exposition) is placed on the
+# passage it expounds. Read by kjv-import (crates/import/src/fathers.rs) from the
+# Christian Classics Ethereal Library's editions of the Nicene and Post-Nicene Fathers
+# (public-domain translations), pinned in sources.toml.
+#
+# Each series:
+#   commentary    the commentary it belongs to (commentaries.toml, format "ccel")
+#   volume        the CCEL volume ("npnf110": Nicene and Post-Nicene Fathers, Series I, vol. 10)
+#   parent        the title of the division holding the series' units
+#   work          the work's name, for the build report
+#   book          the book it expounds (the library's code)
+#   extent        "key": a unit is on the passage its key names (Augustine's tractates name
+#                 their whole passage); "until-next": a unit runs from its key's start to the
+#                 verse before the next unit's (Chrysostom's homilies name only where they begin;
+#                 the last runs to the end of the book)
+#   introduction  titles of units that introduce the book (Chrysostom's "Argument"): its
+#                 introduction ("0:0")
+#   skip          titles of units that are not the Father's (editors' prefaces and essays), or
+#                 have no passage; each with the reason in a comment
+#   keys          a unit's passage where the edition's key is missing or narrower than the
+#                 unit (title = passage, OSIS-style, KJV numbering)
+#   letters       Psalm 119's units are its 22 sections, Aleph to Tau, eight verses each
+#   title_keys    each unit is the whole Psalm its title names (the edition keys six
+#                 Psalms wrongly: Psalm XIII as 12, XXXV, LXV and CX as 1, LXII as 42,
+#                 LXVII as 47)
+#
+# A unit's key is the first `<scripCom>` the edition places in it (its `osisRef`, else its
+# `passage`), else its title read as a passage ("Psalm XI"). Where the title says where
+# the unit begins, the key must agree: where it doesn't, the title is right every time,
+# and `keys` gives the passage (a disagreement not settled here is a build error). A unit
+# titled "Title Page." is always skipped. A unit with no key that is neither an
+# introduction nor skipped is a build error.
+
+# ------------------------------------------------------------------ John Chrysostom
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf110"
+parent = "The Homilies of St. John Chrysostom."
+work = "Homilies on the Gospel of St. Matthew"
+book = "MAT"
+extent = "until-next"
+introduction = ["Homily 1"]
+# The edition keys these 1:23-24, 2:2, 12:25-26, 21:1-14, and 21:15
+keys = { "Matthew 1. 22, 23." = "MAT.1.22-MAT.1.23", "Matthew II. 1, 2." = "MAT.2.1-MAT.2.2", "Matthew XI. 25, 26." = "MAT.11.25-MAT.11.26", "Matthew XXII. 1-14." = "MAT.22.1-MAT.22.14", "Matthew XXII. 15." = "MAT.22.15" }
+# The Oxford translator's preface, and the American editor's essay on Chrysostom as an exegete
+skip = ["Preface to the Oxford Edition.", "Introductory Essay."]
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf111"
+parent = "A Commentary on the Acts of the Apostles"
+work = "Homilies on the Acts of the Apostles"
+book = "ACT"
+extent = "until-next"
+# The edition's key for Homily XXXIX reads "Acts xvii. 32-24"; its title, 32-34
+keys = { "Homily XXXIX on Acts xvii. 32-34. xviii. 1." = "ACT.17.32-ACT.18.1" }
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf111"
+parent = "The Homilies of St. John Chrysostom on Paul's Epistle to the Romans"
+work = "Homilies on the Epistle to the Romans"
+book = "ROM"
+extent = "until-next"
+introduction = ["The Argument"]
+# The Oxford translator's preface
+skip = ["Preface to Homilies on Romans."]
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf112"
+parent = "Homilies on First Corinthians."
+work = "Homilies on the First Epistle to the Corinthians"
+book = "1CO"
+extent = "until-next"
+introduction = ["Argument."]
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf112"
+parent = "Homilies on Second Corinthians."
+work = "Homilies on the Second Epistle to the Corinthians"
+book = "2CO"
+extent = "until-next"
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf113"
+parent = "Commentary on Galatians."
+work = "Commentary on the Epistle to the Galatians"
+book = "GAL"
+# One unit per chapter; the edition keys each by its chapter (the first also by the
+# book, a marker for the whole commentary)
+extent = "key"
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf113"
+parent = "Homilies on Ephesians."
+work = "Homilies on the Epistle to the Ephesians"
+book = "EPH"
+extent = "until-next"
+introduction = ["The Argument."]
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf113"
+parent = "Homilies on Philippians."
+work = "Homilies on the Epistle to the Philippians"
+book = "PHP"
+extent = "until-next"
+introduction = ["Introductory Discourse."]
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf113"
+parent = "Homilies on Colossians."
+work = "Homilies on the Epistle to the Colossians"
+book = "COL"
+extent = "until-next"
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf113"
+parent = "Homilies on First Thessalonians."
+work = "Homilies on the First Epistle to the Thessalonians"
+book = "1TH"
+extent = "until-next"
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf113"
+parent = "Homilies on 2 Thessalonians."
+work = "Homilies on the Second Epistle to the Thessalonians"
+book = "2TH"
+extent = "until-next"
+introduction = ["Argument."]
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf113"
+parent = "Homilies on 1 Timothy."
+work = "Homilies on the First Epistle to Timothy"
+book = "1TI"
+extent = "until-next"
+introduction = ["Argument."]
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf113"
+parent = "Homilies on 2 Timothy."
+work = "Homilies on the Second Epistle to Timothy"
+book = "2TI"
+extent = "until-next"
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf113"
+parent = "Homilies on Titus."
+work = "Homilies on the Epistle to Titus"
+book = "TIT"
+extent = "until-next"
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf113"
+parent = "Homilies on Philemon."
+work = "Homilies on the Epistle to Philemon"
+book = "PHM"
+extent = "until-next"
+introduction = ["Argument."]
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf114"
+parent = "The Homilies of St. John Chrysostom on the Gospel of St. John."
+work = "Homilies on the Gospel of St. John"
+book = "JHN"
+extent = "until-next"
+# Homily I, titled "Preface.", is Chrysostom's own opening on the evangelist
+introduction = ["Preface."]
+# The edition keys this 9:32-36
+keys = { "John 9.34–36" = "JHN.9.34-JHN.9.36" }
+# The Oxford translator's preface
+skip = ["Preface to the Homilies on the Gospel of St. John."]
+
+[[series]]
+commentary = "chrysostom"
+volume = "npnf114"
+parent = "The Homilies of St. John Chrysostom on the Epistle to the Hebrews."
+work = "Homilies on the Epistle to the Hebrews"
+book = "HEB"
+extent = "until-next"
+introduction = ["Argument."]
+# The Oxford editor's preface and the American editor's introduction
+skip = ["Preface.", "Introduction."]
+
+# ------------------------------------------------------------------ Augustine of Hippo
+
+[[series]]
+commentary = "augustine"
+volume = "npnf107"
+parent = "Lectures or Tractates on the Gospel According to St. John."
+work = "Tractates on the Gospel of John"
+book = "JHN"
+extent = "key"
+# The edition keys these 13:33 (two tractates on the passage) and 18:24-26
+keys = { "Chapter XIII. 31–32." = "JHN.13.31-JHN.13.32", "Chapter XVIII. 13–27." = "JHN.18.13-JHN.18.27" }
+
+[[series]]
+commentary = "augustine"
+volume = "npnf107"
+parent = "Ten Homilies on the First Epistle of John."
+work = "Ten Homilies on the First Epistle of John"
+book = "1JN"
+extent = "key"
+introduction = ["The Prologue."]
+# The translator's introduction; and extracts from Augustine's other works, appended by
+# the editors, which the edition does not place on a passage
+skip = ["Introduction.", "Liber de Correptione et Gratia, § 35.", "Collatio cum Maximino, § 14.", "De Trinitate, lib. i. 6, § 9."]
+
+[[series]]
+commentary = "augustine"
+volume = "npnf108"
+parent = "Expositions on the Book of Psalms."
+work = "Expositions on the Book of Psalms"
+book = "PSA"
+extent = "key"
+title_keys = true
+# The editor's preface, and the Oxford translators' notice; and Psalm 119, expounded
+# section by section in the next series
+skip = ["Editor’s Preface.", "Advertisement.", "Psalm CXIX"]
+
+[[series]]
+commentary = "augustine"
+volume = "npnf108"
+parent = "Psalm CXIX"
+work = "Expositions on the Book of Psalms: Psalm 119"
+book = "PSA"
+extent = "key"
+letters = true
+
+[[series]]
+commentary = "augustine"
+volume = "npnf106"
+parent = "Our Lord’s Sermon on the Mount."
+work = "Our Lord's Sermon on the Mount"
+book = "MAT"
+extent = "key"
+# The second book expounds chapters 6 and 7; the edition keys it to chapter 6
+keys = { "On the Latter Part of Our Lord’s Sermon on the Mount, Contained in the Sixth and Seventh Chapters of Matthew." = "MAT.6.1-MAT.7.29" }
+
+[[series]]
+commentary = "augustine"
+volume = "npnf106"
+parent = "Sermons on Selected Lessons of the New Testament."
+work = "Sermons on Selected Lessons of the New Testament"
+book = "MAT"
+extent = "key"
+# The translator's notice
+skip = ["Advertisement."]
+# The first sermon, on the genealogies in Matthew and Luke, has no key in the edition;
+# the edition keys the others Matthew 6:9, 12:19, 25:25, Mark 8:32, John 14:7, 14:8
+[series.keys]
+"Of the agreement of the evangelists Matthew and Luke in the generations of the Lord." = "MAT.1.1-MAT.1.17 LUK.3.23-LUK.3.38"
+"Again on the words of the Gospel, Matt. xi. 28, ‘Come unto me, all ye that labour and are heavy laden, and I will give you rest,’ etc." = "MAT.11.28"
+"On the words of the Gospel, Matt. xiii. 19, etc., where the Lord Jesus explaineth the parables of the sower." = "MAT.13.19"
+"On the words of the Gospel, Matt. xxv. 24, etc., where the slothful servant who would not put out the talent he had received, is condemned." = "MAT.25.24"
+"On the words of the Gospel, Mark xiii. 32, ‘But of that day or that hour knoweth no one, not even the angels in heaven, neither the Son, but the Father.’" = "MRK.13.32"
+"On the words of the Gospel, John xvi. 7, ‘I tell you the truth; it is expedient for you that I go away,’ etc." = "JHN.16.7"
+"On the same words of the Gospel, John xvi. 8, ‘He will convict the world in respect of sin, and of righteousness, and of judgement.’" = "JHN.16.8"

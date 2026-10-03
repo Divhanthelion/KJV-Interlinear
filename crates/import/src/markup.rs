@@ -38,7 +38,10 @@
 //! | | `sync type=Strongs` | dropped and counted (a Strong's number, not text) |
 //!
 //! The Tyndale Open Study Notes ([`Dialect::Tyndale`]) are HTML-like XML: `p` and `span`
-//! by `class` (see [`Conv::tyndale`]), and `a href="?bref=Gen.1.1"` links.
+//! by `class` (see [`Conv::tyndale`]), and `a href="?bref=Gen.1.1"` links. The Christian
+//! Classics Ethereal Library's ThML editions of the Fathers ([`Dialect::Ccel`]) style `p`
+//! and `span` by classes each volume defines in its own stylesheet ([`Style`]); see
+//! [`Conv::ccel`].
 //!
 //! Anything else is an error naming the element, never silently dropped.
 //!
@@ -86,6 +89,57 @@ pub enum Dialect {
     /// The Tyndale Open Study Notes: well-formed XML of `p` and `span` by class, and
     /// `a href` links in the NLT's numbering.
     Tyndale,
+    /// The Christian Classics Ethereal Library's ThML (the Fathers): well-formed XML of
+    /// `p` and `span` styled by each volume's stylesheet, `note`, `scripRef`.
+    Ccel,
+}
+
+/// What a CCEL volume's stylesheet says a class looks like (only what the note markup can
+/// carry: the rest, sizes, margins, capitals by transformation, is how it was printed).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct Style {
+    pub italic: bool,
+    pub bold: bool,
+    pub small_caps: bool,
+    pub superscript: bool,
+    /// Printed in capitals (`text-transform:uppercase`): the text keeps its letters, and
+    /// is drawn in small capitals, as near as the note markup comes
+    pub capitals: bool,
+    /// A centred paragraph: a heading ("Homily XV.", "Matt. V. 1, 2.")
+    pub centred: bool,
+}
+
+/// What a conversion may look up: Tyndale's items for links to them, a CCEL volume's
+/// styles by `p.c13` / `span.c11`.
+#[derive(Debug, Default)]
+pub struct Lookups {
+    pub links: BTreeMap<String, String>,
+    pub styles: BTreeMap<String, Style>,
+}
+
+/// A CCEL volume's stylesheet (`p.c13 { text-indent:.25in }`) read as [`Style`]s.
+pub fn ccel_styles(css: &str) -> BTreeMap<String, Style> {
+    let mut out = BTreeMap::new();
+    let mut rest = css;
+    while let Some(open) = rest.find('{') {
+        let selector = rest[..open].trim();
+        let Some(close) = rest[open..].find('}') else { break };
+        let body = rest[open + 1..open + close].to_ascii_lowercase().replace(' ', "");
+        rest = &rest[open + close + 1..];
+        let has = |prop: &str| body.split(';').any(|d| d.trim() == prop);
+        let style = Style {
+            italic: has("font-style:italic"),
+            bold: has("font-weight:bold") || has("font-weight:700"),
+            small_caps: has("font-variant:small-caps"),
+            superscript: has("vertical-align:super"),
+            capitals: has("text-transform:uppercase"),
+            centred: has("text-align:center"),
+        };
+        for sel in selector.split(',') {
+            out.insert(sel.trim().to_string(), style);
+        }
+    }
+    out
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -300,6 +354,13 @@ pub fn tokenize(raw: &str, dialect: Dialect, stats: &mut Stats) -> Result<Vec<To
         }
     };
     while i < b.len() {
+        // A comment in a CCEL edition (an editing leftover, not text)
+        if dialect == Dialect::Ccel && raw[i..].starts_with("<!--") {
+            let end = raw[i..].find("-->").ok_or_else(|| format!("a comment never closed at: {}", context(raw, i)))?;
+            *stats.ignored.entry("<!-- comment --> (an editing leftover)".into()).or_default() += 1;
+            i += end + 3;
+            continue;
+        }
         match b[i] {
             b'<' => match scan_tag(&raw[i..]) {
                 Some((tok, n)) => {
@@ -764,8 +825,8 @@ fn checkable(shown: &str) -> bool {
 
 struct Conv<'a> {
     opts: Options,
-    /// Tyndale: where each item a link may name is about (see [`convert_linked`])
-    links: &'a BTreeMap<String, String>,
+    /// Tyndale's items, a CCEL volume's styles (see [`convert_with`])
+    lookups: &'a Lookups,
     blocks: Vec<Block>,
     cur: Option<(Kind, Vec<Item>)>,
     /// Inside a footnote or another inline-only container (a heading, list item, cell).
@@ -879,8 +940,10 @@ impl Conv<'_> {
     }
 
     fn element(&mut self, e: &El) -> Res {
-        if self.opts.dialect == Dialect::Tyndale {
-            return self.tyndale(e);
+        match self.opts.dialect {
+            Dialect::Tyndale => return self.tyndale(e),
+            Dialect::Ccel => return self.ccel(e),
+            _ => {}
         }
         let thml = self.opts.dialect == Dialect::Thml;
         let kids = &e.kids[..];
@@ -1242,6 +1305,256 @@ impl Conv<'_> {
         }
     }
 
+    /// The CCEL ThML editions of the Fathers. A unit's divisions (a Psalm's parts) are
+    /// structure; `scripCom` (the unit's key), page breaks, index markers and rules are
+    /// dropped and counted. Paragraphs are headings when centred, and italic throughout
+    /// when their class is (the passage expounded, printed before the homily); spans take
+    /// their class's italic, bold, small capitals and superscript, or a language
+    /// (`Greek` and `lang="EL"` are `grc`). `note` is a footnote, its paragraphs as lines;
+    /// `scripRef` a reference by its `osisRef`.
+    fn ccel(&mut self, e: &El) -> Res {
+        let kids = &e.kids[..];
+        let style = |kind: &str| e.attr("class").and_then(|c| self.lookups.styles.get(&format!("{kind}.{c}"))).copied().unwrap_or_default();
+        match e.name.as_str() {
+            "div1" | "div2" | "div3" | "div4" | "div5" => {
+                if self.inline_depth > 0 {
+                    return Err(format!("{} where only inline content can be", e.describe()));
+                }
+                self.flush();
+                self.count(format!("<{}> (a part of the unit)", e.name));
+                self.walk(kids)?;
+                self.flush();
+                Ok(())
+            }
+            "scripCom" | "pb" | "insertIndex" | "hr" => {
+                if e.kids.iter().any(|k| matches!(k, Node::Text(t) if !t.trim().is_empty()) || matches!(k, Node::El(_))) {
+                    return Err(format!("{} has content", e.describe()));
+                }
+                self.count(format!("<{}> (no text)", e.name));
+                Ok(())
+            }
+            "p" => {
+                check_attrs(e, &["class", "id"])?;
+                if self.in_fn > 0 {
+                    // A footnote's paragraphs, one after another as lines
+                    if self.cur.as_ref().is_some_and(|(_, items)| !matches!(items.last(), Some(Item::Open(Tag::Fn)))) {
+                        self.push(Item::Br);
+                    }
+                    return self.walk(kids);
+                }
+                if self.inline_depth > 0 {
+                    return Err(format!("{} where only inline content can be", e.describe()));
+                }
+                let s = style("p");
+                self.begin(if s.centred { Kind::H } else { Kind::P });
+                self.inline_depth += 1;
+                let r = if s.italic { self.inline(Tag::I, kids) } else { self.walk(kids) };
+                self.inline_depth -= 1;
+                r?;
+                self.flush();
+                Ok(())
+            }
+            "h1" | "h2" | "h3" | "h4" => {
+                check_attrs(e, &["id", "class"])?;
+                if self.inline_depth > 0 {
+                    return Err(format!("{} where only inline content can be", e.describe()));
+                }
+                self.begin(Kind::H);
+                self.inline_depth += 1;
+                let r = self.walk(kids);
+                self.inline_depth -= 1;
+                r?;
+                self.flush();
+                Ok(())
+            }
+            "span" => {
+                check_attrs(e, &["class", "id", "lang", "dir"])?;
+                if e.attr("dir").is_some() {
+                    self.drop_data("span dir= (writing direction)");
+                }
+                let class = e.attr("class").unwrap_or("");
+                let lang = match (e.attr("lang"), class) {
+                    (Some("EL"), _) | (_, "Greek") => Some("grc"),
+                    (Some("HE"), _) | (_, "Hebrew") => Some("he"),
+                    (Some("DE"), _) => Some("de"),
+                    (Some("FR"), _) => Some("fr"),
+                    (Some("LA"), _) => Some("la"),
+                    (Some(other), _) => return Err(format!("unknown language {other:?} in {}", e.describe())),
+                    (None, _) => None,
+                };
+                let mut tags: Vec<Tag> = Vec::new();
+                if let Some(code) = lang {
+                    tags.push(Tag::Lang(code.into()));
+                } else if class == "sc" {
+                    tags.push(Tag::Sc);
+                } else if !class.is_empty() {
+                    let s = self.lookups.styles.get(&format!("span.{class}")).copied().ok_or_else(|| format!("{}: no style for its class", e.describe()))?;
+                    if s.bold {
+                        tags.push(Tag::B);
+                    }
+                    if s.italic {
+                        tags.push(Tag::I);
+                    }
+                    if s.small_caps || s.capitals {
+                        tags.push(Tag::Sc);
+                    }
+                    if s.superscript {
+                        tags.push(Tag::Sup);
+                    }
+                }
+                for t in &tags {
+                    self.push(Item::Open(t.clone()));
+                }
+                self.walk(kids)?;
+                for t in tags.iter().rev() {
+                    self.push(Item::Close(t.clone()));
+                }
+                Ok(())
+            }
+            "i" => {
+                check_attrs(e, &["id"])?;
+                self.inline(Tag::I, kids)
+            }
+            "b" => {
+                check_attrs(e, &["id"])?;
+                self.inline(Tag::B, kids)
+            }
+            "sup" => {
+                check_attrs(e, &["id"])?;
+                self.inline(Tag::Sup, kids)
+            }
+            "br" => {
+                check_attrs(e, &["id"])?;
+                self.push(Item::Br);
+                Ok(())
+            }
+            "a" => {
+                // Anchors and links within the edition: their text
+                check_attrs(e, &["id", "href", "class", "name"])?;
+                self.count("<a> (a link within the edition: its text kept)");
+                self.walk(kids)
+            }
+            "note" => {
+                check_attrs(e, &["n", "id", "place", "anchored"])?;
+                self.stats.footnotes += 1;
+                self.push(Item::Open(Tag::Fn));
+                self.in_fn += 1;
+                self.inline_depth += 1;
+                let r = self.walk(kids);
+                self.inline_depth -= 1;
+                self.in_fn -= 1;
+                r?;
+                self.push(Item::Close(Tag::Fn));
+                Ok(())
+            }
+            "scripRef" => {
+                check_attrs(e, &["id", "passage", "parsed", "osisRef", "version"])?;
+                let link = self.ccel_link(e.attr("osisRef"), e.attr("passage"), &e.text());
+                self.reference(e, link)
+            }
+            "ul" | "ol" => {
+                check_attrs(e, &["id", "class"])?;
+                if self.inline_depth > 0 {
+                    return Err(format!("{} where only inline content can be", e.describe()));
+                }
+                self.flush();
+                self.walk(kids)
+            }
+            "li" => {
+                check_attrs(e, &["id", "class"])?;
+                if self.inline_depth > 0 {
+                    return Err(format!("{} where only inline content can be", e.describe()));
+                }
+                self.begin(Kind::Li(1));
+                self.inline_depth += 1;
+                let r = self.walk(kids);
+                self.inline_depth -= 1;
+                r?;
+                self.flush();
+                Ok(())
+            }
+            "table" => {
+                check_attrs(e, &["id", "class", "style", "border", "cellpadding", "cellspacing", "width"])?;
+                if self.inline_depth > 0 {
+                    return Err(format!("{} where only inline content can be", e.describe()));
+                }
+                self.flush();
+                self.walk(kids)
+            }
+            "tr" => {
+                check_attrs(e, &["id", "class", "style"])?;
+                self.flush();
+                let mut cells = Vec::new();
+                for k in kids {
+                    match k {
+                        Node::Text(t) if t.bytes().all(is_ws) => {}
+                        Node::El(c) if c.name == "td" || c.name == "th" => {
+                            check_attrs(c, &["id", "class", "style", "colspan", "rowspan", "valign", "align", "width"])?;
+                            cells.push(self.collect_inline(&c.kids, "<td>")?);
+                        }
+                        other => return Err(format!("{other:?} inside <tr>")),
+                    }
+                }
+                if cells.iter().any(|c| !c.is_empty()) {
+                    self.blocks.push(Block::Row(cells));
+                }
+                Ok(())
+            }
+            _ => Err(format!("unknown element {}", e.describe())),
+        }
+    }
+
+    /// The `to` for a CCEL reference: the edition's `osisRef`, which its editors made from
+    /// the printed text (converting the Latin Psalm numbers Augustine's text sometimes
+    /// prints, "Ps. xxvi. 9", to the English, 27:9), with two exceptions, each read from
+    /// the printed text ("Ps. cii. 27", or `passage` where the text is a fragment) with its
+    /// Roman numerals, and counted in `refs_corrected`:
+    ///
+    /// * a Psalm above a hundred whose `osisRef` dropped the numeral's C ("Ps. cii. 27" has
+    ///   `Ps.2.27`, "Ps. cx. 1" `Ps.10.1`): 198 times in the Fathers' volumes; the printed
+    ///   number is the English;
+    /// * an `osisRef` naming verses the KJV hasn't, where the printed text reads as verses
+    ///   it has.
+    ///
+    /// References the edition marks as the Septuagint's or the Vulgate's (`Bible.lxx:`,
+    /// `Bible.vul:`) are read the same way, except in the Psalms, whose numbering those
+    /// differ in: no `to` (counted as unparsed).
+    fn ccel_link(&mut self, osis_ref: Option<&str>, passage: Option<&str>, shown: &str) -> Link {
+        let osis = osis_ref.map(str::trim).filter(|r| !r.is_empty());
+        let versioned = osis.is_some_and(|r| r.contains("Bible.lxx:") || r.contains("Bible.vul:"));
+        if versioned && osis.is_some_and(|r| r.contains(":Ps.")) {
+            return Link::Unresolved;
+        }
+        let from_osis = osis.and_then(|r| reference::from_osis(&r.replace("Bible.lxx:", "Bible:").replace("Bible.vul:", "Bible:")).ok());
+        let read_text = |t: &str| -> Option<Vec<reference::Range>> {
+            reference::parse_with(&arabic(t.trim()), RefOptions::default()).ok().filter(|r| possible(r))
+        };
+        let from_text = read_text(shown).or_else(|| passage.and_then(read_text));
+        // The C dropped from a Psalm above a hundred
+        let dropped_c = match (&from_osis, &from_text) {
+            (Some(o), Some(t)) => matches!((o.as_slice(), t.as_slice()), ([o], [t])
+                if o.book == "PSA" && t.book == "PSA" && t.start.0 >= 100 && o.start.0 == t.start.0 - 100),
+            _ => false,
+        };
+        match (from_osis, from_text) {
+            (Some(_), Some(t)) if dropped_c => {
+                self.stats.refs_corrected.push(format!("{} ({shown})", osis.unwrap_or("")));
+                Link::To(join_osis(&t))
+            }
+            (Some(o), _) if possible(&o) => Link::To(join_osis(&o)),
+            (Some(_), Some(t)) => {
+                self.stats.refs_corrected.push(format!("{} ({shown})", osis.unwrap_or("")));
+                Link::To(join_osis(&t))
+            }
+            (Some(_), None) => {
+                self.stats.refs_impossible.push(format!("{} ({shown})", osis.unwrap_or("")));
+                Link::Withheld
+            }
+            (None, Some(t)) => Link::To(join_osis(&t)),
+            (None, None) => Link::Unresolved,
+        }
+    }
+
     /// The `to` for a Tyndale link: `?bref=` a passage, or `?item=` another study note (its
     /// passage), read by [`tyndale_ranges`]. A link that can't be read, or names verses
     /// the KJV hasn't, is read again from its shown text ("1:3–2:3" for the cut-short
@@ -1253,13 +1566,13 @@ impl Conv<'_> {
         if let Some(item) = href_read.strip_prefix("?item=") {
             // Another item: "Blessing_ThemeNote_Filament", "Gen_BookIntro_ISB"
             let key = item.rsplit_once('_').map_or(item, |(key, _)| key);
-            if let Some(to) = self.links.get(key) {
+            if let Some(to) = self.lookups.links.get(key) {
                 return Link::To(to.clone());
             }
             // A name mistyped ("TheMessiahsBanquet" for "TheMessianicBanquet"): the item of
             // that kind whose title is the link's text
             let kind = key.rsplit_once('_').map_or("", |(_, kind)| kind);
-            if let Some(to) = self.links.get(&format!("title:{shown}_{kind}")) {
+            if let Some(to) = self.lookups.links.get(&format!("title:{shown}_{kind}")) {
                 self.stats.refs_corrected.push(format!("{href} ({shown})"));
                 return Link::To(to.clone());
             }
@@ -1409,6 +1722,55 @@ impl Conv<'_> {
 }
 
 // ------------------------------------------------------------------------------------
+// Printed references with Roman numerals (the Fathers' editions)
+// ------------------------------------------------------------------------------------
+
+/// Roman numerals in a printed passage as numbers, and "V. 1" as "5:1": "Matt. V. 1, 2" ->
+/// "Matt. 5:1, 2", "Psalm XI" -> "Psalm 11", "Philippians i. 8-11" -> "Philippians 1:8-11".
+pub fn arabic(s: &str) -> String {
+    let value = |w: &str| -> Option<u32> {
+        let mut total = 0u32;
+        let mut prev = 0u32;
+        for c in w.chars().rev() {
+            let v = match c.to_ascii_uppercase() {
+                'I' => 1,
+                'V' => 5,
+                'X' => 10,
+                'L' => 50,
+                'C' => 100,
+                _ => return None,
+            };
+            if v < prev { total = total.checked_sub(v)? } else { total += v }
+            prev = prev.max(v);
+        }
+        Some(total)
+    };
+    let mut out = String::new();
+    let words: Vec<&str> = s.split(' ').collect();
+    for (k, w) in words.iter().enumerate() {
+        let bare = w.trim_end_matches(['.', ',', ';']);
+        let tail = &w[bare.len()..];
+        // A numeral is all one case (not "I" the pronoun in a phrase: titles here are passages)
+        let numeral = !bare.is_empty() && (bare.chars().all(|c| "IVXLC".contains(c)) || bare.chars().all(|c| "ivxlc".contains(c))) && k > 0;
+        match value(bare).filter(|_| numeral) {
+            Some(n) => {
+                out.push_str(&n.to_string());
+                // "V. 1" -> "5:1"
+                if tail.starts_with('.') && words.get(k + 1).is_some_and(|nx| nx.starts_with(|c: char| c.is_ascii_digit())) {
+                    out.push(':');
+                    out.push_str(&tail[1..]);
+                    continue;
+                }
+                out.push_str(tail);
+            }
+            None => out.push_str(w),
+        }
+        out.push(' ');
+    }
+    out.trim_end().replace(": ", ":")
+}
+
+// ------------------------------------------------------------------------------------
 // Tyndale references
 // ------------------------------------------------------------------------------------
 
@@ -1495,17 +1857,18 @@ pub fn tyndale_ranges(s: &str, renumbered: &mut u64) -> Option<Vec<reference::Ra
 /// Converts one note's raw markup to the note markup. The body is empty when the source
 /// had no text (only structure).
 pub fn convert(raw: &str, opts: Options) -> Result<(String, Stats), String> {
-    convert_linked(raw, opts, &BTreeMap::new())
+    convert_with(raw, opts, &Lookups::default())
 }
 
-/// [`convert`], for a source whose links name its other items (the Tyndale notes:
-/// `?item=Blessing_ThemeNote_Filament`): `links` gives each item's passage as a `to`,
-/// keyed `Blessing_ThemeNote`, and by title, `title:Blessing_ThemeNote`.
-pub fn convert_linked(raw: &str, opts: Options, links: &BTreeMap<String, String>) -> Result<(String, Stats), String> {
+/// [`convert`], with what the source's markup refers to: the Tyndale notes' links name
+/// its other items (`?item=Blessing_ThemeNote_Filament`; `links` gives each item's
+/// passage as a `to`, keyed `Blessing_ThemeNote`, and by title,
+/// `title:Blessing_ThemeNote`); a CCEL volume's classes are its stylesheet's (`styles`).
+pub fn convert_with(raw: &str, opts: Options, lookups: &Lookups) -> Result<(String, Stats), String> {
     let mut stats = Stats::default();
     let toks = tokenize(raw, opts.dialect, &mut stats)?;
     let tree = build_tree(toks)?;
-    let mut conv = Conv { opts, links, blocks: Vec::new(), cur: None, inline_depth: 0, in_fn: 0, stats, };
+    let mut conv = Conv { opts, lookups, blocks: Vec::new(), cur: None, inline_depth: 0, in_fn: 0, stats, };
     conv.walk(&tree)?;
     conv.flush();
     let body = write_blocks(&conv.blocks);
@@ -1562,6 +1925,10 @@ fn source_stream(raw: &str, dialect: Dialect) -> Result<Vec<Sym>, String> {
     let mut i = 0;
     while i < raw.len() {
         let rest = &raw[i..];
+        if dialect == Dialect::Ccel && rest.starts_with("<!--") {
+            i += rest.find("-->").ok_or("a comment never closed")? + 3;
+            continue;
+        }
         let c = rest.chars().next().unwrap();
         match c {
             '<' => match scan_tag(rest) {

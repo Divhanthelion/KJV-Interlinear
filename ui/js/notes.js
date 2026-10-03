@@ -223,7 +223,7 @@ function note(n, ctx) {
   const place = h("span", { class: "note-place" }, n.label);
   if (!long) return h("section", { class: "note" }, h("h4", { class: "note-label" }, place), content);
   // A folded article is named by its title ("Adam and Eve"), where it opens with one
-  const title = /^<h>(.*?)<\/h>/.exec(n.body)?.[1].replace(/<[^>]*>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+  const title = /^<h>(.*?)<\/h>/.exec(n.body)?.[1].replace(/<br\/>/g, " ").replace(/<[^>]*>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
   return h(
     "details",
     { class: "note" },

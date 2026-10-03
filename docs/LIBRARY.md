@@ -40,7 +40,7 @@ The interlinear stays, but it is no longer the centre of the app.
 | Commentary | Keil & Delitzsch | CrossWire `KD` | KJV | Public domain |
 | Commentary | John Gill | SermonIndex SWORD module `sigill` (keeps the Hebrew; HelloAO's copy strips it) | KJV | Public domain |
 | Commentary | Jamieson-Fausset-Brown (1871, unabridged) | CrossWire `JFB` | KJV | Public domain |
-| Commentary | Church Fathers | NPNF/ANF/Oxford translations (tertullian.org, Writings-Database), keyed by homily headings; filtered HCF index for the rest | verse ranges | Public domain translations only; no machine translations, no modern copyrighted excerpts |
+| Commentary | Church Fathers: John Chrysostom's homilies on Matthew, John, Acts, and Paul's epistles with Hebrews (`chrysostom`); Augustine's expositions of the Psalms, tractates on John and 1 John, the Sermon on the Mount, and sermons on New Testament lessons (`augustine`) | The Nicene and Post-Nicene Fathers, First Series (vols. 6–8, 10–14), in the Christian Classics Ethereal Library's ThML (`data/library/fathers.toml` lists each series); each homily placed on the passage it expounds | KJV (the editions' Psalm numbers are the English) | Public domain translations only; no machine translations, no modern copyrighted excerpts |
 | Cross-references | Treasury of Scripture Knowledge | CrossWire `TSK` (the commentary above, read as references) | KJV | Public domain |
 | Cross-references | OpenBible.info | `cross-references.zip` from openbible.info (ESV numbering; 3 John 1:15 is the KJV's 1:14) | KJV | CC BY 4.0 |
 
@@ -56,6 +56,8 @@ data/library/
   commentaries/<id>/index.toml     generated: counts, orphans placed, ranges trimmed, references
   commentaries/<id>/<BOOK>.jsonl   one note per line: {"from":"3:16","to":"3:18","body":"…"}
                                    ("0" verse = chapter introduction, "0:0" = book introduction)
+  fathers.toml                the Church Fathers' series: which division of which volume, and
+                              how each homily is placed on its passage (see crates/import/src/fathers.rs)
   crossrefs.toml              the cross-reference collections: name, licence, credit; the
                               Treasury names its commentary, the others a pinned source
   crossrefs/<id>/index.toml   generated: counts, references left out or renumbered, source and SHA-256
@@ -74,7 +76,18 @@ text of every verse is checked against eBible's separately produced VPL edition.
 **Commentary notes** use a small, closed markup in `body`, described below. The
 importer turns each source format (OSIS, ThML, the Tyndale notes' XML) into this one
 markup; anything it doesn't recognise is an import error, never silently dropped. The
-Tyndale notes' links to their own items (a theme article, a book's introduction,
+The Fathers come from the Christian Classics Ethereal Library's editions of the Nicene
+and Post-Nicene Fathers (public-domain translations, read only where the edition names
+the passage a homily expounds). A homily is placed by the passage its title names, or
+the edition's key where the title names none; the keys disagree with the titles 26
+times (Homily LXIX on Matthew, on the wedding feast of 22:1-14, is keyed 21:1-14; six
+Psalms are keyed to others) and the titles are right each time, so each is settled in
+`fathers.toml` and an unsettled one fails the build. Chrysostom's titles give where a
+homily begins, so it runs to where the next begins. The editions' references are taken
+except where they misread a Psalm number above a hundred ("Ps. cii. 27" keyed Psalm
+2:27), read then from the printed text. Editors' prefaces and essays are left out.
+
+The Tyndale notes' links to their own items (a theme article, a book's introduction,
 another study note) open the passage that item is about; a link whose target is cut
 short ("Gen.1.3-2") is read from its shown text ("1:3–2:3") only when that starts
 where the link does. Every repair and every link left without a `to` is counted in

@@ -676,6 +676,62 @@ sha256 = "7b4d5ae088449d5a6925170c4b89b978acee2f78f73dc6b8a278fa948a7e8498"
 retrieved = "2026-10-02"
 
 [[source]]
+path = "ccel/npnf110.xml"
+url = "https://www.ccel.org/ccel/schaff/npnf110.xml"
+size = 3956654
+sha256 = "e110c98b1f444147bf7baf79e46e56ae6c6a1f0b2983e6fc52f2356fac7f858f"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ccel/npnf111.xml"
+url = "https://www.ccel.org/ccel/schaff/npnf111.xml"
+size = 5349065
+sha256 = "46072a7fefb80b4b7ea68544b46c13fc1785bd29d99834fd2f867f8aa5e14f08"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ccel/npnf112.xml"
+url = "https://www.ccel.org/ccel/schaff/npnf112.xml"
+size = 3253154
+sha256 = "b8b345e060625cdf495e888322d88e922f66e686863e818a978204c5f564a4dd"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ccel/npnf113.xml"
+url = "https://www.ccel.org/ccel/schaff/npnf113.xml"
+size = 4441248
+sha256 = "d62c7c82b262c738739090ffaf5473aa5a76dbadf62ebee0dccac8c4a7db4762"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ccel/npnf114.xml"
+url = "https://www.ccel.org/ccel/schaff/npnf114.xml"
+size = 4728349
+sha256 = "b130406978fbceb7bcd0774b0e8b09905f35a020a2300c1baf02f314a2d5a70a"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ccel/npnf107.xml"
+url = "https://www.ccel.org/ccel/schaff/npnf107.xml"
+size = 3694413
+sha256 = "75d52f4c31dde0959974256b3f5d84394b7b96fcd2883e78a3d32e0b66c5869a"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ccel/npnf108.xml"
+url = "https://www.ccel.org/ccel/schaff/npnf108.xml"
+size = 6222968
+sha256 = "87b60e90917e69f03c75955517fc996a0e6d22dc9862365b45c308e70e5bf784"
+retrieved = "2026-10-02"
+
+[[source]]
+path = "ccel/npnf106.xml"
+url = "https://www.ccel.org/ccel/schaff/npnf106.xml"
+size = 4680096
+sha256 = "3710c6985a8dfc4e4ffafc461a7a8550db609b0506535453dac252f2aa55b604"
+retrieved = "2026-10-02"
+
+[[source]]
 path = "openbible/cross-references.zip"
 url = "https://a.openbible.info/data/cross-references.zip"
 size = 1982012
