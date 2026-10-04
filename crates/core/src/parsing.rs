@@ -7,10 +7,7 @@ use crate::models::{Bible, Book, Chapter, Testament, Verse};
 
 impl Bible {
     /// Load Bible from Old and New Testament directories
-    pub fn from_directories(
-        old_testament_path: &Path,
-        new_testament_path: &Path,
-    ) -> io::Result<Self> {
+    pub fn from_directories(old_testament_path: &Path, new_testament_path: &Path) -> io::Result<Self> {
         let mut bible = Bible { books: Vec::new() };
 
         // Get the standard book order
@@ -33,26 +30,24 @@ impl Bible {
     }
 }
 
-fn read_testament_books(
-    bible: &mut Bible,
-    testament_path: &Path,
-    testament: Testament,
-) -> io::Result<()> {
+fn read_testament_books(bible: &mut Bible, testament_path: &Path, testament: Testament) -> io::Result<()> {
     for entry in fs::read_dir(testament_path)? {
         let entry = entry?;
         let file_path = entry.path();
 
         // Skip .DS_Store files and Zone.Identifier files (Windows metadata)
         if let Some(file_name) = file_path.file_name().and_then(|n| n.to_str())
-            && (file_name == ".DS_Store" || file_name.contains("Zone.Identifier")) {
-                continue;
-            }
+            && (file_name == ".DS_Store" || file_name.contains("Zone.Identifier"))
+        {
+            continue;
+        }
 
         if file_path.is_file()
-            && let Some(book_name) = file_path.file_stem().and_then(|s| s.to_str()) {
-                let book = parse_book_file(&file_path, book_name.to_string(), testament.clone())?;
-                bible.books.push(book);
-            }
+            && let Some(book_name) = file_path.file_stem().and_then(|s| s.to_str())
+        {
+            let book = parse_book_file(&file_path, book_name.to_string(), testament.clone())?;
+            bible.books.push(book);
+        }
     }
 
     Ok(())
@@ -61,11 +56,7 @@ fn read_testament_books(
 fn parse_book_file(file_path: &Path, book_name: String, testament: Testament) -> io::Result<Book> {
     let file = File::open(file_path)?;
 
-    let mut book = Book {
-        name: book_name,
-        testament,
-        chapters: Vec::new(),
-    };
+    let mut book = Book { name: book_name, testament, chapters: Vec::new() };
 
     let reader = io::BufReader::new(file);
     for line_result in reader.lines() {
@@ -93,12 +84,7 @@ fn parse_book_file(file_path: &Path, book_name: String, testament: Testament) ->
             });
         }
 
-        let verse = Verse {
-            book: book.name.clone(),
-            chapter: chapter_num,
-            verse_number: verse_num,
-            text,
-        };
+        let verse = Verse { book: book.name.clone(), chapter: chapter_num, verse_number: verse_num, text };
         let chapter = &mut book.chapters[chapter_num as usize - 1];
         if verse_num == 0 {
             chapter.superscription = Some(verse);
@@ -207,11 +193,7 @@ pub fn canonical_book_index(name: &str) -> Option<usize> {
 fn get_standard_book_order() -> HashMap<String, usize> {
     let books = CANONICAL_BOOKS;
 
-    books
-        .iter()
-        .enumerate()
-        .map(|(i, &name)| (name.to_string(), i))
-        .collect()
+    books.iter().enumerate().map(|(i, &name)| (name.to_string(), i)).collect()
 }
 
 #[cfg(test)]
@@ -232,14 +214,8 @@ mod tests {
 
     #[test]
     fn test_parse_line() {
-        assert_eq!(
-            parse_line("3:16 For God so  loved"),
-            Some((3, 16, "For God so loved".to_string()))
-        );
-        assert_eq!(
-            parse_line("51:0 To the chief Musician"),
-            Some((51, 0, "To the chief Musician".to_string()))
-        );
+        assert_eq!(parse_line("3:16 For God so  loved"), Some((3, 16, "For God so loved".to_string())));
+        assert_eq!(parse_line("51:0 To the chief Musician"), Some((51, 0, "To the chief Musician".to_string())));
         assert_eq!(parse_line("chapter one"), None);
         assert_eq!(parse_line("0:1 text"), None);
         assert_eq!(parse_line("1:1 "), None);

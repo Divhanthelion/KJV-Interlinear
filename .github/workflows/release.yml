@@ -40,14 +40,18 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - name: Fetch the eBible.org source text (pinned)
+      - name: Fetch the eBible.org source texts (pinned)
         run: |
           curl -fsSL --retry 3 https://ebible.org/Scriptures/eng-kjv_vpl.zip -o "$RUNNER_TEMP/eng-kjv_vpl.zip"
           echo "3c611764ee4c66248681f83f1ce5689e77a9c50a590fc3241584259c1b9183b5 *$RUNNER_TEMP/eng-kjv_vpl.zip" | sha256sum -c -
           unzip -o "$RUNNER_TEMP/eng-kjv_vpl.zip" eng-kjv_vpl.txt -d "$RUNNER_TEMP"
+          curl -fsSL --retry 3 https://ebible.org/Scriptures/eng-kjv_usfm.zip -o "$RUNNER_TEMP/eng-kjv_usfm.zip"
+          echo "0e0359e9e488582a72c86800f227839ecb16dada7bb5ba316509d374c59e559a *$RUNNER_TEMP/eng-kjv_usfm.zip" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/usfm" && unzip -o "$RUNNER_TEMP/eng-kjv_usfm.zip" -d "$RUNNER_TEMP/usfm"
       - run: cargo test --release -p kjv-core -p kjv-ai -p kjv-devserver
         env:
           KJV_SOURCE: ${{ runner.temp }}/eng-kjv_vpl.txt
+          KJV_USFM: ${{ runner.temp }}/usfm
 
   desktop:
     name: Desktop (${{ matrix.name }})

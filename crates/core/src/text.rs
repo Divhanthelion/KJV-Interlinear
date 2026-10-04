@@ -13,10 +13,14 @@ fn fold_char(c: char, out: &mut String) {
     }
 }
 
-/// Fold a whole string for search comparisons.
+/// Fold a whole string for search comparisons. Runs of whitespace fold to one
+/// space, so "God  so" finds "God so" (verse text never has two in a row).
 pub fn fold_for_search(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     for c in s.chars() {
+        if c.is_whitespace() && out.ends_with(' ') {
+            continue;
+        }
         fold_char(c, &mut out);
     }
     out
@@ -81,11 +85,7 @@ pub fn segments(text: &str, red: &[(usize, usize)], hits: &[(usize, usize)]) -> 
         let (red, hit) = (covers(red, start), covers(hits, start));
         match out.last_mut() {
             Some(last) if last.red == red && last.hit == hit => last.text.push_str(&text[start..end]),
-            _ => out.push(Segment {
-                text: text[start..end].to_string(),
-                red,
-                hit,
-            }),
+            _ => out.push(Segment { text: text[start..end].to_string(), red, hit }),
         }
     }
     out
@@ -120,16 +120,21 @@ mod tests {
     }
 
     #[test]
+    fn query_whitespace_collapses() {
+        assert_eq!(fold_for_search("God  so\t loved"), "god so loved");
+        let text = "For God so loved the world";
+        let r = find_folded_ranges(text, "God  so");
+        assert_eq!(r.iter().map(|&(s, e)| &text[s..e]).collect::<Vec<_>>(), ["God so"]);
+    }
+
+    #[test]
     fn segments_combine_red_and_hits() {
         let text = "And Jesus said, Follow me.";
         let red = [(16, 26)];
         let hits = [(20, 26)];
         let s = segments(text, &red, &hits);
         let parts: Vec<(&str, bool, bool)> = s.iter().map(|x| (x.text.as_str(), x.red, x.hit)).collect();
-        assert_eq!(
-            parts,
-            vec![("And Jesus said, ", false, false), ("Foll", true, false), ("ow me.", true, true)]
-        );
+        assert_eq!(parts, vec![("And Jesus said, ", false, false), ("Foll", true, false), ("ow me.", true, true)]);
         // No ranges: one plain segment
         assert_eq!(segments("plain", &[], &[]).len(), 1);
     }

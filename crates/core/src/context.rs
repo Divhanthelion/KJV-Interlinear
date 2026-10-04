@@ -14,13 +14,29 @@ use crate::text::format_gloss;
 pub enum Scope {
     /// Nothing attached
     None,
-    Verse { book: String, chapter: u32, verse: u32 },
+    Verse {
+        book: String,
+        chapter: u32,
+        verse: u32,
+    },
     /// Verses `from..=to` of one chapter
-    Verses { book: String, chapter: u32, from: u32, to: u32 },
-    Chapter { book: String, chapter: u32 },
-    Book { book: String },
+    Verses {
+        book: String,
+        chapter: u32,
+        from: u32,
+        to: u32,
+    },
+    Chapter {
+        book: String,
+        chapter: u32,
+    },
+    Book {
+        book: String,
+    },
     /// Whole books, in canonical order whatever order they are given in
-    Books { books: Vec<String> },
+    Books {
+        books: Vec<String>,
+    },
     Bible,
 }
 
@@ -56,7 +72,8 @@ pub fn build(data: &DataBundle, scope: &Scope, options: &ContextOptions) -> Resu
         Scope::None => String::new(),
         Scope::Verse { book, chapter, verse } => {
             let (b, ch) = find_chapter(data, book, *chapter)?;
-            let v = find_verse(ch, *verse).ok_or_else(|| format!("{} has no verse {}", chapter_heading(book, *chapter), verse))?;
+            let v = find_verse(ch, *verse)
+                .ok_or_else(|| format!("{} has no verse {}", chapter_heading(book, *chapter), verse))?;
             out.book_heading(b);
             out.chapter_heading(b, ch);
             out.verse(v);
@@ -71,14 +88,12 @@ pub fn build(data: &DataBundle, scope: &Scope, options: &ContextOptions) -> Resu
             }
             out.book_heading(b);
             out.chapter_heading(b, ch);
+            // Label what is attached: John 3:30–99 is John 3:30–36
+            let (first, last) = (picked[0].verse_number, picked[picked.len() - 1].verse_number);
             for v in picked {
                 out.verse(v);
             }
-            if from == to {
-                reference(book, *chapter, from)
-            } else {
-                format!("{}–{}", reference(book, *chapter, from), to)
-            }
+            verses_label(book, *chapter, first, last)
         }
         Scope::Chapter { book, chapter } => {
             let (b, ch) = find_chapter(data, book, *chapter)?;
@@ -134,6 +149,22 @@ pub fn estimate_tokens(text: &str) -> usize {
     (ascii * 10).div_ceil(38) + (other * 9).div_ceil(5)
 }
 
+/// "Romans 8:28–30", "John 3:36", "Psalm 51 (title)", "Psalm 51:1–3 (with title)".
+fn verses_label(book: &str, chapter: u32, first: u32, last: u32) -> String {
+    let range = |from: u32| {
+        if from == last {
+            reference(book, chapter, from)
+        } else {
+            format!("{}–{}", reference(book, chapter, from), last)
+        }
+    };
+    match (first, last) {
+        (0, 0) => reference(book, chapter, 0),
+        (0, _) => format!("{} (with title)", range(1)),
+        _ => range(first),
+    }
+}
+
 /// Consecutive books as ranges: "Genesis–Deuteronomy", "Matthew–John, Romans–Jude",
 /// "Ruth, Esther".
 fn books_label(data: &DataBundle, picked: &[&Book]) -> String {
@@ -163,11 +194,7 @@ fn books_label(data: &DataBundle, picked: &[&Book]) -> String {
 }
 
 fn find_book<'a>(data: &'a DataBundle, name: &str) -> Result<&'a Book, String> {
-    data.bible
-        .books
-        .iter()
-        .find(|b| b.name == name)
-        .ok_or_else(|| format!("no book named {:?}", name))
+    data.bible.books.iter().find(|b| b.name == name).ok_or_else(|| format!("no book named {:?}", name))
 }
 
 fn find_chapter<'a>(data: &'a DataBundle, book: &str, chapter: u32) -> Result<(&'a Book, &'a Chapter), String> {

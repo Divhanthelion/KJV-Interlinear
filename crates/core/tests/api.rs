@@ -9,8 +9,7 @@ use kjv_core::bundle::DataBundle;
 fn data() -> &'static DataBundle {
     static DATA: OnceLock<DataBundle> = OnceLock::new();
     DATA.get_or_init(|| {
-        DataBundle::from_sources(Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/../..")))
-            .expect("bundle builds")
+        DataBundle::from_sources(Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/../.."))).expect("bundle builds")
     })
 }
 
@@ -124,6 +123,79 @@ fn strongs_search_and_lexicon() {
     let none = api::strongs_search(data(), "hello", 10);
     assert!(none.key.is_none() && none.hits.is_empty());
     assert!(api::lexicon(data(), "H999999").is_none());
+}
+
+/// The word's sense code picks the lexicon sense STEP tagged it with.
+#[test]
+fn words_open_the_lexicon_at_their_own_sense() {
+    // Hebrews 4:8 "For if Jesus had given them rest": the Greek is Joshua's name
+    let heb4 = api::chapter(data(), "Hebrews", 4, &full()).unwrap();
+    let words = &heb4.verses[7].original.as_ref().unwrap().words;
+    let joshua = words.iter().find(|w| w.key.as_deref() == Some("G2424")).expect("Ἰησοῦς in Hebrews 4:8");
+    assert_eq!((joshua.strongs.as_deref(), joshua.dkey.as_deref()), (Some("G2424"), Some("G2424I")));
+    let lex = api::lexicon(data(), joshua.dkey.as_deref().unwrap()).unwrap();
+    assert!(lex.gloss.contains("Joshua") && !lex.gloss.contains("Jesus"), "{}", lex.gloss);
+    assert_eq!((lex.strongs.as_str(), lex.key.as_str()), ("G2424", "G2424"));
+    // The plain number is still Jesus, and the concordance is the same for both
+    assert_eq!(api::lexicon(data(), "G2424").unwrap().gloss, "Jesus");
+    let by_sense = api::strongs_search(data(), "G2424I", 10);
+    assert_eq!(by_sense.lexicon.as_ref().map(|l| l.gloss.as_str()), Some("Joshua"));
+    assert_eq!(
+        (by_sense.key.as_deref(), by_sense.total),
+        (Some("G2424"), api::strongs_search(data(), "G2424", 10).total)
+    );
+
+    // Genesis 1:1 "beginning": H7225 with its sense, and without one
+    let gen1 = api::chapter(data(), "Genesis", 1, &full()).unwrap();
+    let first = &gen1.verses[0].original.as_ref().unwrap().words[0];
+    assert_eq!((first.key.as_deref(), first.dkey.as_deref()), (Some("H7225"), Some("H7225G")));
+    assert!(api::lexicon(data(), "H7225G").unwrap().gloss.contains("beginning"));
+    assert!(api::lexicon(data(), "H7225").is_some());
+    // A word without a sense letter looks itself up
+    let mat1 = api::chapter(data(), "Matthew", 1, &full()).unwrap();
+    let book = &mat1.verses[0].original.as_ref().unwrap().words[0];
+    assert_eq!((book.key.as_deref(), book.dkey.as_deref()), (Some("G0976"), Some("G0976")));
+    // A sense the lexicon lacks falls back to the number
+    assert_eq!(api::lexicon(data(), "G2424Z").unwrap().gloss, "Jesus");
+}
+
+#[test]
+fn aramaic_verses_are_tagged_arc() {
+    let lang = |book: &str, chapter: u32, verse: u32| {
+        let view = api::chapter(data(), book, chapter, &full()).unwrap();
+        view.verses[verse as usize - 1].original.as_ref().unwrap().lang
+    };
+    assert_eq!(lang("Daniel", 2, 4), "arc");
+    assert_eq!(lang("Daniel", 2, 5), "arc");
+    assert_eq!(lang("Jeremiah", 10, 11), "arc");
+    assert_eq!(lang("Jeremiah", 10, 10), "he");
+    assert_eq!(lang("Genesis", 1, 1), "he");
+}
+
+#[test]
+fn search_ignores_extra_spaces_in_the_query() {
+    let spaced = api::search(data(), "God  so", Scope::All, None, 1000);
+    assert_eq!(spaced.total, api::search(data(), "God so", Scope::All, None, 1000).total);
+    let john = spaced.hits.iter().find(|h| h.reference == "John 3:16").expect("John 3:16 found");
+    assert!(john.segments.iter().any(|s| s.hit && s.text == "God so"));
+
+    let options = ChapterOptions { red_letter: false, query: Some(" God \t so ".into()), original: false };
+    let john3 = api::chapter(data(), "John", 3, &options).unwrap();
+    assert!(john3.verses[15].segments.iter().any(|s| s.hit && s.text == "God so"));
+}
+
+#[test]
+fn copy_errors_name_the_verse() {
+    let err = kjv_core::dispatch::dispatch(
+        data(),
+        "copy_text",
+        serde_json::json!({"book": "John", "chapter": 3, "verse": 99}),
+    )
+    .unwrap_err();
+    assert_eq!(err, "no text for John 3:99");
+    let err = kjv_core::dispatch::dispatch(data(), "copy_text", serde_json::json!({"book": "John", "chapter": 30}))
+        .unwrap_err();
+    assert_eq!(err, "no text for John 30");
 }
 
 #[test]

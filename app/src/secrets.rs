@@ -2,16 +2,20 @@
 //! Windows Credential Manager, the macOS and iOS Keychain, the Android Keystore, or
 //! the Secret Service on Linux. Where none is available (a Linux desktop without a
 //! keyring), keys go in a file only this user can read, and the page is told so.
+//!
+//! Each key is saved with the server it's for (see `kjv_ai::keys`) and is only sent
+//! there; a key saved before that is bound to the first server it's used with.
 
-use std::collections::BTreeMap;
-use std::fs;
 use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 
 use keyring_core::{CredentialStore, Entry};
+use kjv_ai::keys::{self, KeyFile};
 use serde::Serialize;
 
 const SERVICE: &str = "io.github.divhanthelion.kjvinterlinear";
+/// Where an older Test button put keys typed into the provider form
+const OLD_TEST_ID: &str = "__test__";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -24,50 +28,58 @@ pub enum Storage {
 pub struct KeyStatus {
     pub stored: bool,
     pub storage: Storage,
+    /// The server the key is saved for; None if no key, or one saved before keys
+    /// were bound to a server
+    pub origin: Option<String>,
 }
 
 pub struct Secrets {
-    fallback: PathBuf,
+    file: KeyFile,
 }
 
 impl Secrets {
     /// `dir` is the app's private config directory (for the fallback file).
     pub fn new(dir: PathBuf) -> Self {
-        Self { fallback: dir.join("secrets.json") }
+        Self { file: KeyFile::new(dir.join("secrets.json")) }
     }
 
     pub fn storage(&self) -> Storage {
         if store().is_some() { Storage::Keychain } else { Storage::File }
     }
 
-    pub fn get(&self, id: &str) -> Result<Option<String>, String> {
-        if store().is_some() {
-            match entry(id)?.get_password() {
-                Ok(key) => return Ok(Some(key)),
-                Err(keyring_core::Error::NoEntry) => {}
-                Err(e) => return Err(format!("Couldn't read the key from the system keychain: {}", e)),
-            }
+    /// The key to send with a request to `base_url`, if one is saved. A key saved for
+    /// a different server is an error, and nothing should be sent.
+    pub fn key_for(&self, id: &str, base_url: &str) -> Result<Option<String>, String> {
+        let Some(stored) = self.read(id)? else {
+            return Ok(None);
+        };
+        let found = keys::unlock(&stored, base_url)?;
+        if let Some(bound) = found.rebind {
+            // One-time upgrade of an unbound key; it still works this time if saving fails
+            let _ = self.write(id, &bound);
         }
-        // Keys saved before a keychain became available still work
-        Ok(self.read_file()?.remove(id))
+        Ok(Some(found.key))
     }
 
-    pub fn set(&self, id: &str, key: &str) -> Result<Storage, String> {
+    /// Save a key; an empty one removes it. With `base_url` the key is bound to that
+    /// server. Without it (a page that predates binding) it's saved unbound, and bound
+    /// on first use.
+    pub fn set(&self, id: &str, key: &str, base_url: Option<&str>) -> Result<Storage, String> {
         let key = key.trim();
         if key.is_empty() {
             return self.delete(id).map(|()| self.storage());
         }
-        if store().is_some() {
-            entry(id)?
-                .set_password(key)
-                .map_err(|e| format!("Couldn't save the key in the system keychain: {}", e))?;
-            self.remove_from_file(id)?;
-            return Ok(Storage::Keychain);
+        if keys::is_reserved_id(id) {
+            return Err(format!("Keys can't be saved under {:?}.", id));
         }
-        let mut keys = self.read_file()?;
-        keys.insert(id.to_string(), key.to_string());
-        self.write_file(&keys)?;
-        Ok(Storage::File)
+        let stored = match base_url {
+            Some(base) => keys::bind(key, base)?,
+            None => key.to_string(),
+        };
+        let storage = self.write(id, &stored)?;
+        // Clear away a typed key the old Test button may have left behind
+        let _ = self.delete(OLD_TEST_ID);
+        Ok(storage)
     }
 
     pub fn delete(&self, id: &str) -> Result<(), String> {
@@ -77,45 +89,41 @@ impl Secrets {
                 Err(e) => return Err(format!("Couldn't remove the key from the system keychain: {}", e)),
             }
         }
-        self.remove_from_file(id)
+        self.file.remove(id)
     }
 
     pub fn status(&self, id: &str) -> Result<KeyStatus, String> {
-        Ok(KeyStatus { stored: self.get(id)?.is_some(), storage: self.storage() })
+        let stored = self.read(id)?;
+        Ok(KeyStatus {
+            stored: stored.is_some(),
+            storage: self.storage(),
+            origin: stored.as_deref().and_then(keys::bound_origin),
+        })
     }
 
-    fn read_file(&self) -> Result<BTreeMap<String, String>, String> {
-        match fs::read_to_string(&self.fallback) {
-            Ok(text) => Ok(serde_json::from_str(&text).unwrap_or_default()),
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(BTreeMap::new()),
-            Err(e) => Err(format!("read {}: {}", self.fallback.display(), e)),
-        }
-    }
-
-    fn remove_from_file(&self, id: &str) -> Result<(), String> {
-        let mut keys = self.read_file()?;
-        if keys.remove(id).is_some() {
-            if keys.is_empty() {
-                fs::remove_file(&self.fallback).map_err(|e| e.to_string())?;
-            } else {
-                self.write_file(&keys)?;
+    /// The stored value (a bound key's JSON, or an older plain key).
+    fn read(&self, id: &str) -> Result<Option<String>, String> {
+        if store().is_some() {
+            match entry(id)?.get_password() {
+                Ok(stored) => return Ok(Some(stored)),
+                Err(keyring_core::Error::NoEntry) => {}
+                Err(e) => return Err(format!("Couldn't read the key from the system keychain: {}", e)),
             }
         }
-        Ok(())
+        // Keys saved before a keychain became available still work
+        self.file.get(id)
     }
 
-    fn write_file(&self, keys: &BTreeMap<String, String>) -> Result<(), String> {
-        if let Some(dir) = self.fallback.parent() {
-            fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    fn write(&self, id: &str, stored: &str) -> Result<Storage, String> {
+        if store().is_some() {
+            entry(id)?
+                .set_password(stored)
+                .map_err(|e| format!("Couldn't save the key in the system keychain: {}", e))?;
+            self.file.remove(id)?;
+            return Ok(Storage::Keychain);
         }
-        let tmp = self.fallback.with_extension("json.tmp");
-        fs::write(&tmp, serde_json::to_string(keys).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::PermissionsExt;
-            fs::set_permissions(&tmp, fs::Permissions::from_mode(0o600)).map_err(|e| e.to_string())?;
-        }
-        fs::rename(&tmp, &self.fallback).map_err(|e| e.to_string())
+        self.file.set(id, stored)?;
+        Ok(Storage::File)
     }
 }
 

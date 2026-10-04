@@ -9,8 +9,7 @@ use std::path::Path;
 use std::sync::LazyLock;
 
 use crate::models::{
-    ExtendedBible, InterlinearVerse, LexiconEntry, OriginalLanguage, OriginalWord, StrongsIndex,
-    VerseRef,
+    ExtendedBible, InterlinearVerse, LexiconEntry, OriginalLanguage, OriginalWord, StrongsIndex, VerseRef,
 };
 
 /// Book name mapping from STEP Bible abbreviations to standard names.
@@ -126,24 +125,16 @@ fn parse_reference(reference: &str) -> Option<WordRef> {
         verse = v.parse().ok()?;
     }
 
-    Some(WordRef {
-        book,
-        chapter,
-        verse,
-        word_type,
-    })
+    Some(WordRef { book, chapter, verse, word_type })
 }
 
-/// Extract the primary Strong's number from a dStrongs field
-/// Examples: "H9003/{H7225G}" -> "H7225", "{H1254A}" -> "H1254", "G0976=N-NSF" -> "G0976"
-fn extract_strongs_number(dstrongs: &str) -> Option<String> {
+/// The primary disambiguated Strong's code of a dStrongs field, sense letter kept.
+/// Examples: "H9003/{H7225G}" -> "H7225G", "{H1254A}" -> "H1254A", "G2424I" -> "G2424I"
+fn extract_dstrong(dstrongs: &str) -> Option<String> {
     // Hebrew marks the root with {braces}; prefixes/suffixes sit outside them
     if let Some(start) = dstrongs.find('{') {
-        let root: String = dstrongs[start + 1..]
-            .chars()
-            .take_while(|c| *c != '}')
-            .collect();
-        if let Some(s) = leading_strongs(&root) {
+        let root: String = dstrongs[start + 1..].chars().take_while(|c| *c != '}').collect();
+        if let Some(s) = leading_dstrong(&root) {
             return Some(s);
         }
     }
@@ -155,7 +146,7 @@ fn extract_strongs_number(dstrongs: &str) -> Option<String> {
             continue;
         }
         if let Some(pos) = part.find(['H', 'G'])
-            && let Some(s) = leading_strongs(&part[pos..])
+            && let Some(s) = leading_dstrong(&part[pos..])
         {
             return Some(s);
         }
@@ -163,16 +154,32 @@ fn extract_strongs_number(dstrongs: &str) -> Option<String> {
     None
 }
 
-/// "H7225G" -> "H7225"; None unless a letter is followed by digits.
-fn leading_strongs(s: &str) -> Option<String> {
-    let mut chars = s.chars();
-    let letter = chars.next().filter(|c| *c == 'H' || *c == 'G')?;
-    let digits: String = chars.take_while(|c| c.is_ascii_digit()).collect();
-    if digits.is_empty() {
-        None
-    } else {
-        Some(format!("{}{}", letter, digits))
+/// (plain number for the concordance, sense code when STEP gives a sense letter):
+/// "G2424I" -> ("G2424", Some("G2424I")), "G0976" -> ("G0976", None)
+fn split_dstrong(dstrong: Option<String>) -> (Option<String>, Option<String>) {
+    match dstrong {
+        Some(d) if strongs_base(&d).len() < d.len() => (Some(strongs_base(&d).to_string()), Some(d)),
+        plain => (plain, None),
     }
+}
+
+/// "H7225G" -> "H7225G", "H2148v" -> "H2148v"; None unless H or G is followed by digits.
+fn leading_dstrong(s: &str) -> Option<String> {
+    if !s.starts_with(['H', 'G']) {
+        return None;
+    }
+    let base = strongs_base(s);
+    if base.len() < 2 {
+        return None;
+    }
+    let sense = s[base.len()..].chars().take_while(|c| c.is_ascii_alphabetic()).count();
+    Some(s[..base.len() + sense].to_string())
+}
+
+/// "H7225G" -> "H7225": the letter and its digits (`code` starts with ASCII H or G).
+fn strongs_base(code: &str) -> &str {
+    let digits = code.chars().skip(1).take_while(|c| c.is_ascii_digit()).count();
+    &code[..1 + digits]
 }
 
 /// Clean Hebrew text (remove forward slashes used for prefix/suffix markers)
@@ -198,9 +205,10 @@ fn clean_greek_text(text: &str) -> String {
 /// Extract transliteration from Greek field like "Βίβλος (Biblos)"
 fn extract_greek_transliteration(text: &str) -> String {
     if let Some(start) = text.find('(')
-        && let Some(rel_end) = text[start + 1..].find(')') {
-            return text[start + 1..start + 1 + rel_end].to_string();
-        }
+        && let Some(rel_end) = text[start + 1..].find(')')
+    {
+        return text[start + 1..start + 1 + rel_end].to_string();
+    }
     String::new()
 }
 
@@ -270,16 +278,18 @@ fn tr_variant(variants: &str) -> Option<OriginalWord> {
         };
         let translit = translit.split_once('=').map_or(translit, |(_, t)| t);
         let first_tag = tags.split(" + ").next().unwrap_or("");
-        let (strongs, morph) = match first_tag.split_once('=') {
-            Some((s, m)) => (extract_strongs_number(s), Some(m.trim().to_string())),
-            None => (extract_strongs_number(first_tag), None),
+        let (dstrong, morph) = match first_tag.split_once('=') {
+            Some((s, m)) => (extract_dstrong(s), Some(m.trim().to_string())),
+            None => (extract_dstrong(first_tag), None),
         };
+        let (strongs, dstrong) = split_dstrong(dstrong);
         return Some(OriginalWord {
             position: 0,
             original_text: clean_greek_text(greek),
             transliteration: translit.trim().to_string(),
             english_gloss: gloss.trim().to_string(),
             strongs_number: strongs,
+            dstrong,
             morphology: morph,
         });
     }
@@ -349,12 +359,60 @@ fn push_word(
     interlinear.original_words.push(word);
 }
 
-/// True for word rows ("Gen.1.1#01=L…"), false for headers and summary lines.
+/// True for word rows ("Gen.1.1#01=L…", "1Sa.…"), false for headers and summary
+/// lines. Judged by shape, not by known book names, so a row naming an unknown
+/// book still counts as a word row and fails loudly.
 fn is_word_row(line: &str) -> bool {
-    let Some(first) = line.split('\t').next() else {
+    let first = line.split('\t').next().unwrap_or("");
+    let Some((book, rest)) = first.split_once('.') else {
         return false;
     };
-    first.contains('#') && first.contains('.') && !line.starts_with('#')
+    first.contains('#')
+        && book.len() == 3
+        && book.chars().all(|c| c.is_ascii_alphanumeric())
+        && rest.starts_with(|c: char| c.is_ascii_digit())
+}
+
+/// Word rows that could not be parsed; any at all fails the load rather than
+/// shipping a text with words silently missing.
+#[derive(Default)]
+struct Malformed {
+    count: usize,
+    first: Option<(usize, String)>,
+}
+
+impl Malformed {
+    fn add(&mut self, line_number: usize, line: &str) {
+        self.count += 1;
+        if self.first.is_none() {
+            self.first = Some((line_number, line.chars().take(120).collect()));
+        }
+    }
+
+    fn check(self, path: &Path) -> Result<(), String> {
+        match self.first {
+            None => Ok(()),
+            Some((n, line)) => Err(format!(
+                "{}: {} word rows could not be parsed; the first is line {}: {:?}",
+                path.display(),
+                self.count,
+                n,
+                line
+            )),
+        }
+    }
+}
+
+/// STEP's grammar codes start with H for Hebrew words and A for Aramaic ones.
+fn word_is_aramaic(word: &OriginalWord) -> bool {
+    word.morphology.as_deref().is_some_and(|m| m.starts_with('A'))
+}
+
+/// A verse is Aramaic when most of its words are: Daniel 2:4 turns from Hebrew to
+/// Aramaic after its fourth word, and the verse is labelled by its eight Aramaic ones.
+fn hebrew_verse_language(words: &[OriginalWord]) -> OriginalLanguage {
+    let aramaic = words.iter().filter(|w| word_is_aramaic(w)).count();
+    if aramaic * 2 > words.len() { OriginalLanguage::Aramaic } else { OriginalLanguage::Hebrew }
 }
 
 /// Load Hebrew OT data from TAHOT TSV file
@@ -366,21 +424,22 @@ pub fn load_hebrew_ot(
     let file = File::open(path).map_err(|e| format!("Failed to open {}: {}", path.display(), e))?;
     let reader = BufReader::new(file);
     let mut word_count = 0;
+    let mut malformed = Malformed::default();
 
-    for line in reader.lines() {
+    for (n, line) in reader.lines().enumerate() {
         let line = line.map_err(|e| format!("Failed to read {}: {}", path.display(), e))?;
         if !is_word_row(&line) {
             continue;
         }
 
-        let fields: Vec<&str> = line.split('\t').collect();
-        if fields.len() < 6 {
-            continue;
-        }
-
         // Fields: Ref, Hebrew, Transliteration, English, dStrongs, Grammar
-        let Some(word_ref) = parse_reference(fields[0]) else {
-            continue;
+        let fields: Vec<&str> = line.split('\t').collect();
+        let word_ref = match parse_reference(fields[0]) {
+            Some(r) if fields.len() >= 6 => r,
+            _ => {
+                malformed.add(n + 1, &line);
+                continue;
+            }
         };
 
         // "X" words are reconstructed from the LXX and are not in the Hebrew the KJV translated.
@@ -389,20 +448,24 @@ pub fn load_hebrew_ot(
             continue;
         }
 
+        let (strongs, dstrong) = split_dstrong(extract_dstrong(fields[4]));
         let word = OriginalWord {
             position: 0,
             original_text: clean_hebrew_text(fields[1]),
             transliteration: clean_hebrew_transliteration(fields[2]),
             english_gloss: fields[3].trim().to_string(),
-            strongs_number: extract_strongs_number(fields[4]),
-            morphology: Some(fields[5].trim())
-                .filter(|m| !m.is_empty())
-                .map(str::to_string),
+            strongs_number: strongs,
+            dstrong,
+            morphology: Some(fields[5].trim()).filter(|m| !m.is_empty()).map(str::to_string),
         };
         push_word(verses, strongs_index, &word_ref, OriginalLanguage::Hebrew, word);
         word_count += 1;
     }
+    malformed.check(path)?;
 
+    for verse in verses.values_mut() {
+        verse.language = hebrew_verse_language(&verse.original_words);
+    }
     Ok(word_count)
 }
 
@@ -415,21 +478,22 @@ pub fn load_greek_nt(
     let file = File::open(path).map_err(|e| format!("Failed to open {}: {}", path.display(), e))?;
     let reader = BufReader::new(file);
     let mut word_count = 0;
+    let mut malformed = Malformed::default();
 
-    for line in reader.lines() {
+    for (n, line) in reader.lines().enumerate() {
         let line = line.map_err(|e| format!("Failed to read {}: {}", path.display(), e))?;
         if !is_word_row(&line) {
             continue;
         }
 
-        let fields: Vec<&str> = line.split('\t').collect();
-        if fields.len() < 5 {
-            continue;
-        }
-
         // Fields: Ref, Greek(translit), English, dStrongs=Grammar, DictForm=Gloss, editions, variants
-        let Some(word_ref) = parse_reference(fields[0]) else {
-            continue;
+        let fields: Vec<&str> = line.split('\t').collect();
+        let word_ref = match parse_reference(fields[0]) {
+            Some(r) if fields.len() >= 5 => r,
+            _ => {
+                malformed.add(n + 1, &line);
+                continue;
+            }
         };
 
         let editions = fields.get(5).copied().unwrap_or("");
@@ -438,16 +502,18 @@ pub fn load_greek_nt(
             continue;
         }
 
-        let (strongs, morphology) = match fields[3].split_once('=') {
-            Some((s, m)) => (extract_strongs_number(s), Some(m.trim().to_string())),
-            None => (extract_strongs_number(fields[3]), None),
+        let (dstrong, morphology) = match fields[3].split_once('=') {
+            Some((s, m)) => (extract_dstrong(s), Some(m.trim().to_string())),
+            None => (extract_dstrong(fields[3]), None),
         };
+        let (strongs, dstrong) = split_dstrong(dstrong);
         let mut word = OriginalWord {
             position: 0,
             original_text: clean_greek_text(fields[1]),
             transliteration: extract_greek_transliteration(fields[1]),
             english_gloss: strip_verse_marker(fields[2]).to_string(),
             strongs_number: strongs,
+            dstrong,
             morphology,
         };
 
@@ -461,6 +527,7 @@ pub fn load_greek_nt(
         push_word(verses, strongs_index, &word_ref, OriginalLanguage::Greek, word);
         word_count += 1;
     }
+    malformed.check(path)?;
 
     Ok(word_count)
 }
@@ -474,16 +541,13 @@ pub fn clean_lexicon_markup(input: &str) -> String {
     let mut i = 0;
 
     while i < chars.len() {
-        if chars[i] == '<' {
+        // A tag opens with a letter or '/'; any other '<' is text, as in "(future<->past)"
+        if chars[i] == '<' && chars.get(i + 1).is_some_and(|c| c.is_ascii_alphabetic() || *c == '/') {
             // Find end of tag
             if let Some(rel_end) = chars[i..].iter().position(|&c| c == '>') {
                 let tag: String = chars[i + 1..i + rel_end].iter().collect();
                 let tag_lower = tag.to_ascii_lowercase();
-                let tag_name = tag_lower
-                    .trim_start_matches('/')
-                    .split([' ', '=', '\''])
-                    .next()
-                    .unwrap_or("");
+                let tag_name = tag_lower.trim_start_matches('/').split([' ', '=', '\'']).next().unwrap_or("");
 
                 match tag_name {
                     "br" | "lb" => {
@@ -539,17 +603,18 @@ pub fn clean_lexicon_markup(input: &str) -> String {
     cleaned.trim().to_string()
 }
 
-/// Load lexicon data from TBESH or TBESG TSV file
+/// Load lexicon data from TBESH or TBESG TSV file.
+///
+/// Each entry is keyed by its sense code when it has a sense letter ("G2424I" =
+/// Joshua), and the first entry of each number is also keyed by the plain number
+/// ("G2424" = Jesus), which is what lookups without a sense fall back to.
 pub fn load_lexicon(path: &Path) -> Result<HashMap<String, LexiconEntry>, String> {
     let file = File::open(path).map_err(|e| format!("Failed to open {}: {}", path.display(), e))?;
     let reader = BufReader::new(file);
     let mut lexicon = HashMap::new();
 
     for line in reader.lines() {
-        let line = match line {
-            Ok(l) => l,
-            Err(_) => continue,
-        };
+        let line = line.map_err(|e| format!("Failed to read {}: {}", path.display(), e))?;
 
         // Skip header lines and comments
         if line.is_empty()
@@ -598,6 +663,11 @@ pub fn load_lexicon(path: &Path) -> Result<HashMap<String, LexiconEntry>, String
             definition: clean_lexicon_markup(fields[7]),
         };
 
+        // dStrong column: "G2424I = the Greek of"
+        let (_, sense) = split_dstrong(leading_dstrong(fields[1].trim_start()));
+        if let Some(sense) = sense {
+            lexicon.entry(sense).or_insert_with(|| entry.clone());
+        }
         // Only insert if not already present (first entry wins)
         lexicon.entry(strongs_number).or_insert(entry);
     }
@@ -605,83 +675,44 @@ pub fn load_lexicon(path: &Path) -> Result<HashMap<String, LexiconEntry>, String
     Ok(lexicon)
 }
 
-/// Load all original language data from the data directory
+/// The STEP files the app is built from; every one is required.
+pub const HEBREW_FILES: [&str; 4] =
+    ["TAHOT_Gen-Deu.txt", "TAHOT_Jos-Est.txt", "TAHOT_Job-Sng.txt", "TAHOT_Isa-Mal.txt"];
+pub const GREEK_FILES: [&str; 2] = ["TAGNT_Mat-Jhn.txt", "TAGNT_Act-Rev.txt"];
+pub const LEXICON_FILES: [&str; 2] = ["TBESH.txt", "TBESG.txt"];
+
+/// Load all original language data from the data directory. A missing or
+/// unreadable file is an error: a build must never ship with part of the data.
 pub fn load_extended_bible(data_dir: &Path) -> Result<ExtendedBible, String> {
     let mut extended = ExtendedBible::new();
 
-    // Load Hebrew OT files
-    let hebrew_files = [
-        "TAHOT_Gen-Deu.txt",
-        "TAHOT_Jos-Est.txt",
-        "TAHOT_Job-Sng.txt",
-        "TAHOT_Isa-Mal.txt",
-    ];
-
-    for file_name in &hebrew_files {
-        let path = data_dir.join(file_name);
-        if path.exists() {
-            match load_hebrew_ot(
-                &path,
-                &mut extended.interlinear_ot,
-                &mut extended.strongs_index,
-            ) {
-                Ok(count) => eprintln!("Loaded {} Hebrew words from {}", count, file_name),
-                Err(e) => eprintln!("Warning: Failed to load {}: {}", file_name, e),
-            }
-        }
+    for file_name in HEBREW_FILES {
+        let count =
+            load_hebrew_ot(&data_dir.join(file_name), &mut extended.interlinear_ot, &mut extended.strongs_index)?;
+        eprintln!("Loaded {} Hebrew words from {}", count, file_name);
     }
 
-    // Load Greek NT files
-    let greek_files = ["TAGNT_Mat-Jhn.txt", "TAGNT_Act-Rev.txt"];
-
-    for file_name in &greek_files {
-        let path = data_dir.join(file_name);
-        if path.exists() {
-            match load_greek_nt(
-                &path,
-                &mut extended.interlinear_nt,
-                &mut extended.strongs_index,
-            ) {
-                Ok(count) => eprintln!("Loaded {} Greek words from {}", count, file_name),
-                Err(e) => eprintln!("Warning: Failed to load {}: {}", file_name, e),
-            }
-        }
+    for file_name in GREEK_FILES {
+        let count =
+            load_greek_nt(&data_dir.join(file_name), &mut extended.interlinear_nt, &mut extended.strongs_index)?;
+        eprintln!("Loaded {} Greek words from {}", count, file_name);
     }
 
-    // Load Hebrew lexicon
-    let hebrew_lexicon_path = data_dir.join("TBESH.txt");
-    if hebrew_lexicon_path.exists() {
-        match load_lexicon(&hebrew_lexicon_path) {
-            Ok(lex) => {
-                eprintln!("Loaded {} Hebrew lexicon entries", lex.len());
-                extended.hebrew_lexicon = lex;
-            }
-            Err(e) => eprintln!("Warning: Failed to load Hebrew lexicon: {}", e),
-        }
-    }
-
-    // Load Greek lexicon
-    let greek_lexicon_path = data_dir.join("TBESG.txt");
-    if greek_lexicon_path.exists() {
-        match load_lexicon(&greek_lexicon_path) {
-            Ok(lex) => {
-                eprintln!("Loaded {} Greek lexicon entries", lex.len());
-                extended.greek_lexicon = lex;
-            }
-            Err(e) => eprintln!("Warning: Failed to load Greek lexicon: {}", e),
-        }
-    }
+    let [hebrew_lexicon, greek_lexicon] = LEXICON_FILES;
+    extended.hebrew_lexicon = load_lexicon(&data_dir.join(hebrew_lexicon))?;
+    extended.greek_lexicon = load_lexicon(&data_dir.join(greek_lexicon))?;
+    eprintln!(
+        "Loaded {} Hebrew and {} Greek lexicon keys",
+        extended.hebrew_lexicon.len(),
+        extended.greek_lexicon.len()
+    );
 
     // Concordance in canonical verse order (words arrive in file order, which differs
     // from KJV order where verse boundaries differ, e.g. Philippians 1:16-17)
     extended.rebuild_strongs_index();
 
     // Ensure word order is stable for rendering
-    for verse in extended
-        .interlinear_ot
-        .values_mut()
-        .chain(extended.interlinear_nt.values_mut())
-    {
+    for verse in extended.interlinear_ot.values_mut().chain(extended.interlinear_nt.values_mut()) {
         verse.original_words.sort_by_key(|w| w.position);
     }
 
@@ -691,6 +722,134 @@ pub fn load_extended_bible(data_dir: &Path) -> Result<ExtendedBible, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The plain Strong's number of a dStrongs field (the concordance key).
+    fn extract_strongs_number(dstrongs: &str) -> Option<String> {
+        split_dstrong(extract_dstrong(dstrongs)).0
+    }
+
+    /// A data file in the system temp directory, removed when dropped.
+    struct TempFile(std::path::PathBuf);
+
+    impl TempFile {
+        fn new(name: &str, contents: &str) -> Self {
+            static NEXT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+            let n = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            let path = std::env::temp_dir().join(format!("kjv-core-{}-{}-{}", std::process::id(), n, name));
+            std::fs::write(&path, contents).unwrap();
+            Self(path)
+        }
+    }
+
+    impl Drop for TempFile {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_file(&self.0);
+        }
+    }
+
+    const HEBREW_HEADER: &str = "TAHOT Gen-Deu - header\n\
+        Ref: Eng (+Heb)#Heb.words\tBible reference in English Bibles. [Exception: at Gen.014.017#09]\n\
+        The Qere recorded here (ie Gen.9.21#07; Gen.12.8#08)\n\
+        # Gen.1.1\tsummary line\n";
+
+    fn load_hebrew(contents: &str) -> Result<(usize, HashMap<VerseRef, InterlinearVerse>), String> {
+        let file = TempFile::new("tahot.txt", contents);
+        let mut verses = HashMap::new();
+        let count = load_hebrew_ot(&file.0, &mut verses, &mut StrongsIndex::new())?;
+        Ok((count, verses))
+    }
+
+    #[test]
+    fn word_rows_are_recognised_by_shape() {
+        assert!(is_word_row("Gen.1.1#01=L\tבְּ/רֵאשִׁ֖ית"));
+        assert!(is_word_row("1Sa.24.8(24.9)#06=Q(K)\t"));
+        // Unknown book: still a word row, so it fails to parse instead of vanishing
+        assert!(is_word_row("Xyz.1.1#01=L\tword"));
+        assert!(!is_word_row("Ref: Eng (+Heb)#Heb.words\tBible reference"));
+        assert!(!is_word_row("The Qere recorded here (ie Gen.9.21#07; Gen.12.8#08)"));
+        assert!(!is_word_row("# Gen.1.1\tsummary"));
+        assert!(!is_word_row("Gen.1.1\tno word number"));
+    }
+
+    #[test]
+    fn hebrew_loader_skips_headers_and_legitimate_omissions() {
+        let rows = "Gen.1.1#01=L\tבְּ/רֵאשִׁ֖ית\tbe./re.Shit\tin/ beginning\tH9003/{H7225G}\tHR/Ncfsa\n\
+            1Sa.13.1#05=X\tשְׁלֹשִׁים\tshe.lo.Shim\tthirty\t{H7970}\tHAcbpa\n\
+            1Sa.9.1#04=Q(K)\t\t\t\t\t\n";
+        let (count, verses) = load_hebrew(&format!("{}{}", HEBREW_HEADER, rows)).unwrap();
+        assert_eq!(count, 1);
+        let word = &verses[&VerseRef::new("Genesis", 1, 1)].original_words[0];
+        assert_eq!(word.strongs_number.as_deref(), Some("H7225"));
+        assert_eq!(word.dstrong.as_deref(), Some("H7225G"));
+    }
+
+    #[test]
+    fn hebrew_loader_fails_on_malformed_word_rows() {
+        let good = "Gen.1.1#01=L\tבְּ/רֵאשִׁ֖ית\tbe./re.Shit\tin/ beginning\tH9003/{H7225G}\tHR/Ncfsa\n";
+        // Too few fields
+        let err = load_hebrew(&format!("{}{}Gen.1.1#02=L\tבָּרָ֣א\tba.Ra'\n", HEBREW_HEADER, good)).unwrap_err();
+        assert!(err.contains("1 word rows could not be parsed") && err.contains("line 6"), "{}", err);
+        // Unparseable reference (unknown book, no verse number)
+        let bad = "Xyz.1.1#01=L\ta\tb\tc\t{H0001}\tHNcmsa\nGen.1#01=L\ta\tb\tc\t{H0001}\tHNcmsa\n";
+        let err = load_hebrew(&format!("{}{}", good, bad)).unwrap_err();
+        assert!(err.contains("2 word rows") && err.contains("Xyz.1.1#01=L"), "{}", err);
+    }
+
+    #[test]
+    fn greek_loader_fails_on_malformed_word_rows() {
+        let file = TempFile::new(
+            "tagnt.txt",
+            "Mat.1.1#01=NKO\tΒίβλος (Biblos)\t[The] book\tG0976=N-NSF\tβίβλος=book\tNA28+TR\n\
+             Mat.1.1#02=NKO\tγενέσεως (geneseōs)\n",
+        );
+        let err = load_greek_nt(&file.0, &mut HashMap::new(), &mut StrongsIndex::new()).unwrap_err();
+        assert!(err.contains("1 word rows") && err.contains("line 2"), "{}", err);
+    }
+
+    #[test]
+    fn missing_data_file_is_an_error() {
+        let dir = std::env::temp_dir().join(format!("kjv-core-{}-empty", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let err = load_extended_bible(&dir).unwrap_err();
+        assert!(err.contains("TAHOT_Gen-Deu.txt"), "{}", err);
+        let _ = std::fs::remove_dir(&dir);
+    }
+
+    #[test]
+    fn aramaic_is_told_from_hebrew_by_its_grammar_code() {
+        let word = |morph: &str| OriginalWord {
+            position: 0,
+            original_text: String::new(),
+            transliteration: String::new(),
+            english_gloss: String::new(),
+            strongs_number: None,
+            dstrong: None,
+            morphology: Some(morph.to_string()),
+        };
+        assert!(word_is_aramaic(&word("AVqrmsa")));
+        assert!(!word_is_aramaic(&word("HVqp3ms")));
+        let mixed = [word("Hc/Vpw3mp"), word("AVqv2ms"), word("ANcbsd/Ta")];
+        assert_eq!(hebrew_verse_language(&mixed), OriginalLanguage::Aramaic);
+        // A tie stays Hebrew
+        assert_eq!(hebrew_verse_language(&mixed[..2]), OriginalLanguage::Hebrew);
+    }
+
+    #[test]
+    fn lexicon_keeps_each_sense() {
+        let file = TempFile::new(
+            "tbesg.txt",
+            "eStrong#\tdStrong\tuStrong\tGreek\tTranslit\tMorph\tGloss\tMeaning\n\
+             G2424\tG2424G =\tG2424G\tἸησοῦς\tIēsous\tN:N-M-P\tJesus\t<b>JESUS</b>\n\
+             G2424\tG2424I = the Greek of\tH3091G\tἸησοῦς\tIēsous\tN:N-M-P\tJoshua\t<b>JESUS</b>\n\
+             G0976\tG0976 =\tG0976\tβίβλος\tbiblos\tN:N-F\tbook\tbook\n",
+        );
+        let lex = load_lexicon(&file.0).unwrap();
+        assert_eq!(lex["G2424"].gloss, "Jesus", "the plain number is its first sense");
+        assert_eq!(lex["G2424G"].gloss, "Jesus");
+        assert_eq!(lex["G2424I"].gloss, "Joshua");
+        assert_eq!(lex["G0976"].gloss, "book");
+        assert_eq!(lex.len(), 4);
+    }
 
     #[test]
     fn test_parse_reference_hebrew() {
@@ -783,39 +942,29 @@ mod tests {
 
     #[test]
     fn test_extract_strongs_hebrew() {
-        assert_eq!(
-            extract_strongs_number("H9003/{H7225G}"),
-            Some("H7225".to_string())
-        );
-        assert_eq!(
-            extract_strongs_number("{H1254A}"),
-            Some("H1254".to_string())
-        );
-        assert_eq!(
-            extract_strongs_number("{H0430G}"),
-            Some("H0430".to_string())
-        );
+        assert_eq!(extract_strongs_number("H9003/{H7225G}"), Some("H7225".to_string()));
+        assert_eq!(extract_strongs_number("{H1254A}"), Some("H1254".to_string()));
+        assert_eq!(extract_strongs_number("{H0430G}"), Some("H0430".to_string()));
         // Root is a particle: take the braced tag, not the prefix or suffix
-        assert_eq!(
-            extract_strongs_number("H9002/{H9005}/H9033"),
-            Some("H9005".to_string())
-        );
-        assert_eq!(
-            extract_strongs_number(r"H9004/{H9005}\H9014"),
-            Some("H9005".to_string())
-        );
+        assert_eq!(extract_strongs_number("H9002/{H9005}/H9033"), Some("H9005".to_string()));
+        assert_eq!(extract_strongs_number(r"H9004/{H9005}\H9014"), Some("H9005".to_string()));
     }
 
     #[test]
     fn test_extract_strongs_greek() {
-        assert_eq!(
-            extract_strongs_number("G0976=N-NSF"),
-            Some("G0976".to_string())
-        );
-        assert_eq!(
-            extract_strongs_number("G2424G=N-GSM-P"),
-            Some("G2424".to_string())
-        );
+        assert_eq!(extract_strongs_number("G0976=N-NSF"), Some("G0976".to_string()));
+        assert_eq!(extract_strongs_number("G2424G=N-GSM-P"), Some("G2424".to_string()));
+    }
+
+    #[test]
+    fn sense_codes_are_kept_beside_the_plain_number() {
+        let split = |s: &str| split_dstrong(extract_dstrong(s));
+        assert_eq!(split("G2424I"), (Some("G2424".into()), Some("G2424I".into())));
+        assert_eq!(split("H9003/{H7225G}"), (Some("H7225".into()), Some("H7225G".into())));
+        assert_eq!(split("{H2148v}"), (Some("H2148".into()), Some("H2148v".into())));
+        assert_eq!(split("G0976"), (Some("G0976".into()), None));
+        assert_eq!(split("H9002/{H0560}"), (Some("H0560".into()), None));
+        assert_eq!(split("{ש}"), (None, None));
     }
 
     #[test]
@@ -827,10 +976,7 @@ mod tests {
     #[test]
     fn test_extract_greek_transliteration() {
         assert_eq!(extract_greek_transliteration("Βίβλος (Biblos)"), "Biblos");
-        assert_eq!(
-            extract_greek_transliteration("γενέσεως (geneseōs)"),
-            "geneseōs"
-        );
+        assert_eq!(extract_greek_transliteration("γενέσεως (geneseōs)"), "geneseōs");
         // Closing paren before opening must not panic or slice incorrectly
         assert_eq!(extract_greek_transliteration("foo) bar (baz"), "");
         assert_eq!(extract_greek_transliteration("foo) bar (baz)"), "baz");
@@ -854,5 +1000,11 @@ mod tests {
     fn test_clean_lexicon_markup_newlines_from_br() {
         let cleaned = clean_lexicon_markup("a<BR />b<br>c");
         assert_eq!(cleaned, "a\nb\nc");
+    }
+
+    #[test]
+    fn test_clean_lexicon_markup_keeps_a_bare_angle_bracket() {
+        assert_eq!(clean_lexicon_markup("<i>tense</i> (future<->past)"), "tense (future<->past)");
+        assert_eq!(clean_lexicon_markup("a < b </b>c"), "a < b c");
     }
 }

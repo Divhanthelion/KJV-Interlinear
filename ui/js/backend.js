@@ -46,17 +46,26 @@ export function openExternal(url) {
 // API keys go to the Rust side and stay there (the system keychain); the page only
 // learns whether one is stored.
 
-export function aiModels(args) {
-  return tauri ? tauri.core.invoke("ai_models", { args }) : post("ai_models", args);
+/**
+ * A provider's models. args: { providerId, kind, baseUrl }. With `apiKey` (a key being
+ * tested; "" for none) that key is used and nothing is stored; without it, the key
+ * saved for providerId (refused if it was saved for another address).
+ */
+export function aiModels(args, apiKey) {
+  return tauri ? tauri.core.invoke("ai_models", { args, apiKey }) : post("ai_models", { ...args, apiKey });
 }
 
 export function aiKeyStatus(providerId) {
   return tauri ? tauri.core.invoke("ai_key_status", { providerId }) : post("ai_key_status", { providerId });
 }
 
-/** Save (or with an empty key, remove) a provider's key. Resolves to "keychain" or "file". */
-export function aiKeySet(providerId, key) {
-  return tauri ? tauri.core.invoke("ai_key_set", { providerId, key }) : post("ai_key_set", { providerId, key });
+/**
+ * Save (or with an empty key, remove) a provider's key, for the address it will be sent
+ * to (`baseUrl`). Resolves to "keychain" or "file".
+ */
+export function aiKeySet(providerId, key, baseUrl = null) {
+  const args = { providerId, key, baseUrl };
+  return tauri ? tauri.core.invoke("ai_key_set", args) : post("ai_key_set", args);
 }
 
 export function aiKeyDelete(providerId) {

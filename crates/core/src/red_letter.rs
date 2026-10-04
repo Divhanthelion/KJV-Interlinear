@@ -10,6 +10,8 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
+use crate::models::Bible;
+
 #[derive(Debug, Deserialize)]
 struct WordsOfJesusFile {
     verses: HashMap<String, Vec<String>>,
@@ -23,8 +25,7 @@ pub struct RedLetterIndex {
 
 impl RedLetterIndex {
     pub fn load(path: &Path) -> Result<Self, String> {
-        let file = File::open(path)
-            .map_err(|e| format!("Failed to open red-letter data {}: {}", path.display(), e))?;
+        let file = File::open(path).map_err(|e| format!("Failed to open red-letter data {}: {}", path.display(), e))?;
         let data: WordsOfJesusFile = serde_json::from_reader(BufReader::new(file))
             .map_err(|e| format!("Failed to parse red-letter data: {}", e))?;
 
@@ -39,13 +40,11 @@ impl RedLetterIndex {
 
     /// The spoken substrings of a verse, if Christ speaks in it.
     pub fn get(&self, book: &str, chapter: u32, verse: u32) -> Option<&[String]> {
-        self.entries
-            .get(&(book.to_string(), chapter, verse))
-            .map(Vec::as_slice)
+        self.entries.get(&(book.to_string(), chapter, verse)).map(Vec::as_slice)
     }
 
     /// Byte ranges of the spoken words in `text`. Each span is found after the previous
-    /// one; a span that doesn't occur is skipped (the data tests guarantee none do).
+    /// one; a span that doesn't occur is skipped (`DataBundle::validate` ensures none do).
     pub fn ranges(&self, book: &str, chapter: u32, verse: u32, text: &str) -> Vec<(usize, usize)> {
         let mut out = Vec::new();
         let mut from = 0;
@@ -57,6 +56,31 @@ impl RedLetterIndex {
             }
         }
         out
+    }
+
+    /// Entries that don't fit `bible`: a verse that doesn't exist, or a span that
+    /// isn't found (in order) in its verse's text. Empty when every one resolves.
+    pub fn unresolved(&self, bible: &Bible) -> Vec<String> {
+        let mut problems = Vec::new();
+        for ((book, chapter, verse), spans) in &self.entries {
+            let at = format!("{} {}:{}", book, chapter, verse);
+            match bible.get_verse(book, *chapter, *verse) {
+                None => problems.push(format!("red letter for {}, which is not a verse", at)),
+                Some(v) => {
+                    let found = self.ranges(book, *chapter, *verse, &v.text).len();
+                    if found != spans.len() {
+                        problems.push(format!(
+                            "{}: {} of {} red-letter spans found in the text",
+                            at,
+                            found,
+                            spans.len()
+                        ));
+                    }
+                }
+            }
+        }
+        problems.sort();
+        problems
     }
 
     /// All (book, chapter, verse) keys in the index.
@@ -90,9 +114,7 @@ mod tests {
         RedLetterIndex {
             entries: entries
                 .iter()
-                .map(|(b, c, v, spans)| {
-                    ((b.to_string(), *c, *v), spans.iter().map(|s| s.to_string()).collect())
-                })
+                .map(|(b, c, v, spans)| ((b.to_string(), *c, *v), spans.iter().map(|s| s.to_string()).collect()))
                 .collect(),
         }
     }
@@ -128,5 +150,32 @@ mod tests {
         let idx = index(&[("Matthew", 1, 1, &["x"])]);
         assert!(idx.get("Matthew", 1, 2).is_none());
         assert!(idx.ranges("Genesis", 1, 1, "In the beginning").is_empty());
+    }
+
+    #[test]
+    fn unresolved_names_missing_verses_and_spans() {
+        use crate::models::{Book, Chapter, Testament, Verse};
+        let text = "Jesus said unto them, Follow me.";
+        let bible = Bible {
+            books: vec![Book {
+                name: "John".into(),
+                testament: Testament::New,
+                chapters: vec![Chapter {
+                    number: 1,
+                    superscription: None,
+                    verses: vec![Verse { book: "John".into(), chapter: 1, verse_number: 43, text: text.into() }],
+                }],
+            }],
+        };
+        assert!(index(&[("John", 1, 43, &["Follow me."])]).unresolved(&bible).is_empty());
+        // Out of order counts as not found
+        let idx = index(&[("John", 1, 43, &["Follow me.", "them"]), ("John", 1, 99, &["x"])]);
+        assert_eq!(
+            idx.unresolved(&bible),
+            vec![
+                "John 1:43: 1 of 2 red-letter spans found in the text".to_string(),
+                "red letter for John 1:99, which is not a verse".to_string(),
+            ]
+        );
     }
 }

@@ -96,14 +96,15 @@ async function goTo(book, chapter, verse = 0, opts = {}) {
   if (seq !== navSeq) return; // a later navigation won
 
   const changedChapter = state.chapter?.book !== book || state.chapter?.chapter !== chapter;
-  const anchor = opts.keepScroll ? firstVisibleVerse() : null;
+  const place = opts.keepScroll ? readingPlace() : null;
   state.chapter = view;
   const target = verse > 0 && verse <= view.verses.length ? verse : null;
   state.selectedVerse = opts.select === false ? null : target;
   render();
 
-  if (target && !opts.top) scrollToVerse(target);
-  else if (anchor !== null) scrollToVerse(anchor);
+  // keepScroll (a search re-highlighting the chapter) stays put, even with a verse selected
+  if (target && !opts.top && !opts.keepScroll) scrollToVerse(target);
+  else if (place) returnTo(place);
   else if (changedChapter || opts.top) reader.scrollTop = 0;
 
   settings.position = { book, chapter, verse: target ?? 1 };
@@ -133,6 +134,8 @@ function render() {
   $("next-chapter").disabled = !view.next;
   document.title = `${view.heading} · KJV Interlinear`;
   updateActions();
+  // The chapter is in the page now (Android CI waits for this line in logcat)
+  console.log("kjv:ready", view.book, view.chapter);
 }
 
 function step(direction) {
@@ -144,13 +147,28 @@ function scrollToVerse(n) {
   reader.querySelector(`#v${n}`)?.scrollIntoView({ block: "start" });
 }
 
-/** The verse at the top of the reading pane, to keep the place when the layout changes. */
-function firstVisibleVerse() {
+/** The verse at the top of the reading pane, and how far its top is from the pane's. */
+function readingPlace() {
   const top = reader.getBoundingClientRect().top;
   for (const el of reader.querySelectorAll(".verse")) {
-    if (el.getBoundingClientRect().bottom > top + 8) return Number(el.dataset.verse);
+    const box = el.getBoundingClientRect();
+    if (box.bottom > top + 8) return { verse: Number(el.dataset.verse), offset: box.top - top };
   }
   return null;
+}
+
+/** The verse at the top of the reading pane, to keep the place when the layout changes. */
+function firstVisibleVerse() {
+  return readingPlace()?.verse ?? null;
+}
+
+/**
+ * Put the reader back exactly where it was. (Scrolling the verse into view instead would
+ * creep up a verse each time: the scroll padding leaves the one above peeking in.)
+ */
+function returnTo(place) {
+  const el = reader.querySelector(`#v${place.verse}`);
+  if (el) reader.scrollTop += el.getBoundingClientRect().top - reader.getBoundingClientRect().top - place.offset;
 }
 
 /** Re-render in place (view change), keeping the reader on the same verse. */
@@ -304,6 +322,7 @@ const ctx = {
   setHighlight,
   refreshPanel,
   openPanel,
+  updateActions,
   toast,
   changeSettings(mutator) {
     const before = settings.view;
@@ -357,14 +376,11 @@ function onKeydown(event) {
   const mod = event.ctrlKey || event.metaKey;
   const key = event.key.toLowerCase();
 
-  if (mod && key === "f") {
+  if (mod && (key === "f" || key === "j")) {
     event.preventDefault();
-    openPanel("search");
-    return;
-  }
-  if (mod && key === "j") {
-    event.preventDefault();
-    if (state.panel === "chat") closePanel();
+    if (isPickerOpen()) return; // the book picker is modal: panels wait until it closes
+    if (key === "f") openPanel("search");
+    else if (state.panel === "chat") closePanel();
     else openPanel("chat");
     return;
   }
@@ -520,12 +536,15 @@ async function start() {
   }
   wireStaticControls();
   try {
-    const [loaded, books, version] = await Promise.all([
-      prefs.load(),
+    const [books, version] = await Promise.all([
       call("books"),
       window.__TAURI__?.app?.getVersion?.().catch(() => null) ?? null,
+      // Taken as soon as it's read, even if the books fail: from then on the window
+      // closing saves these, never the defaults
+      prefs.load().then((loaded) => {
+        settings = loaded;
+      }),
     ]);
-    settings = loaded;
     ctx.version = version;
     state.books = books;
     state.bookMap = new Map(books.map((b) => [b.name, b]));
@@ -534,6 +553,7 @@ async function start() {
     reader.setAttribute("aria-busy", "false");
     return;
   }
+  if (!prefs.isLoaded()) toast("Couldn't read your settings: changes won't be saved this time");
   const preview = previewParams();
   if (preview) applyPreviewSettings(preview);
   prefs.apply(settings);
