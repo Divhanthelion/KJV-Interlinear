@@ -1,2 +1,7 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+# Shell scripts must stay LF even on Windows checkouts; batch files need CRLF
+*.sh text eol=lf
+gradlew text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf

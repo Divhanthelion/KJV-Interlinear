@@ -60,11 +60,7 @@ impl Bible {
     }
 
     /// Search verses in the given books (case-, apostrophe- and æ-insensitive)
-    fn search_books<'a>(
-        &'a self,
-        query: &str,
-        include: impl Fn(&Book) -> bool,
-    ) -> Vec<&'a Verse> {
+    fn search_books<'a>(&'a self, query: &str, include: impl Fn(&Book) -> bool) -> Vec<&'a Verse> {
         let query = fold_for_search(query);
         if query.is_empty() {
             return Vec::new();
@@ -100,10 +96,7 @@ impl Bible {
 
     /// Get chapter count for a book
     pub fn chapter_count(&self, book_name: &str) -> Option<usize> {
-        self.books
-            .iter()
-            .find(|b| b.name == book_name)
-            .map(|b| b.chapters.len())
+        self.books.iter().find(|b| b.name == book_name).map(|b| b.chapters.len())
     }
 
     /// Get verse count for a chapter
@@ -173,6 +166,16 @@ pub fn normalize_strongs(input: &str) -> Option<String> {
     Some(format!("{}{:04}", letter, n))
 }
 
+/// `normalize_strongs` keeping STEP's sense letter: "g2424I" -> "G2424I", "H430" -> "H0430".
+pub fn normalize_dstrong(input: &str) -> Option<String> {
+    let key = normalize_strongs(input)?;
+    let s = input.trim();
+    let rest = s.strip_prefix(['H', 'G', 'h', 'g']).unwrap_or(s);
+    let sense: String =
+        rest.trim_start_matches(|c: char| c.is_ascii_digit()).chars().take_while(char::is_ascii_alphabetic).collect();
+    Some(key + &sense)
+}
+
 /// Generate common Strong's key spellings (padded / unpadded).
 fn strongs_key_variants(strongs: &str) -> Vec<String> {
     let mut out = Vec::new();
@@ -216,8 +219,12 @@ pub struct OriginalWord {
     pub transliteration: String,
     /// English translation/gloss
     pub english_gloss: String,
-    /// Strong's number (e.g., "H430" for Hebrew, "G2316" for Greek)
+    /// Strong's number (e.g., "H0430" for Hebrew, "G2316" for Greek); the concordance key
     pub strongs_number: Option<String>,
+    /// STEP's sense-disambiguated code when it adds a sense letter ("G2424I" =
+    /// Joshua, "G2424G" = Jesus); None when the tag is the plain number
+    #[serde(default)]
+    pub dstrong: Option<String>,
     /// Morphology code (e.g., "HNcmpa" for Hebrew noun)
     pub morphology: Option<String>,
 }
@@ -242,11 +249,7 @@ pub struct VerseRef {
 
 impl VerseRef {
     pub fn new(book: &str, chapter: u32, verse: u32) -> Self {
-        Self {
-            book: book.to_string(),
-            chapter,
-            verse,
-        }
+        Self { book: book.to_string(), chapter, verse }
     }
 }
 
@@ -278,19 +281,12 @@ pub struct StrongsIndex {
 
 impl StrongsIndex {
     pub fn new() -> Self {
-        Self {
-            hebrew: HashMap::new(),
-            greek: HashMap::new(),
-        }
+        Self { hebrew: HashMap::new(), greek: HashMap::new() }
     }
 
     /// Record that a Strong's number occurs in a verse (each verse listed once)
     pub fn add_occurrence(&mut self, strongs: &str, verse_ref: VerseRef) {
-        let map = if strongs.starts_with('H') {
-            &mut self.hebrew
-        } else {
-            &mut self.greek
-        };
+        let map = if strongs.starts_with('H') { &mut self.hebrew } else { &mut self.greek };
         let refs = map.entry(strongs.to_string()).or_default();
         // Words arrive in text order, so a repeat within a verse is always the last entry
         if refs.last() != Some(&verse_ref) {
@@ -301,11 +297,7 @@ impl StrongsIndex {
     /// Get all verses containing a Strong's number ("H430", "h0430" and "H0430" are equivalent)
     pub fn get_occurrences(&self, strongs: &str) -> Option<&Vec<VerseRef>> {
         let key = normalize_strongs(strongs)?;
-        if key.starts_with('H') {
-            self.hebrew.get(&key)
-        } else {
-            self.greek.get(&key)
-        }
+        if key.starts_with('H') { self.hebrew.get(&key) } else { self.greek.get(&key) }
     }
 
     /// Number of verses containing a Strong's number
@@ -354,31 +346,17 @@ impl ExtendedBible {
     }
 
     /// Get interlinear data for a verse
-    pub fn get_interlinear(
-        &self,
-        book: &str,
-        chapter: u32,
-        verse: u32,
-    ) -> Option<&InterlinearVerse> {
+    pub fn get_interlinear(&self, book: &str, chapter: u32, verse: u32) -> Option<&InterlinearVerse> {
         let verse_ref = VerseRef::new(book, chapter, verse);
-        self.interlinear_ot
-            .get(&verse_ref)
-            .or_else(|| self.interlinear_nt.get(&verse_ref))
+        self.interlinear_ot.get(&verse_ref).or_else(|| self.interlinear_nt.get(&verse_ref))
     }
 
     /// Rebuild the Strong's concordance: verses in canonical order, each listed once.
     pub fn rebuild_strongs_index(&mut self) {
-        let mut verses: Vec<&InterlinearVerse> = self
-            .interlinear_ot
-            .values()
-            .chain(self.interlinear_nt.values())
-            .collect();
+        let mut verses: Vec<&InterlinearVerse> =
+            self.interlinear_ot.values().chain(self.interlinear_nt.values()).collect();
         verses.sort_by_key(|v| {
-            (
-                crate::parsing::canonical_book_index(&v.book).unwrap_or(usize::MAX),
-                v.chapter,
-                v.verse_number,
-            )
+            (crate::parsing::canonical_book_index(&v.book).unwrap_or(usize::MAX), v.chapter, v.verse_number)
         });
         let mut index = StrongsIndex::new();
         for verse in verses {
@@ -394,11 +372,7 @@ impl ExtendedBible {
 
     /// Get lexicon entry for a Strong's number
     pub fn get_lexicon_entry(&self, strongs: &str) -> Option<&LexiconEntry> {
-        let map = if strongs.starts_with('H') {
-            &self.hebrew_lexicon
-        } else {
-            &self.greek_lexicon
-        };
+        let map = if strongs.starts_with('H') { &self.hebrew_lexicon } else { &self.greek_lexicon };
 
         if let Some(entry) = map.get(strongs) {
             return Some(entry);
@@ -423,14 +397,7 @@ impl ExtendedBible {
             None => return Vec::new(),
         };
 
-        verse_refs
-            .iter()
-            .filter_map(|vr| {
-                self.interlinear_ot
-                    .get(vr)
-                    .or_else(|| self.interlinear_nt.get(vr))
-            })
-            .collect()
+        verse_refs.iter().filter_map(|vr| self.interlinear_ot.get(vr).or_else(|| self.interlinear_nt.get(vr))).collect()
     }
 
     /// Get count of occurrences for a Strong's number
@@ -466,8 +433,7 @@ mod tests {
                                 book: "Genesis".to_string(),
                                 chapter: 1,
                                 verse_number: 1,
-                                text: "In the beginning God created the heaven and the earth."
-                                    .to_string(),
+                                text: "In the beginning God created the heaven and the earth.".to_string(),
                             },
                             Verse {
                                 book: "Genesis".to_string(),
@@ -578,6 +544,16 @@ mod tests {
         assert_eq!(normalize_strongs("H0430G").as_deref(), Some("H0430"));
         assert_eq!(normalize_strongs("X12"), None);
         assert_eq!(normalize_strongs("H"), None);
+    }
+
+    #[test]
+    fn test_normalize_dstrong_keeps_the_sense_letter() {
+        assert_eq!(normalize_dstrong("G2424I").as_deref(), Some("G2424I"));
+        assert_eq!(normalize_dstrong(" g2424I ").as_deref(), Some("G2424I"));
+        assert_eq!(normalize_dstrong("H7225G").as_deref(), Some("H7225G"));
+        assert_eq!(normalize_dstrong("H2148v").as_deref(), Some("H2148v"));
+        assert_eq!(normalize_dstrong("H430").as_deref(), Some("H0430"));
+        assert_eq!(normalize_dstrong("hello"), None);
     }
 
     #[test]

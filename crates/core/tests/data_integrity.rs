@@ -5,7 +5,7 @@ use std::path::Path;
 use std::sync::OnceLock;
 
 use kjv_core::bundle::DataBundle;
-use kjv_core::models::{Bible, ExtendedBible, Testament, VerseRef};
+use kjv_core::models::{Bible, ExtendedBible, OriginalLanguage, Testament, Verse, VerseRef};
 use kjv_core::original_languages::load_extended_bible;
 use kjv_core::red_letter::RedLetterIndex;
 
@@ -17,14 +17,18 @@ fn root() -> &'static Path {
 fn bible() -> &'static Bible {
     static BIBLE: OnceLock<Bible> = OnceLock::new();
     BIBLE.get_or_init(|| {
-        Bible::from_directories(&root().join("old_testament"), &root().join("new_testament"))
-            .expect("KJV text loads")
+        Bible::from_directories(&root().join("old_testament"), &root().join("new_testament")).expect("KJV text loads")
     })
 }
 
 fn extended() -> &'static ExtendedBible {
     static EXT: OnceLock<ExtendedBible> = OnceLock::new();
     EXT.get_or_init(|| load_extended_bible(&root().join("data")).expect("STEP data loads"))
+}
+
+fn bundle() -> &'static DataBundle {
+    static BUNDLE: OnceLock<DataBundle> = OnceLock::new();
+    BUNDLE.get_or_init(|| DataBundle::from_sources(root()).expect("bundle builds"))
 }
 
 /// Every verse, plus Psalm titles as verse 0.
@@ -44,10 +48,7 @@ fn kjv_refs() -> Vec<VerseRef> {
 }
 
 fn verse_text(book: &str, chapter: u32, verse: u32) -> &'static str {
-    &bible()
-        .get_verse(book, chapter, verse)
-        .unwrap_or_else(|| panic!("{} {}:{} exists", book, chapter, verse))
-        .text
+    &bible().get_verse(book, chapter, verse).unwrap_or_else(|| panic!("{} {}:{} exists", book, chapter, verse)).text
 }
 
 fn original_words(book: &str, chapter: u32, verse: u32) -> Vec<&'static str> {
@@ -75,12 +76,7 @@ fn kjv_has_canonical_books_chapters_and_verses() {
     assert_eq!(b.books[65].name, "Revelation");
 
     let count = |t: Testament| -> usize {
-        b.books
-            .iter()
-            .filter(|bk| bk.testament == t)
-            .flat_map(|bk| &bk.chapters)
-            .map(|c| c.verses.len())
-            .sum()
+        b.books.iter().filter(|bk| bk.testament == t).flat_map(|bk| &bk.chapters).map(|c| c.verses.len()).sum()
     };
     assert_eq!(count(Testament::Old), 23_145);
     assert_eq!(count(Testament::New), 7_957);
@@ -102,18 +98,15 @@ fn kjv_has_canonical_books_chapters_and_verses() {
 
 #[test]
 fn psalm_titles_are_superscriptions() {
-    let titled = bible()
-        .books
-        .iter()
-        .flat_map(|b| &b.chapters)
-        .filter(|c| c.superscription.is_some())
-        .count();
+    let titled = bible().books.iter().flat_map(|b| &b.chapters).filter(|c| c.superscription.is_some()).count();
     assert_eq!(titled, 116);
     let psalms = bible().books.iter().find(|b| b.name == "Psalms").unwrap();
     assert_eq!(psalms.chapters.iter().filter(|c| c.superscription.is_some()).count(), 116);
 
     let ps51 = &psalms.chapters[50];
-    assert!(ps51.superscription.as_ref().unwrap().text.starts_with("To the chief Musician, A Psalm of David, when Nathan"));
+    assert!(
+        ps51.superscription.as_ref().unwrap().text.starts_with("To the chief Musician, A Psalm of David, when Nathan")
+    );
     assert!(ps51.verses[0].text.starts_with("Have mercy upon me, O God"));
     assert!(psalms.chapters[0].superscription.is_none());
 }
@@ -151,8 +144,7 @@ fn yhwh_is_rendered_lord_or_god() {
     for book in bible().books.iter().filter(|b| b.testament == Testament::Old) {
         for chapter in &book.chapters {
             for verse in chapter.superscription.iter().chain(&chapter.verses) {
-                let Some(iv) = extended().get_interlinear(&book.name, chapter.number, verse.verse_number)
-                else {
+                let Some(iv) = extended().get_interlinear(&book.name, chapter.number, verse.verse_number) else {
                     continue;
                 };
                 let yhwh = iv
@@ -166,9 +158,7 @@ fn yhwh_is_rendered_lord_or_god() {
                     .filter(|w| matches!(*w, "LORD" | "GOD" | "JEHOVAH" | "JAH"))
                     .count()
                     + verse.text.matches("Jehovah").count();
-                if yhwh > rendered
-                    && !allowed.contains(&(book.name.as_str(), chapter.number, verse.verse_number))
-                {
+                if yhwh > rendered && !allowed.contains(&(book.name.as_str(), chapter.number, verse.verse_number)) {
                     unexpected.push(format!("{} {}:{} {}", book.name, chapter.number, verse.verse_number, verse.text));
                 }
             }
@@ -184,18 +174,10 @@ fn every_verse_has_original_language_words() {
     let ext = extended();
     let missing: Vec<String> = kjv_refs()
         .iter()
-        .filter(|r| {
-            ext.get_interlinear(&r.book, r.chapter, r.verse)
-                .is_none_or(|iv| iv.original_words.is_empty())
-        })
+        .filter(|r| ext.get_interlinear(&r.book, r.chapter, r.verse).is_none_or(|iv| iv.original_words.is_empty()))
         .map(|r| format!("{} {}:{}", r.book, r.chapter, r.verse))
         .collect();
-    assert!(
-        missing.is_empty(),
-        "{} verses lack Hebrew/Greek: {:?}",
-        missing.len(),
-        &missing[..missing.len().min(20)]
-    );
+    assert!(missing.is_empty(), "{} verses lack Hebrew/Greek: {:?}", missing.len(), &missing[..missing.len().min(20)]);
 }
 
 #[test]
@@ -203,13 +185,28 @@ fn no_original_language_verse_is_orphaned() {
     let refs = kjv_refs();
     let kjv: HashSet<&VerseRef> = refs.iter().collect();
     let ext = extended();
-    let orphans: Vec<&VerseRef> = ext
-        .interlinear_ot
-        .keys()
-        .chain(ext.interlinear_nt.keys())
-        .filter(|r| !kjv.contains(r))
-        .collect();
+    let orphans: Vec<&VerseRef> =
+        ext.interlinear_ot.keys().chain(ext.interlinear_nt.keys()).filter(|r| !kjv.contains(r)).collect();
     assert!(orphans.is_empty(), "no KJV verse for {:?}", orphans);
+}
+
+/// Every word of every file is loaded: these totals change only with the data
+/// files themselves (or with a deliberate change to what the loader keeps).
+#[test]
+fn every_word_row_is_loaded() {
+    let words = |verses: &std::collections::HashMap<VerseRef, kjv_core::models::InterlinearVerse>| -> usize {
+        verses.values().map(|v| v.original_words.len()).sum()
+    };
+    // TAHOT Gen-Deu 79,981 + Jos-Est 107,120 + Job-Sng 39,080 + Isa-Mal 79,305
+    assert_eq!(words(&extended().interlinear_ot), 305_486);
+    // TAGNT Mat-Jhn 66,355 + Act-Rev 74,542
+    assert_eq!(words(&extended().interlinear_nt), 140_897);
+    // Lexicon entries by plain number; sense codes ("G2424I") are keyed besides these
+    let plain = |lexicon: &std::collections::HashMap<String, kjv_core::models::LexiconEntry>| {
+        lexicon.keys().filter(|k| k[1..].chars().all(|c| c.is_ascii_digit())).count()
+    };
+    assert_eq!(plain(&extended().hebrew_lexicon), 8_723);
+    assert_eq!(plain(&extended().greek_lexicon), 10_847);
 }
 
 #[test]
@@ -225,8 +222,33 @@ fn words_are_complete_and_linked_to_the_lexicon() {
             if let Some(s) = &w.strongs_number {
                 assert!(ext.get_lexicon_entry(s).is_some(), "{} {} not in lexicon", at, s);
             }
+            if let Some(d) = &w.dstrong {
+                assert!(
+                    w.strongs_number.as_ref().is_some_and(|s| d.starts_with(s.as_str()) && d.len() > s.len()),
+                    "{} sense {}",
+                    at,
+                    d
+                );
+            }
         }
     }
+}
+
+#[test]
+fn aramaic_verses_are_marked_aramaic() {
+    let language = |b: &str, c: u32, v: u32| extended().get_interlinear(b, c, v).map(|iv| iv.language.clone());
+    assert_eq!(language("Genesis", 1, 1), Some(OriginalLanguage::Hebrew));
+    assert_eq!(language("Psalms", 3, 0), Some(OriginalLanguage::Hebrew));
+    assert_eq!(language("Jeremiah", 10, 11), Some(OriginalLanguage::Aramaic));
+    // Daniel 2:4 turns to Aramaic after "to the king in Syriack"; 2:4b–7:28 is Aramaic
+    assert_eq!(language("Daniel", 2, 3), Some(OriginalLanguage::Hebrew));
+    assert_eq!(language("Daniel", 2, 4), Some(OriginalLanguage::Aramaic));
+    assert_eq!(language("Daniel", 2, 5), Some(OriginalLanguage::Aramaic));
+    assert_eq!(language("Daniel", 7, 28), Some(OriginalLanguage::Aramaic));
+    assert_eq!(language("Daniel", 8, 1), Some(OriginalLanguage::Hebrew));
+    assert_eq!(language("Ezra", 4, 7), Some(OriginalLanguage::Hebrew));
+    assert_eq!(language("Ezra", 4, 8), Some(OriginalLanguage::Aramaic));
+    assert_eq!(language("Matthew", 1, 1), Some(OriginalLanguage::Greek));
 }
 
 #[test]
@@ -304,21 +326,8 @@ fn strongs_search_accepts_unpadded_numbers() {
 fn red_letter_spans_are_exact() {
     let rl = RedLetterIndex::load(&root().join("data/words_of_jesus.json")).expect("red-letter data loads");
     assert_eq!(rl.len(), 2028);
-
-    let mut problems = Vec::new();
-    for (book, chapter, verse) in rl.keys() {
-        let Some(v) = bible().get_verse(&book, chapter, verse) else {
-            problems.push(format!("{} {}:{} is not a verse", book, chapter, verse));
-            continue;
-        };
-        let spans = rl.get(&book, chapter, verse).unwrap();
-        let ranges = rl.ranges(&book, chapter, verse, &v.text);
-        if ranges.len() != spans.len() {
-            problems.push(format!("{} {}:{}: {} of {} spans found", book, chapter, verse, ranges.len(), spans.len()));
-        }
-    }
-    assert!(problems.is_empty(), "{}", problems.join("
-"));
+    let problems = rl.unresolved(bible());
+    assert!(problems.is_empty(), "{}", problems.join("\n"));
 }
 
 /// Red text for a verse, spans joined with " / ".
@@ -350,11 +359,12 @@ fn red_letter_marks_only_the_words_spoken() {
 
 #[test]
 fn bundle_round_trips_exactly() {
-    let bundle = DataBundle::from_sources(root()).expect("bundle builds");
+    let bundle = bundle();
     let bytes = bundle.to_bytes().expect("bundle serializes");
     let back = DataBundle::from_bytes(&bytes).expect("bundle reads back");
 
-    // Same bytes again means nothing was lost or reordered in the round trip
+    // The same length again means nothing was lost in the round trip (the bytes
+    // themselves can differ: maps serialize in their in-memory order)
     assert_eq!(back.to_bytes().unwrap().len(), bytes.len());
     assert_eq!(back.bible.books.len(), 66);
     assert_eq!(back.extended.interlinear_ot.len(), bundle.extended.interlinear_ot.len());
@@ -374,4 +384,49 @@ fn bundle_round_trips_exactly() {
     let v = back.bible.get_verse("John", 3, 16).unwrap();
     assert!(v.text.starts_with("For God so loved the world"));
     eprintln!("bundle size: {:.1} MB", bytes.len() as f64 / 1e6);
+}
+
+/// The problems `validate` reports after `change` breaks a copy of the real bundle.
+fn broken(change: impl FnOnce(&mut DataBundle)) -> String {
+    let mut b = bundle().clone();
+    change(&mut b);
+    b.validate().expect_err("validate catches the change")
+}
+
+/// `from_sources` validates, so these fail the app's build rather than ship.
+#[test]
+fn validation_rejects_an_incomplete_bundle() {
+    assert_eq!(bundle().validate(), Ok(()));
+
+    let err = broken(|b| b.bible.books.swap(0, 1));
+    assert!(err.contains("not the 66 in canonical order"), "{}", err);
+
+    let err = broken(|b| {
+        b.bible.books[0].chapters[0].verses.remove(4);
+    });
+    assert!(err.contains("Genesis 1: verse 5 is numbered 6"), "{}", err);
+    assert!(err.contains("31101 verses, 1189 chapters, and 116 Psalm titles"), "{}", err);
+
+    let err = broken(|b| {
+        b.bible.books[42].chapters.remove(2);
+    });
+    assert!(err.contains("John: chapter 3 is numbered 4"), "{}", err);
+
+    let err = broken(|b| {
+        let first = b.bible.books[1].chapters[0].verses[0].clone();
+        b.bible.books[1].chapters[0].superscription = Some(Verse { verse_number: 0, ..first });
+    });
+    assert!(err.contains("Exodus 1 has a title; only Psalms do"), "{}", err);
+    assert!(err.contains("Exodus 1:0 has no Hebrew or Greek words"), "{}", err);
+
+    let err = broken(|b| {
+        b.extended.interlinear_nt.remove(&VerseRef::new("John", 3, 16));
+    });
+    assert!(err.contains("John 3:16 has no Hebrew or Greek words"), "{}", err);
+
+    let err = broken(|b| {
+        let ch = &mut b.bible.books[42].chapters[10];
+        ch.verses[42].text = ch.verses[42].text.replace("Lazarus", "Lazarvs");
+    });
+    assert!(err.contains("John 11:43: 0 of 1 red-letter spans found"), "{}", err);
 }

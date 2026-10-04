@@ -209,6 +209,7 @@ async function aiSettings(ai) {
   await sleep(300);
   await fetch(`${BASE}/api/settings_save`, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ai: { providers: [MOCK], providerId: "mock", model: null, scope: "chapter", books: [], consent: {}, calibration: {}, ...ai } }),
   });
 }
@@ -321,7 +322,7 @@ await test("Chat: conversations are saved, starred, renamed, reopened, and clear
   const rows = () => $$(".conversation-row .row-main").map((e) => e.textContent);
   const historyView = () => $('[aria-label="Conversations"]');
   // Start from an empty list (the earlier chat tests saved theirs)
-  const api = (name, body) => fetch("/api/" + name, { method: "POST", body: JSON.stringify(body) }).then((r) => r.json());
+  const api = (name, body) => fetch("/api/" + name, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((r) => r.json());
   for (const c of await api("conversations_list", {})) await api("conversation_delete", { id: c.id });
   $('[data-open-panel="chat"]').click();
   await until(() => $(".chat-model")?.value.endsWith("mock-model"), "model list");
@@ -378,7 +379,7 @@ for (const width of [320, 768, 1440]) {
 // Every chapter as drawn, compared with old_testament/ and new_testament/ character by
 // character (crates/core/tests/text_fidelity.rs checks those files against the source)
 {
-  const books = await (await fetch(`${BASE}/api/books`, { method: "POST", body: "{}" })).json();
+  const books = await (await fetch(`${BASE}/api/books`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" })).json();
   const chapters = [];
   for (const b of books) {
     const dir = b.testament === "old" ? "old_testament" : "new_testament";

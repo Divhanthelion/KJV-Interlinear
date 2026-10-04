@@ -6,10 +6,12 @@ import { h } from "./dom.js";
 
 /**
  * Build a function that finds references like "John 3:16", "1 Cor. 13:4–7",
- * "Ps 23:1" in text. `books` is the app's book list ({ name, display, abbr }).
- * Returns (text) => [{ start, end, book, chapter, verse }].
+ * "Ps 23:1" in text. `books` is the app's book list ({ name, display, abbr, chapters }).
+ * Returns (text) => [{ start, end, book, chapter, verse }]. A chapter the book doesn't
+ * have ("Jude 3:1") isn't a reference: it stays plain text.
  */
 export function referenceFinder(books) {
+  const chapters = new Map(books.map((b) => [b.name, b.chapters]));
   const alias = new Map();
   const add = (label, book) => alias.set(label.toLowerCase(), book);
   for (const b of books) {
@@ -35,11 +37,15 @@ export function referenceFinder(books) {
   return (text) => {
     const found = [];
     for (const m of text.matchAll(pattern)) {
+      const book = alias.get(m[1].toLowerCase());
+      const chapter = Number(m[2]);
+      const last = chapters.get(book);
+      if (chapter < 1 || (Number.isInteger(last) && chapter > last)) continue;
       found.push({
         start: m.index,
         end: m.index + m[0].length,
-        book: alias.get(m[1].toLowerCase()),
-        chapter: Number(m[2]),
+        book,
+        chapter,
         verse: Number(m[3]),
       });
     }
@@ -58,7 +64,8 @@ export function renderMarkdown(source, opts = {}) {
 
   const isBlank = (l) => /^\s*$/.test(l);
   const fence = /^\s*(```|~~~)/;
-  const heading = /^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$/;
+  // A closing run of #s is dropped only after a space: "## Learn C#" keeps its "C#"
+  const heading = /^\s{0,3}(#{1,6})\s+(.*?)(?:\s+#+)?\s*$/;
   const rule = /^\s{0,3}([-*_])(\s*\1){2,}\s*$/;
   const quote = /^\s{0,3}>\s?/;
   const item = /^(\s*)([-*+•]|\d{1,3}[.)])\s+(.*)$/;

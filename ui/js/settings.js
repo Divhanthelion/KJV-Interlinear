@@ -125,19 +125,34 @@ export function sanitize(raw) {
   };
 }
 
+// Nothing is written until the saved settings have been read: saving the defaults
+// before then (the window closing early) or after a failed read would replace the
+// reader's file. "No settings yet" (null) is a successful read; an error is not.
+let loaded = false;
+
+/** The saved settings, or the defaults on first run or when they can't be read. */
 export async function load() {
+  let raw;
   try {
-    return sanitize(await loadSettings());
+    raw = await loadSettings();
   } catch (error) {
-    console.error("Could not load settings", error);
+    console.error("Could not load settings; changes won't be saved", error);
     return sanitize(null);
   }
+  loaded = true;
+  return sanitize(raw);
+}
+
+/** False until settings have been read successfully (saving is off until then). */
+export function isLoaded() {
+  return loaded;
 }
 
 let saveTimer = null;
 
 /** Save soon; repeated changes within half a second are written once. */
 export function save(settings) {
+  if (!loaded) return;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     saveSettings(settings).catch((error) => console.error("Could not save settings", error));
@@ -146,6 +161,7 @@ export function save(settings) {
 
 /** Write immediately (e.g. when the window is closing). */
 export function flush(settings) {
+  if (!loaded) return Promise.resolve();
   clearTimeout(saveTimer);
   return saveSettings(settings);
 }

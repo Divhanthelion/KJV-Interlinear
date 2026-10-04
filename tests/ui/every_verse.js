@@ -86,7 +86,8 @@ async (chapters, view) => {
           if (!w) return;
           const part = (cls) => card.querySelector(cls)?.textContent ?? "";
           const shown = [part(".word-orig"), part(".word-translit"), part(".word-strongs"), part(".word-morph"), part(".word-gloss")];
-          const given = [w.text, w.translit, w.strongs ?? "", w.morph ?? "", w.gloss || " "];
+          // A word with no gloss keeps its line with a no-break space (see reader.js)
+          const given = [w.text, w.translit, w.strongs ?? "", w.morph ?? "", w.gloss || "\u00a0"];
           shown.forEach((s, n) => {
             if (s !== given[n]) report(`${where} word ${k + 1}`, difference(given[n], s));
           });

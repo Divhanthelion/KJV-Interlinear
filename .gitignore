@@ -17,3 +17,10 @@ dist/
 
 # Tauri generates these on every build
 app/gen/schemas/
+
+# Signing material and local packaging output must never be committed
+*.jks
+*.keystore
+*.p12
+*.msix
+screens/

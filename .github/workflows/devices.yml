@@ -6,10 +6,14 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   android:
     name: Android emulator
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - name: Enable KVM for the emulator
@@ -21,17 +25,19 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      # r28+ aligns native libraries to 16 KB pages, which Google Play requires
       - name: Android NDK
         run: |
-          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;27.2.12479018" > /dev/null
-          echo "NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;29.0.13846066" > /dev/null
+          echo "NDK_HOME=$ANDROID_HOME/ndk/29.0.13846066" >> "$GITHUB_ENV"
+      - uses: gradle/actions/wrapper-validation@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-linux-android
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@v2
         with:
-          tool: tauri-cli
+          tool: tauri-cli@2.12.0
       - name: Generate the Android project if it isn't committed yet
         working-directory: app
         run: test -d gen/android || cargo tauri android init --ci
@@ -55,6 +61,7 @@ jobs:
   ios:
     name: iOS Simulator
     runs-on: macos-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -62,7 +69,7 @@ jobs:
           targets: aarch64-apple-ios-sim
       - uses: Swatinem/rust-cache@v2
       # Native (arm64) CLI: the Xcode build phase calls back into it
-      - run: cargo tauri --version || cargo install tauri-cli --version "^2" --locked
+      - run: cargo tauri --version || cargo install tauri-cli --version =2.12.0 --locked
       - name: Generate the Xcode project if it isn't committed yet
         working-directory: app
         run: test -d gen/apple || cargo tauri ios init --ci
