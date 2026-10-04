@@ -7,11 +7,53 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
+  # A release built from mismatched versions produces installers Partner Center
+  # and Play reject (the version inside isn't higher than the live one), so stop early.
+  version:
+    name: Tag matches the app version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare the tag with tauri.conf.json and Cargo.toml
+        run: |
+          conf=$(jq -r .version app/tauri.conf.json)
+          cargo=$(grep -m1 '^version' app/Cargo.toml | cut -d'"' -f2)
+          echo "tauri.conf.json=$conf app/Cargo.toml=$cargo ref=$GITHUB_REF_NAME"
+          [ "$conf" = "$cargo" ] || { echo "::error::app/Cargo.toml and tauri.conf.json disagree"; exit 1; }
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            [ "v$conf" = "$GITHUB_REF_NAME" ] || { echo "::error::tag $GITHUB_REF_NAME but the app says $conf"; exit 1; }
+          fi
+
+  # The same data and adapter tests CI runs; a release must not skip them
+  test:
+    name: Data and API tests
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Fetch the eBible.org source text (pinned)
+        run: |
+          curl -fsSL --retry 3 https://ebible.org/Scriptures/eng-kjv_vpl.zip -o "$RUNNER_TEMP/eng-kjv_vpl.zip"
+          echo "3c611764ee4c66248681f83f1ce5689e77a9c50a590fc3241584259c1b9183b5 *$RUNNER_TEMP/eng-kjv_vpl.zip" | sha256sum -c -
+          unzip -o "$RUNNER_TEMP/eng-kjv_vpl.zip" eng-kjv_vpl.txt -d "$RUNNER_TEMP"
+      - run: cargo test --release -p kjv-core -p kjv-ai -p kjv-devserver
+        env:
+          KJV_SOURCE: ${{ runner.temp }}/eng-kjv_vpl.txt
+
   desktop:
     name: Desktop (${{ matrix.name }})
+    needs: [version, test]
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -44,15 +86,16 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
       # The Rust build of the Tauri CLI (the Android project calls back into it).
       # Prebuilt on Linux/Windows; built natively on macOS, where the prebuilt one is
-      # Intel-only and runs under Rosetta.
+      # Intel-only and runs under Rosetta. Pinned to the version gen/android was made with.
       - uses: taiki-e/install-action@v2
         if: runner.os != 'macOS'
         with:
-          tool: tauri-cli
+          tool: tauri-cli@2.12.0
       - if: runner.os == 'macOS'
-        run: cargo tauri --version || cargo install tauri-cli --version "^2" --locked
+        run: cargo tauri --version || cargo install tauri-cli --version =2.12.0 --locked
       # macOS signing and notarization, only once the Apple account secrets exist
-      # (an empty certificate variable makes the bundler fail)
+      # (an empty certificate variable makes the bundler fail). Heredoc form, so a
+      # certificate exported with line wraps still parses.
       - name: Apple signing
         if: runner.os == 'macOS' && env.HAS_APPLE_SIGNING == 'true'
         env:
@@ -64,7 +107,11 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           for name in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_SIGNING_IDENTITY APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID; do
-            echo "$name=${!name}" >> "$GITHUB_ENV"
+            {
+              echo "$name<<EOF_SECRET"
+              echo "${!name}"
+              echo "EOF_SECRET"
+            } >> "$GITHUB_ENV"
           done
       - uses: tauri-apps/tauri-action@v0
         env:
@@ -90,21 +137,31 @@ jobs:
           name: microsoft-store
           path: KJV-Interlinear_*_x64.msix
           if-no-files-found: error
+      - name: Checksums
+        shell: bash
+        run: |
+          shopt -s nullglob globstar
+          files=(target/release/bundle/**/*.{msi,exe,deb,rpm,AppImage} target/universal-apple-darwin/release/bundle/**/*.dmg)
+          [ ${#files[@]} -gt 0 ] || { echo "::error::no installers were produced"; exit 1; }
+          sha256sum "${files[@]}" > "SHA256SUMS-${{ runner.os }}.txt"
+          cat "SHA256SUMS-${{ runner.os }}.txt"
       - name: Keep installers as workflow artifacts
         uses: actions/upload-artifact@v4
         with:
           name: desktop-${{ runner.os }}
           path: |
+            SHA256SUMS-*.txt
             target/release/bundle/**/*.msi
             target/release/bundle/**/*.exe
             target/release/bundle/**/*.deb
             target/release/bundle/**/*.rpm
             target/release/bundle/**/*.AppImage
             target/universal-apple-darwin/release/bundle/**/*.dmg
-          if-no-files-found: ignore
+          if-no-files-found: error
 
   android:
     name: Android
+    needs: [version, test]
     runs-on: ubuntu-latest
     env:
       ANDROID_KEY_BASE64: ${{ secrets.ANDROID_KEY_BASE64 }}
@@ -114,11 +171,14 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      # The runner image already has the Android SDK; add the NDK Tauri needs
+      # The runner image already has the Android SDK; add the NDK Tauri needs.
+      # r28+ aligns native libraries to 16 KB pages, which Google Play requires;
+      # r27 produced 4 KB-aligned libraries that Play rejects.
       - name: Android NDK
         run: |
-          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;27.2.12479018" > /dev/null
-          echo "NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;29.0.13846066" > /dev/null
+          echo "NDK_HOME=$ANDROID_HOME/ndk/29.0.13846066" >> "$GITHUB_ENV"
+      - uses: gradle/actions/wrapper-validation@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
@@ -126,7 +186,7 @@ jobs:
       # The Rust build of the Tauri CLI (the Android project calls back into it)
       - uses: taiki-e/install-action@v2
         with:
-          tool: tauri-cli
+          tool: tauri-cli@2.12.0
       - name: Generate the Android project if it isn't committed yet
         working-directory: app
         run: test -d gen/android || cargo tauri android init --ci
@@ -146,15 +206,28 @@ jobs:
       - name: Build app bundle and APK
         working-directory: app
         run: cargo tauri android build --aab --apk
+      # Fail here, not in the Play Console: every 64-bit library must be 16 KB aligned
+      - name: Verify 16 KB page alignment
+        run: |
+          readelf="$NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf"
+          bad=0
+          for so in target/aarch64-linux-android/release/*.so target/x86_64-linux-android/release/*.so; do
+            align=$("$readelf" -lW "$so" | awk '/LOAD/ { print $NF }' | sort -u | tail -1)
+            echo "$so LOAD align $align"
+            case "$align" in 0x4000|0x10000) ;; *) echo "::error::$so is not 16 KB aligned"; bad=1 ;; esac
+          done
+          exit $bad
       - uses: actions/upload-artifact@v4
         with:
           name: android
           path: |
             app/gen/android/app/build/outputs/bundle/**/*.aab
             app/gen/android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
 
   ios:
     name: iOS (compile check)
+    needs: version
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -163,7 +236,7 @@ jobs:
           targets: aarch64-apple-ios,aarch64-apple-ios-sim
       - uses: Swatinem/rust-cache@v2
       # Native (arm64) CLI: under Rosetta, Homebrew can't install xcodegen for the Xcode project
-      - run: cargo tauri --version || cargo install tauri-cli --version "^2" --locked
+      - run: cargo tauri --version || cargo install tauri-cli --version =2.12.0 --locked
       - name: Generate the Xcode project if it isn't committed yet
         working-directory: app
         run: test -d gen/apple || cargo tauri ios init --ci
