@@ -5,11 +5,54 @@ on:
   pull_request:
 jobs:
   test:
-    runs-on: ubuntu-latest
+    name: Test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Install GUI libs
+        if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libxkbcommon-dev libwayland-dev libx11-dev pkg-config
       - run: cargo test
+  lint:
+    name: rustfmt + clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Install GUI libs
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libxkbcommon-dev libwayland-dev libx11-dev pkg-config
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+  mobile-check:
+    name: Check ${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: aarch64-linux-android
+            os: ubuntu-latest
+          - target: aarch64-apple-ios
+            os: macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+      - name: Point cc at the preinstalled NDK
+        if: matrix.target == 'aarch64-linux-android'
+        run: |
+          NDKBIN="$ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          echo "CC_aarch64_linux_android=$NDKBIN/aarch64-linux-android24-clang" >> "$GITHUB_ENV"
+          echo "AR_aarch64_linux_android=$NDKBIN/llvm-ar" >> "$GITHUB_ENV"
+      - run: cargo check --lib --target ${{ matrix.target }}

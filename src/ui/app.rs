@@ -70,8 +70,11 @@ pub struct BibleApp {
     sidebar_tab: SidebarTab,
     navigate_to: Option<(String, u32, Option<u32>)>,
 
-    // Clipboard
+    // Clipboard (arboard has no mobile backend; egui's clipboard is used there)
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
     clipboard: Option<arboard::Clipboard>,
+    #[cfg(any(target_os = "android", target_os = "ios"))]
+    pending_copy: Option<String>,
     copy_feedback: Option<(String, f64)>,
 }
 
@@ -128,7 +131,10 @@ impl BibleApp {
             show_settings_window: false,
             sidebar_tab: SidebarTab::Bookmarks,
             navigate_to: None,
+            #[cfg(not(any(target_os = "android", target_os = "ios")))]
             clipboard: arboard::Clipboard::new().ok(),
+            #[cfg(any(target_os = "android", target_os = "ios"))]
+            pending_copy: None,
             copy_feedback: None,
         };
 
@@ -272,10 +278,16 @@ impl BibleApp {
     }
 
     fn copy_to_clipboard(&mut self, text: &str) {
+        #[cfg(not(any(target_os = "android", target_os = "ios")))]
         if let Some(ref mut clipboard) = self.clipboard
             && clipboard.set_text(text.to_string()).is_ok()
         {
             self.copy_feedback = Some(("Copied!".to_string(), 2.0));
+        }
+        // Mobile: hand the text to egui on the next frame (see update()).
+        #[cfg(any(target_os = "android", target_os = "ios"))]
+        {
+            self.pending_copy = Some(text.to_string());
         }
     }
 
@@ -627,6 +639,8 @@ impl BibleApp {
     fn render_sidebar(&mut self, ctx: &Context, theme: &Theme) {
         egui::SidePanel::left("sidebar")
             .default_width(220.0)
+            // Never let the sidebar crush the text column on narrow screens
+            .max_width(ctx.screen_rect().width() * 0.45)
             .frame(
                 egui::Frame::new()
                     .fill(theme.bg_panel)
@@ -1326,6 +1340,13 @@ impl eframe::App for BibleApp {
         let was_typing = ctx.wants_keyboard_input();
         self.handle_keyboard(ctx);
 
+        // Mobile: flush a pending copy through egui's clipboard
+        #[cfg(any(target_os = "android", target_os = "ios"))]
+        if let Some(text) = self.pending_copy.take() {
+            ctx.copy_text(text);
+            self.copy_feedback = Some(("Copied!".to_string(), 2.0));
+        }
+
         // Handle navigation queue
         if let Some((book, chapter, verse)) = self.navigate_to.take() {
             self.selected_book = book;
@@ -1389,7 +1410,15 @@ impl eframe::App for BibleApp {
         self.settings.save_if_dirty();
     }
 
+    // eframe's on_exit takes the GL context only when built with the glow
+    // renderer; the iOS build uses wgpu and has no such parameter.
+    #[cfg(not(target_os = "ios"))]
     fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
+        self.settings.force_save();
+    }
+
+    #[cfg(target_os = "ios")]
+    fn on_exit(&mut self) {
         self.settings.force_save();
     }
 }

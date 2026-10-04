@@ -84,12 +84,18 @@ fn main() -> eframe::Result<()> {
         }
     };
 
+    // glow (OpenGL) everywhere it exists; iOS builds use wgpu (Metal) instead
+    #[cfg(not(target_os = "ios"))]
+    let renderer = eframe::Renderer::Glow;
+    #[cfg(target_os = "ios")]
+    let renderer = eframe::Renderer::Wgpu;
+
     let options = NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([1000.0, 700.0])
             .with_min_inner_size([800.0, 600.0])
             .with_title("KJV Interlinear"),
-        renderer: eframe::Renderer::Glow,
+        renderer,
         ..Default::default()
     };
 

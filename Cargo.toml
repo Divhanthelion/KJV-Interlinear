@@ -8,12 +8,25 @@ repository = "https://github.com/Divhanthelion/KJV-Interlinear"
 readme = "README.md"
 
 [dependencies]
-eframe = { version = "0.31.1", default-features = false, features = ["default_fonts", "glow", "wayland", "x11"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-arboard = "3.4"
 directories = "5.0"
 bincode = "1.3"
+
+# glow (OpenGL) everywhere it exists; iOS has no glutin backend, so it gets
+# the wgpu (Metal) renderer instead. Resolver v2 keeps these per-target.
+[target.'cfg(not(any(target_os = "ios", target_os = "android")))'.dependencies]
+eframe = { version = "0.31.1", default-features = false, features = ["default_fonts", "glow", "wayland", "x11"] }
+
+[target.'cfg(target_os = "android")'.dependencies]
+eframe = { version = "0.31.1", default-features = false, features = ["default_fonts", "glow", "android-native-activity"] }
+
+[target.'cfg(target_os = "ios")'.dependencies]
+eframe = { version = "0.31.1", default-features = false, features = ["default_fonts", "wgpu"] }
+
+# No clipboard backend on mobile; egui's own clipboard is used there instead.
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+arboard = "3.4"
 
 [package.metadata.bundle]
 name = "KJV Interlinear"
