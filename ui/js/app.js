@@ -304,7 +304,10 @@ function syncNavState() {
 }
 
 function openStrongs(key) {
-  state.strongs.query = key.replace(/^([HG])0+(?=\d)/, "$1");
+  // The box shows the plain number; the word's sense code (H0430G) still
+  // drives the first lookup, so the lexicon opens at that word's own sense
+  state.strongs.query = key.replace(/^([HG])0*(\d+)[A-Z]?$/, "$1$2");
+  state.strongs.lookupKey = key;
   state.strongs.pending = true;
   openPanel("strongs", { focus: desktop.matches });
 }

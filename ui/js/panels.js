@@ -180,6 +180,9 @@ export function renderStrongs(body, ctx) {
   const run = async () => {
     st.query = input.value;
     const query = input.value.trim();
+    // A tapped word carries its sense code (H0430G) while the box shows H430
+    const lookup = st.lookupKey ?? query;
+    st.lookupKey = null;
     if (query === looked) return;
     looked = query;
     const seq = ++strongsSeq;
@@ -188,7 +191,7 @@ export function renderStrongs(body, ctx) {
       return draw();
     }
     try {
-      const r = await call("strongs", { query });
+      const r = await call("strongs", { query: lookup });
       if (seq !== strongsSeq) return;
       st.results = r;
       draw();
