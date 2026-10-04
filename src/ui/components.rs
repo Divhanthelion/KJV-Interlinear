@@ -4,7 +4,7 @@ use eframe::egui::{self, Color32, CornerRadius, RichText, Stroke, Ui, Vec2};
 use crate::models::{
     Bookmark, HistoryEntry, InterlinearVerse, LexiconEntry, OriginalLanguage, OriginalWord, Verse,
 };
-use crate::red_letter::{red_letter_segments, RedLetterIndex};
+use crate::red_letter::{RedLetterIndex, red_letter_segments};
 use crate::settings::{DisplayMode, FontSize, Settings};
 use crate::text::{find_folded_ranges, hebrew_visual, visual_bidi};
 use crate::theme::Theme;
@@ -27,7 +27,8 @@ fn red_ranges(
     if !settings.red_letter {
         return Vec::new();
     }
-    let Some(spec) = red_letter.and_then(|idx| idx.get(&verse.book, verse.chapter, verse.verse_number))
+    let Some(spec) =
+        red_letter.and_then(|idx| idx.get(&verse.book, verse.chapter, verse.verse_number))
     else {
         return Vec::new();
     };
@@ -69,7 +70,8 @@ fn render_kjv_text(
     }
     cuts.sort_unstable();
     cuts.dedup();
-    let covers = |ranges: &[(usize, usize)], at: usize| ranges.iter().any(|&(s, e)| s <= at && at < e);
+    let covers =
+        |ranges: &[(usize, usize)], at: usize| ranges.iter().any(|&(s, e)| s <= at && at < e);
 
     let mut job = LayoutJob::default();
     for span in cuts.windows(2) {
@@ -92,7 +94,13 @@ fn render_kjv_text(
 }
 
 /// Clickable verse number; returns true when clicked. Titles (verse 0) have none.
-fn verse_number(ui: &mut Ui, verse: &Verse, settings: &Settings, theme: &Theme, trailing: &str) -> bool {
+fn verse_number(
+    ui: &mut Ui,
+    verse: &Verse,
+    settings: &Settings,
+    theme: &Theme,
+    trailing: &str,
+) -> bool {
     if !settings.show_verse_numbers || verse.verse_number == 0 {
         return false;
     }
@@ -166,8 +174,13 @@ pub fn render_original_paragraph(
     } else {
         egui::Layout::left_to_right(egui::Align::TOP).with_main_wrap(true)
     };
+    // A wrapping layout under with_layout is handed the parent's full remaining
+    // height, so the row balloons and the text is clipped (hit the Greek NT in
+    // Parallel/Original views). An explicit zero-height allocation hugs content.
+    let wrap_width = ui.available_width();
     let mut selected = false;
-    ui.with_layout(layout, |ui| {
+    ui.allocate_ui_with_layout(egui::vec2(wrap_width, 0.0), layout, |ui| {
+        ui.set_max_width(wrap_width);
         ui.spacing_mut().item_spacing.x = font_size * 0.3;
         if let Some(verse) = verse {
             // First item: at the right edge for Hebrew, the left edge for Greek
@@ -186,7 +199,12 @@ pub fn render_original_paragraph(
 }
 
 /// Render a bookmark item - returns (clicked, delete)
-pub fn render_bookmark(ui: &mut Ui, bookmark: &Bookmark, settings: &Settings, theme: &Theme) -> (bool, bool) {
+pub fn render_bookmark(
+    ui: &mut Ui,
+    bookmark: &Bookmark,
+    settings: &Settings,
+    theme: &Theme,
+) -> (bool, bool) {
     let font_size = settings.font_size.pixels() - 2.0;
 
     let reference = format!("{} {}:{}", bookmark.book, bookmark.chapter, bookmark.verse);
@@ -488,8 +506,11 @@ pub fn render_verse_parallel(
 
     ui.add_space(6.0);
     let rect = ui.available_rect_before_wrap();
-    ui.painter()
-        .hline(rect.x_range(), rect.top(), Stroke::new(1.0_f32, theme.divider));
+    ui.painter().hline(
+        rect.x_range(),
+        rect.top(),
+        Stroke::new(1.0_f32, theme.divider),
+    );
     ui.add_space(10.0);
     interaction
 }
@@ -571,17 +592,14 @@ fn format_gloss(gloss: &str) -> String {
 pub fn format_strongs_display(strongs: &str) -> String {
     // G0027 → G27 for display (keep leading letter)
     if let Some(letter) = strongs.chars().next()
-        && (letter == 'H' || letter == 'G') {
-            let digits: String = strongs
-                .chars()
-                .skip(1)
-                .skip_while(|c| *c == '0')
-                .collect();
-            if digits.is_empty() {
-                return format!("{}0", letter);
-            }
-            return format!("{}{}", letter, digits);
+        && (letter == 'H' || letter == 'G')
+    {
+        let digits: String = strongs.chars().skip(1).skip_while(|c| *c == '0').collect();
+        if digits.is_empty() {
+            return format!("{}0", letter);
         }
+        return format!("{}{}", letter, digits);
+    }
     strongs.to_string()
 }
 
@@ -624,8 +642,16 @@ fn render_interlinear_word_block(
     let morph = word.morphology.as_deref().unwrap_or("");
     let lines = [
         (orig_display, orig_size.max(base_size), true),
-        (word.transliteration.as_str(), (base_size - 2.0).max(10.0), settings.show_transliteration),
-        (strongs_label.as_str(), (base_size - 3.0).max(9.0), settings.show_strongs_inline),
+        (
+            word.transliteration.as_str(),
+            (base_size - 2.0).max(10.0),
+            settings.show_transliteration,
+        ),
+        (
+            strongs_label.as_str(),
+            (base_size - 3.0).max(9.0),
+            settings.show_strongs_inline,
+        ),
         (morph, (base_size - 4.0).max(8.0), settings.show_morphology),
         (gloss.as_str(), (base_size - 1.0).max(11.0), true),
     ];
@@ -633,9 +659,13 @@ fn render_interlinear_word_block(
     for (text, size, shown) in lines {
         if shown && !text.is_empty() {
             let width = ui.fonts(|f| {
-                f.layout_no_wrap(text.to_string(), egui::FontId::proportional(size), Color32::WHITE)
-                    .size()
-                    .x
+                f.layout_no_wrap(
+                    text.to_string(),
+                    egui::FontId::proportional(size),
+                    Color32::WHITE,
+                )
+                .size()
+                .x
             });
             col_width = col_width.max(width + 4.0);
         }
@@ -754,71 +784,72 @@ pub fn render_lexicon_popup(
 ) {
     let font_size = settings.font_size.pixels();
 
-    egui::Window::new(format!("Strong's {}", format_strongs_display(strongs_number)))
-        .collapsible(true)
-        .resizable(true)
-        .default_size([400.0, 300.0])
-        .open(open)
-        .show(ctx, |ui| {
-            if let Some(entry) = entry {
-                // Header with original word
-                let word_color = if settings.dark_mode {
-                    Color32::from_rgb(180, 150, 220)
-                } else {
-                    Color32::from_rgb(100, 50, 150)
-                };
-
-                ui.heading(RichText::new(visual_bidi(&entry.original_word)).color(word_color));
-                ui.label(
-                    RichText::new(&entry.transliteration)
-                        .italics()
-                        .size(font_size),
-                );
-
-                ui.separator();
-
-                // Gloss
-                ui.strong("Gloss:");
-                ui.label(visual_bidi(&entry.gloss));
-
-                ui.add_space(8.0);
-
-                // Full definition (markup already stripped at load; clean again defensively)
-                ui.strong("Definition:");
-                egui::ScrollArea::vertical()
-                    .max_height(220.0)
-                    .show(ui, |ui| {
-                        // Definitions quote Hebrew inline; reorder it line by line
-                        let definition =
-                            crate::original_languages::loader::clean_lexicon_markup(&entry.definition)
-                                .lines()
-                                .map(visual_bidi)
-                                .collect::<Vec<_>>()
-                                .join("\n");
-                        ui.label(
-                            RichText::new(definition)
-                                .size(font_size - 1.0)
-                                .color(if settings.dark_mode {
-                                    Color32::from_rgb(210, 210, 215)
-                                } else {
-                                    Color32::from_rgb(40, 40, 45)
-                                }),
-                        );
-                    });
-
-                ui.add_space(8.0);
-
-                // Morphology
-                if !entry.morph.is_empty() {
-                    ui.horizontal(|ui| {
-                        ui.strong("Morphology:");
-                        ui.label(&entry.morph);
-                    });
-                }
+    egui::Window::new(format!(
+        "Strong's {}",
+        format_strongs_display(strongs_number)
+    ))
+    .collapsible(true)
+    .resizable(true)
+    .default_size([400.0, 300.0])
+    .open(open)
+    .show(ctx, |ui| {
+        if let Some(entry) = entry {
+            // Header with original word
+            let word_color = if settings.dark_mode {
+                Color32::from_rgb(180, 150, 220)
             } else {
-                ui.label("Lexicon entry not found.");
+                Color32::from_rgb(100, 50, 150)
+            };
+
+            ui.heading(RichText::new(visual_bidi(&entry.original_word)).color(word_color));
+            ui.label(
+                RichText::new(&entry.transliteration)
+                    .italics()
+                    .size(font_size),
+            );
+
+            ui.separator();
+
+            // Gloss
+            ui.strong("Gloss:");
+            ui.label(visual_bidi(&entry.gloss));
+
+            ui.add_space(8.0);
+
+            // Full definition (markup already stripped at load; clean again defensively)
+            ui.strong("Definition:");
+            egui::ScrollArea::vertical()
+                .max_height(220.0)
+                .show(ui, |ui| {
+                    // Definitions quote Hebrew inline; reorder it line by line
+                    let definition =
+                        crate::original_languages::loader::clean_lexicon_markup(&entry.definition)
+                            .lines()
+                            .map(visual_bidi)
+                            .collect::<Vec<_>>()
+                            .join("\n");
+                    ui.label(RichText::new(definition).size(font_size - 1.0).color(
+                        if settings.dark_mode {
+                            Color32::from_rgb(210, 210, 215)
+                        } else {
+                            Color32::from_rgb(40, 40, 45)
+                        },
+                    ));
+                });
+
+            ui.add_space(8.0);
+
+            // Morphology
+            if !entry.morph.is_empty() {
+                ui.horizontal(|ui| {
+                    ui.strong("Morphology:");
+                    ui.label(&entry.morph);
+                });
             }
-        });
+        } else {
+            ui.label("Lexicon entry not found.");
+        }
+    });
 }
 
 /// Extended settings panel with original language options

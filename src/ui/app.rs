@@ -138,9 +138,7 @@ impl BibleApp {
 
     /// Check if original language data is available
     fn has_original_languages(&self) -> bool {
-        self.extended_bible
-            .as_ref()
-            .is_some_and(|e| e.is_loaded())
+        self.extended_bible.as_ref().is_some_and(|e| e.is_loaded())
     }
 
     /// Get interlinear data for current verse
@@ -237,13 +235,14 @@ impl BibleApp {
                 .iter()
                 .position(|b| b.name == self.selected_book);
             if let Some(idx) = current_idx
-                && idx > 0 {
-                    let prev_book = &self.bible.books[idx - 1];
-                    self.selected_book = prev_book.name.clone();
-                    self.selected_chapter = prev_book.chapters.len() as u32;
-                    self.selected_verse = 1;
-                    self.update_chapter_display();
-                }
+                && idx > 0
+            {
+                let prev_book = &self.bible.books[idx - 1];
+                self.selected_book = prev_book.name.clone();
+                self.selected_chapter = prev_book.chapters.len() as u32;
+                self.selected_verse = 1;
+                self.update_chapter_display();
+            }
         }
     }
 
@@ -262,20 +261,22 @@ impl BibleApp {
                 .iter()
                 .position(|b| b.name == self.selected_book);
             if let Some(idx) = current_idx
-                && idx < self.bible.books.len() - 1 {
-                    self.selected_book = self.bible.books[idx + 1].name.clone();
-                    self.selected_chapter = 1;
-                    self.selected_verse = 1;
-                    self.update_chapter_display();
-                }
+                && idx < self.bible.books.len() - 1
+            {
+                self.selected_book = self.bible.books[idx + 1].name.clone();
+                self.selected_chapter = 1;
+                self.selected_verse = 1;
+                self.update_chapter_display();
+            }
         }
     }
 
     fn copy_to_clipboard(&mut self, text: &str) {
         if let Some(ref mut clipboard) = self.clipboard
-            && clipboard.set_text(text.to_string()).is_ok() {
-                self.copy_feedback = Some(("Copied!".to_string(), 2.0));
-            }
+            && clipboard.set_text(text.to_string()).is_ok()
+        {
+            self.copy_feedback = Some(("Copied!".to_string(), 2.0));
+        }
     }
 
     fn copy_current_verse(&mut self) {
@@ -353,7 +354,6 @@ impl BibleApp {
             if i.key_pressed(Key::B) && i.modifiers.command {
                 self.toggle_bookmark();
             }
-
         });
     }
 
@@ -472,8 +472,8 @@ impl BibleApp {
 
                 ui.add_space(8.0);
 
-                // Navigation bar with improved styling
-                ui.horizontal(|ui| {
+                // Navigation bar; wraps so no control is pushed off narrow windows
+                ui.horizontal_wrapped(|ui| {
                     ui.spacing_mut().item_spacing.x = 8.0;
 
                     // Book selector with custom width
@@ -544,8 +544,7 @@ impl BibleApp {
                     ) {
                         self.go_to_previous_chapter();
                     }
-                    if components::nav_button(ui, "\u{25B6}", "Next Chapter (Right Arrow)", theme)
-                    {
+                    if components::nav_button(ui, "\u{25B6}", "Next Chapter (Right Arrow)", theme) {
                         self.go_to_next_chapter();
                     }
 
@@ -811,7 +810,8 @@ impl BibleApp {
                 for verse in &verses {
                     // Placeholder so the selection highlight is painted under the verse
                     let background = ui.painter().add(egui::Shape::Noop);
-                    let block = ui.vertical(|ui| self.render_one_verse(ui, verse, &highlight_terms, theme));
+                    let block =
+                        ui.vertical(|ui| self.render_one_verse(ui, verse, &highlight_terms, theme));
                     let rect = block.response.rect;
 
                     if verse.verse_number > 0 && verse.verse_number == self.selected_verse {
@@ -831,7 +831,11 @@ impl BibleApp {
                                     egui::CornerRadius::same(4),
                                     theme.selection.gamma_multiply(0.25),
                                 ),
-                                egui::Shape::rect_filled(bar, egui::CornerRadius::same(2), theme.primary),
+                                egui::Shape::rect_filled(
+                                    bar,
+                                    egui::CornerRadius::same(2),
+                                    theme.primary,
+                                ),
                             ]),
                         );
                     }
@@ -987,7 +991,7 @@ impl BibleApp {
         });
 
         if self.settings.show_search_panel {
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 let search_response = ui.add(
                     TextEdit::singleline(&mut self.search_query)
                         .hint_text("Search for text...")
@@ -1000,6 +1004,11 @@ impl BibleApp {
                 }
                 // Enter searches immediately
                 if search_response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
+                    self.perform_search();
+                }
+                // Escape while typing surrenders focus; also clear in one press
+                if search_response.lost_focus() && ui.input(|i| i.key_pressed(Key::Escape)) {
+                    self.search_query.clear();
                     self.perform_search();
                 }
 
@@ -1041,10 +1050,10 @@ impl BibleApp {
                         .button("X")
                         .on_hover_text("Clear Search (Escape)")
                         .clicked()
-                    {
-                        self.search_query.clear();
-                        self.perform_search();
-                    }
+                {
+                    self.search_query.clear();
+                    self.perform_search();
+                }
 
                 // Manual search button
                 if ui.button("Search").clicked() {
@@ -1066,7 +1075,10 @@ impl BibleApp {
                             let location = if result.verse_number == 0 {
                                 format!("{} {} (title)", result.book, result.chapter)
                             } else {
-                                format!("{} {}:{}", result.book, result.chapter, result.verse_number)
+                                format!(
+                                    "{} {}:{}",
+                                    result.book, result.chapter, result.verse_number
+                                )
                             };
                             let reference = format!(
                                 "{} - {}",
@@ -1145,7 +1157,7 @@ impl BibleApp {
             });
 
             if self.settings.show_strongs_panel {
-                ui.horizontal(|ui| {
+                ui.horizontal_wrapped(|ui| {
                     ui.label("Strong's #:");
                     let strongs_response = ui.add(
                         TextEdit::singleline(&mut self.strongs_query)
@@ -1162,10 +1174,11 @@ impl BibleApp {
                     }
 
                     if !self.strongs_query.is_empty()
-                        && ui.button("X").on_hover_text("Clear").clicked() {
-                            self.strongs_query.clear();
-                            self.perform_strongs_search();
-                        }
+                        && ui.button("X").on_hover_text("Clear").clicked()
+                    {
+                        self.strongs_query.clear();
+                        self.perform_strongs_search();
+                    }
                 });
 
                 if let Some(key) = &self.strongs_key {
@@ -1195,14 +1208,12 @@ impl BibleApp {
                     }
                 } else if !self.strongs_query.trim().is_empty() {
                     ui.label(
-                        RichText::new("Enter a number like H430 or G2316")
-                            .color(theme.text_muted),
+                        RichText::new("Enter a number like H430 or G2316").color(theme.text_muted),
                     );
                 }
 
                 // Strong's search results
                 if !self.strongs_results.is_empty() {
-
                     ScrollArea::vertical()
                         .max_height(self.settings.strongs_panel_height)
                         .id_salt("strongs_results_scroll")
@@ -1234,13 +1245,7 @@ impl BibleApp {
                 .as_ref()
                 .and_then(|ext| ext.get_lexicon_entry(strongs_number));
             let mut open = true;
-            components::render_lexicon_popup(
-                ctx,
-                strongs_number,
-                entry,
-                &mut open,
-                &self.settings,
-            );
+            components::render_lexicon_popup(ctx, strongs_number, entry, &mut open, &self.settings);
             if !open {
                 self.show_lexicon_popup = None;
             }
@@ -1277,18 +1282,18 @@ impl BibleApp {
                             ui.label("Application code: MIT License");
                             ui.add_space(5.0);
                             ui.label(RichText::new("KJV text:").strong());
-                            ui.label("1769 standard text (public domain) via CrossWire / eBible.org");
-                            ui.hyperlink_to("eBible.org", "https://ebible.org/find/details.php?id=eng-kjv");
+                            ui.label(
+                                "1769 standard text (public domain) via CrossWire / eBible.org",
+                            );
+                            ui.hyperlink_to(
+                                "eBible.org",
+                                "https://ebible.org/find/details.php?id=eng-kjv",
+                            );
                             ui.add_space(5.0);
                             if self.has_original_languages() {
                                 ui.label(RichText::new("Original language data:").strong());
-                                ui.label(
-                                    "TAHOT, TAGNT, TBESH, TBESG from STEP Bible (CC BY 4.0).",
-                                );
-                                ui.hyperlink_to(
-                                    "STEPBible.org",
-                                    "https://www.STEPBible.org/",
-                                );
+                                ui.label("TAHOT, TAGNT, TBESH, TBESG from STEP Bible (CC BY 4.0).");
+                                ui.hyperlink_to("STEPBible.org", "https://www.STEPBible.org/");
                                 ui.hyperlink_to(
                                     "STEPBible-Data",
                                     "https://github.com/STEPBible/STEPBible-Data",

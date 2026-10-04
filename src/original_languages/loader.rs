@@ -108,7 +108,11 @@ struct WordRef {
 /// The leading ref is English (NRSV) versification; a `[..]` ref overrides it for the KJV.
 fn parse_reference(reference: &str) -> Option<WordRef> {
     let (verse_part, word_part) = reference.split_once('#')?;
-    let word_type = word_part.split_once('=').map(|(_, t)| t).unwrap_or("").to_string();
+    let word_type = word_part
+        .split_once('=')
+        .map(|(_, t)| t)
+        .unwrap_or("")
+        .to_string();
 
     let main_end = verse_part.find(['(', '[', '{']).unwrap_or(verse_part.len());
     let mut parts = verse_part[..main_end].split('.');
@@ -198,16 +202,21 @@ fn clean_greek_text(text: &str) -> String {
 /// Extract transliteration from Greek field like "Βίβλος (Biblos)"
 fn extract_greek_transliteration(text: &str) -> String {
     if let Some(start) = text.find('(')
-        && let Some(rel_end) = text[start + 1..].find(')') {
-            return text[start + 1..start + 1 + rel_end].to_string();
-        }
+        && let Some(rel_end) = text[start + 1..].find(')')
+    {
+        return text[start + 1..start + 1 + rel_end].to_string();
+    }
     String::new()
 }
 
 /// Drop a versification note at the start of a gloss ("[13.1] And" -> "And").
 fn strip_verse_marker(gloss: &str) -> &str {
     let gloss = gloss.trim();
-    let Some(open) = gloss.chars().next().filter(|c| matches!(c, '[' | '(' | '{')) else {
+    let Some(open) = gloss
+        .chars()
+        .next()
+        .filter(|c| matches!(c, '[' | '(' | '{'))
+    else {
         return gloss;
     };
     let close = match open {
@@ -218,7 +227,9 @@ fn strip_verse_marker(gloss: &str) -> &str {
     match gloss.find(close) {
         Some(end)
             if end > 1
-                && gloss[1..end].chars().all(|c| c.is_ascii_digit() || c == '.')
+                && gloss[1..end]
+                    .chars()
+                    .all(|c| c.is_ascii_digit() || c == '.')
                 && gloss[1..end].contains('.') =>
         {
             gloss[end + 1..].trim_start()
@@ -399,7 +410,13 @@ pub fn load_hebrew_ot(
                 .filter(|m| !m.is_empty())
                 .map(str::to_string),
         };
-        push_word(verses, strongs_index, &word_ref, OriginalLanguage::Hebrew, word);
+        push_word(
+            verses,
+            strongs_index,
+            &word_ref,
+            OriginalLanguage::Hebrew,
+            word,
+        );
         word_count += 1;
     }
 
@@ -458,7 +475,13 @@ pub fn load_greek_nt(
             }
         }
 
-        push_word(verses, strongs_index, &word_ref, OriginalLanguage::Greek, word);
+        push_word(
+            verses,
+            strongs_index,
+            &word_ref,
+            OriginalLanguage::Greek,
+            word,
+        );
         word_count += 1;
     }
 

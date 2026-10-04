@@ -12,21 +12,23 @@ pub fn asset_roots() -> Vec<PathBuf> {
     }
 
     if let Ok(exe) = std::env::current_exe()
-        && let Some(dir) = exe.parent() {
-            roots.push(dir.to_path_buf());
-            // target/release -> project root
-            if let Some(parent) = dir.parent() {
-                roots.push(parent.to_path_buf());
-                if let Some(grand) = parent.parent() {
-                    roots.push(grand.to_path_buf());
-                }
+        && let Some(dir) = exe.parent()
+    {
+        roots.push(dir.to_path_buf());
+        // target/release -> project root
+        if let Some(parent) = dir.parent() {
+            roots.push(parent.to_path_buf());
+            if let Some(grand) = parent.parent() {
+                roots.push(grand.to_path_buf());
             }
-            // macOS: App.app/Contents/MacOS -> Resources
-            if dir.ends_with("MacOS")
-                && let Some(contents) = dir.parent() {
-                    roots.push(contents.join("Resources"));
-                }
         }
+        // macOS: App.app/Contents/MacOS -> Resources
+        if dir.ends_with("MacOS")
+            && let Some(contents) = dir.parent()
+        {
+            roots.push(contents.join("Resources"));
+        }
+    }
 
     roots
 }

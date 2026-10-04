@@ -53,9 +53,20 @@ pub fn find_folded_ranges(haystack: &str, needle: &str) -> Vec<(usize, usize)> {
 
 /// Hebrew points, accents, and joiners that attach to the preceding letter.
 fn is_hebrew_mark(c: char) -> bool {
-    matches!(c,
-        '\u{0591}'..='\u{05BD}' | '\u{05BF}' | '\u{05C1}' | '\u{05C2}' | '\u{05C4}' | '\u{05C5}'
-        | '\u{05C7}' | '\u{034F}' | '\u{200C}' | '\u{200D}')
+    matches!(
+        c,
+        '\u{0591}'
+            ..='\u{05BD}'
+                | '\u{05BF}'
+                | '\u{05C1}'
+                | '\u{05C2}'
+                | '\u{05C4}'
+                | '\u{05C5}'
+                | '\u{05C7}'
+                | '\u{034F}'
+                | '\u{200C}'
+                | '\u{200D}'
+    )
 }
 
 /// Reorder a Hebrew word for egui, which lays text out left-to-right only.
@@ -133,7 +144,10 @@ mod tests {
 
     #[test]
     fn folded_search_matches_apostrophe_and_ae() {
-        assert_eq!(fold_for_search("Moses\u{2019} seat"), fold_for_search("moses' SEAT"));
+        assert_eq!(
+            fold_for_search("Moses\u{2019} seat"),
+            fold_for_search("moses' SEAT")
+        );
         assert_eq!(fold_for_search("Cæsar"), "caesar");
     }
 

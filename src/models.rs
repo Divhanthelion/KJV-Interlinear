@@ -60,11 +60,7 @@ impl Bible {
     }
 
     /// Search verses in the given books (case-, apostrophe- and æ-insensitive)
-    fn search_books<'a>(
-        &'a self,
-        query: &str,
-        include: impl Fn(&Book) -> bool,
-    ) -> Vec<&'a Verse> {
+    fn search_books<'a>(&'a self, query: &str, include: impl Fn(&Book) -> bool) -> Vec<&'a Verse> {
         let query = fold_for_search(query);
         if query.is_empty() {
             return Vec::new();
@@ -182,7 +178,11 @@ fn strongs_key_variants(strongs: &str) -> Vec<String> {
     if letter != 'H' && letter != 'G' {
         return out;
     }
-    let digits: String = strongs.chars().skip(1).filter(|c| c.is_ascii_digit()).collect();
+    let digits: String = strongs
+        .chars()
+        .skip(1)
+        .filter(|c| c.is_ascii_digit())
+        .collect();
     if digits.is_empty() {
         return out;
     }
@@ -365,9 +365,13 @@ impl ExtendedBible {
             .or_else(|| self.interlinear_nt.get(&verse_ref))
     }
 
-    /// Get lexicon entry for a Strong's number
+    /// Get lexicon entry for a Strong's number ("h430" and "430" also find H0430)
     pub fn get_lexicon_entry(&self, strongs: &str) -> Option<&LexiconEntry> {
-        let map = if strongs.starts_with('H') {
+        // Pick the language map from the normalized key, so "h430" or a bare
+        // number is not searched in the Greek lexicon.
+        let normalized = normalize_strongs(strongs);
+        let letter = normalized.as_deref().or(Some(strongs))?.chars().next()?;
+        let map = if letter == 'H' {
             &self.hebrew_lexicon
         } else {
             &self.greek_lexicon
@@ -376,12 +380,12 @@ impl ExtendedBible {
         if let Some(entry) = map.get(strongs) {
             return Some(entry);
         }
-        if let Some(entry) = normalize_strongs(strongs).and_then(|k| map.get(&k)) {
+        if let Some(entry) = normalized.as_ref().and_then(|k| map.get(k)) {
             return Some(entry);
         }
 
         // Try zero-padded / unpadded variants (G27 ↔ G0027)
-        for variant in strongs_key_variants(strongs) {
+        for variant in strongs_key_variants(normalized.as_deref().unwrap_or(strongs)) {
             if let Some(entry) = map.get(&variant) {
                 return Some(entry);
             }
@@ -551,6 +555,30 @@ mod tests {
         assert_eq!(normalize_strongs("H0430G").as_deref(), Some("H0430"));
         assert_eq!(normalize_strongs("X12"), None);
         assert_eq!(normalize_strongs("H"), None);
+    }
+
+    #[test]
+    fn test_lexicon_lookup_normalizes_case_and_padding() {
+        let mut ext = ExtendedBible::new();
+        ext.hebrew_lexicon.insert(
+            "H0430".to_string(),
+            LexiconEntry {
+                strongs_number: "H0430".to_string(),
+                original_word: "אֱלֹהִים".to_string(),
+                transliteration: "elohim".to_string(),
+                morph: "H:N-M".to_string(),
+                gloss: "God".to_string(),
+                definition: "God, gods".to_string(),
+            },
+        );
+        for query in ["H0430", "H430", "h430", "430"] {
+            assert!(
+                ext.get_lexicon_entry(query).is_some(),
+                "lookup failed for {:?}",
+                query
+            );
+        }
+        assert!(ext.get_lexicon_entry("G430").is_none());
     }
 
     #[test]

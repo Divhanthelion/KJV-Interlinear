@@ -12,5 +12,4 @@ ACTION_PLAN.md
 !.env.example
 __pycache__/
 *.pyc
-target/
 dist/

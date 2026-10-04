@@ -55,8 +55,8 @@ fn fingerprint_data_dir(data_dir: &Path) -> Result<String, String> {
             continue;
         }
 
-        let meta = fs::metadata(&path)
-            .map_err(|e| format!("Failed to stat {}: {}", path.display(), e))?;
+        let meta =
+            fs::metadata(&path).map_err(|e| format!("Failed to stat {}: {}", path.display(), e))?;
         let len = meta.len();
         let mtime = meta
             .modified()
@@ -109,7 +109,10 @@ pub fn try_load_cached(data_dir: &Path) -> Option<ExtendedBible> {
             Some(bible)
         }
         Err(e) => {
-            eprintln!("Warning: corrupt original-language cache ({}), rebuilding", e);
+            eprintln!(
+                "Warning: corrupt original-language cache ({}), rebuilding",
+                e
+            );
             let _ = fs::remove_file(&cache_path);
             let _ = fs::remove_file(&meta_path);
             None
@@ -147,7 +150,8 @@ pub fn save_cache(data_dir: &Path, bible: &ExtendedBible) {
     }
 
     if let Ok(file) = File::create(&meta_path)
-        && let Err(e) = serde_json::to_writer_pretty(file, &meta) {
-            eprintln!("Warning: failed to write language cache meta: {}", e);
-        }
+        && let Err(e) = serde_json::to_writer_pretty(file, &meta)
+    {
+        eprintln!("Warning: failed to write language cache meta: {}", e);
+    }
 }

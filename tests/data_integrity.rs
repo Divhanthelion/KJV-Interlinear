@@ -34,7 +34,11 @@ fn kjv_refs() -> Vec<VerseRef> {
                 refs.push(VerseRef::new(&book.name, chapter.number, 0));
             }
             for verse in &chapter.verses {
-                refs.push(VerseRef::new(&book.name, chapter.number, verse.verse_number));
+                refs.push(VerseRef::new(
+                    &book.name,
+                    chapter.number,
+                    verse.verse_number,
+                ));
             }
         }
     }
@@ -51,7 +55,12 @@ fn verse_text(book: &str, chapter: u32, verse: u32) -> &'static str {
 fn original_words(book: &str, chapter: u32, verse: u32) -> Vec<&'static str> {
     extended()
         .get_interlinear(book, chapter, verse)
-        .map(|iv| iv.original_words.iter().map(|w| w.original_text.as_str()).collect())
+        .map(|iv| {
+            iv.original_words
+                .iter()
+                .map(|w| w.original_text.as_str())
+                .collect()
+        })
         .unwrap_or_default()
 }
 
@@ -59,7 +68,12 @@ fn original_words(book: &str, chapter: u32, verse: u32) -> Vec<&'static str> {
 fn glosses(book: &str, chapter: u32, verse: u32) -> Vec<&'static str> {
     extended()
         .get_interlinear(book, chapter, verse)
-        .map(|iv| iv.original_words.iter().map(|w| w.english_gloss.as_str()).collect())
+        .map(|iv| {
+            iv.original_words
+                .iter()
+                .map(|w| w.english_gloss.as_str())
+                .collect()
+        })
         .unwrap_or_default()
 }
 
@@ -82,17 +96,34 @@ fn kjv_has_canonical_books_chapters_and_verses() {
     };
     assert_eq!(count(Testament::Old), 23_145);
     assert_eq!(count(Testament::New), 7_957);
-    assert_eq!(b.books.iter().map(|bk| bk.chapters.len()).sum::<usize>(), 1_189);
+    assert_eq!(
+        b.books.iter().map(|bk| bk.chapters.len()).sum::<usize>(),
+        1_189
+    );
 
     for book in &b.books {
         for (i, chapter) in book.chapters.iter().enumerate() {
-            assert_eq!(chapter.number as usize, i + 1, "{} chapter order", book.name);
-            assert!(!chapter.verses.is_empty(), "{} {} is empty", book.name, chapter.number);
+            assert_eq!(
+                chapter.number as usize,
+                i + 1,
+                "{} chapter order",
+                book.name
+            );
+            assert!(
+                !chapter.verses.is_empty(),
+                "{} {} is empty",
+                book.name,
+                chapter.number
+            );
             for (j, verse) in chapter.verses.iter().enumerate() {
                 let at = format!("{} {}:{}", book.name, chapter.number, verse.verse_number);
                 assert_eq!(verse.verse_number as usize, j + 1, "{} numbering", at);
                 assert!(!verse.text.contains("  "), "double space in {}", at);
-                assert!(!verse.text.contains(['[', ']', '¶', '{', '}', '<', '>']), "markup in {}", at);
+                assert!(
+                    !verse.text.contains(['[', ']', '¶', '{', '}', '<', '>']),
+                    "markup in {}",
+                    at
+                );
             }
         }
     }
@@ -108,10 +139,23 @@ fn psalm_titles_are_superscriptions() {
         .count();
     assert_eq!(titled, 116);
     let psalms = bible().books.iter().find(|b| b.name == "Psalms").unwrap();
-    assert_eq!(psalms.chapters.iter().filter(|c| c.superscription.is_some()).count(), 116);
+    assert_eq!(
+        psalms
+            .chapters
+            .iter()
+            .filter(|c| c.superscription.is_some())
+            .count(),
+        116
+    );
 
     let ps51 = &psalms.chapters[50];
-    assert!(ps51.superscription.as_ref().unwrap().text.starts_with("To the chief Musician, A Psalm of David, when Nathan"));
+    assert!(
+        ps51.superscription
+            .as_ref()
+            .unwrap()
+            .text
+            .starts_with("To the chief Musician, A Psalm of David, when Nathan")
+    );
     assert!(ps51.verses[0].text.starts_with("Have mercy upon me, O God"));
     assert!(psalms.chapters[0].superscription.is_none());
 }
@@ -146,10 +190,15 @@ fn yhwh_is_rendered_lord_or_god() {
     .collect();
 
     let mut unexpected = Vec::new();
-    for book in bible().books.iter().filter(|b| b.testament == Testament::Old) {
+    for book in bible()
+        .books
+        .iter()
+        .filter(|b| b.testament == Testament::Old)
+    {
         for chapter in &book.chapters {
             for verse in chapter.superscription.iter().chain(&chapter.verses) {
-                let Some(iv) = extended().get_interlinear(&book.name, chapter.number, verse.verse_number)
+                let Some(iv) =
+                    extended().get_interlinear(&book.name, chapter.number, verse.verse_number)
                 else {
                     continue;
                 };
@@ -167,12 +216,19 @@ fn yhwh_is_rendered_lord_or_god() {
                 if yhwh > rendered
                     && !allowed.contains(&(book.name.as_str(), chapter.number, verse.verse_number))
                 {
-                    unexpected.push(format!("{} {}:{} {}", book.name, chapter.number, verse.verse_number, verse.text));
+                    unexpected.push(format!(
+                        "{} {}:{} {}",
+                        book.name, chapter.number, verse.verse_number, verse.text
+                    ));
                 }
             }
         }
     }
-    assert!(unexpected.is_empty(), "YHWH not rendered LORD/GOD:\n{}", unexpected.join("\n"));
+    assert!(
+        unexpected.is_empty(),
+        "YHWH not rendered LORD/GOD:\n{}",
+        unexpected.join("\n")
+    );
 }
 
 // ---------------------------------------------------------------- original languages
@@ -213,15 +269,40 @@ fn no_original_language_verse_is_orphaned() {
 #[test]
 fn words_are_complete_and_linked_to_the_lexicon() {
     let ext = extended();
-    for iv in ext.interlinear_ot.values().chain(ext.interlinear_nt.values()) {
+    for iv in ext
+        .interlinear_ot
+        .values()
+        .chain(ext.interlinear_nt.values())
+    {
         for (i, w) in iv.original_words.iter().enumerate() {
-            let at = format!("{} {}:{} word {}", iv.book, iv.chapter, iv.verse_number, i + 1);
+            let at = format!(
+                "{} {}:{} word {}",
+                iv.book,
+                iv.chapter,
+                iv.verse_number,
+                i + 1
+            );
             assert_eq!(w.position as usize, i + 1, "{} position", at);
             assert!(!w.original_text.trim().is_empty(), "{} has no text", at);
-            assert!(!w.original_text.contains(['/', '\\', '¶', '[', ']']), "{} markup: {}", at, w.original_text);
-            assert!(!w.transliteration.contains(['/', '\\']), "{} transliteration: {}", at, w.transliteration);
+            assert!(
+                !w.original_text.contains(['/', '\\', '¶', '[', ']']),
+                "{} markup: {}",
+                at,
+                w.original_text
+            );
+            assert!(
+                !w.transliteration.contains(['/', '\\']),
+                "{} transliteration: {}",
+                at,
+                w.transliteration
+            );
             if let Some(s) = &w.strongs_number {
-                assert!(ext.get_lexicon_entry(s).is_some(), "{} {} not in lexicon", at, s);
+                assert!(
+                    ext.get_lexicon_entry(s).is_some(),
+                    "{} {} not in lexicon",
+                    at,
+                    s
+                );
             }
         }
     }
@@ -232,7 +313,10 @@ fn hebrew_follows_the_text_the_kjv_translated() {
     let gen1 = extended().get_interlinear("Genesis", 1, 1).unwrap();
     assert_eq!(gen1.original_words.len(), 7);
     assert_eq!(gen1.original_words[0].transliteration, "bereShit");
-    assert_eq!(gen1.original_words[0].strongs_number.as_deref(), Some("H7225"));
+    assert_eq!(
+        gen1.original_words[0].strongs_number.as_deref(),
+        Some("H7225")
+    );
 
     // Psalm titles are verse 0; Hebrew 3:2 is English 3:1
     assert_eq!(glosses("Psalms", 3, 0).first(), Some(&"a psalm"));
@@ -240,7 +324,11 @@ fn hebrew_follows_the_text_the_kjv_translated() {
     // English Malachi 4 is Hebrew 3:19-24
     assert!(!original_words("Malachi", 4, 6).is_empty());
     // LXX-reconstructed "thirty" (type X) is not in the Hebrew the KJV followed
-    assert!(!glosses("First Samuel", 13, 1).iter().any(|g| g.contains("thirty")));
+    assert!(
+        !glosses("First Samuel", 13, 1)
+            .iter()
+            .any(|g| g.contains("thirty"))
+    );
 }
 
 #[test]
@@ -264,7 +352,13 @@ fn greek_follows_the_textus_receptus() {
         ("Acts", 28, 29),
         ("Romans", 16, 24),
     ] {
-        assert!(original_words(b, c, v).len() >= 5, "{} {}:{} missing TR text", b, c, v);
+        assert!(
+            original_words(b, c, v).len() >= 5,
+            "{} {}:{} missing TR text",
+            b,
+            c,
+            v
+        );
     }
     assert!(glosses("First John", 5, 7).contains(&"Father"));
     assert!(glosses("Matthew", 6, 13).contains(&"glory"));
@@ -288,7 +382,10 @@ fn greek_follows_the_textus_receptus() {
 #[test]
 fn strongs_search_accepts_unpadded_numbers() {
     let ext = extended();
-    let refs = ext.strongs_index.get_occurrences("H430").expect("H430 found");
+    let refs = ext
+        .strongs_index
+        .get_occurrences("H430")
+        .expect("H430 found");
     assert_eq!(refs[0], VerseRef::new("Genesis", 1, 1));
     let unique: HashSet<&VerseRef> = refs.iter().collect();
     assert_eq!(unique.len(), refs.len(), "each verse listed once");
@@ -319,7 +416,10 @@ fn red_letter_quotes_all_match_their_verses() {
                 .sum();
             // Allow for folded apostrophes/ligatures and trimmed punctuation
             if red + 3 < quote.trim().len() {
-                problems.push(format!("{} {}:{} only {} of {:?} is red", book, chapter, verse, red, quote));
+                problems.push(format!(
+                    "{} {}:{} only {} of {:?} is red",
+                    book, chapter, verse, red, quote
+                ));
             }
         }
     }

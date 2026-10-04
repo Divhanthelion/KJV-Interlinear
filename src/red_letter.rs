@@ -150,30 +150,32 @@ fn find_folded(haystack: &str, needle: &str) -> Option<(usize, usize)> {
     let needle_folded = fold_string(needle);
 
     if !needle_folded.is_empty()
-        && let Some(byte_pos) = hay_folded.find(&needle_folded) {
-            let char_pos = hay_folded[..byte_pos].chars().count();
-            let needle_chars = needle_folded.chars().count();
-            let start = hay_map[char_pos].0;
-            let end = hay_map[char_pos + needle_chars - 1].1;
-            return Some((start, end));
-        }
+        && let Some(byte_pos) = hay_folded.find(&needle_folded)
+    {
+        let char_pos = hay_folded[..byte_pos].chars().count();
+        let needle_chars = needle_folded.chars().count();
+        let start = hay_map[char_pos].0;
+        let end = hay_map[char_pos + needle_chars - 1].1;
+        return Some((start, end));
+    }
 
     // Trailing punctuation drift (e.g. "cumi." vs "cumi;")
-    let trimmed = needle.trim_end_matches(|c: char| {
-        matches!(c, '.' | ';' | ',' | ':' | '!' | '?' | '"' | '\'')
-    });
-    if trimmed.len() < needle.len() && !trimmed.is_empty()
-        && let Some(r) = find_folded(haystack, trimmed) {
-            return Some(r);
-        }
+    let trimmed = needle.trim_end_matches(['.', ';', ',', ':', '!', '?', '"', '\'']);
+    if trimmed.len() < needle.len()
+        && !trimmed.is_empty()
+        && let Some(r) = find_folded(haystack, trimmed)
+    {
+        return Some(r);
+    }
 
     // Hyphen optional: "Bar-jona" vs "Barjona"
     if needle.contains('-') {
         let dehyphen: String = needle.chars().filter(|&c| c != '-').collect();
         if dehyphen != needle
-            && let Some(r) = find_folded(haystack, &dehyphen) {
-                return Some(r);
-            }
+            && let Some(r) = find_folded(haystack, &dehyphen)
+        {
+            return Some(r);
+        }
     }
 
     // Truncated quotes in source JSON: shorten from the end by words until it matches
@@ -218,10 +220,7 @@ fn find_folded(haystack: &str, needle: &str) -> Option<(usize, usize)> {
 ///
 /// If the quote substring is not found in the verse text, returns a single
 /// non-red segment (never paint the whole verse as a fallback).
-pub fn red_letter_segments<'a>(
-    verse_text: &'a str,
-    spec: &RedLetterSpec,
-) -> Vec<(&'a str, bool)> {
+pub fn red_letter_segments<'a>(verse_text: &'a str, spec: &RedLetterSpec) -> Vec<(&'a str, bool)> {
     match spec {
         RedLetterSpec::Full => vec![(verse_text, true)],
         RedLetterSpec::Quote(quote) => {
@@ -335,7 +334,8 @@ mod tests {
     #[test]
     fn segments_ae_ligature() {
         let text = "And Jesus answering said unto them, Render to Cæsar the things that are Cæsar\u{2019}s, and to God the things that are God\u{2019}s. And they marvelled at him.";
-        let quote = "Render to Caesar the things that are Caesar's, and to God the things that are God's.";
+        let quote =
+            "Render to Caesar the things that are Caesar's, and to God the things that are God's.";
         let segs = red_letter_segments(text, &RedLetterSpec::Quote(quote.to_string()));
         assert_eq!(segs.len(), 3);
         assert!(segs[1].1);

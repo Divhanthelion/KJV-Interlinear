@@ -44,15 +44,17 @@ fn read_testament_books(
 
         // Skip .DS_Store files and Zone.Identifier files (Windows metadata)
         if let Some(file_name) = file_path.file_name().and_then(|n| n.to_str())
-            && (file_name == ".DS_Store" || file_name.contains("Zone.Identifier")) {
-                continue;
-            }
+            && (file_name == ".DS_Store" || file_name.contains("Zone.Identifier"))
+        {
+            continue;
+        }
 
         if file_path.is_file()
-            && let Some(book_name) = file_path.file_stem().and_then(|s| s.to_str()) {
-                let book = parse_book_file(&file_path, book_name.to_string(), testament.clone())?;
-                bible.books.push(book);
-            }
+            && let Some(book_name) = file_path.file_stem().and_then(|s| s.to_str())
+        {
+            let book = parse_book_file(&file_path, book_name.to_string(), testament.clone())?;
+            bible.books.push(book);
+        }
     }
 
     Ok(())

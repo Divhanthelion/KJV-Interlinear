@@ -176,19 +176,20 @@ impl Settings {
     /// Load settings from disk, or return defaults if not found
     pub fn load() -> Self {
         if let Some(path) = Self::settings_path()
-            && let Ok(contents) = fs::read_to_string(&path) {
-                // Editors such as Notepad may add a UTF-8 BOM, which serde_json rejects
-                match serde_json::from_str(contents.trim_start_matches('\u{FEFF}')) {
-                    Ok(settings) => return settings,
-                    Err(e) => {
-                        eprintln!(
-                            "Warning: corrupt settings.json ({}), backing up and resetting",
-                            e
-                        );
-                        let _ = fs::rename(&path, path.with_extension("json.bak"));
-                    }
+            && let Ok(contents) = fs::read_to_string(&path)
+        {
+            // Editors such as Notepad may add a UTF-8 BOM, which serde_json rejects
+            match serde_json::from_str(contents.trim_start_matches('\u{FEFF}')) {
+                Ok(settings) => return settings,
+                Err(e) => {
+                    eprintln!(
+                        "Warning: corrupt settings.json ({}), backing up and resetting",
+                        e
+                    );
+                    let _ = fs::rename(&path, path.with_extension("json.bak"));
                 }
             }
+        }
         Self::default()
     }
 
@@ -317,10 +318,9 @@ impl SettingsStore {
     }
 
     pub fn save_if_dirty(&mut self) {
-        if self.dirty
-            && self.settings.save().is_ok() {
-                self.dirty = false;
-            }
+        if self.dirty && self.settings.save().is_ok() {
+            self.dirty = false;
+        }
     }
 
     pub fn force_save(&mut self) {
