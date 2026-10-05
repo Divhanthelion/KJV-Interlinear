@@ -1,8 +1,18 @@
-# KJV text fingerprint, checked by crates/core/tests/text_fidelity.rs.
-# Any change to any character of old_testament/ or new_testament/ fails the tests
-# until this file is rewritten (KJV_UPDATE_LOCK=1) and the change reviewed.
+# KJV text and data fingerprint, checked by crates/core/tests/text_fidelity.rs.
+# Any change to any character of old_testament/, new_testament/, or the data/ files
+# fails the tests until this file is rewritten (KJV_UPDATE_LOCK=1) and the change reviewed.
 
 all	31102 verses	116 titles	4112680 chars	fc21bf1144562061b3a9cb8ee69dc121c68cc6570b0cfcdbd0a9cb93bfb76acb
+
+file	data/words_of_jesus.json	30d69ce5942efa6e07bad04b5180f1bc188f021567d38b0fb58622ea27db27f9
+file	data/TAHOT_Gen-Deu.txt	e9b8546ee48fe0bfc57c3b70f5f40e98d96580e803526d19026224e31753368b
+file	data/TAHOT_Jos-Est.txt	195fee1dc3653bab33701f170734eb894ed647c10cd08cc61749375fe8b73775
+file	data/TAHOT_Job-Sng.txt	84e118a97e5725e3847cdfdd593873513021c790c63cc91a0d41fca2b5db2ed5
+file	data/TAHOT_Isa-Mal.txt	f3ded203d2a74d6368932c97ae550d1d0754b271af491dc0dedf36fe3ba0bcc5
+file	data/TAGNT_Mat-Jhn.txt	ab8eaaeb68e17a1dcfa34e1e9350358f22f03bc2a97244d848750ad81044bc8e
+file	data/TAGNT_Act-Rev.txt	524e32375361e6d3fa2f7ef00b87605fdc4317a762f395651a05fdc31ad031b7
+file	data/TBESH.txt	bdfdd17c1377aa5400618930fd0ea6f9a6f8d77ffdbbcd575b35d2d81c89401f
+file	data/TBESG.txt	312f723d7b8ef263bbdfb0451c9b8057125804dfff390b6f8544cff2a84b57f4
 
 char	U+0020	space	759458
 char	U+0021	!	313

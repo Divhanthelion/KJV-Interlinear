@@ -12,7 +12,7 @@ A King James Bible with the Hebrew and Greek behind every verse, for Windows, ma
 - **Hebrew & Greek interlinear**: every verse and Psalm title, word by word, with transliteration, Strong's number, grammar, and gloss
 - **Four views**: KJV, Parallel (KJV beside the original), Interlinear, and Original only
 - **Strong's & lexicon**: tap any word for its Hebrew (TBESH) or Greek (TBESG) dictionary entry and every verse that uses it
-- **Red letter**: the words of Christ, taken span-for-span from the 1769 edition's own markup
+- **Red letter**: the words of Christ, taken span-for-span from the eBible.org edition's own markup
 - **Search**: live search across all books, one book, or one testament, with matches highlighted; `Caesar's` finds `Cæsar’s`
 - **Study assistant (optional)**: ask about a verse, a chapter, chosen books, or the whole Bible with the text attached (and, if you like, every verse's Hebrew or Greek words with Strong's numbers). Use your own AI: a server on your network (vLLM, Ollama, LM Studio, llama.cpp) or your API key for Anthropic, OpenAI, Gemini, DeepSeek, OpenRouter, or Groq. It shows whether the passage fits the model's context window, streams the model's reasoning apart from the answer, links every reference it cites, and keeps keys in the system keychain. Conversations are saved on the device to reopen and continue later, with starred favourites and a history you can clear. Long answers never pull the page out from under you: it follows new text only while you're at the bottom
 - **Bookmarks & history**, **light and dark themes**, adjustable text size and font
@@ -59,14 +59,14 @@ To work on the interface in a browser with the real data:
 cargo run --release -p kjv-devserver   # then open http://localhost:1420
 ```
 
-Release builds for every platform (Windows, macOS universal, Linux, Android, iOS) run in GitHub Actions when a `v*` tag is pushed; see [docs/RELEASING.md](docs/RELEASING.md).
+Release builds for Windows, macOS universal, Linux, and Android (plus an iOS compile check; signed iOS builds need an Apple account) run in GitHub Actions when a `v*` tag is pushed; see [docs/RELEASING.md](docs/RELEASING.md).
 
 ## Text accuracy
 
 Every character of the KJV is checked automatically, on every change and weekly in CI:
 
-- **Against the source.** All 31,102 verses and 116 Psalm titles are compared character for character with the eBible.org 1769 text they came from. Any difference is reported by verse and character position.
-- **Against a reviewed fingerprint.** [`kjv-text.lock`](crates/core/tests/kjv-text.lock) records a SHA-256 for every chapter and the count of each of the text's 65 distinct characters. Changing a single comma fails the tests until the change is reviewed and the lock rewritten.
+- **Against the source.** All 31,102 verses are compared character for character with the eBible.org 1769 text they came from (Psalm titles joined to verse 1, as the source stores them; the title/verse boundary is checked against the source's own \d markers). Any difference is reported by verse and character position.
+- **Against a reviewed fingerprint.** [`kjv-text.lock`](crates/core/tests/kjv-text.lock) records the text's SHA-256, a hash for every chapter, and the count of each of the text's 65 distinct characters. Changing a single comma fails the tests until the change is reviewed and the lock rewritten.
 - **Typography.** Spacing, punctuation, capitals, apostrophes, hyphens, and parentheses are checked in every verse.
 - **Through the app.** Every verse is checked in the embedded data, the reader, search results, and copied text.
 - **On screen.** The UI test turns every page of all 1,189 chapters in a real browser and compares what is drawn, after CSS, with the text files. It also checks every Hebrew and Greek word card.

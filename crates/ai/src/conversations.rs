@@ -65,7 +65,7 @@ impl Conversations {
     fn file(&self, id: &str) -> Result<PathBuf, String> {
         let ok = !id.is_empty()
             && id.len() <= 64
-            && id != "index"
+            && !reserved(id)
             && id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_');
         if !ok {
             return Err(format!("not a conversation id: {:?}", id));
@@ -87,8 +87,9 @@ impl Conversations {
         for entry in entries.flatten() {
             let path = entry.path();
             if path.extension().is_some_and(|e| e == "json")
-                && path.file_name().is_some_and(|n| n != INDEX)
-                && let Some(conversation) = fs::read_to_string(&path).ok().and_then(|t| serde_json::from_str::<Value>(&t).ok())
+                && path.file_name().and_then(|n| n.to_str()).is_some_and(|n| !n.eq_ignore_ascii_case(INDEX))
+                && let Some(conversation) =
+                    fs::read_to_string(&path).ok().and_then(|t| serde_json::from_str::<Value>(&t).ok())
             {
                 list.push(summary(&conversation));
             }
@@ -100,6 +101,15 @@ impl Conversations {
         let text = serde_json::to_string(&sorted(list)).map_err(|e| e.to_string())?;
         write_atomic(&self.dir.join(INDEX), &text)
     }
+}
+
+/// Names that can't be conversations, in any letter case (Windows and macOS folders
+/// don't tell `Index.json` from `index.json`): the index, and the device names Windows
+/// won't make files of (`con`, `nul`, `com1`, …).
+fn reserved(id: &str) -> bool {
+    let id = id.to_ascii_lowercase();
+    let numbered = |prefix: &str| id.len() == 4 && id.starts_with(prefix) && id.as_bytes()[3].is_ascii_digit();
+    matches!(id.as_str(), "index" | "con" | "prn" | "aux" | "nul") || numbered("com") || numbered("lpt")
 }
 
 /// What the list shows for a conversation.
@@ -186,10 +196,28 @@ mod tests {
     #[test]
     fn ids_cannot_reach_outside_the_folder() {
         let (s, _dir) = store();
-        for bad in ["../x", "a/b", "a\\b", "", "index", "index.json", &"x".repeat(65)] {
+        for bad in [
+            "../x",
+            "a/b",
+            "a\\b",
+            "",
+            "index",
+            "INDEX",
+            "Index",
+            "index.json",
+            "con",
+            "NUL",
+            "Com1",
+            "lpt9",
+            &"x".repeat(65),
+        ] {
             assert!(s.save(&json!({"id": bad})).is_err(), "{:?}", bad);
             assert!(s.load(bad).is_err());
             assert!(s.delete(bad).is_err());
+        }
+        // Names that merely start like reserved ones are fine
+        for good in ["indexes", "console", "com10", "c1"] {
+            assert!(s.file(good).is_ok(), "{:?}", good);
         }
     }
 }

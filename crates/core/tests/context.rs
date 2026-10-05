@@ -9,8 +9,7 @@ use kjv_core::context::{self, ContextOptions, Scope};
 fn data() -> &'static DataBundle {
     static DATA: OnceLock<DataBundle> = OnceLock::new();
     DATA.get_or_init(|| {
-        DataBundle::from_sources(Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/../..")))
-            .expect("bundle builds")
+        DataBundle::from_sources(Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/../.."))).expect("bundle builds")
     })
 }
 
@@ -58,11 +57,26 @@ fn verse_ranges_are_inclusive_in_either_order() {
     assert_eq!(a.text, b.text);
 }
 
+/// The label names the verses actually attached, not the range asked for.
+#[test]
+fn range_labels_name_the_verses_attached() {
+    let label = |book: &str, chapter: u32, from: u32, to: u32| {
+        let c = context::build(data(), &Scope::Verses { book: book.into(), chapter, from, to }, &plain()).unwrap();
+        (c.label, c.verses)
+    };
+    assert_eq!(label("John", 3, 30, 99), ("John 3:30–36".to_string(), 7));
+    assert_eq!(label("John", 3, 36, 99), ("John 3:36".to_string(), 1));
+    assert_eq!(label("Psalms", 51, 0, 3), ("Psalm 51:1–3 (with title)".to_string(), 4));
+    assert_eq!(label("Psalms", 51, 0, 1), ("Psalm 51:1 (with title)".to_string(), 2));
+    assert_eq!(label("Psalms", 51, 0, 0), ("Psalm 51 (title)".to_string(), 1));
+    // Psalm 1 has no title: a range from 0 starts at verse 1
+    assert_eq!(label("Psalms", 1, 0, 2), ("Psalm 1:1–2".to_string(), 2));
+}
+
 #[test]
 fn books_follow_canonical_order_and_get_a_range_label() {
-    let law = Scope::Books {
-        books: ["Deuteronomy", "Genesis", "Numbers", "Leviticus", "Exodus"].map(String::from).to_vec(),
-    };
+    let law =
+        Scope::Books { books: ["Deuteronomy", "Genesis", "Numbers", "Leviticus", "Exodus"].map(String::from).to_vec() };
     let c = context::build(data(), &law, &plain()).unwrap();
     assert_eq!(c.label, "Genesis–Deuteronomy");
     let headings: Vec<&str> = c.text.lines().filter(|l| l.starts_with("# ")).collect();
@@ -81,13 +95,7 @@ fn books_follow_canonical_order_and_get_a_range_label() {
 #[test]
 fn whole_bible_has_every_verse_and_psalm_title() {
     let c = context::build(data(), &Scope::Bible, &plain()).unwrap();
-    let titles = data()
-        .bible
-        .books
-        .iter()
-        .flat_map(|b| &b.chapters)
-        .filter(|ch| ch.superscription.is_some())
-        .count();
+    let titles = data().bible.books.iter().flat_map(|b| &b.chapters).filter(|ch| ch.superscription.is_some()).count();
     assert_eq!(c.verses, 31102 + titles);
     assert_eq!(c.text.lines().filter(|l| l.starts_with("# ")).count(), 66);
     assert_eq!(c.text.lines().filter(|l| l.starts_with("## ")).count(), 1189);
@@ -105,6 +113,12 @@ fn original_words_follow_each_verse() {
 
     let c = context::build(data(), &verse("John", 1, 1), &options).unwrap();
     assert!(c.text.lines().nth(3).unwrap().starts_with("   Greek: "));
+
+    for (book, chapter, v) in [("Daniel", 2, 5), ("Jeremiah", 10, 11)] {
+        let c = context::build(data(), &verse(book, chapter, v), &options).unwrap();
+        let line = c.text.lines().nth(3).unwrap();
+        assert!(line.starts_with("   Aramaic: "), "{} {}:{}: {}", book, chapter, v, line);
+    }
 }
 
 #[test]

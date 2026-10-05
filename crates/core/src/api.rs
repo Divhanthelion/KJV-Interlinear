@@ -4,7 +4,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::bundle::DataBundle;
-use crate::models::{LexiconEntry, OriginalLanguage, Testament, Verse, normalize_strongs};
+use crate::models::{LexiconEntry, OriginalLanguage, Testament, Verse, normalize_dstrong, normalize_strongs};
 use crate::text::{Segment, find_folded_ranges, format_gloss, segments};
 
 /// Display name and abbreviation for each book, keyed by the name used in the data.
@@ -79,26 +79,16 @@ const BOOK_LABELS: [(&str, &str, &str); 66] = [
 
 /// "First Samuel" -> "1 Samuel"
 pub fn display_name(book: &str) -> &str {
-    BOOK_LABELS
-        .iter()
-        .find(|(name, _, _)| *name == book)
-        .map_or(book, |(_, display, _)| display)
+    BOOK_LABELS.iter().find(|(name, _, _)| *name == book).map_or(book, |(_, display, _)| display)
 }
 
 fn abbreviation(book: &str) -> &str {
-    BOOK_LABELS
-        .iter()
-        .find(|(name, _, _)| *name == book)
-        .map_or(book, |(_, _, abbr)| abbr)
+    BOOK_LABELS.iter().find(|(name, _, _)| *name == book).map_or(book, |(_, _, abbr)| abbr)
 }
 
 /// "Genesis 1", "Psalm 23" (a single psalm is "Psalm")
 pub fn chapter_heading(book: &str, chapter: u32) -> String {
-    if book == "Psalms" {
-        format!("Psalm {}", chapter)
-    } else {
-        format!("{} {}", display_name(book), chapter)
-    }
+    if book == "Psalms" { format!("Psalm {}", chapter) } else { format!("{} {}", display_name(book), chapter) }
 }
 
 /// "John 3:16", "Psalm 51 (title)" for verse 0
@@ -118,11 +108,7 @@ pub fn strongs_display(key: &str) -> String {
     match chars.next() {
         Some(letter @ ('H' | 'G')) => {
             let digits: String = chars.skip_while(|c| *c == '0').collect();
-            if digits.is_empty() {
-                format!("{}0", letter)
-            } else {
-                format!("{}{}", letter, digits)
-            }
+            if digits.is_empty() { format!("{}0", letter) } else { format!("{}{}", letter, digits) }
         }
         _ => key.to_string(),
     }
@@ -188,6 +174,9 @@ pub struct WordView {
     pub strongs: Option<String>,
     /// "H0430" for lookups
     pub key: Option<String>,
+    /// `key` with STEP's sense letter when it has one ("G2424I" = Joshua, not Jesus):
+    /// the `strongs` and `lexicon` commands show that sense's entry for it
+    pub dkey: Option<String>,
     pub morph: Option<String>,
 }
 
@@ -225,17 +214,9 @@ pub struct ChapterView {
     pub next: Option<ChapterRef>,
 }
 
-pub fn chapter(
-    data: &DataBundle,
-    book: &str,
-    chapter: u32,
-    options: &ChapterOptions,
-) -> Result<ChapterView, String> {
+pub fn chapter(data: &DataBundle, book: &str, chapter: u32, options: &ChapterOptions) -> Result<ChapterView, String> {
     let books = &data.bible.books;
-    let book_index = books
-        .iter()
-        .position(|b| b.name == book)
-        .ok_or_else(|| format!("no book named {:?}", book))?;
+    let book_index = books.iter().position(|b| b.name == book).ok_or_else(|| format!("no book named {:?}", book))?;
     let b = &books[book_index];
     let ch = b
         .chapters
@@ -257,9 +238,7 @@ pub fn chapter(
     let next = if (chapter as usize) < b.chapters.len() {
         Some(ChapterRef { book: b.name.clone(), chapter: chapter + 1 })
     } else {
-        books
-            .get(book_index + 1)
-            .map(|nb| ChapterRef { book: nb.name.clone(), chapter: 1 })
+        books.get(book_index + 1).map(|nb| ChapterRef { book: nb.name.clone(), chapter: 1 })
     };
 
     Ok(ChapterView {
@@ -274,50 +253,39 @@ pub fn chapter(
     })
 }
 
-fn verse_view(
-    data: &DataBundle,
-    verse: &Verse,
-    query: Option<&str>,
-    options: &ChapterOptions,
-) -> VerseView {
+fn verse_view(data: &DataBundle, verse: &Verse, query: Option<&str>, options: &ChapterOptions) -> VerseView {
     let red = if options.red_letter { red_ranges(data, verse) } else { Vec::new() };
     let hits = query.map(|q| find_folded_ranges(&verse.text, q)).unwrap_or_default();
     let original = if options.original {
-        data.extended
-            .get_interlinear(&verse.book, verse.chapter, verse.verse_number)
-            .map(|iv| OriginalView {
-                lang: match iv.language {
-                    OriginalLanguage::Hebrew => "he",
-                    OriginalLanguage::Aramaic => "arc",
-                    OriginalLanguage::Greek => "grc",
-                },
-                words: iv
-                    .original_words
-                    .iter()
-                    .map(|w| WordView {
-                        text: w.original_text.trim().to_string(),
-                        translit: w.transliteration.clone(),
-                        gloss: format_gloss(&w.english_gloss),
-                        strongs: w.strongs_number.as_deref().map(strongs_display),
-                        key: w.strongs_number.clone(),
-                        morph: w.morphology.clone(),
-                    })
-                    .collect(),
-            })
+        data.extended.get_interlinear(&verse.book, verse.chapter, verse.verse_number).map(|iv| OriginalView {
+            lang: match iv.language {
+                OriginalLanguage::Hebrew => "he",
+                OriginalLanguage::Aramaic => "arc",
+                OriginalLanguage::Greek => "grc",
+            },
+            words: iv
+                .original_words
+                .iter()
+                .map(|w| WordView {
+                    text: w.original_text.trim().to_string(),
+                    translit: w.transliteration.clone(),
+                    gloss: format_gloss(&w.english_gloss),
+                    strongs: w.strongs_number.as_deref().map(strongs_display),
+                    key: w.strongs_number.clone(),
+                    dkey: w.dstrong.clone().or_else(|| w.strongs_number.clone()),
+                    morph: w.morphology.clone(),
+                })
+                .collect(),
+        })
     } else {
         None
     };
-    VerseView {
-        number: verse.verse_number,
-        segments: segments(&verse.text, &red, &hits),
-        original,
-    }
+    VerseView { number: verse.verse_number, segments: segments(&verse.text, &red, &hits), original }
 }
 
 /// Byte ranges spoken by Christ.
 fn red_ranges(data: &DataBundle, verse: &Verse) -> Vec<(usize, usize)> {
-    data.red_letter
-        .ranges(&verse.book, verse.chapter, verse.verse_number, &verse.text)
+    data.red_letter.ranges(&verse.book, verse.chapter, verse.verse_number, &verse.text)
 }
 
 // ---------------------------------------------------------------- search
@@ -350,13 +318,7 @@ pub struct SearchResults {
     pub hits: Vec<Hit>,
 }
 
-pub fn search(
-    data: &DataBundle,
-    query: &str,
-    scope: Scope,
-    book: Option<&str>,
-    limit: usize,
-) -> SearchResults {
+pub fn search(data: &DataBundle, query: &str, scope: Scope, book: Option<&str>, limit: usize) -> SearchResults {
     let query = query.trim();
     let matches = match scope {
         Scope::All => data.bible.search(query),
@@ -398,9 +360,11 @@ pub struct LexiconView {
     pub definition: String,
 }
 
+/// Lexicon entry for "H430", "h0430", or a sense code like "G2424I" (Joshua); a
+/// sense the lexicon lacks falls back to the number's first entry.
 pub fn lexicon(data: &DataBundle, strongs: &str) -> Option<LexiconView> {
     let key = normalize_strongs(strongs)?;
-    let entry: &LexiconEntry = data.extended.get_lexicon_entry(&key)?;
+    let entry: &LexiconEntry = data.extended.get_lexicon_entry(&normalize_dstrong(strongs)?)?;
     Some(LexiconView {
         strongs: strongs_display(&key),
         lang: if key.starts_with('H') { "he" } else { "grc" },
@@ -424,7 +388,8 @@ pub struct StrongsResults {
     pub hits: Vec<Hit>,
 }
 
-/// Verses containing a Strong's number ("H430", "h0430", "430" = Hebrew).
+/// Verses containing a Strong's number ("H430", "h0430", "430" = Hebrew). A sense
+/// code ("G2424I") picks that sense's lexicon entry; the verses are all the number's.
 pub fn strongs_search(data: &DataBundle, query: &str, limit: usize) -> StrongsResults {
     let Some(key) = normalize_strongs(query) else {
         return StrongsResults { key: None, strongs: None, lexicon: None, total: 0, hits: Vec::new() };
@@ -433,7 +398,6 @@ pub fn strongs_search(data: &DataBundle, query: &str, limit: usize) -> StrongsRe
     let hits = refs
         .into_iter()
         .flatten()
-        .take(limit)
         .filter_map(|r| {
             let text = verse_text(data, &r.book, r.chapter, r.verse)?;
             Some(Hit {
@@ -444,10 +408,11 @@ pub fn strongs_search(data: &DataBundle, query: &str, limit: usize) -> StrongsRe
                 segments: segments(text, &[], &[]),
             })
         })
+        .take(limit)
         .collect();
     StrongsResults {
         strongs: Some(strongs_display(&key)),
-        lexicon: lexicon(data, &key),
+        lexicon: lexicon(data, query),
         total: refs.map_or(0, Vec::len),
         key: Some(key),
         hits,

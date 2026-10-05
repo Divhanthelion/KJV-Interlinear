@@ -2,7 +2,7 @@
 
 use serde_json::{Value, json};
 
-use crate::{ChatRequest, Endpoint, Event, ModelInfo, Role, Usage, url};
+use crate::{ChatRequest, Endpoint, Event, ModelInfo, Role, Usage, secret_header, url};
 
 const VERSION: &str = "2023-06-01";
 /// Models that take `fallbacks: "default"`: if a safety classifier declines a
@@ -54,7 +54,7 @@ pub fn models_request(client: &reqwest::Client, endpoint: &Endpoint) -> reqwest:
 
 fn headers(request: reqwest::RequestBuilder, endpoint: &Endpoint) -> reqwest::RequestBuilder {
     request
-        .header("x-api-key", endpoint.api_key.as_deref().unwrap_or("").trim())
+        .header("x-api-key", secret_header(endpoint.api_key.as_deref().unwrap_or("").trim()))
         .header("anthropic-version", VERSION)
 }
 
@@ -195,6 +195,9 @@ mod tests {
                              "effort": {"supported": true}}
         }]}));
         let m = &list[0];
-        assert_eq!((m.context_window, m.max_output, m.adaptive_thinking, m.effort), (Some(1000000), Some(128000), true, true));
+        assert_eq!(
+            (m.context_window, m.max_output, m.adaptive_thinking, m.effort),
+            (Some(1000000), Some(128000), true, true)
+        );
     }
 }

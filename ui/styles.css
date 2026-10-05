@@ -29,6 +29,7 @@
   --red-letter: #b0261d;
   --hit: #ffe486;
   --hit-text: #1e1c19;
+  --hit-red: #b0261d; /* red letter on --hit: 5.3:1 */
   --hebrew: #5d3b91;
   --greek: #22704e;
   --selected: rgb(47 93 168 / 0.08);
@@ -68,6 +69,7 @@
   --red-letter: #ff8f84;
   --hit: #6e5c13;
   --hit-text: #fff6d6;
+  --hit-red: #ffcbc4; /* --red-letter is only 3:1 on --hit; this is 4.6:1 */
   --hebrew: #c9adf2;
   --greek: #8fd6b3;
   --selected: rgb(140 180 255 / 0.10);
@@ -90,6 +92,7 @@
     --red-letter: #ff8f84;
     --hit: #6e5c13;
     --hit-text: #fff6d6;
+    --hit-red: #ffcbc4;
     --hebrew: #c9adf2;
     --greek: #8fd6b3;
     --selected: rgb(140 180 255 / 0.10);
@@ -333,6 +336,9 @@ mark.hit {
   border-radius: 3px;
   padding: 0 1px;
 }
+/* Words of Christ stay red inside a search match (a lighter red on the dark highlight) */
+mark.hit.red { color: var(--hit-red); }
+.app[data-red-letter="false"] mark.hit.red { color: var(--hit-text); }
 
 .verse.is-title .verse-text {
   font-style: italic;
@@ -589,6 +595,7 @@ input[type="number"]:focus, select:focus, .chat-input:focus {
   text-align: start;
 }
 .row-button:hover { background: var(--surface-2); }
+.row-button:disabled { opacity: 0.5; cursor: default; background: none; }
 .row-button .grow { flex: 1; min-width: 0; }
 .row-sub { display: block; font-size: 0.8125rem; color: var(--muted); }
 .row-main { display: block; font-weight: 600; }

@@ -2,7 +2,7 @@
 
 use serde_json::{Value, json};
 
-use crate::{ChatRequest, Endpoint, Event, ModelInfo, Role, Usage, url};
+use crate::{ChatRequest, Endpoint, Event, ModelInfo, Role, Usage, secret_header, url};
 
 pub fn request(client: &reqwest::Client, req: &ChatRequest) -> reqwest::RequestBuilder {
     let mut system = req.instructions.clone();
@@ -33,8 +33,11 @@ pub fn request(client: &reqwest::Client, req: &ChatRequest) -> reqwest::RequestB
         "generationConfig": config,
     });
     let model = req.model.trim_start_matches("models/");
-    key(client.post(url(&req.endpoint.base_url, &format!("models/{}:streamGenerateContent?alt=sse", model))), &req.endpoint)
-        .json(&body)
+    key(
+        client.post(url(&req.endpoint.base_url, &format!("models/{}:streamGenerateContent?alt=sse", model))),
+        &req.endpoint,
+    )
+    .json(&body)
 }
 
 pub fn models_request(client: &reqwest::Client, endpoint: &Endpoint) -> reqwest::RequestBuilder {
@@ -42,7 +45,7 @@ pub fn models_request(client: &reqwest::Client, endpoint: &Endpoint) -> reqwest:
 }
 
 fn key(request: reqwest::RequestBuilder, endpoint: &Endpoint) -> reqwest::RequestBuilder {
-    request.header("x-goog-api-key", endpoint.api_key.as_deref().unwrap_or("").trim())
+    request.header("x-goog-api-key", secret_header(endpoint.api_key.as_deref().unwrap_or("").trim()))
 }
 
 /// Chat models only (the list also has embedding and image models).
@@ -70,6 +73,8 @@ pub fn parse_models(json: &Value) -> Vec<ModelInfo> {
         .collect()
 }
 
+/// Gemini says why it stopped (`finishReason`) in the last chunk, often alongside the
+/// final usage, so `Done` waits for the end of the stream.
 #[derive(Default)]
 pub struct Decoder {
     reason: Option<String>,
@@ -123,9 +128,15 @@ impl crate::Decoder for Decoder {
         Ok(false)
     }
 
-    fn flush(&mut self, emit: &mut dyn FnMut(Event)) {
-        if let Some(reason) = self.reason.take() {
-            emit(Event::Done { reason: Some(reason) });
+    /// `Done` with the finish reason; true when there was one, so the caller doesn't add
+    /// a second `Done`. No reason at all means the stream was cut short.
+    fn flush(&mut self, emit: &mut dyn FnMut(Event)) -> bool {
+        match self.reason.take() {
+            Some(reason) => {
+                emit(Event::Done { reason: Some(reason) });
+                true
+            }
+            None => false,
         }
     }
 }
@@ -143,9 +154,9 @@ mod tests {
             r#"{"candidates":[{"content":{"parts":[{"text":"Weighing it.","thought":true}],"role":"model"}}]}"#,
             r#"{"candidates":[{"content":{"parts":[{"text":"Selah."}],"role":"model"},"finishReason":"STOP"}],"usageMetadata":{"promptTokenCount":50,"candidatesTokenCount":3,"thoughtsTokenCount":10}}"#,
         ] {
-            d.decode(line, &mut |e| events.push(e)).unwrap();
+            assert!(!d.decode(line, &mut |e| events.push(e)).unwrap());
         }
-        d.flush(&mut |e| events.push(e));
+        assert!(d.flush(&mut |e| events.push(e)), "a finish reason ends the reply");
         assert_eq!(
             events,
             vec![
@@ -155,6 +166,15 @@ mod tests {
                 Event::Done { reason: Some("stop".into()) },
             ]
         );
+    }
+
+    #[test]
+    fn no_finish_reason_leaves_the_ending_to_the_caller() {
+        let mut d = Decoder::default();
+        let mut events = Vec::new();
+        d.decode(r#"{"candidates":[{"content":{"parts":[{"text":"In the"}]}}]}"#, &mut |e| events.push(e)).unwrap();
+        assert!(!d.flush(&mut |e| events.push(e)));
+        assert_eq!(events, vec![Event::Text { text: "In the".into() }]);
     }
 
     #[test]

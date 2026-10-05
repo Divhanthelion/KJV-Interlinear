@@ -81,8 +81,10 @@ pub fn dispatch(data: &DataBundle, name: &str, args: Value) -> Result<Value, Str
                 Some(v) => api::copy_verse(data, &a.book, a.chapter, v),
                 None => api::copy_chapter(data, &a.book, a.chapter),
             };
-            text.map(|t| json!(t))
-                .ok_or_else(|| format!("no text for {} {}", a.book, a.chapter))
+            text.map(|t| json!(t)).ok_or_else(|| match a.verse {
+                Some(v) => format!("no text for {} {}:{}", a.book, a.chapter, v),
+                None => format!("no text for {} {}", a.book, a.chapter),
+            })
         }
         "context_size" => {
             let a: ContextArgs = parse(name, args)?;

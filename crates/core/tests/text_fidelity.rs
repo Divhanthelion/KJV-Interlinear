@@ -4,8 +4,9 @@
 //!    (`KJV_SOURCE=path/to/eng-kjv_vpl.txt`; CI downloads it, see ci.yml).
 //! 2. The text files match the reviewed fingerprint in `kjv-text.lock`: every
 //!    chapter's SHA-256 and the count of every character, so no change slips in
-//!    unnoticed. After a deliberate, reviewed change, rewrite it with
-//!    `KJV_UPDATE_LOCK=1 cargo test -p kjv-core --test text_fidelity`.
+//!    unnoticed; the same goes for the SHA-256 of each STEP and red-letter file
+//!    in data/. After a deliberate, reviewed change, rewrite it locally (never
+//!    in CI) with `KJV_UPDATE_LOCK=1 cargo test -p kjv-core --test text_fidelity`.
 //! 3. Typography holds everywhere: spacing, punctuation, capitals, parentheses.
 //! 4. Every verse reaches the app unchanged: the files as read here (independently
 //!    of the app's parser) equal the embedded bundle, the chapter view's segments
@@ -21,6 +22,7 @@ use std::sync::OnceLock;
 
 use kjv_core::api::{self, ChapterOptions, Scope};
 use kjv_core::bundle::DataBundle;
+use kjv_core::original_languages::loader::{GREEK_FILES, HEBREW_FILES, LEXICON_FILES};
 use sha2::{Digest, Sha256};
 
 fn root() -> &'static Path {
@@ -214,7 +216,31 @@ fn hex(bytes: &[u8]) -> String {
     bytes.iter().map(|b| format!("{:02x}", b)).collect()
 }
 
-/// The lock file's contents for the text as it is now.
+/// The data files the app is built from besides the KJV text.
+fn data_files() -> Vec<String> {
+    std::iter::once("words_of_jesus.json")
+        .chain(HEBREW_FILES)
+        .chain(GREEK_FILES)
+        .chain(LEXICON_FILES)
+        .map(|f| format!("data/{}", f))
+        .collect()
+}
+
+/// SHA-256 of a file as the repository stores it: Git may check text out with
+/// CRLF line endings on Windows, so CR before LF is left out.
+fn file_sha256(path: &Path) -> String {
+    let bytes = std::fs::read(path).unwrap_or_else(|e| panic!("{}: {}", path.display(), e));
+    let mut h = Sha256::new();
+    for (i, line) in bytes.split(|b| *b == b'\n').enumerate() {
+        if i > 0 {
+            h.update(b"\n");
+        }
+        h.update(line.strip_suffix(b"\r").unwrap_or(line));
+    }
+    hex(&h.finalize())
+}
+
+/// The lock file's contents for the text and data as they are now.
 fn fingerprint() -> String {
     let mut whole = Sha256::new();
     let mut chars: BTreeMap<char, usize> = BTreeMap::new();
@@ -240,14 +266,29 @@ fn fingerprint() -> String {
             }
             let count = lines.iter().filter(|l| l.verse > 0).count();
             let title = if lines.iter().any(|l| l.verse == 0) { " +title" } else { "" };
-            writeln!(chapters, "{} {}\t{} verses{}\t{} chars\t{}", book.name, c, count, title, n, &hex(&h.finalize())[..16]).unwrap();
+            writeln!(
+                chapters,
+                "{} {}\t{} verses{}\t{} chars\t{}",
+                book.name,
+                c,
+                count,
+                title,
+                n,
+                &hex(&h.finalize())[..16]
+            )
+            .unwrap();
         }
     }
     let mut out = String::new();
-    out.push_str("# KJV text fingerprint, checked by crates/core/tests/text_fidelity.rs.\n");
-    out.push_str("# Any change to any character of old_testament/ or new_testament/ fails the tests\n");
-    out.push_str("# until this file is rewritten (KJV_UPDATE_LOCK=1) and the change reviewed.\n\n");
-    writeln!(out, "all\t{} verses\t{} titles\t{} chars\t{}\n", verses, titles, total_chars, hex(&whole.finalize())).unwrap();
+    out.push_str("# KJV text and data fingerprint, checked by crates/core/tests/text_fidelity.rs.\n");
+    out.push_str("# Any change to any character of old_testament/, new_testament/, or the data/ files\n");
+    out.push_str("# fails the tests until this file is rewritten (KJV_UPDATE_LOCK=1) and the change reviewed.\n\n");
+    writeln!(out, "all\t{} verses\t{} titles\t{} chars\t{}\n", verses, titles, total_chars, hex(&whole.finalize()))
+        .unwrap();
+    for file in data_files() {
+        writeln!(out, "file\t{}\t{}", file, file_sha256(&root().join(&file))).unwrap();
+    }
+    out.push('\n');
     for (c, n) in &chars {
         let shown = if *c == ' ' { "space".to_string() } else { c.to_string() };
         writeln!(out, "char\tU+{:04X}\t{}\t{}", *c as u32, shown, n).unwrap();
@@ -257,10 +298,23 @@ fn fingerprint() -> String {
     out
 }
 
+/// The lock records a reviewed text, so it is rewritten locally and the change
+/// committed for review; CI only ever checks it.
+fn refuse_lock_update_in_ci(ci: bool) {
+    assert!(!ci, "KJV_UPDATE_LOCK is refused when CI is set: rewrite kjv-text.lock locally and commit it for review");
+}
+
+#[test]
+#[should_panic(expected = "KJV_UPDATE_LOCK is refused when CI is set")]
+fn lock_is_never_rewritten_in_ci() {
+    refuse_lock_update_in_ci(true);
+}
+
 #[test]
 fn text_matches_the_reviewed_fingerprint() {
     let now = fingerprint();
     if std::env::var_os("KJV_UPDATE_LOCK").is_some() {
+        refuse_lock_update_in_ci(std::env::var_os("CI").is_some());
         std::fs::write(lock_path(), &now).unwrap();
         eprintln!("wrote {}", lock_path().display());
         return;
@@ -278,7 +332,7 @@ fn text_matches_the_reviewed_fingerprint() {
             .take(60)
             .collect();
         panic!(
-            "The KJV text changed. If this was deliberate and reviewed, run\n  KJV_UPDATE_LOCK=1 cargo test -p kjv-core --test text_fidelity\n{}",
+            "The KJV text or data changed. If this was deliberate and reviewed, run\n  KJV_UPDATE_LOCK=1 cargo test -p kjv-core --test text_fidelity\n{}",
             changed.join("\n")
         );
     }
@@ -386,11 +440,8 @@ fn every_verse_reaches_the_app_unchanged() {
         let app_book = &data.bible.books[bi];
         assert_eq!(app_book.name, book.name);
         let in_files = book.lines.len();
-        let in_app: usize = app_book
-            .chapters
-            .iter()
-            .map(|c| c.verses.len() + usize::from(c.superscription.is_some()))
-            .sum();
+        let in_app: usize =
+            app_book.chapters.iter().map(|c| c.verses.len() + usize::from(c.superscription.is_some())).sum();
         assert_eq!(in_app, in_files, "{}: the app has {} verses and titles, the file {}", book.name, in_app, in_files);
 
         let mut by_chapter: BTreeMap<u32, Vec<&Line>> = BTreeMap::new();
@@ -504,24 +555,28 @@ fn font_coverage(path: &Path) -> std::collections::HashSet<u32> {
 fn font_faces() -> BTreeMap<String, (PathBuf, Vec<(u32, u32)>)> {
     let css = std::fs::read_to_string(root().join("ui/styles.css")).unwrap();
     let value = |block: &str, name: &str| {
-        let start = block.find(&format!("{}:", name)).unwrap_or_else(|| panic!("@font-face without {}", name)) + name.len() + 1;
+        let start =
+            block.find(&format!("{}:", name)).unwrap_or_else(|| panic!("@font-face without {}", name)) + name.len() + 1;
         block[start..block[start..].find(';').unwrap() + start].trim().to_string()
     };
-    css.split("@font-face").skip(1).map(|rest| {
-        let block = &rest[..rest.find('}').unwrap()];
-        let family = value(block, "font-family").trim_matches('"').to_string();
-        let src = value(block, "src");
-        let file = src.split('"').nth(1).expect("src: url(\"…\")");
-        let ranges = value(block, "unicode-range")
-            .split(',')
-            .map(|r| {
-                let r = r.trim().trim_start_matches("U+");
-                let (a, b) = r.split_once('-').unwrap_or((r, r));
-                (u32::from_str_radix(a, 16).unwrap(), u32::from_str_radix(b, 16).unwrap())
-            })
-            .collect();
-        (family, (root().join("ui").join(file), ranges))
-    }).collect()
+    css.split("@font-face")
+        .skip(1)
+        .map(|rest| {
+            let block = &rest[..rest.find('}').unwrap()];
+            let family = value(block, "font-family").trim_matches('"').to_string();
+            let src = value(block, "src");
+            let file = src.split('"').nth(1).expect("src: url(\"…\")");
+            let ranges = value(block, "unicode-range")
+                .split(',')
+                .map(|r| {
+                    let r = r.trim().trim_start_matches("U+");
+                    let (a, b) = r.split_once('-').unwrap_or((r, r));
+                    (u32::from_str_radix(a, 16).unwrap(), u32::from_str_radix(b, 16).unwrap())
+                })
+                .collect();
+            (family, (root().join("ui").join(file), ranges))
+        })
+        .collect()
 }
 
 /// Every letter, vowel point, accent, and breathing mark in the Hebrew and Greek
@@ -550,7 +605,9 @@ fn bundled_fonts_draw_every_hebrew_and_greek_mark() {
             for w in &iv.original_words {
                 // Spaces (in a few multi-part words) need no glyph of their own
                 for c in w.original_text.trim().chars().filter(|c| *c != ' ') {
-                    used.entry(c).or_insert_with(|| (0, format!("{} {}:{}", iv.book, iv.chapter, iv.verse_number))).0 += 1;
+                    used.entry(c)
+                        .or_insert_with(|| (0, format!("{} {}:{}", iv.book, iv.chapter, iv.verse_number)))
+                        .0 += 1;
                 }
             }
         }
@@ -562,7 +619,11 @@ fn bundled_fonts_draw_every_hebrew_and_greek_mark() {
             })
             .map(|(c, (n, at))| {
                 let cp = *c as u32;
-                let why = if !ranges.iter().any(|&(a, b)| (a..=b).contains(&cp)) { "outside its unicode-range" } else { "no glyph in the font" };
+                let why = if !ranges.iter().any(|&(a, b)| (a..=b).contains(&cp)) {
+                    "outside its unicode-range"
+                } else {
+                    "no glyph in the font"
+                };
                 format!("  U+{:04X} {:?} ×{} (first in {}): {}", cp, c, n, at, why)
             })
             .collect();

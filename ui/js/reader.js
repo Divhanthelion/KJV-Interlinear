@@ -46,7 +46,7 @@ function wordCard(word, lang) {
       class: "word",
       type: "button",
       dir: "ltr",
-      "data-key": word.key,
+      "data-key": word.dkey ?? word.key,
       "aria-label": label,
       disabled: word.key ? null : true,
     },
