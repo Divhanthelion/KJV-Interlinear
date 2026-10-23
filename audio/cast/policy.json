@@ -1,0 +1,18 @@
+{
+ "about": "Casting rules applied when the script is voiced. See docs/casting.md; the owner decides the open ones (docs/decisions.md).",
+ "accent": "Natural, timeless English with clear diction and a light British colour; no regional or ethnic caricature. Voices differ by age, pitch, texture, pace and temperament.",
+ "author_voices": {
+  "ROM": "Paul", "1CO": "Paul", "2CO": "Paul", "GAL": "Paul", "EPH": "Paul", "PHP": "Paul", "COL": "Paul",
+  "1TH": "Paul", "2TH": "Paul", "1TI": "Paul", "2TI": "Paul", "TIT": "Paul", "PHM": "Paul",
+  "JAS": "James", "1PE": "Peter (Simon)", "2PE": "Peter (Simon)",
+  "1JN": "John", "2JN": "John", "3JN": "John", "JUD": "Jude", "REV": "John",
+  "LAM": "Jeremiah", "ECC": "Solomon, king"
+ },
+ "author_voices_note": "Narrator lines of these books are read by their author (The Word of Promise cast the writers of the books); announcements, titles and colophons stay with the narrator. Hebrews has no named author and stays with the narrator.",
+ "age_variants": "A character's '(old)' form shares the character's voice, and the delivery cue gives the age; '(young)' and '(child)' forms get voices of their own age.",
+ "joint_speakers": "A line spoken by 'A/B' is voiced by FCBH's choice ('as') or by A.",
+ "groups": "A group's lines are voiced by one designed voice for now (a spokesperson). Ensemble mixing is a later step (docs/SOP.md).",
+ "scripture_quotations": "Glyssen's 'scripture' quotations are voiced by the prophet quoted when Glyssen names one (Isaiah, Jeremiah, ...), else by the narrator.",
+ "angel_of_the_lord": "own voice",
+ "deliveries": true
+}

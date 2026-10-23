@@ -1,0 +1,426 @@
+{
+ "pinned": "2026-10-07",
+ "glyssen_commit": "e912d2097dffc625778782c18043e21d8820c414",
+ "files": [
+  {
+   "path": "glyssen/LICENSE",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/LICENSE",
+   "sha256": "3b0fc4597fd203fa0feba70b46a9091fbbaff4e2e3d20940a3a3e6d1f4b7adbc",
+   "bytes": 1109
+  },
+  {
+   "path": "glyssen/CharacterDetail.txt",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/GlyssenCharacters/Resources/CharacterDetail.txt",
+   "sha256": "2310fb5324a368b4184f74638625507e128286fb585cf4c6e5326f9059be47d7",
+   "bytes": 73904
+  },
+  {
+   "path": "glyssen/CharacterVerse.txt",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/GlyssenCharacters/Resources/CharacterVerse.txt",
+   "sha256": "3007fb35bf9239e9633295f9c4966c1c125d86cd520d874aab3372ba9baa03f7",
+   "bytes": 1025113
+  },
+  {
+   "path": "glyssen/English/GEN.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/GEN.xml",
+   "sha256": "783d53fe88d06050cc410c9cbd2f0f3197b45d57b001cae5f5bd30f546888d58",
+   "bytes": 474088
+  },
+  {
+   "path": "glyssen/English/EXO.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/EXO.xml",
+   "sha256": "869b18a38d0fe569185167422015bd1dfd0491572de881c9ff7275305de413cd",
+   "bytes": 350446
+  },
+  {
+   "path": "glyssen/English/LEV.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/LEV.xml",
+   "sha256": "fc10fa235fbc1996850bed95eedae92ca691910be4da352b4550b19353d22fc6",
+   "bytes": 234239
+  },
+  {
+   "path": "glyssen/English/NUM.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/NUM.xml",
+   "sha256": "302ab378dcd667eec8b9998b51272d3c851969aeecaf4617fb9df2c9d54122c8",
+   "bytes": 355959
+  },
+  {
+   "path": "glyssen/English/DEU.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/DEU.xml",
+   "sha256": "ca87f3a7543811afc29f999ff725baf8b6b88b79efdfdd727d74ee95471934a2",
+   "bytes": 269477
+  },
+  {
+   "path": "glyssen/English/JOS.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/JOS.xml",
+   "sha256": "b47a584026bff5668e1102c09f111d9206652156440c883dd61e230b73a0fba3",
+   "bytes": 197851
+  },
+  {
+   "path": "glyssen/English/JDG.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/JDG.xml",
+   "sha256": "5679011b5ab25f9edeba48b7828da7b2ea6ef6b85dea8d55acf43c0cb90f8208",
+   "bytes": 215107
+  },
+  {
+   "path": "glyssen/English/RUT.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/RUT.xml",
+   "sha256": "7e5c39f57a68db50c9531c26813c3c5c5bc37fec35cd209a373ae1e43446e1b1",
+   "bytes": 30972
+  },
+  {
+   "path": "glyssen/English/1SA.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/1SA.xml",
+   "sha256": "26713fcd0e5d18ad452138989ae56d82233236470395698880896d30680106f9",
+   "bytes": 289319
+  },
+  {
+   "path": "glyssen/English/2SA.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/2SA.xml",
+   "sha256": "8f3870406673dcc5c7e7a1db09f0cfdf50b6af447c61de4a09e9a492836beb20",
+   "bytes": 238791
+  },
+  {
+   "path": "glyssen/English/1KI.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/1KI.xml",
+   "sha256": "5305c90f5952f68d990ce765e7c3027a1d9a068018d6fee28eff45652004e73f",
+   "bytes": 269262
+  },
+  {
+   "path": "glyssen/English/2KI.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/2KI.xml",
+   "sha256": "06cfbdce5c91ae3ef83ab9c42efe49b7247785b3bde80e78ee4c9f478e2c1a8b",
+   "bytes": 260335
+  },
+  {
+   "path": "glyssen/English/1CH.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/1CH.xml",
+   "sha256": "a27aed57b7369902011cbfbdf3bd5cf6b86d2cf7bd9f8e0b829aab1c2361a0a0",
+   "bytes": 243157
+  },
+  {
+   "path": "glyssen/English/2CH.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/2CH.xml",
+   "sha256": "b43ca689827410aebe455b6c4e080b21a6caf6d3961465a4f873607fb51b4d39",
+   "bytes": 265908
+  },
+  {
+   "path": "glyssen/English/EZR.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/EZR.xml",
+   "sha256": "b955d04b4e18883f1c1b320ab045fe7cb781dc3c33b66cdabe2ee778fe927642",
+   "bytes": 82060
+  },
+  {
+   "path": "glyssen/English/NEH.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/NEH.xml",
+   "sha256": "2a1b84c0e17e1daa7c42c9aa0e3343d7ca1dcf91f26986b7b42cfe6f41f7ae03",
+   "bytes": 116545
+  },
+  {
+   "path": "glyssen/English/EST.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/EST.xml",
+   "sha256": "57ec3c2ba894cf54f1be18cb9b912b8b075f0ada0d0a5341a047c92539edd518",
+   "bytes": 59224
+  },
+  {
+   "path": "glyssen/English/JOB.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/JOB.xml",
+   "sha256": "8526da7c7196783d515bd14653fc14a0da335613bd4353282199d932c20fe213",
+   "bytes": 240353
+  },
+  {
+   "path": "glyssen/English/PSA.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/PSA.xml",
+   "sha256": "dd01cadffc13ba596d5db2fffe0d79572edae37793f6e618d83a49ef7dd79e4b",
+   "bytes": 595483
+  },
+  {
+   "path": "glyssen/English/PRO.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/PRO.xml",
+   "sha256": "10271aec6025d3f633f749cd0c92893ff724a5eac58dfe871d4bede32ddf110d",
+   "bytes": 205749
+  },
+  {
+   "path": "glyssen/English/ECC.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/ECC.xml",
+   "sha256": "3085de0939fd87ebe12137bfd2faa729c92690b55744d6a0e4a9463b8fb9e272",
+   "bytes": 60071
+  },
+  {
+   "path": "glyssen/English/SNG.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/SNG.xml",
+   "sha256": "e186990c4dc297ccc7cbc22bd196a890fb6e9b60d6269edab158ffbbd8313bb8",
+   "bytes": 30861
+  },
+  {
+   "path": "glyssen/English/ISA.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/ISA.xml",
+   "sha256": "9cbb7504e7d16d92f284e57fc6441fb99153ccb1b4ae65ae0263a4d9d67d07a5",
+   "bytes": 391346
+  },
+  {
+   "path": "glyssen/English/JER.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/JER.xml",
+   "sha256": "9aa71ce2e7ce5567640a6209aa92a975885c7dde6f21f03d2a9f9da3e811a2c7",
+   "bytes": 443506
+  },
+  {
+   "path": "glyssen/English/LAM.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/LAM.xml",
+   "sha256": "cfd64d596f373df1d191b646f0ec0e1486844f946be830cb1265652f1217b4e5",
+   "bytes": 40544
+  },
+  {
+   "path": "glyssen/English/EZK.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/EZK.xml",
+   "sha256": "08dcda78ac5382e44880ea77164a68bfe25fab2788743516f504f5d5da5d0f2a",
+   "bytes": 377629
+  },
+  {
+   "path": "glyssen/English/DAN.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/DAN.xml",
+   "sha256": "9008ae73792a226b9e0e73bdbd956450ebabbb46ff7c60268d0a264a1308dddd",
+   "bytes": 118493
+  },
+  {
+   "path": "glyssen/English/HOS.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/HOS.xml",
+   "sha256": "a25e0a70ea54b9804872d24462d6664a89d6c178ac0421b41307b6a1365ed579",
+   "bytes": 55638
+  },
+  {
+   "path": "glyssen/English/JOL.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/JOL.xml",
+   "sha256": "3b715f9cb490d55bb17f42a947efb01469107b6acfb0338a63276691878c9de2",
+   "bytes": 21201
+  },
+  {
+   "path": "glyssen/English/AMO.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/AMO.xml",
+   "sha256": "2a39fc5cbc59021e9648ba07f99de64f6fb9a367e3f06ad5e3aca8b800a88b27",
+   "bytes": 48453
+  },
+  {
+   "path": "glyssen/English/OBA.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/OBA.xml",
+   "sha256": "5502f5efba1dc8529c4cefd841a5b238899fdcb0e2b3725a6c91fa98d31a2b12",
+   "bytes": 6969
+  },
+  {
+   "path": "glyssen/English/JON.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/JON.xml",
+   "sha256": "358df8654642342bf385d1cec56d1b9ca3eb58beeb86882aadb59ec0cafeeb24",
+   "bytes": 16141
+  },
+  {
+   "path": "glyssen/English/MIC.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/MIC.xml",
+   "sha256": "9cf4c884cc8df45bbeb61b1aefef3cdc2cb9e40cef6076eb15f3409c197a28c6",
+   "bytes": 31797
+  },
+  {
+   "path": "glyssen/English/NAM.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/NAM.xml",
+   "sha256": "ce0de719a8b48c09c216e4c8780f2ef12517860d465d1cdd83c0bdf9820266a1",
+   "bytes": 14157
+  },
+  {
+   "path": "glyssen/English/HAB.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/HAB.xml",
+   "sha256": "8889ce9a648e1286512aaaea00789b5f7e7715396a5e4c5d10541ee8e7fcbef7",
+   "bytes": 15347
+  },
+  {
+   "path": "glyssen/English/ZEP.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/ZEP.xml",
+   "sha256": "f23b3126865f7b4e011e38c896dc596485f8a8a02126d5764f8758830596ef17",
+   "bytes": 17120
+  },
+  {
+   "path": "glyssen/English/HAG.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/HAG.xml",
+   "sha256": "a369356e501fa89fefcf5b9def453ba3cd476c29b120eddf5880e9b214791998",
+   "bytes": 12173
+  },
+  {
+   "path": "glyssen/English/ZEC.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/ZEC.xml",
+   "sha256": "00127aeeb5e8426e99d9507c5e46d5978ea820e45cd527a3adbc2d770d68152d",
+   "bytes": 69165
+  },
+  {
+   "path": "glyssen/English/MAL.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/MAL.xml",
+   "sha256": "395159e1267318dcc1d47f9dade798424f502425fe587a1f4f579b1b8a4b5c77",
+   "bytes": 21177
+  },
+  {
+   "path": "glyssen/English/MAT.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/MAT.xml",
+   "sha256": "7aaff92815b3c12faa192cd04f3c6b81715d17be693ef2bbece0ebc4ea1ea532",
+   "bytes": 338947
+  },
+  {
+   "path": "glyssen/English/MRK.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/MRK.xml",
+   "sha256": "1a882e3d1be2d8fdeabc5c32aa2ff15f0dde35254a4c86192178e2f2ac4ec5bf",
+   "bytes": 226814
+  },
+  {
+   "path": "glyssen/English/LUK.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/LUK.xml",
+   "sha256": "265a787dd1ba0b75457488896f01a51e11cbcb0b3db908dbd7577ac5a53c167f",
+   "bytes": 363347
+  },
+  {
+   "path": "glyssen/English/JHN.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/JHN.xml",
+   "sha256": "3377d354219e4070944ec7256b1732aaa7a500ebb47ea3795aca9cf6b3ecfd44",
+   "bytes": 291787
+  },
+  {
+   "path": "glyssen/English/ACT.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/ACT.xml",
+   "sha256": "0015e52e29bd02ae739a3ebb81b61f7cc14d50086cb4d75339770f59ebf26686",
+   "bytes": 322647
+  },
+  {
+   "path": "glyssen/English/ROM.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/ROM.xml",
+   "sha256": "b1b218d8592c25905fe514601cfbb37bd6d78133376d43f5f8b0c78419e07c67",
+   "bytes": 125669
+  },
+  {
+   "path": "glyssen/English/1CO.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/1CO.xml",
+   "sha256": "7e7c74b1665d19be765396d8f09565768e4f8b53f03cbc8d0dc5d8ca7cc8b943",
+   "bytes": 120959
+  },
+  {
+   "path": "glyssen/English/2CO.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/2CO.xml",
+   "sha256": "c0f88489856dab860b658cb632756a56545dfe8e364750af30cf837fc45b0fa5",
+   "bytes": 74507
+  },
+  {
+   "path": "glyssen/English/GAL.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/GAL.xml",
+   "sha256": "0b2e9ef32eb0ab966e1c414f59f9301c266b61bc759e0951d359d5e099588397",
+   "bytes": 41673
+  },
+  {
+   "path": "glyssen/English/EPH.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/EPH.xml",
+   "sha256": "7d4029af914159b36b0bd75ce20b83e6b42754e0fb8e69081df0bdc618a21633",
+   "bytes": 41633
+  },
+  {
+   "path": "glyssen/English/PHP.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/PHP.xml",
+   "sha256": "859561795602a14241a9777eede38c0849149038887c2dffb146a014a41f3593",
+   "bytes": 28509
+  },
+  {
+   "path": "glyssen/English/COL.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/COL.xml",
+   "sha256": "e652ee09117941db18e25115fa27b5b8e14108f15ad31c9bca1e9fe3270a5b5d",
+   "bytes": 26476
+  },
+  {
+   "path": "glyssen/English/1TH.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/1TH.xml",
+   "sha256": "f8abcc7cc0474ea0e22c778c2dbaf4916d57441c11e13f6de7cc9f525d672ea8",
+   "bytes": 23955
+  },
+  {
+   "path": "glyssen/English/2TH.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/2TH.xml",
+   "sha256": "bf3725a525da4dba1dac64fc5c736392af5122cd2f44ffaf32fa742924eeb67c",
+   "bytes": 13515
+  },
+  {
+   "path": "glyssen/English/1TI.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/1TI.xml",
+   "sha256": "2ff5c5d6165992ccf78093c86fdb84947000a9640f271943ca522299edbb17cf",
+   "bytes": 31703
+  },
+  {
+   "path": "glyssen/English/2TI.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/2TI.xml",
+   "sha256": "63750a5115e21c1be6aaa29044b3d3e262dabd47fb844dd42c2d561542073737",
+   "bytes": 22990
+  },
+  {
+   "path": "glyssen/English/TIT.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/TIT.xml",
+   "sha256": "d0c771105be7c1a7fdc9c4f42e8cca0680c6d5a4b6a0b2f0b7e55466c61a2935",
+   "bytes": 13165
+  },
+  {
+   "path": "glyssen/English/PHM.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/PHM.xml",
+   "sha256": "d2b77e31989b73df248314142834e672bb4e9809b7cf556fdad515152ccd91be",
+   "bytes": 6545
+  },
+  {
+   "path": "glyssen/English/HEB.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/HEB.xml",
+   "sha256": "42f5894e6411583d51aee3ecc8c43f6658b6552e023d583a9cfdd38900fd046f",
+   "bytes": 91253
+  },
+  {
+   "path": "glyssen/English/JAS.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/JAS.xml",
+   "sha256": "18944035921efbb1deb9b062b4130fbd02283dcbd2c28833427d2c7c3869a30a",
+   "bytes": 30595
+  },
+  {
+   "path": "glyssen/English/1PE.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/1PE.xml",
+   "sha256": "3acae883d11d65cf459065686afb413ab035adcc1f5e5830dd7d12b5b97f76c8",
+   "bytes": 31425
+  },
+  {
+   "path": "glyssen/English/2PE.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/2PE.xml",
+   "sha256": "ad1d87344ea147cbfd8c4a8ff6b80fd2944db3d98c50ec4e7760b190785d582e",
+   "bytes": 19200
+  },
+  {
+   "path": "glyssen/English/1JN.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/1JN.xml",
+   "sha256": "d36d2e86ae559ed7d6070f4ea2213ab9fcb93d64a67cc3523f40cabb69646de5",
+   "bytes": 29893
+  },
+  {
+   "path": "glyssen/English/2JN.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/2JN.xml",
+   "sha256": "e96e90b23ccff67638b69d8b28cf59caf82703d5d661a48aa22bcffe7b4ee505",
+   "bytes": 3973
+  },
+  {
+   "path": "glyssen/English/3JN.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/3JN.xml",
+   "sha256": "a66328087da642fb0769342401f96b06ad6ccb151d1c66b60c29ca10187ce93c",
+   "bytes": 4237
+  },
+  {
+   "path": "glyssen/English/JUD.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/JUD.xml",
+   "sha256": "19008ec815019939db3d760898c97212ee1e449d8b39b64bccc802ee2502721e",
+   "bytes": 8028
+  },
+  {
+   "path": "glyssen/English/REV.xml",
+   "url": "https://raw.githubusercontent.com/sillsdev/Glyssen/e912d2097dffc625778782c18043e21d8820c414/DistFiles/reference_texts/English/REV.xml",
+   "sha256": "9db43575c4381b901e11501c5b00296c3db86200581f98acee882011e2da5d83",
+   "bytes": 142033
+  },
+  {
+   "path": "ebible/eng-kjv_usfm.zip",
+   "url": "https://ebible.org/Scriptures/eng-kjv_usfm.zip",
+   "sha256": "0e0359e9e488582a72c86800f227839ecb16dada7bb5ba316509d374c59e559a",
+   "bytes": 2765652
+  }
+ ]
+}

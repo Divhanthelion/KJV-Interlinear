@@ -1,0 +1,628 @@
+{
+ "narrator": {
+  "brief": "A man in his late fifties, a warm, resonant baritone with a storyteller's intimacy. Unhurried and even, as if reading aloud by lamplight to people he loves; reverent without being pompous or sing-song. Every word clear, never rushed, and steady enough to listen to for hours.",
+  "inspiration": "The great narrators of recorded Bibles were mature, cultured voices that never upstaged the story: Michael York (The Word of Promise), John Rhys-Davies (Truth & Life), Orson Welles narrating King of Kings (1961), and the classic single-voice KJV readers.",
+  "scripture": "Carries about half of all the words in the Bible; must stay pleasant over 70+ hours."
+ },
+ "God": {
+  "brief": "An ageless male voice of overwhelming majesty: a vast, resonant bass that seems to fill a great space, rich, full and powerful, every word weighty and sure. Slow, deliberate and commanding, the voice of the one who made heaven and earth; grand without strain, sovereign and utterly certain, with deep warmth beneath the power. Tender in mercy, terrible in judgment.",
+  "brief_history": ["2026-10-09, before the owner asked for 'grander': An ageless male voice, deep and immense yet quiet: a low bass-baritone with great warmth and stillness. Slow and deliberate, never shouting; authority that needs no force. Tender in mercy, terrible in judgment, intimate when calling a prophet by name. No theatrical boom."],
+  "inspiration": "Productions have gone two ways: the vast, deep voice (Martin Jarvis in The Word of Promise, Brian Cox in Truth & Life, Samuel L. Jackson in The Bible Experience) and the intimate one (the burning bush in The Prince of Egypt). We want both in one: depth without bombast.",
+  "scripture": "A still small voice (1 Kings 19:12); speaks with Moses face to face, as a man speaketh unto his friend (Exodus 33:11). About a fifth of all the words in the Bible, mostly the prophets' oracles."
+ },
+ "Jesus": {
+  "brief": "A man of about thirty-three, a warm, clear baritone with quiet authority. Approachable and kind, speaking to people rather than at them; natural rhythm, never pious or sing-song. Capable of fierce rebuke, playful irony and broken grief, but always the same person.",
+  "inspiration": "The most loved portrayals are human and present rather than stately: Jonathan Roumie (The Chosen), Robert Powell's intense calm (Jesus of Nazareth), Jim Caviezel (The Word of Promise, The Passion of the Christ), Neal McDonough (Truth & Life), Blair Underwood (The Bible Experience).",
+  "scripture": "The common people heard him gladly (Mark 12:37); he taught them as one having authority (Matthew 7:29)."
+ },
+ "Moses": {
+  "brief": "An old man, eighty and beyond: a weathered, gravelly baritone with a slightly heavy, deliberate tongue, choosing his words carefully. Meek and patient as a shepherd, but immovable, and capable of blazing anger. Grows in authority from the hesitant man at the bush to the farewell orator of Deuteronomy.",
+  "inspiration": "Charlton Heston's commanding Moses (The Ten Commandments), Ben Kingsley (Moses, 1995), Richard Dreyfuss (The Word of Promise), Forest Whitaker (The Bible Experience), Val Kilmer and Christian Bale in film. We take the age and gravity, and add the halting speech the text gives him.",
+  "scripture": "I am slow of speech, and of a slow tongue (Exodus 4:10); the man Moses was very meek (Numbers 12:3); eighty years old when he spoke to Pharaoh (Exodus 7:7)."
+ },
+ "David": {
+  "brief": "A man in his thirties, a bright, lyrical baritone with a musician's phrasing. Passionate and quick to feel: exuberant joy, fierce courage, raw repentance. A warrior-poet's energy, charismatic and warm.",
+  "inspiration": "Gregory Peck (David and Bathsheba), Gary Sinise (The Word of Promise), Michael Iskander as the young David (House of David).",
+  "scripture": "Ruddy, of a beautiful countenance (1 Samuel 16:12); cunning in playing, a mighty valiant man, prudent in matters (1 Samuel 16:18). 'David (old)' uses this voice, older and frailer."
+ },
+ "Job": {
+  "brief": "A man of about sixty, a rich baritone worn rough by suffering. Eloquent, dignified, poetic; raw grief and anguished protest that never loses its nobility. Long sentences delivered with a broken man's stubborn clarity.",
+  "inspiration": "Audio dramatizations treat Job as a great tragic role for a classical actor: the speeches are poetry and need a voice that can carry them.",
+  "scripture": "Perfect and upright (Job 1:1); I will speak in the anguish of my spirit (Job 7:11)."
+ },
+ "Jeremiah": {
+  "brief": "A man in his thirties to forties, a tenor-baritone with an earnest, aching quality. Urgent and anguished, tears close to the surface; reluctant, sensitive, but burning with a message he cannot hold in.",
+  "inspiration": "The weeping prophet is usually played as young and fragile rather than stern.",
+  "scripture": "I am a child (Jeremiah 1:6); his word was in mine heart as a burning fire shut up in my bones (Jeremiah 20:9); Oh that mine eyes were a fountain of tears (Jeremiah 9:1)."
+ },
+ "Solomon, king": {
+  "brief": "A regal man in his forties, a smooth, cultivated, articulate baritone. Measured and aphoristic, every sentence balanced; poised and assured, with a later world-weary, reflective melancholy.",
+  "inspiration": "Yul Brynner (Solomon and Sheba) and Malcolm McDowell (The Word of Promise) played him polished and kingly.",
+  "scripture": "A wise and an understanding heart (1 Kings 3:12); Vanity of vanities (Ecclesiastes 1:2)."
+ },
+ "Paul": {
+  "brief": "A wiry man in his fifties, an intense, slightly reedy baritone. Rapid, driving reasoning that piles clause on clause; passionate and persuasive, sometimes sharp, deeply tender with friends. A scholar's precision, a traveller's weariness, and no grandiose oratory.",
+  "inspiration": "Stacy Keach (The Word of Promise), James Faulkner (Paul, Apostle of Christ). The text suggests a brilliant writer who was not an impressive speaker.",
+  "scripture": "His letters are weighty and powerful; but his bodily presence is weak, and his speech contemptible (2 Corinthians 10:10)."
+ },
+ "Jacob (Israel)": {
+  "brief": "A man whose life runs from quick, clever youth to great age: a soft-spoken, persuasive tenor-baritone, smooth and careful, a schemer's quickness that mellows into a patriarch's weary tenderness.",
+  "inspiration": "Played as Esau's opposite: the quiet, calculating brother (Joseph: King of Dreams gave the old Jacob a tender, grieving voice).",
+  "scripture": "The voice is Jacob's voice, but the hands are the hands of Esau (Genesis 27:22): Jacob's voice must be unmistakably different from Esau's."
+ },
+ "Esau": {
+  "brief": "A burly outdoorsman of about forty, a loud, hearty, rough baritone. Blunt, impulsive, quick to anger and quick to forgive; a hunter's open, unpolished speech.",
+  "inspiration": "Always cast as Jacob's physical, impulsive opposite.",
+  "scripture": "A cunning hunter, a man of the field (Genesis 25:27). His voice must be clearly unlike Jacob's (Genesis 27:22)."
+ },
+ "Peter (Simon)": {
+  "brief": "A robust fisherman in his thirties, a gruff, full-bodied baritone with a rough, rustic edge. Impulsive, warm-hearted, blunt, quick to speak; later the steady, bold leader of Acts.",
+  "inspiration": "Shahar Isaac (The Chosen), Ernie Hudson (The Word of Promise), Chiwetel Ejiofor (Mary Magdalene), Forest Whitaker (The King of Kings, 2025).",
+  "scripture": "Thy speech bewrayeth thee (Matthew 26:73): his accent gave him away as a Galilean; unlearned and ignorant men (Acts 4:13)."
+ },
+ "Elihu, son of Barakel": {
+  "brief": "A young man in his early twenties, an eager, bright tenor bursting to speak. Confident, verbose, righteously indignant, a little self-important; young energy against the old men's weariness.",
+  "inspiration": "Sean Astin voiced him in The Word of Promise: youthful and earnest.",
+  "scripture": "I am young, and ye are very old; wherefore I was afraid (Job 32:6); I am full of matter (Job 32:18)."
+ },
+ "Daniel": {
+  "brief": "A man who serves kings from youth to old age: a calm, wise, dignified baritone with courtly composure. Unhurried, precise, humble before God and fearless before kings.",
+  "inspiration": "Usually cast as serene and incorruptible.",
+  "scripture": "An excellent spirit was in him (Daniel 6:3). Still serving in the first year of Cyrus, past eighty."
+ },
+ "Isaiah": {
+  "brief": "A man in his prime, a majestic orator: rich, resonant baritone with poetic grandeur and an aristocrat's polish. Soaring in comfort, thunderous in rebuke.",
+  "inspiration": "The most literary of the prophets; productions give him a classical actor's voice.",
+  "scripture": "Here am I; send me (Isaiah 6:8); a counsellor of kings (Isaiah 37)."
+ },
+ "Samuel": {
+  "brief": "An elderly man, upright and grave: a firm, clear baritone with a prophet-judge's moral weight. Stern but fatherly, few words, each final.",
+  "inspiration": "Stephen Lang (House of David) and Peter O'Toole (One Night with the King) played him as a stern old seer.",
+  "scripture": "I am old and grayheaded (1 Samuel 12:2); the LORD let none of his words fall to the ground (1 Samuel 3:19)."
+ },
+ "man in linen above river": {
+  "brief": "A heavenly being of overwhelming presence: a deep, luminous, resonant male voice with great stillness and clarity, as from a vast space. Calm, solemn, kind to the trembling listener.",
+  "inspiration": "A vision voice: otherworldly by its stillness, not by effects.",
+  "scripture": "The voice of his words like the voice of a multitude (Daniel 10:6)."
+ },
+ "Eliphaz the Temanite": {
+  "brief": "The eldest of Job's friends, about seventy: a smooth, dignified, slightly patronizing baritone. Courteous, measured, mystical, sure he is wise.",
+  "inspiration": "The four comforters should be four unmistakable voices: Eliphaz the smooth elder, Bildad the stiff traditionalist, Zophar the blunt one, Elihu the young one.",
+  "scripture": "With us are both the grayheaded and very aged men (Job 15:10); a vision in the night (Job 4:13)."
+ },
+ "Bildad the Shuhite": {
+  "brief": "A man in his sixties, a dry, stiff, moralizing tenor-baritone. Brisk and formal; recites tradition like a lecturer; little warmth.",
+  "inspiration": "Played as the friend who argues from the fathers.",
+  "scripture": "Enquire, I pray thee, of the former age (Job 8:8)."
+ },
+ "Zophar the Naamathite": {
+  "brief": "A man in his fifties, a harsh, abrupt, coarse baritone. Impatient, blunt to the point of rudeness, quick to condemn.",
+  "inspiration": "The angriest of the comforters.",
+  "scripture": "Should a man full of talk be justified? (Job 11:2)."
+ },
+ "Joshua": {
+  "brief": "A soldier-leader in his prime, a firm, clear baritone: decisive, courageous, direct. A general's voice that carries across a camp; loyal and devout. 'Joshua (old)' uses this voice, older and slower.",
+  "inspiration": "John Derek played the young Joshua in The Ten Commandments; most portrayals stress strength and courage.",
+  "scripture": "Be strong and of a good courage (Joshua 1:6); as for me and my house, we will serve the LORD (Joshua 24:15)."
+ },
+ "Joseph": {
+  "brief": "A man from seventeen to his fifties: a clear, earnest tenor-baritone. As the young dreamer, open and a little naive; as Egypt's governor, controlled, commanding and formal, with deep emotion barely held in.",
+  "inspiration": "Ben Affleck voiced him in Joseph: King of Dreams; stage and film Josephs are young and sincere.",
+  "scripture": "He wept aloud (Genesis 45:2); he spoke roughly to his brothers, who did not know him (Genesis 42:7)."
+ },
+ "Saul": {
+  "brief": "A tall, imposing king in his forties, a strong baritone that grows erratic: proud, jealous, haunted, swinging between charm, rage and despair.",
+  "inspiration": "Ali Suliman (House of David) played a magnetic, tormented Saul.",
+  "scripture": "From his shoulders and upward he was higher than any of the people (1 Samuel 9:2); an evil spirit troubled him (1 Samuel 16:14)."
+ },
+ "Rabshakeh": {
+  "brief": "An Assyrian field commander, about fifty: a brash, loud, sneering baritone that bellows across a wall. Propagandist, mocking, arrogant, enjoying the fear he causes.",
+  "inspiration": "A villain's set piece: the siege speech of 2 Kings 18.",
+  "scripture": "Then Rabshakeh stood and cried with a loud voice in the Jews' language (2 Kings 18:28)."
+ },
+ "Hezekiah, king of Judah": {
+  "brief": "A devout king in his forties, a sincere, gentle baritone; prayerful and earnest, anxious under siege, broken and grateful in sickness and recovery.",
+  "inspiration": "A good king under pressure.",
+  "scripture": "Hezekiah turned his face toward the wall, and prayed (2 Kings 20:2)."
+ },
+ "Stephen": {
+  "brief": "A young man in his late twenties, a luminous, fervent tenor. Eloquent, fearless, rising to a prophetic intensity; serene at the end.",
+  "inspiration": "The first martyr's speech is one of the longest in Acts.",
+  "scripture": "They saw his face as it had been the face of an angel (Acts 6:15)."
+ },
+ "Nebuchadnezzar, king of Babylon": {
+  "brief": "An emperor in his prime, a booming, imperious bass-baritone, used to absolute obedience; arrogant and volatile, later humbled and awed.",
+  "inspiration": "Played as the archetypal tyrant who is brought low.",
+  "scripture": "Is not this great Babylon, that I have built? (Daniel 4:30)."
+ },
+ "Elijah": {
+  "brief": "A wild, rough-hewn prophet in his fifties: a fierce, thunderous, gravelly baritone from the desert. Sardonic with false prophets, terrifying to kings, and in the cave, utterly exhausted.",
+  "inspiration": "The archetypal fiery prophet; his successor Elisha must sound distinct.",
+  "scripture": "An hairy man, girt with a girdle of leather (2 Kings 1:8); mocked them, Cry aloud: for he is a god (1 Kings 18:27)."
+ },
+ "Elisha": {
+  "brief": "A prophet in his forties, a calmer, compassionate, mellow baritone with steady authority; practical, kind to the poor, occasionally stern.",
+  "inspiration": "Played as Elijah's gentler successor.",
+  "scripture": "A holy man of God (2 Kings 4:9)."
+ },
+ "Yahweh's angel": {
+  "brief": "A messenger who speaks as God himself: a warm, clear, commanding male voice with stillness and light; gentle with the frightened, final in judgment.",
+  "inspiration": "FCBH casts the angel of the LORD with the actor who plays Jesus (an ancient reading of these appearances). Here he has his own voice unless the owner chooses that tradition (see decisions).",
+  "scripture": "The angel of the LORD called unto him out of heaven (Genesis 22:11)."
+ },
+ "Balaam": {
+  "brief": "A famous foreign seer in his sixties, a theatrical, oily, sonorous baritone; mercenary and ambivalent, grandly poetic in his oracles.",
+  "inspiration": "A conflicted villain with some of the most beautiful oracles in the Torah.",
+  "scripture": "How shall I curse, whom God hath not cursed? (Numbers 23:8)."
+ },
+ "donkey (female)": {
+  "brief": "Balaam's she-ass, given speech: a plaintive, gentle, slightly reproachful female voice, soft and earthy, simple and sincere.",
+  "inspiration": "Played straight, not as comedy.",
+  "scripture": "What have I done unto thee, that thou hast smitten me these three times? (Numbers 22:28)."
+ },
+ "Abraham (Abram)": {
+  "brief": "An old man, seventy-five to a hundred and seventy-five: a warm, patient, deep baritone with a nomad chief's hospitality. Gentle authority, faith with a trembling edge; courageous and humble in intercession.",
+  "inspiration": "George C. Scott (The Bible: In the Beginning), Richard Harris (Abraham, 1994), Jon Voight (The Word of Promise), T. D. Jakes (The Bible Experience).",
+  "scripture": "I have taken upon me to speak unto the Lord, which am but dust and ashes (Genesis 18:27)."
+ },
+ "Jonathan": {
+  "brief": "A young prince in his twenties, a warm, bright, loyal baritone; brave, generous, open-hearted, the kindest voice in Saul's court.",
+  "inspiration": "Always cast as warm and noble.",
+  "scripture": "The soul of Jonathan was knit with the soul of David (1 Samuel 18:1)."
+ },
+ "Wisdom": {
+  "brief": "Wisdom personified, a woman of radiant maturity: a clear, ringing, joyful mezzo voice calling in the streets. Commanding, generous, delighted, ancient and young at once.",
+  "inspiration": "Proverbs makes Wisdom a woman; productions give her a luminous, confident voice.",
+  "scripture": "Doth not wisdom cry? (Proverbs 8:1); I was daily his delight, rejoicing always before him (Proverbs 8:30)."
+ },
+ "Folly": {
+  "brief": "Folly personified, a woman: a loud, coaxing, sly, honeyed voice, cheap and seductive.",
+  "inspiration": "Wisdom's counterpart in Proverbs 9.",
+  "scripture": "A foolish woman is clamorous (Proverbs 9:13)."
+ },
+ "John the Baptist": {
+  "brief": "A wilderness ascetic in his early thirties: a raw, fiery, booming outdoor voice, rough and intense. Uncompromising and urgent, humble before the one he heralds.",
+  "inspiration": "Charlton Heston (The Greatest Story Ever Told), Robert Ryan (King of Kings, 1961), Michael York (Jesus of Nazareth).",
+  "scripture": "The voice of one crying in the wilderness (Matthew 3:3); O generation of vipers (Matthew 3:7)."
+ },
+ "Gabriel": {
+  "brief": "An archangel: a radiant, clear, warm tenor with serene, awe-inspiring authority. Gentle with the afraid, joyful in announcement.",
+  "inspiration": "Classic annunciation scenes give him a luminous, kind voice.",
+  "scripture": "I am Gabriel, that stand in the presence of God (Luke 1:19); Fear not, Mary (Luke 1:30)."
+ },
+ "Joab": {
+  "brief": "A hard-bitten general in his fifties, a gravelly, clipped, pragmatic baritone; ruthless and loyal, sardonic, a soldier's bluntness.",
+  "inspiration": "The archetypal hard man of David's court.",
+  "scripture": "Joab the son of Zeruiah (2 Samuel 2:13)."
+ },
+ "Judah": {
+  "brief": "A rugged man in his forties, a strong, rough baritone that grows in dignity: brash among his brothers, eloquent and broken when pleading for Benjamin.",
+  "inspiration": "Mark Hamill voiced him in Joseph: King of Dreams.",
+  "scripture": "His plea of Genesis 44:18-34 is among the most moving speeches in Genesis."
+ },
+ "Abraham's chief servant": {
+  "brief": "An elderly steward, about sixty-five: a careful, humble, faithful baritone; a natural storyteller retelling his errand with quiet wonder.",
+  "inspiration": "Trusted servant of a great house.",
+  "scripture": "The eldest servant of his house, that ruled over all that he had (Genesis 24:2)."
+ },
+ "Ahijah the prophet": {
+  "brief": "A very old, blind prophet: a thin, grave, solemn voice with a seer's certainty.",
+  "inspiration": "",
+  "scripture": "Ahijah could not see; for his eyes were set by reason of his age (1 Kings 14:4)."
+ },
+ "Ahab, king of Israel": {
+  "brief": "A king in his forties, a blustering, petulant, sulky baritone; vain, weak-willed, easily led, occasionally shrewd.",
+  "inspiration": "",
+  "scripture": "He laid him down upon his bed, and turned away his face, and would eat no bread (1 Kings 21:4)."
+ },
+ "Artaxerxes, king of Persia": {
+  "brief": "A Persian emperor, about forty: a formal, polished, unhurried voice of decrees, cultured and reserved.",
+  "inspiration": "",
+  "scripture": "Artaxerxes, king of kings (Ezra 7:12)."
+ },
+ "Nathan": {
+  "brief": "A court prophet in his sixties: a wise, tactful, calm baritone that tells a story gently, then cuts like a blade.",
+  "inspiration": "Raymond Massey played him in David and Bathsheba.",
+  "scripture": "Thou art the man (2 Samuel 12:7)."
+ },
+ "Pharaoh (3rd)": {
+  "brief": "Egypt's god-king in his forties: a cold, imperious, contemptuous baritone, aristocratic and hardening into fury; never begs, until he does.",
+  "inspiration": "Yul Brynner's Rameses (The Ten Commandments), Ralph Fiennes (The Prince of Egypt), Joel Edgerton (Exodus: Gods and Kings).",
+  "scripture": "Who is the LORD, that I should obey his voice? (Exodus 5:2)."
+ },
+ "Pharaoh (2nd)": {
+  "brief": "Joseph's Pharaoh, a regal man of fifty: a warm, generous, commanding voice, troubled by dreams, magnanimous to Joseph.",
+  "inspiration": "Must sound nothing like the Pharaoh of the Exodus.",
+  "scripture": "Can we find such a one as this is, a man in whom the Spirit of God is? (Genesis 41:38)."
+ },
+ "Jehu, son of Nimshi": {
+  "brief": "A violent commander in his thirties: a fast, aggressive, swaggering baritone, ruthless and zealous.",
+  "inspiration": "",
+  "scripture": "He driveth furiously (2 Kings 9:20)."
+ },
+ "Boaz": {
+  "brief": "A landowner of about fifty-five: a kind, generous, gracious bass-baritone, steady and upright, with gentle humour.",
+  "inspiration": "Ruth's kinsman is always played warm and noble.",
+  "scripture": "A mighty man of wealth (Ruth 2:1); The LORD be with you (Ruth 2:4)."
+ },
+ "Ruth": {
+  "brief": "A young Moabite widow in her twenties: a soft, warm, steadfast alto, humble and quietly determined; loyal to the bone.",
+  "inspiration": "",
+  "scripture": "Whither thou goest, I will go (Ruth 1:16). Must differ clearly from Orpah and Naomi."
+ },
+ "Naomi": {
+  "brief": "A widow in her late fifties: a weathered, bittersweet mezzo, motherly and shrewd; grief and bitterness turning to hope.",
+  "inspiration": "",
+  "scripture": "Call me not Naomi, call me Mara (Ruth 1:20)."
+ },
+ "Orpah": {
+  "brief": "A young Moabite widow, early twenties: a lighter, higher, tearful soprano, affectionate and torn.",
+  "inspiration": "",
+  "scripture": "Orpah kissed her mother in law; but Ruth clave unto her (Ruth 1:14)."
+ },
+ "Gideon (Jerubbaal)": {
+  "brief": "A farmer turned general, about thirty: a hesitant, doubting tenor-baritone that grows bold; earnest, cautious, then commanding.",
+  "inspiration": "",
+  "scripture": "My family is poor in Manasseh, and I am the least in my father's house (Judges 6:15)."
+ },
+ "daughter of Zion": {
+  "brief": "Jerusalem personified as a woman: a grieving, dignified, haunting mezzo voice; lament and longing.",
+  "inspiration": "",
+  "scripture": "Lamentations and the prophets speak of Jerusalem as a bereaved daughter."
+ },
+ "Laban": {
+  "brief": "A sly herdsman-chief in his sixties: an unctuous, wheedling, calculating baritone, all hospitality on the surface.",
+  "inspiration": "",
+  "scripture": "Thou hast changed my wages ten times (Genesis 31:41)."
+ },
+ "Micaiah, son of Imlah": {
+  "brief": "A lone prophet in his forties: a dry, steady, fearless baritone with an edge of irony.",
+  "inspiration": "",
+  "scripture": "What the LORD saith unto me, that will I speak (1 Kings 22:14)."
+ },
+ "Hannah": {
+  "brief": "A woman in her thirties: a heartfelt, tender, prayerful alto; quiet anguish, then soaring joy in her song.",
+  "inspiration": "",
+  "scripture": "She spake in her heart; only her lips moved, but her voice was not heard (1 Samuel 1:13)."
+ },
+ "Isaac": {
+  "brief": "A gentle, quiet man: a mild, soft-spoken baritone, peaceable and contemplative. 'Isaac (old)' uses this voice, blind and frail.",
+  "inspiration": "",
+  "scripture": "Isaac went out to meditate in the field at the eventide (Genesis 24:63)."
+ },
+ "woman from Tekoa": {
+  "brief": "A wise woman of about fifty playing a part: a quick, persuasive, theatrical mezzo, plaintive on purpose.",
+  "inspiration": "",
+  "scripture": "A wise woman (2 Samuel 14:2)."
+ },
+ "Aaron": {
+  "brief": "Moses' older brother, past eighty: a fluent, smoother, more agreeable baritone than his brother's, eloquent and conciliatory, a priest's dignity.",
+  "inspiration": "Jeff Goldblum voiced a nervous Aaron in The Prince of Egypt; here the text's point is his ease of speech.",
+  "scripture": "I know that he can speak well (Exodus 4:14)."
+ },
+ "Huldah, prophetess": {
+  "brief": "A prophetess in her fifties: a firm, clear, authoritative alto, solemn and unafraid.",
+  "inspiration": "",
+  "scripture": "Thus saith the LORD God of Israel, Tell the man that sent you to me (2 Kings 22:15)."
+ },
+ "Samson": {
+  "brief": "A huge, strong man in his twenties: a brash, booming, playful baritone; a riddler, reckless and boastful, desperate at the end.",
+  "inspiration": "Victor Mature (Samson and Delilah).",
+  "scripture": "With the jawbone of an ass, heaps upon heaps (Judges 15:16)."
+ },
+ "Delilah": {
+  "brief": "A seductive woman in her twenties: a low, silky, teasing alto, wheedling and relentless.",
+  "inspiration": "Hedy Lamarr (Samson and Delilah).",
+  "scripture": "She pressed him daily with her words, and urged him (Judges 16:16)."
+ },
+ "Esther, queen": {
+  "brief": "A young queen in her early twenties: a poised, warm, courageous mezzo-soprano; gentle, intelligent, rising to resolve.",
+  "inspiration": "Marcia Gay Harden (The Word of Promise), Angela Bassett (The Bible Experience), Tiffany Dupont (One Night with the King).",
+  "scripture": "If I perish, I perish (Esther 4:16)."
+ },
+ "Mordecai, cousin of Esther": {
+  "brief": "An older official of about sixty: a steady, principled, grave baritone, protective and unbending.",
+  "inspiration": "John Rhys-Davies (One Night with the King).",
+  "scripture": "Who knoweth whether thou art come to the kingdom for such a time as this? (Esther 4:14)."
+ },
+ "Haman, highest noble to Xerxes, king": {
+  "brief": "A vain courtier in his forties: a silky, self-important, venomous baritone, gloating then panicked.",
+  "inspiration": "James Callis (One Night with the King).",
+  "scripture": "To whom would the king delight to do honour more than to myself? (Esther 6:6)."
+ },
+ "Xerxes, king of Persia and Media (Ahasuerus)": {
+  "brief": "A capricious emperor in his thirties: an expansive, indulgent, impulsive baritone, generous and dangerous.",
+  "inspiration": "Luke Goss (One Night with the King).",
+  "scripture": "What is thy petition? and it shall be granted thee (Esther 5:6)."
+ },
+ "Josiah, king of Judah": {
+  "brief": "A young reforming king in his twenties: a sincere, resolute tenor-baritone, zealous and tender-hearted.",
+  "inspiration": "",
+  "scripture": "Thine heart was tender (2 Kings 22:19)."
+ },
+ "Pilate": {
+  "brief": "A Roman governor in his fifties: a weary, cynical, patrician baritone; dry, clipped, uneasy beneath the control.",
+  "inspiration": "Rod Steiger (Jesus of Nazareth), Telly Savalas (The Greatest Story Ever Told), Hristo Shopov (The Passion of the Christ), David Bowie (The Last Temptation of Christ).",
+  "scripture": "What is truth? (John 18:38)."
+ },
+ "Darius, king of Medes and Persians": {
+  "brief": "An elderly emperor of about sixty-two: a dignified, warm, troubled baritone, bound by his own law.",
+  "inspiration": "",
+  "scripture": "Darius the Median took the kingdom, being about threescore and two years old (Daniel 5:31)."
+ },
+ "Caleb": {
+  "brief": "A vigorous old soldier of eighty-five: a hearty, confident, gravelly baritone, cheerful and fearless.",
+  "inspiration": "",
+  "scripture": "As my strength was then, even so is my strength now (Joshua 14:11)."
+ },
+ "Festus, governor of Judea": {
+  "brief": "A Roman governor in his forties: a brisk, practical, bureaucratic voice, impatient with religion.",
+  "inspiration": "",
+  "scripture": "Paul, thou art beside thyself (Acts 26:24)."
+ },
+ "Absalom, son of David": {
+  "brief": "A handsome prince in his twenties: a charming, smooth, ambitious tenor-baritone with a winning warmth that hides cold calculation.",
+  "inspiration": "",
+  "scripture": "Absalom stole the hearts of the men of Israel (2 Samuel 15:6)."
+ },
+ "Jethro (Reuel), Moses' father-in-law": {
+  "brief": "A desert priest of about seventy: a kindly, wise, fatherly baritone, practical and good-humoured.",
+  "inspiration": "Danny Glover voiced him in The Prince of Egypt.",
+  "scripture": "The thing that thou doest is not good (Exodus 18:17)."
+ },
+ "Abigail": {
+  "brief": "An intelligent woman in her late twenties: a gracious, articulate, persuasive mezzo, quick-witted and calm under pressure.",
+  "inspiration": "",
+  "scripture": "A woman of good understanding, and of a beautiful countenance (1 Samuel 25:3)."
+ },
+ "Jonah": {
+  "brief": "A prophet in his forties: a petulant, sulky, self-pitying tenor-baritone, reluctant and resentful.",
+  "inspiration": "Cuba Gooding Jr. (The Bible Experience).",
+  "scripture": "I do well to be angry, even unto death (Jonah 4:9)."
+ },
+ "Rebekah": {
+  "brief": "A woman from a bright, decisive girl to a determined mother: a quick, clear, energetic mezzo, kind and resourceful.",
+  "inspiration": "",
+  "scripture": "I will go (Genesis 24:58)."
+ },
+ "Satan (Devil)": {
+  "brief": "A smooth, intelligent, quietly seductive voice of indeterminate age, unsettlingly calm and reasonable; mocking under the charm. Never a growl or a monster.",
+  "inspiration": "Donald Pleasence (The Greatest Story Ever Told), Rosalinda Celentano's androgynous Satan (The Passion of the Christ): menace through calm.",
+  "scripture": "Satan himself is transformed into an angel of light (2 Corinthians 11:14)."
+ },
+ "serpent": {
+  "brief": "The serpent in the garden: a soft, silky, insinuating voice, ageless and curious; friendly, reasonable, and false.",
+  "inspiration": "Eartha Kitt voiced the serpent in The Bible Experience; it must not sound like the Satan of the Gospels.",
+  "scripture": "The serpent was more subtil than any beast of the field (Genesis 3:1)."
+ },
+ "Eve": {
+  "brief": "The first woman, young: a clear, fresh, curious soprano-mezzo, innocent at first, then ashamed.",
+  "inspiration": "",
+  "scripture": "The mother of all living (Genesis 3:20)."
+ },
+ "Adam": {
+  "brief": "The first man, young: a clear, open, wondering tenor-baritone, joyful at first, then defensive and afraid.",
+  "inspiration": "",
+  "scripture": "This is now bone of my bones (Genesis 2:23)."
+ },
+ "Cain": {
+  "brief": "A farmer in his twenties: a sullen, resentful, defensive baritone, dark and brooding.",
+  "inspiration": "Richard Harris (The Bible: In the Beginning).",
+  "scripture": "Am I my brother's keeper? (Genesis 4:9)."
+ },
+ "Noah": {
+  "brief": "An ancient man of six hundred years: a deep, patient, steady bass voice, quiet and obedient, slow and weathered.",
+  "inspiration": "Max von Sydow (The Word of Promise), John Huston (The Bible: In the Beginning), Russell Crowe (Noah).",
+  "scripture": "Noah was a just man and perfect in his generations (Genesis 6:9)."
+ },
+ "Sarah (Sarai)": {
+  "brief": "A beautiful woman from her sixties to her nineties: a dignified, wry, spirited alto, capable of laughter and of jealousy. 'Sarah (Sarai) (old)' uses this voice.",
+  "inspiration": "Ava Gardner (The Bible: In the Beginning).",
+  "scripture": "God hath made me to laugh (Genesis 21:6)."
+ },
+ "Hagar, Sarai's maid": {
+  "brief": "An Egyptian servant woman in her twenties: a frightened, proud, grieving mezzo with a desert-hardened strength.",
+  "inspiration": "",
+  "scripture": "Let me not see the death of the child (Genesis 21:16)."
+ },
+ "Lot": {
+  "brief": "Abraham's nephew in his fifties: an anxious, placating, hesitant tenor-baritone, a man who lingers.",
+  "inspiration": "",
+  "scripture": "While he lingered (Genesis 19:16)."
+ },
+ "Rachel": {
+  "brief": "A beautiful young woman: a bright, passionate, impatient soprano, loved and desperate.",
+  "inspiration": "",
+  "scripture": "Give me children, or else I die (Genesis 30:1)."
+ },
+ "Leah": {
+  "brief": "Rachel's older sister: a quiet, plaintive, longing alto, gentle and hurt.",
+  "inspiration": "",
+  "scripture": "Now this time will my husband be joined unto me (Genesis 29:34)."
+ },
+ "Miriam": {
+  "brief": "Moses' sister, an older woman: a strong, musical, proud mezzo, a leader of song. 'Miriam (young)' is the same voice as a quick, clever girl.",
+  "inspiration": "Sandra Bullock voiced her in The Prince of Egypt.",
+  "scripture": "Sing ye to the LORD (Exodus 15:21)."
+ },
+ "Goliath, Philistine champion": {
+  "brief": "A giant warrior: an enormous, booming, mocking bass, slow and contemptuous, the biggest voice in the Bible.",
+  "inspiration": "Martyn Ford (House of David).",
+  "scripture": "Am I a dog, that thou comest to me with staves? (1 Samuel 17:43)."
+ },
+ "Michal, David's wife": {
+  "brief": "A king's daughter in her twenties: a proud, sharp, wounded soprano, scornful at last.",
+  "inspiration": "",
+  "scripture": "How glorious was the king of Israel to day (2 Samuel 6:20)."
+ },
+ "Bathsheba": {
+  "brief": "A woman from her twenties to queen mother: a soft, composed, quietly persuasive mezzo, dignified.",
+  "inspiration": "Susan Hayward (David and Bathsheba).",
+  "scripture": "Let my lord king David live for ever (1 Kings 1:31)."
+ },
+ "Jezebel": {
+  "brief": "A foreign queen in her forties: a cold, venomous, commanding contralto, imperious and scornful.",
+  "inspiration": "",
+  "scripture": "Dost thou now govern the kingdom of Israel? (1 Kings 21:7)."
+ },
+ "Naaman": {
+  "brief": "A proud army commander in his forties: an indignant, booming baritone that softens into grateful humility.",
+  "inspiration": "",
+  "scripture": "Behold, I thought (2 Kings 5:11)."
+ },
+ "Gehazi": {
+  "brief": "Elisha's servant, about thirty: a nervous, eager, slippery tenor, ingratiating and greedy.",
+  "inspiration": "",
+  "scripture": "Thy servant went no whither (2 Kings 5:25)."
+ },
+ "Mary, Jesus' mother": {
+  "brief": "A young woman from fifteen to her forties: a gentle, humble, luminous soprano-mezzo with deep, quiet faith; tender and strong.",
+  "inspiration": "Olivia Hussey (Jesus of Nazareth), Keisha Castle-Hughes (The Nativity Story), Julia Ormond (Truth & Life), Maia Morgenstern (The Passion of the Christ).",
+  "scripture": "Behold the handmaid of the Lord (Luke 1:38); she kept all these things, and pondered them in her heart (Luke 2:19)."
+ },
+ "Mary Magdalene": {
+  "brief": "A woman in her thirties: a warm, intense, emotional alto, devoted and direct; grief turning to astonished joy.",
+  "inspiration": "Elizabeth Tabish (The Chosen), Kristen Bell (Truth & Life), Marisa Tomei (The Word of Promise), Rooney Mara (Mary Magdalene).",
+  "scripture": "They have taken away my Lord (John 20:13)."
+ },
+ "Martha": {
+  "brief": "A practical woman in her thirties: a brisk, frank, capable mezzo, busy and outspoken, with deep faith.",
+  "inspiration": "",
+  "scripture": "Lord, dost thou not care that my sister hath left me to serve alone? (Luke 10:40)."
+ },
+ "Mary, sister of Martha": {
+  "brief": "Martha's younger sister: a soft, contemplative, tender soprano, quiet and devoted.",
+  "inspiration": "",
+  "scripture": "Lord, if thou hadst been here, my brother had not died (John 11:32)."
+ },
+ "Elizabeth": {
+  "brief": "An elderly woman in her sixties: a warm, joyful, wise alto, full of wonder.",
+  "inspiration": "Shohreh Aghdashloo (The Nativity Story).",
+  "scripture": "Blessed art thou among women (Luke 1:42)."
+ },
+ "Zacharias (Zechariah)": {
+  "brief": "An aged priest in his seventies: a thin, reverent, doubtful tenor, then a jubilant prophetic voice when his tongue is loosed.",
+  "inspiration": "",
+  "scripture": "Whereby shall I know this? for I am an old man (Luke 1:18)."
+ },
+ "Simeon, devout man in Jerusalem": {
+  "brief": "A very old devout man: a frail, trembling, radiant voice, at peace.",
+  "inspiration": "",
+  "scripture": "Lord, now lettest thou thy servant depart in peace (Luke 2:29)."
+ },
+ "Nicodemus": {
+  "brief": "A respected Pharisee in his sixties: a cultured, cautious, thoughtful baritone, honestly puzzled.",
+  "inspiration": "Laurence Olivier (Jesus of Nazareth), Erick Avari (The Chosen).",
+  "scripture": "How can a man be born when he is old? (John 3:4)."
+ },
+ "Thomas": {
+  "brief": "A disciple in his thirties: a sceptical, blunt, plain-spoken tenor-baritone, loyal and frank.",
+  "inspiration": "",
+  "scripture": "Except I shall see in his hands the print of the nails, I will not believe (John 20:25)."
+ },
+ "Judas Iscariot": {
+  "brief": "A disciple in his thirties: a clever, controlled, tight baritone with a calculating edge; reasonable-sounding, later hollow and desperate.",
+  "inspiration": "Ian McShane (Jesus of Nazareth), Harvey Keitel (The Last Temptation of Christ), Luke Perry (The Word of Promise), Carl Anderson (Jesus Christ Superstar).",
+  "scripture": "Why was not this ointment sold for three hundred pence? (John 12:5); I have betrayed the innocent blood (Matthew 27:4)."
+ },
+ "Caiaphas, the high priest": {
+  "brief": "A powerful high priest in his fifties: a cold, measured, authoritative baritone, polished and politically shrewd.",
+  "inspiration": "Anthony Quinn (Jesus of Nazareth), Malcolm McDowell (Truth & Life), Mattia Sbragia (The Passion of the Christ).",
+  "scripture": "It is expedient for us, that one man should die for the people (John 11:50)."
+ },
+ "Herod Antipas (the tetrarch)": {
+  "brief": "A decadent ruler in his forties: a languid, mocking, self-indulgent baritone, superstitious and curious.",
+  "inspiration": "Christopher Plummer (Jesus of Nazareth), José Ferrer (The Greatest Story Ever Told).",
+  "scripture": "This is John the Baptist; he is risen from the dead (Matthew 14:2)."
+ },
+ "Herod the Great": {
+  "brief": "An old, paranoid king in his late sixties: a cunning, oily, menacing baritone, falsely pious.",
+  "inspiration": "Peter Ustinov (Jesus of Nazareth), Claude Rains (The Greatest Story Ever Told), Ciarán Hinds (The Nativity Story).",
+  "scripture": "That I may come and worship him also (Matthew 2:8)."
+ },
+ "centurion with great faith": {
+  "brief": "A Roman officer in his forties: a clipped, disciplined, respectful baritone, humble and direct.",
+  "inspiration": "",
+  "scripture": "I am a man under authority (Matthew 8:9)."
+ },
+ "centurion at crucifixion": {
+  "brief": "A hardened Roman soldier: a rough, awed baritone that cracks with realization.",
+  "inspiration": "John Wayne played him in The Greatest Story Ever Told.",
+  "scripture": "Truly this was the Son of God (Matthew 27:54)."
+ },
+ "criminal on cross, repentant": {
+  "brief": "A dying man in his thirties: a hoarse, strained, broken voice, humble and hopeful.",
+  "inspiration": "",
+  "scripture": "Lord, remember me when thou comest into thy kingdom (Luke 23:42)."
+ },
+ "John": {
+  "brief": "The beloved disciple, from his twenties to great age: a gentle, intimate, warm tenor-baritone, contemplative and loving; the voice of an old man remembering, when he writes.",
+  "inspiration": "George Xanthis (The Chosen); Louis Gossett Jr. voiced John in The Word of Promise, whose cast includes the writers of the books.",
+  "scripture": "That disciple whom Jesus loved (John 21:7); Little children, love one another (1 John)."
+ },
+ "James": {
+  "brief": "The brother of Jesus, leader of the Jerusalem church: a plain, firm, practical baritone, sober and wise, few words.",
+  "inspiration": "",
+  "scripture": "Be ye doers of the word, and not hearers only (James 1:22)."
+ },
+ "Jude": {
+  "brief": "A brother of James, in his forties: an urgent, earnest, forceful tenor-baritone, a short letter delivered with passion.",
+  "inspiration": "Read in the writer's voice (author_voices in policy.json).",
+  "scripture": "Earnestly contend for the faith (Jude 1:3)."
+ },
+ "Gamaliel": {
+  "brief": "An eminent old rabbi: a calm, learned, judicious baritone with gentle authority.",
+  "inspiration": "",
+  "scripture": "If it be of God, ye cannot overthrow it (Acts 5:39)."
+ },
+ "Cornelius": {
+  "brief": "A Roman centurion in his forties: an earnest, devout, respectful baritone, direct and humble.",
+  "inspiration": "",
+  "scripture": "A devout man, and one that feared God (Acts 10:2)."
+ },
+ "Holy Spirit, the": {
+  "brief": "A voice of pure presence: a soft, clear, intimate voice, calm and close, neither old nor young.",
+  "inspiration": "Rarely voiced; must not be confused with God's voice or Christ's.",
+  "scripture": "Separate me Barnabas and Saul (Acts 13:2)."
+ },
+ "woman, Samaritan": {
+  "brief": "A woman of about forty: a lively, sharp, guarded mezzo with streetwise humour, opening into wonder.",
+  "inspiration": "",
+  "scripture": "Come, see a man, which told me all things that ever I did (John 4:29)."
+ },
+ "Belshazzar, king of Babylon": {
+  "brief": "A young, decadent king: a loud, drunken, arrogant tenor-baritone that turns to terror.",
+  "inspiration": "",
+  "scripture": "The king's countenance was changed (Daniel 5:6)."
+ },
+ "queen of Sheba": {
+  "brief": "A powerful queen in her thirties: a rich, confident, gracious contralto, curious and admiring.",
+  "inspiration": "Gina Lollobrigida (Solomon and Sheba).",
+  "scripture": "The half was not told me (1 Kings 10:7)."
+ },
+ "beloved": {
+  "brief": "The bride of the Song: a young woman's warm, sensuous, yearning mezzo, intimate and joyful.",
+  "inspiration": "",
+  "scripture": "I am my beloved's, and my beloved is mine (Song of Solomon 6:3)."
+ },
+ "Nehemiah": {
+  "brief": "A royal cupbearer turned governor, about forty: an energetic, determined, practical baritone, prayerful and plain-spoken.",
+  "inspiration": "Harry Hamlin (The Word of Promise).",
+  "scripture": "I am doing a great work, so that I cannot come down (Nehemiah 6:3)."
+ },
+ "Eli": {
+  "brief": "An old, heavy high priest of ninety: a tired, gentle, fatalistic voice, kindly and weak.",
+  "inspiration": "",
+  "scripture": "It is the LORD: let him do what seemeth him good (1 Samuel 3:18)."
+ },
+ "Deborah/Barak": {
+  "brief": "Shared by Deborah and Barak; led by Deborah's voice.",
+  "inspiration": "Joan Allen (The Word of Promise) as Deborah.",
+  "scripture": "Judges 5, the Song of Deborah, is sung by both."
+ },
+ "Deborah": {
+  "brief": "A prophetess and judge in her forties: a commanding, inspiring, clear mezzo, decisive and fearless.",
+  "inspiration": "Joan Allen (The Word of Promise).",
+  "scripture": "I arose a mother in Israel (Judges 5:7)."
+ }
+}

@@ -1,0 +1,192 @@
+# pattern	arpabet	source / note
+# Case-sensitive regular expressions on whole words; context in lookarounds only.
+# Seed entries from the 2026-10-07 tests; the full name lexicon is built per docs/SOP.md (Step 4).
+Maher-shalal-hash-baz	M EY2 HH ER0 SH AE2 L AE0 L HH AE1 SH B AE2 Z	ISBE (1915) ma-her-shal-al-hash'-baz; the KJV hyphenates it, so the joined pattern matched nothing; heard "Maher Shalal Hashbaaz" (Isaiah 8:1,3)
+Zaphnath-paaneah	Z AE2 F N AE0 TH P EY2 AH0 N IY1 AH0	ISBE (1915) zaf-nath-pa-a-ne'-a; the KJV hyphenates it, so the joined pattern matched nothing; heard "Zaphnath-panea", a syllable short (Genesis 41:45)
+Chedorlaomer	K EH2 D ER0 L EY0 OW1 M ER0	ISBE (1915) ked-or-la-o'-mer
+MENE	M IY1 N IY0	Daniel 5:25; traditional English reading me'-ne
+TEKEL	T EH1 K AH0 L	Daniel 5:25,27
+UPHARSIN	Y UW0 F AA1 R S IH0 N	Daniel 5:25
+lead(?= in the mighty waters)	L EH1 D	Exodus 15:10, the metal; read "leed" in test e2
+(?<=, and the )lead(?=,)	L EH1 D	Numbers 31:22, the metal
+(?<=iron pen and )lead	L EH1 D	Job 19:24, the metal
+(?<=the )lead(?= is consumed)	L EH1 D	Jeremiah 6:29, the metal
+(?<=iron, and )lead	L EH1 D	Ezekiel 22:18,20, the metal
+(?<=tin, and )lead	L EH1 D	Ezekiel 27:12, the metal
+(?<=talent of )lead	L EH1 D	Zechariah 5:7, the metal
+(?<=weight of )lead	L EH1 D	Zechariah 5:8, the metal
+^Aleph(?=\.$)	AA1 L EH0 F	Psalm 119 heading only; ISBE (1915) a'-lef, Random House ah-lef; heard "Aleph"
+^Jod(?=\.$)	Y AO1 D	Psalm 119 heading only (yod); Random House yood/yawd; heard "Yod"
+^He(?=\.$)	HH EY1	Psalm 119 heading only; heard "Hey" as intended
+^Pe(?=\.$)	P EY1	Psalm 119 heading only; heard "pay" as intended
+^Nun(?=\.$)	N UW1 N	Psalm 119 heading only (the line is exactly "Nun."); Random House noon; heard "noon". The old Nun(?=\.$) also matched "the son of Nun." at the end of 6 verses (NUM 13:8, 14:30, 26:65, 34:17; DEU 32:44; 1KI 16:34), and the current renders of those chapters send Joshua's father as N UW1 N (checked in the render texts)
+^Vau(?=\.$)	V AA1 V	Psalm 119 heading only; Random House vahv (vav, variant vau); heard "Vov"
+^Cheth(?=\.$)	K EH1 TH	Psalm 119 heading only; Random House khet/kheth (heth, variant cheth); heard "Keth". ISBE (1915) gives khath (KAYTH) if the owner wants it to rhyme with Beth
+^Caph(?=\.$)	K AA1 F	Psalm 119 heading only; Random House kahf, kawf (kaph, variant caph), ISBE (1915) kaf; heard "Cough!", which is Random House's own second reading (kahf and cough sound alike in American speech), so the vowel is kept and the owner approves it on the reel; alternative K AE1 F (British kaf)
+^Koph(?=\.$)	K AO1 F	Psalm 119 heading only; Random House gives kawf, kept K OW1 F so it differs from Caph; heard "Corph"
+^Schin(?=\.$)	SH IY1 N	Psalm 119 heading only; Random House shin, sheen; heard "sheen" as intended
+^Tau(?=\.$)	T AW1	Psalm 119 heading only; Random House taw, tou; heard "Tau" as intended
+Pharez	F EH1 R EH0 Z	traditional English reading FAIR-ez; came out like "Beriz" in the Ruth 4 pilot; confirm on the name reel
+[Rr]ebuke	R IH0 B Y UW1 K	CMU dictionary; owner heard "re-bue-kay" (2026-10-09)
+[Rr]ebuked	R IH0 B Y UW1 K T	CMU dictionary; as rebuke
+[Rr]ebukes	R IH0 B Y UW1 K S	CMU dictionary; as rebuke
+[Rr]ebuketh	R IH0 B Y UW1 K IH0 TH	as rebuke, with -eth
+[Rr]ebuking	R IH0 B Y UW1 K IH0 NG	CMU dictionary; as rebuke
+[Rr]ebuker	R IH0 B Y UW1 K ER0	as rebuke
+[Aa]vaileth	AH0 V EY1 L IH0 TH	avail (CMU AH0 V EY1 L) with -eth; owner heard it wrong (2026-10-09)
+[Ss]hewbread	=showbread	pronounced show-bread (OED); Fish said "shoe-bread" (Exodus 35:13, 39:36; 1 Kings 7:48; Hebrews 9:2), 2026-10-11
+[Ee]merods	EH1 M ER0 AA2 D Z	ISBE (1915) em'-e-rodz; heard as "emirates" (Deuteronomy 28:27; 1 Samuel 5)
+[Hh]oughed	=hocked	hough is hock (OED); heard "huffed", "hoft", "halved" (Joshua 11:9; 2 Samuel 8:4; 1 Chronicles 18:4)
+[Ss]ubtil	=subtle	the KJV spelling of subtle; heard "subble" (Proverbs 7:10)
+[Ff]roward	F R OW1 ER0 D	CMU dictionary; heard "friar and" (Job 5:13)
+[Bb]ough	B AW1	CMU dictionary, rhymes with cow; heard "bar" (Genesis 49:22)
+[Bb]oughs	B AW1 Z	CMU dictionary, as bough
+[Oo]dours	=odors	the American spelling reads right; heard "ogres" (Jeremiah 34:5; Revelation 5:8)
+[Oo]dour	=odor	as odours
+[Cc]arcases	=carcasses	the modern spelling reads right; heard "castes" (Nahum 3:3)
+[Cc]arcase	=carcass	as carcases
+[Aa]ss	AE1 S	CMU dictionary; the animal, heard as "arse" in 6 places (Exodus 23:5; Judges 19:28; 1 Samuel 25:23; Job 39:5; Jeremiah 2:24, 22:19)
+[Aa]sses	AE1 S AH0 Z	CMU dictionary; heard as "arses" in 4 places (Numbers 31:34; 1 Samuel 8:16, 10:14; 1 Chronicles 27:30)
+purloining	P ER0 L OY1 N IH0 NG	CMU dictionary (purloin); heard "purlooming" (Titus 2:10)
+[Hh]adst	=had'st	read as "had" (Genesis 31:42; 2 Samuel 2:27); "had'st" read right in trials
+[Ss]hew	=show	shew is pronounced show (OED); heard "shoe" or "shoo" in 34 of 206 places (Deuteronomy 1:33, 28:50; Psalm 17:7, 25:4; Daniel 2:27, 4:2; Matthew 14:2, 22:19)
+[Ss]hewed	=showed	as shew; heard "shooed" or "chewed" in 7 of 124 places (Genesis 24:14; Leviticus 13:19; 2 Kings 20:13; Psalm 60:3, 142:2; John 21:14; Acts 20:20)
+[Ss]heweth	=showeth	as shew (OED); the transcripts give no fault here, it keeps the family one reading
+[Ss]hewing	=showing	as shew; heard "shooing" in 3 of 15 places (Daniel 5:12; Acts 9:39; Titus 3:2)
+[Ss]hewest	=showest	as shew (OED); no fault heard, it keeps the family one reading
+[Ss]hewedst	=showed'st	shew is pronounced show; heard "shouldest" (Jeremiah 11:18)
+([A-Za-z]+ed)st	=\1'st	the -edst past tense (59 words): Fish said it as the present, "trustest" for "trustedst" (Jeremiah 5:17, 12:5; Deuteronomy 28:52), "anointest", "provokest", "deliverest", "cursed"; "trusted'st" was read right in 4 of 5 trials
+[Aa]ss’s	AE1 S IH0 Z	the animal's; heard "arse his" (Genesis 49:11); the plain entry can't match before ’s
+[Hh]ough	=hock	hough is hock (OED); heard "hoe" (Joshua 11:6)
+stacte	S T AE1 K T IY0	Greek stakte, two syllables; heard "stacked" (Exodus 30:34)
+ligure	L IH1 G Y ER0	ISBE (1915) li'-gur; heard "ligia" (Exodus 28:19, 39:12)
+amerce	AH0 M ER1 S	CMU dictionary; heard "immerse" (Deuteronomy 22:19)
+holpen	HH OW1 L P AH0 N	CMU dictionary; heard "hope in" (Luke 1:54)
+(?<=just man and )an(?= holy)	AE1 N	"an holy" ran together as "unholy" (Mark 6:20)
+(?<=My people )hath(?= been lost sheep)	HH AE1 TH	read as "have" in two takes (Jeremiah 50:6)
+(?<=Behold, he )is(?= come out to fight)	IH1 Z	read as "has" in two takes (2 Kings 19:9)
+nineteenth(?= year of king Nebuchadnezzar)	N AY1 N T IY1 N TH	CMU dictionary; heard "ninth eighth" (2 Kings 25:8, omissions.json). The verse reads "the nineteenth year of king Nebuchadnezzar", so the old pattern matched nothing; Jeremiah 52:12 ("year of Nebuchadrezzar") and 1 Chronicles 24:16, 25:26 were heard right and are left alone
+^Beth(?=\.$)	B EY1 TH	Psalm 119 heading only; ISBE (1915) bath (bayth), Random House bays/bayt; Fish's own reading was "Beth"
+^Gimel(?=\.$)	G IY1 M EH0 L	Psalm 119 heading only; ISBE (1915) ge'-mel (first of ge'-mel, gim'-el); Random House gim-uhl, British also gee-mel; heard "Gimel"
+^Daleth(?=\.$)	D AA1 L EH0 TH	Psalm 119 heading only; ISBE (1915) da'-leth, Random House dah-luhth; heard "Daleth"
+^Zain(?=\.$)	Z AA1 Y IH0 N	Psalm 119 heading only; ISBE (1915) za'-in, Random House zah-yin (zayin); heard "Zane"
+^Teth(?=\.$)	T EH1 TH	Psalm 119 heading only; ISBE (1915) teth, Random House tet; heard "Teth". The "tayth" asked for has no dictionary support I could find (ISBE writes the long a as "a": bath, mam, rash), so this pins the short e
+^Lamed(?=\.$)	L AA1 M EH0 D	Psalm 119 heading only; Random House lah-mid, -med; ISBE (1915) la'-meth (spelled lamedh); heard "Lamed!", which can be the English word lamed
+^Mem(?=\.$)	M EY1 M	Psalm 119 heading only; ISBE (1915) mam, mem; Random House mem; heard "mem"
+^Samech(?=\.$)	S AA1 M EH0 K	Psalm 119 heading only; ISBE (1915) sam'-ek, Random House sah-muhkh (samekh, variant samech); heard "Simek"
+^Ain(?=\.$)	AA1 Y IH0 N	Psalm 119 heading only; Random House ah-yin (ayin), ISBE (1915) a'-in (Ain); heard "Ain", which could be read as "ane"
+^Tzaddi(?=\.$)	T S AA1 D IY0	Psalm 119 heading only; Random House tsah-dee (sadhe); ISBE (1915) tza-de' stresses the second syllable; heard "Sadi" (no t)
+^Resh(?=\.$)	R EY1 SH	Psalm 119 heading only; ISBE (1915) resh, rash; Random House raysh; heard "Resh"
+Job	JH OW1 B	Random House johb; the patriarch (and Issachar's son, Genesis 46:13). 59 in the verses plus the 42 chapter announcements; the KJV never writes lower-case "job". No report can show a misreading: the recognizer writes "Job" for both sounds
+Job’s	JH OW1 B Z	as Job; the plain entry can't match before ’s
+(?:(?<=\bthe )|(?<=\bThe )|(?<=\ba )|(?<=\bhis )|(?<=\bmy )|(?<=\bthy )|(?<=\bThy )|(?<=\btheir )|(?<=\bdeceitful )|(?<=\bbent )|(?<=\bbattle )|(?<=\bwith )|(?<=\bby )|(?<=\bTake )|(?<=hold on )|(?<=unto him ))bow	B OW1	CMU dictionary (bow, the weapon and the rainbow); all 99 "bow" checked one by one: these 57 are the noun, the other 42 are the verb (bow down, bow myself, bow the knee, bow thine ear); no recognizer evidence, it spells both "bow"
+[Bb]ows	B OW1 Z	CMU dictionary; all 14 are the weapons (the KJV verb is boweth)
+bowmen	B OW1 M AH0 N	OED bowman, as bow the weapon
+bowshot	B OW1 SH AA2 T	OED bowshot, as bow the weapon
+live(?= goat| ox| coal)	L AY1 V	CMU dictionary (live, adjective); the KJV's only adjectival "live" (1 Kings 3 and Leviticus 14 say "living")
+[Tt]ear	T EH1 R	CMU dictionary (tear, rend); every singular "tear" in the KJV is the verb; "tears" (36) are all weeping and stay as read
+[Tt]eareth	T EH1 R IH0 TH	tear, rend (CMU T EH1 R) with -eth
+[Aa]ged	EY1 JH IH0 D	CMU dictionary AGED(2), two syllables: all 9 mean old ("the aged", "Paul the aged"). EY1, not AY1 (AY is the vowel of "eye")
+(?:(?<=had )|(?<=hath )|(?<=hast )|(?<=have )|(?<=\bis )|(?<=\bbe )|(?<=was )|(?<=were )|(?<=\bare )|(?<=being )|(?<=plainly )|(?<=ye not )|(?<=[Hh]ave ye never )|(?<=known and ))read	R EH1 D	CMU dictionary READ(2), the past participle after had/hath/hast/have/is/be/was/were/are/being, "Have ye not read", "Have ye never read" (not "Did ye never read", Matthew 21:42); all 70 "read" checked one by one
+(?:(?<=\bhe )|(?<=\bHe )|(?<=\bthey )|(?<=Shaphan )|(?<=Baruch )|(?<=Jehudi )|(?<=priest )|(?<=Joshua )|(?<=Then )|(?<=then )|(?<=chariot )|(?<=messengers, and )|(?<=covenant, and )|(?<=place, and ))read	R EH1 D	CMU dictionary READ(2), the narrative past ("Shaphan read it", "Then read Baruch", "took the book of the covenant, and read"); the 21 left untagged are all present (shall read, to read, "go thou, and read", "Sit down now, and read it", Jeremiah 36:6,15)
+[Pp]resent(?= (?:him|himself|it|our|the|them|themselves|thyself|us|you|your|yourselves|every|their)\b)	P R IY0 Z EH1 N T	CMU dictionary PRESENT(2), the verb: all 22 take an object (him, them, yourselves, the man, your bodies); the other 84 "present" are the gift or "at hand" and keep the noun reading
+[Ww]ound(?= him up| it in linen)	W AW1 N D	CMU dictionary WOUND(2), past of wind; the other 23 "wound" are the injury or "to injure"
+(?:(?<=vile and )|(?<=offscouring and )|(?<=sell the ))refuse	R EH1 F Y UW2 S	OED refuse n. and adj. (REF-yoos): rubbish, worthless; the other 23 are the verb
+(?<=their )desert	D IH0 Z ER1 T	CMU dictionary DESERT(2): "render to them their desert", what they deserve; the other 41 "desert" are the wilderness
+(?<=their )deserts	D IH0 Z ER1 T S	CMU dictionary DESERTS(2): "according to their deserts will I judge them"; the other 5 "deserts" are wildernesses
+(?<=\bthe )sow	S AW1	CMU dictionary SOW(2), the pig ("the sow that was washed"); the other 36 "sow" are the verb
+[Ss]miteth	S M AY1 T IH0 TH	smite (CMU S M AY1 T) with -eth; heard "smitteth" in 11 of 12 places in the chapter transcripts and 8 of 8 in the take transcripts (Exodus 21:12,15; Deuteronomy 25:11, 27:24; Joshua 15:16; Judges 1:12; Ezekiel 7:9)
+[Ss]mitest	S M AY1 T IH0 S T	smite (CMU S M AY1 T) with -est; by analogy with smiteth, which Fish says with a short i; no fault heard in its 2 places (the recognizer wrote "smitest")
+[Dd]rave	D R EY1 V	OED drave, archaic past of drive, rhymes with gave; heard "drove" in 9 of 11 places in the chapter transcripts and 6 of 8 in the take transcripts (Exodus 14:25; Joshua 24:18; Judges 1:19, 6:9; 2 Samuel 6:3); the large-v3 second opinion settled all of them, so listen at Exodus 14:25 first
+gat	G AE1 T	Random House gat (gæt), archaic past of get; heard "got" in 3 places and "get" in 1 of 16 (Genesis 19:27; 2 Samuel 8:13; Psalm 116:3; Lamentations 5:9); the large-v3 second opinion settled them, so this is the weakest of these
+scall	S K AO1 L	Random House skawl, rhymes with call (CMU CALL K AO1 L), not SK AE1 L; heard "scowl" in 12 of 14 places and "scale" in 2 (Leviticus 13:30-37, 14:54)
+alway	AO1 L W EY2	OED alway (ALL-way), the KJV's word, not "always"; heard "always" in 17 of 22 places, hidden until now by qa.SAME alway=always
+throughly	TH R UW1 L IY0	OED throughly (THROO-lee), two syllables; heard "thoroughly" in 12 of 12 places, hidden until now by qa.SAME throughly=thoroughly
+clift	K L IH1 F T	OED clift (cleft); heard "cliff" (Exodus 33:22)
+clifts	K L IH1 F T S	as clift; heard "cliffs" in 2 of 2 places, hidden until now by qa.SAME clifts=cliffs
+Eleazar	EH2 L IY0 EY1 Z ER0	ISBE (1915) el-e-a'-zar (not in CMU); heard "Eliezer", a different man's name, in 37 of 74 places, both ways within one chapter (Numbers 20:25,26; 1 Chronicles 24)
+Eleasah	EH2 L IY0 EY1 S AH0	ISBE (1915) el-e-a'-sa; heard "Eliezer" in 3 of 4 places (1 Chronicles 2:39,40; 8:37)
+Shimei	SH IH1 M IY0 AY2	ISBE (1915) shim'-e-i (not in CMU); heard in two syllables, "Shammai" (another man) 9, "shimmai" 5, "shemai" 2 of 42, both ways in 1 Kings 2
+Cæsar(’s)?	=Caesar\1	CMU caesar S IY1 Z ER0; the ligature was read "kaiser", "Cessna", "Khazar" in 19 of 28 places (Luke 20:22-25; Mark 12:14-17; Acts 25:8-12); the plain spelling reads right. One entry covers Cæsar’s (8 places); qa.norm already folds æ to ae
+Cæsarea	=Caesarea	the plain spelling; the ligature was read "Cassarea" in 3 of 16 places (Acts 12:19, 18:22, 21:8)
+Æneas	=Aeneas	ISBE (1915) e-ne'-as; the ligature was read "Enneas" (Acts 9:33,34); the plain spelling
+Shallum	SH AE1 L AH0 M	ISBE (1915) shal'-um (not in CMU); heard "shalom" in 25 of 27 places (2 Kings 15:10-15; 1 Chronicles 2:40, 9:19)
+Maaseiah	M EY2 AH0 S IY1 Y AH0	ISBE (1915) ma-a-se'-ya; heard "Marcia" 8, "Massiah" 6, "Messiah" 1 and eight other ways in 25 places (1 Chronicles 15:18,20; 2 Chronicles 26:11)
+Machir	M EY1 K ER0	ISBE (1915) ma'-kir; the ch read as sh or h in 10 of 22 places ("mashi", "mahir", "mahan": 1 Chronicles 7:14-17; 2 Samuel 17:27; Numbers 32:39,40)
+Maach?ah	M EY1 AH0 K AH0	ISBE (1915) ma'-a-ka (Maacah, Maachah); the ch read as h, "Maha", in 10 of 21 places (1 Kings 15:10; 2 Chronicles 11:20-22)
+Maachathite	M EY0 AE1 K AH0 TH AY2 T	ISBE (1915) ma-ak'-a-thit; heard "mahathite" and "amarkathite" in 4 of 4 places (2 Samuel 23:34; 2 Kings 25:23; 1 Chronicles 4:19; Jeremiah 40:8)
+Maachathites	M EY0 AE1 K AH0 TH AY2 T S	ISBE (1915) ma-ak'-a-thits; heard "mahathites" 3, "markathites" 1 (Joshua 12:5, 13:11,13)
+Maachathi	M EY0 AE1 K AH0 TH AY2	as Maachathites (ISBE 1915); heard "mahathi" (Deuteronomy 3:14)
+Abel-beth-maachah	EY1 B AH0 L B EH1 TH M EY1 AH0 K AH0	ISBE (1915) a'-bel-beth-ma'-a-ka; heard "Abel Beth Maha" (1 Kings 15:20); the Maachah entry can't match inside a hyphenated word, so the whole word takes one entry
+Ai	EY1 AY1	CMU ai(2) EY1 AY1, ISBE (1915) a'-i; heard as one syllable, "a" 11 or "i" 3, in 14 of 36 places, both ways in Joshua 8
+Hai	HH EY1 AY1	ISBE (1915) ha'-i, as Ai; heard "high" (Genesis 12:8, 13:3)
+Obed-edom	=Obed Edom	ISBE (1915) o'-bed-e'-dom; the hyphenated name came out a syllable short ("Obedon", "Obedom", "Obedim") or slurred ("Obed diddum", "Obeidodom") across 20 places, while Obed (13 of 13) and Edom (87 of 87) are read right as words; the checker splits the hyphen anyway
+Baruch	B AA2 R UW1 K	CMU baruch B AA2 R UW1 K (ISBE 1915 gives ba'-ruk, bar'-uk: owner to choose on the reel); heard "Barak" (another man) 6, "Burak" 1, "Beric" 4 of 26 (Jeremiah 36:4-18, 43:6, 45:1,2)
+Zidon	Z AY1 D AH0 N	ISBE (1915) zi'-don, as CMU sidon S AY1 D AH0 N; heard "Zidane" 4, "Sedan" 1, "Zaidon" 1, "Zidun" 2, "Sidon" 2 of 21 (Ezekiel 28:21,22; Zechariah 9:2; Joshua 19:28); Zidonians is read ZY- already
+Baalim	B EY1 AH0 L IH0 M	ISBE (1915) ba'-a-lim; heard "Balaam" (another name) in 8 of 18 places (1 Samuel 7:4; Judges 10:6; Jeremiah 2:23)
+Amon	EY1 M AH0 N	ISBE (1915) a'-mon (CMU amon is a modern surname, AA0 M AO1 N); heard "Ammon" (the people) in 17 of 19 places (2 Kings 21:18-25; 2 Chronicles 33:20-25; Matthew 1:10)
+Anah	EY1 N AH0	ISBE (1915) a'-na; heard "Anna" in 12 of 12 places (Genesis 36; 1 Chronicles 1:38-41)
+Jazer	JH EY1 Z ER0	ISBE (1915) ja'-zer; heard "Jezer" (another man) in 10 of 11 places (Numbers 32:1,3; Isaiah 16:8,9; Jeremiah 48:32)
+Jaazer	JH EY1 AH0 Z ER0	ISBE (1915) ja'-a-zer, the AV spelling of Jazer; heard "Jezer" (Numbers 21:32, 32:35)
+Kedesh	K IY1 D EH0 SH	ISBE (1915) ke'-desh; heard "Kadesh" (another place) in 10 of 11 places (Judges 4:9-11; Joshua 12:22; 2 Kings 15:29)
+Kedesh-naphtali	K IY1 D EH0 SH N AE1 F T AH0 L AY2	ISBE (1915) ke'-desh-naf'-ta-li; heard "Kadesh Neftali" (Judges 4:6); the Kedesh entry can't match inside the hyphenated word
+Debir	D IY1 B ER0	ISBE (1915) de'-ber (the king and the city alike); heard "deir" 5, "debeah" 4 and five other ways in 14 places (Joshua 10:3,38; 15:15; Judges 1:11)
+Heman	HH IY1 M AH0 N	CMU heman HH IY1 M AH0 N, ISBE (1915) he'-man; heard "Haman" (another man) 3, "Herman" 2, "hemen" 3 of 17 (1 Chronicles 15:17, 16:41,42, 25:4-6)
+Selah?	S IY1 L AH0	ISBE (1915) se'-la, for Selah and Sela alike (not in CMU); heard SEE-lah ("seelah", "sealer", "seeler", "seal her") in 24 places, SIH-, SAH- or SAY-lah ("sila", "salah", "sailor") in 7, "selah"/"sela" in 45, of 76; Sela-hammahlekoth is untouched
+Urijah	Y UH0 R AY1 JH AH0	ISBE (1915) u-ri'-ja (Uriah, read right 27 of 28, has no j); heard "Eurydja", "Eurydia", "eurege" in 10 of 11 places (2 Kings 16:10-16; Jeremiah 26:20-23; Nehemiah 3:4)
+Ziba	Z AY1 B AH0	ISBE (1915) zi'-ba; heard "Zeba" in 6 of 16 places (2 Samuel 9:10,11; 16:3,4; 19:29)
+Zebah	Z IY1 B AH0	ISBE (1915) ze'-ba; heard "Ziba" (another man) in 6 of 12 places (Judges 8:10-21)
+Jehoiachin	JH IH0 HH OY1 AH0 K IH0 N	ISBE (1915) je-hoi'-a-kin; heard "Jehoiakim" (his father) 2, "Jehoachim" 1, "jehiyachin" 2 of 11 (2 Kings 24:6; 2 Chronicles 36:8,9; Jeremiah 52:31)
+Jehoiachin’s	JH IH0 HH OY1 AH0 K IH0 N Z	as Jehoiachin; the plain entry can't match before ’s (Ezekiel 1:2)
+Jehoiakim	JH IH0 HH OY1 AH0 K IH0 M	ISBE (1915) je-hoi'-a-kim; heard without the oi, "Jehoakim", in 19 of 37 places (Jeremiah 26, 36; 2 Chronicles 36:4,5)
+Jehoahaz	JH IH0 HH OW1 AH0 HH AE2 Z	ISBE (1915) je-ho'-a-haz; heard a syllable short, "Jehoaz" or "Johaz", in 12 of 23 places (2 Kings 13:25, 14:1,8, 23:30,31; 2 Chronicles 36:1-4)
+Adonijah	AE2 D AH0 N AY1 JH AH0	ISBE (1915) ad-o-ni'-ja; heard without the j ("Adoniah", "Adonio", "Adonia") in 7 of 26 places (1 Kings 1:7-9; 2:22-28)
+Ahijah	AH0 HH AY1 JH AH0	ISBE (1915) a-hi'-ja; heard "Ahisha" 3, "Ahadja" 3 of 20 (1 Kings 11:29,30; 14:4,5)
+Jeiel	JH IY0 AY1 EH0 L	ISBE (1915) je-i'-el; heard "Jael" (a woman's name) in 6 of 11 places (1 Chronicles 5:7, 16:5; 2 Chronicles 20:14)
+Er	=Ur	said "ur": CMU ur ER1, and Ur is read right 5 of 5 (the online ISBE 1915 text prints "ar" for Er, its vowel mark lost); heard "air", "ere", "eir" in 10 of 11 places (Genesis 38:6,7; 46:12; 1 Chronicles 2:3)
+Bichri	B IH1 K R AY0	ISBE (1915) bik'-ri; the ch read with an sh, "Bishkri", in 8 of 8 places (2 Samuel 20)
+Izhar	IH1 Z HH AA0 R	ISBE (1915) iz'-har; the z and h read as one sound ("Ishar", "Isha") in 8 of 8 places (Exodus 6:18,21; Numbers 16:1; 1 Chronicles 6:2, 23:12)
+Izharites	IH1 Z HH AA0 R AY2 T S	ISBE (1915) iz'-har-its; heard "Isharites" (1 Chronicles 24:22, 26:23,29)
+Joktan	JH AA1 K T AE0 N	ISBE (1915) jok'-tan; the J read as Y ("Yocten", "Yochtan") in 5 of 6 places (Genesis 10:25-29; 1 Chronicles 1:19,20)
+Jokshan	JH AA1 K SH AE0 N	ISBE (1915) jok'-shan; the J read as Y, "Yoxon" (Genesis 25:2,3)
+Joktheel	JH AA1 K TH IY0 EH0 L	ISBE (1915) jok'-the-el; the J read as Y, "Yochthiel", "Yokthiel" (Joshua 15:38; 2 Kings 14:7)
+Jokneam	JH AA1 K N IY0 AE0 M	ISBE (1915) jok'-ne-am; the J read as Y, "Yokneim" (1 Kings 4:12), elsewhere "Jochnium"
+Jokdeam	JH AA1 K D IY0 AE0 M	ISBE (1915) jok'-de-am; heard "York dam" (Joshua 15:56)
+Jakim	JH EY1 K IH0 M	ISBE (1915) ja'-kim; heard "Yakim" (1 Chronicles 8:19) and "Jacob" (24:12)
+Jehoadah	JH IH0 HH OW1 AH0 D AH0	ISBE (1915) je-ho'-a-da; heard "Yehuda" (1 Chronicles 8:36, both)
+Jotbathah	JH AA1 T B AH0 TH AH0	ISBE (1915) jot'-ba-tha; heard "Yotbasah", "Jotbath" (Numbers 33:33,34)
+Archite	=Arkite	ISBE (1915) ar'-kits (Archites); heard "archetype" in 5 of 5 places (2 Samuel 15:32, 16:16, 17:5,14; 1 Chronicles 27:33); "Arkite" (Genesis 10:17) is read ar'-kit
+Charran	K AE1 R AH0 N	ISBE (1915) kar'-an, as CMU haran HH AE1 R AH0 N (the same place) with k; heard "Sharon" (Acts 7:2,4)
+Abijam	AH0 B AY1 JH AE0 M	ISBE (1915) a-bi'-jam; heard "Abidjan", "Abigam" (1 Kings 14:31; 15:1,7,8)
+Manasses	M AH0 N AE1 S IY0 Z	ISBE (1915) ma-nas'-ez; heard "Manasseh", a syllable short, in 3 of 3 places (Matthew 1:10; Revelation 7:6)
+Ezekias	EH2 Z IH0 K AY1 AH0 S	ISBE (1915) ez-e-ki'-as; heard "Ezekiel" (Matthew 1:9,10)
+Nebuzar-adan	N EH2 B Y UW0 Z AA2 R EY1 D AH0 N	ISBE (1915) neb-u-zar-a'-dan; heard "Nebuchadrezzar" (his king) 2 and eight other ways in 15 places (2 Kings 25:8-20; Jeremiah 39:9-11)
+Keilah	K IY0 AY1 L AH0	ISBE (1915) ke-i'-la; heard KEE-lah ("Keilah") 11 and KY-lah ("Kyla", "Kylar") 7 of 18, both ways in 1 Samuel 23
+Eber	IY1 B ER0	ISBE (1915) e'-ber (CMU eber is a German surname, EH1 B ER0); heard "Abir" 4, "Iba" 3, "Eber" 6 (Genesis 11:14-17; 1 Chronicles 1:18,19)
+Amoz	EY1 M AA0 Z	ISBE (1915) a'-moz; heard "Amos" (another prophet) in 5 of 13 places (2 Kings 19:2,20; 2 Chronicles 32:20; Isaiah 2:1, 37:21)
+Iddo	IH1 D OW0	ISBE (1915) id'-o; heard "Edo" 10, "Ido" 3 of 14 (Ezra 5:1, 6:14; Zechariah 1:1,7)
+Huram	HH Y UW1 R AH0 M	ISBE (1915) hu'-ram; heard "Hurrem" 5, "Huram" 4, "Hiram" 1 and two others of 12 (2 Chronicles 2:3,13, 4:11,16, 8:2,18)
+Beriah	B IH0 R AY1 AH0	ISBE (1915) be-ri'-a; heard "Berea" 7 and "Beria" 4 of 11 (Genesis 46:17; Numbers 26:44,45; 1 Chronicles 7:23-31, 8:13,16, 23:10,11)
+Gaal	G EY1 AH0 L	ISBE (1915) ga'-al (CMU gaal is a modern surname, G AA1 L); heard as one syllable, "Gal", in 6 of 9 places (Judges 9:26-41)
+Teman	T IY1 M AH0 N	ISBE (1915) te'-man; heard "Timon" 3, "Timan" 5, "Teman" 1 and two others of 11 (Genesis 36:11,15; Ezekiel 25:13; Amos 1:12)
+Jedaiah	JH IH0 D EY1 Y AH0	ISBE (1915) je-da'-ya; heard "Jediah" 5, "Jedediah"/"Jedidiah" (other names) 3, "Judea" 1 of 13 (Ezra 2:36; Nehemiah 3:10, 12:21; Zechariah 6:14)
+Elioenai	IH0 L AY2 OW0 IY1 N EY0 AY2	ISBE (1915) e-li-o-e'-na-i; heard "Elionini", "Elionai", "Eli and I", "Eli", "Elione" in 7 of 8 places (1 Chronicles 3:23,24, 4:36, 26:3)
+Jeush	JH IY1 AH0 SH	ISBE (1915) je'-ush; heard as one syllable, "Jush" 4, or "Jewish" 2, "Joash" 1 of 8 (Genesis 36:5,14,18; 1 Chronicles 23:10,11)
+Noe	N OW1 IY0	ISBE (1915) no'-e (CMU noe is a modern surname, N OW1); heard "no" (Matthew 24:37,38) and "Noah" (Luke 17:26,27)
+Doeg	D OW1 EH0 G	ISBE (1915) do'-eg; heard six ways in 6 places, "Dog", "Dug", "Doig", "Durg" (1 Samuel 21:7, 22:9-22; Psalm 52 title)
+Javan	JH EY1 V AE0 N	ISBE (1915) ja'-van (CMU javan is a modern name, JH AH0 V AA1 N); heard "Jovim" (Genesis 10:2,4)
+Abidan	AH0 B AY1 D AE0 N	ISBE (1915) a-bi'-dan; heard "Abaddon" in 3 of 5 places (Numbers 2:22; 7:60,65)
+Elizur	IH0 L AY1 Z ER0	ISBE (1915) e-li'-zur; heard "Eliezer" (another man) in 2 of 5 places (Numbers 7:30,35)
+Asshur	AE1 SH ER0	ISBE (1915) ash'-ur (entry Ashur; Asshurim a-shoo'-rim); heard with s or sh, "Asher" (another name), "as her", "as sure", "Assur" in 6 of 8 (Genesis 10:11,22; Ezekiel 27:23, 32:22; Hosea 14:3)
+Becher	B IY1 K ER0	ISBE (1915) be'-ker (CMU becher is a German surname, B EH1 K ER0); the ch read as sh or h ("Beshur", "Beshah", "Beher") in 3 of 5 (Genesis 46:21; Numbers 26:35; 1 Chronicles 7:8)
+Berachah	B IH0 R EY1 K AH0	ISBE (1915) be-ra'-ka; the ch read as sh ("Berasha", "Barashah": 2 Chronicles 20:26)
+Hatach	HH EY1 T AE0 K	ISBE (1915) ha'-tak; heard "Hattash" in 2 of 4 places (Esther 4:9,10)
+Achaz	EY1 K AE0 Z	ISBE (1915) a'-kaz; heard "Arshaz" (Matthew 1:9, both)
+Michtam	=Miktam	ISBE (1915) mik'-tam; the ch read as sh or h ("Mishtam", "Mihtam") in 3 of 6 Psalm titles (57-59)
+Dishon	D AY1 SH AA0 N	ISBE (1915) di'-shon; heard with s ("Dison", "Disan") in 4 of 7 places (Genesis 36:21-30)
+Dishan	D AY1 SH AE0 N	ISBE (1915) di'-shan; heard "Disan" in 3 of 5 places (Genesis 36:21,28,30)
+Jeshaiah	JH IH0 SH EY1 Y AH0	ISBE (1915) je-sha'-ya; heard five ways in 5 places ("Jeziah", "Jeshuriah", "Cheshire": 1 Chronicles 25:3,15; Ezra 8:19)
+Chephirah	K IH0 F AY1 R AH0	ISBE (1915) ke-fi'-ra; the ch read as sh or t ("Shephira", "Shiphira", "Tiphira") in 4 places (Joshua 9:17, 18:26; Nehemiah 7:29)
+Eshtaol	EH1 SH T EY0 AA0 L	ISBE (1915) esh'-ta-ol; heard a syllable short ("Eshtol", "Eshto") in 4 of 7 places (Judges 16:31, 18:2; Joshua 15:33, 19:41)
+Zelotes	Z IH0 L OW1 T IY0 Z	ISBE (1915) ze-lo'-tez; heard "Zelot", "Zelots" (Luke 6:15; Acts 1:13)
+Gibeah	G IH1 B IY0 AH0	ISBE (1915) gib'-e-a; heard "Gibeon" (another city) in 7 of 48 places, all in Judges 19:12-14 and 20:4-10

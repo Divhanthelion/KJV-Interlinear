@@ -1,0 +1,5220 @@
+[
+ {
+  "ref": "GEN 4:8",
+  "notes": [
+   "merged: Cain kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And Cain talked with Abel his brother: and it came to pass, when they were in the field, that Cain rose up against Abel his brother, and slew him.",
+  "lines": [
+   [
+    "narrator",
+    "And Cain talked with Abel his brother: and it came to pass, when they were in the field, that Cain rose up against Abel his brother, and slew him."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Cain said to Abel, his brother,"
+   ],
+   [
+    "Cain",
+    "«Let’s go into the field.»"
+   ],
+   [
+    "narrator",
+    "While they were in the field, Cain rose up against Abel, his brother, and killed him."
+   ]
+  ]
+ },
+ {
+  "ref": "GEN 32:30",
+  "notes": [
+   "merged: Jacob (Israel) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And Jacob called the name of the place Peniel: for I have seen God face to face, and my life is preserved.",
+  "lines": [
+   [
+    "narrator",
+    "And Jacob called the name of the place Peniel: for I have seen God face to face, and my life is preserved."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Jacob called the name of the place Peniel; for he said,"
+   ],
+   [
+    "Jacob (Israel)",
+    "«I have seen God face to face, and my life is preserved.»"
+   ]
+  ]
+ },
+ {
+  "ref": "GEN 35:10",
+  "notes": [
+   "merged: narrator kept with God (the KJV speech runs on)"
+  ],
+  "kjv": "And God said unto him, Thy name is Jacob: thy name shall not be called any more Jacob, but Israel shall be thy name: and he called his name Israel.",
+  "lines": [
+   [
+    "narrator",
+    "And God said unto him,"
+   ],
+   [
+    "God",
+    "Thy name is Jacob: thy name shall not be called any more Jacob, but Israel shall be thy name: and he called his name Israel."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "God said to him,"
+   ],
+   [
+    "God",
+    "«Your name is Jacob. Your name shall not be Jacob any more, but your name will be Israel.»"
+   ],
+   [
+    "narrator",
+    "He named him Israel."
+   ]
+  ]
+ },
+ {
+  "ref": "GEN 38:25",
+  "notes": [
+   "merged: message from Tamar, daughter-in-law of Judah kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "When she was brought forth, she sent to her father in law, saying, By the man, whose these are, am I with child: and she said, Discern, I pray thee, whose are these, the signet, and bracelets, and staff.",
+  "lines": [
+   [
+    "narrator",
+    "When she was brought forth, she sent to her father in law, saying,"
+   ],
+   [
+    "message from Tamar, daughter-in-law of Judah",
+    "By the man,"
+   ],
+   [
+    "narrator",
+    "whose these are, am I with child: and she said, Discern, I pray thee, whose are these, the signet, and bracelets, and staff."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "When she was brought out, she sent to her father-in-law, saying,"
+   ],
+   [
+    "message from Tamar, daughter-in-law of Judah",
+    "«I am with child by the man who owns these.»"
+   ],
+   [
+    "narrator",
+    "She also said,"
+   ],
+   [
+    "message from Tamar, daughter-in-law of Judah",
+    "«Please discern whose these are—the signet, and the cords, and the staff.»"
+   ]
+  ]
+ },
+ {
+  "ref": "EXO 18:4",
+  "notes": [
+   "merged: Moses kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And the name of the other was Eliezer; for the God of my father, said he, was mine help, and delivered me from the sword of Pharaoh:",
+  "lines": [
+   [
+    "narrator",
+    "And the name of the other was Eliezer; for the God of my father, said he, was mine help, and delivered me from the sword of Pharaoh:"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The name of the other was Eliezer, for he said,"
+   ],
+   [
+    "Moses",
+    "«My father’s God was my help and delivered me from Pharaoh’s sword.»"
+   ]
+  ]
+ },
+ {
+  "ref": "NUM 12:4",
+  "notes": [
+   "merged: narrator kept with God (the KJV speech runs on)"
+  ],
+  "kjv": "And the LORD spake suddenly unto Moses, and unto Aaron, and unto Miriam, Come out ye three unto the tabernacle of the congregation. And they three came out.",
+  "lines": [
+   [
+    "narrator",
+    "And the LORD spake suddenly unto Moses, and unto Aaron, and unto Miriam,"
+   ],
+   [
+    "God",
+    "Come out ye three unto the tabernacle of the congregation. And they three came out."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Yahweh spoke suddenly to Moses, to Aaron, and to Miriam,"
+   ],
+   [
+    "God",
+    "«You three come out to the Tent of Meeting!»"
+   ],
+   [
+    "narrator",
+    "The three of them came out."
+   ]
+  ]
+ },
+ {
+  "ref": "NUM 32:5",
+  "notes": [
+   "merged: Gadites/Reubenites kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Wherefore, said they, if we have found grace in thy sight, let this land be given unto thy servants for a possession, and bring us not over Jordan.",
+  "lines": [
+   [
+    "narrator",
+    "Wherefore, said they, if we have found grace in thy sight, let this land be given unto thy servants for a possession, and bring us not over Jordan."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They said,"
+   ],
+   [
+    "Gadites/Reubenites",
+    "«If we have found favor in your sight, let this land be given to your servants for a possession. Don’t bring us over the Jordan.»"
+   ]
+  ]
+ },
+ {
+  "ref": "JOS 24:23",
+  "notes": [
+   "merged: Joshua (old) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Now therefore put away, said he, the strange gods which are among you, and incline your heart unto the LORD God of Israel.",
+  "lines": [
+   [
+    "narrator",
+    "Now therefore put away, said he, the strange gods which are among you, and incline your heart unto the LORD God of Israel."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Joshua said,"
+   ],
+   [
+    "Joshua (old)",
+    "«Now therefore put away the foreign gods which are among you, and incline your heart to Yahweh, the God of Israel.»"
+   ]
+  ]
+ },
+ {
+  "ref": "JDG 12:6",
+  "notes": [
+   "merged: Ephraimites kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Then said they unto him, Say now Shibboleth: and he said Sibboleth: for he could not frame to pronounce it right. Then they took him, and slew him at the passages of Jordan: and there fell at that time of the Ephraimites forty and two thousand.",
+  "lines": [
+   [
+    "narrator",
+    "Then said they unto him,"
+   ],
+   [
+    "Gilead, men of",
+    "Say now Shibboleth:"
+   ],
+   [
+    "narrator",
+    "and he said Sibboleth: for he could not frame to pronounce it right. Then they took him, and slew him at the passages of Jordan: and there fell at that time of the Ephraimites forty and two thousand."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "then they said to him,"
+   ],
+   [
+    "Gilead, men of",
+    "«Now say ‹Shibboleth;› »"
+   ],
+   [
+    "narrator",
+    "and he said"
+   ],
+   [
+    "Ephraimites",
+    "«Sibboleth»"
+   ],
+   [
+    "narrator",
+    "; for he couldn’t manage to pronounce it correctly, then they seized him and killed him at the fords of the Jordan. At that time, forty-two thousand of Ephraim fell."
+   ]
+  ]
+ },
+ {
+  "ref": "JDG 14:13",
+  "notes": [
+   "merged: narrator kept with Samson (the KJV speech runs on)"
+  ],
+  "kjv": "But if ye cannot declare it me, then shall ye give me thirty sheets and thirty change of garments. And they said unto him, Put forth thy riddle, that we may hear it.",
+  "lines": [
+   [
+    "Samson",
+    "But if ye cannot declare it me, then shall ye give me thirty sheets and thirty change of garments. And they said unto him,"
+   ],
+   [
+    "Samson's 30 Philistine companions",
+    "Put forth thy riddle, that we may hear it."
+   ]
+  ],
+  "reference": [
+   [
+    "Samson",
+    "but if you can’t tell me the answer, then you shall give me thirty linen garments and thirty changes of clothing.»"
+   ],
+   [
+    "narrator",
+    "They said to him,"
+   ],
+   [
+    "Samson's 30 Philistine companions",
+    "«Tell us your riddle, that we may hear it.»"
+   ]
+  ]
+ },
+ {
+  "ref": "1SA 10:22",
+  "notes": [
+   "merged: Israelites kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Therefore they enquired of the LORD further, if the man should yet come thither. And the LORD answered, Behold, he hath hid himself among the stuff.",
+  "lines": [
+   [
+    "narrator",
+    "Therefore they enquired of the LORD further, if the man should yet come thither. And the LORD answered,"
+   ],
+   [
+    "God",
+    "Behold, he hath hid himself among the stuff."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Therefore they asked of Yahweh further,"
+   ],
+   [
+    "Israelites",
+    "«Is there yet a man to come here?»"
+   ],
+   [
+    "narrator",
+    "Yahweh answered,"
+   ],
+   [
+    "God",
+    "«Behold, he has hidden himself among the baggage.»"
+   ]
+  ]
+ },
+ {
+  "ref": "2SA 17:8",
+  "notes": [
+   "merged: Hushai, David's friend kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "For, said Hushai, thou knowest thy father and his men, that they be mighty men, and they be chafed in their minds, as a bear robbed of her whelps in the field: and thy father is a man of war, and will not lodge with the people.",
+  "lines": [
+   [
+    "narrator",
+    "For, said Hushai, thou knowest thy father and his men, that they be mighty men, and they be chafed in their minds, as a bear robbed of her whelps in the field: and thy father is a man of war, and will not lodge with the people."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Hushai said moreover,"
+   ],
+   [
+    "Hushai, David's friend",
+    "«You know your father and his men, that they are mighty men, and they are fierce in their minds, like a bear robbed of her cubs in the field. Your father is a man of war, and will not lodge with the people."
+   ]
+  ]
+ },
+ {
+  "ref": "2SA 19:2",
+  "notes": [
+   "merged: informer kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And the victory that day was turned into mourning unto all the people: for the people heard say that day how the king was grieved for his son.",
+  "lines": [
+   [
+    "narrator",
+    "And the victory that day was turned into mourning unto all the people: for the people heard say that day how the king was grieved for his son."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The victory that day was turned into mourning among all the people; for the people heard it said that day,"
+   ],
+   [
+    "informer",
+    "«The king grieves for his son.»"
+   ]
+  ]
+ },
+ {
+  "ref": "1KI 2:29",
+  "notes": [
+   "merged: person who informed Solomon kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And it was told king Solomon that Joab was fled unto the tabernacle of the LORD; and, behold, he is by the altar. Then Solomon sent Benaiah the son of Jehoiada, saying, Go, fall upon him.",
+  "lines": [
+   [
+    "narrator",
+    "And it was told king Solomon that Joab was fled unto the tabernacle of the LORD; and, behold, he is by the altar. Then Solomon sent Benaiah the son of Jehoiada, saying,"
+   ],
+   [
+    "Solomon, king",
+    "Go, fall upon him."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "King Solomon was told,"
+   ],
+   [
+    "person who informed Solomon",
+    "«Joab has fled to Yahweh’s Tent, and behold, he is by the altar.»"
+   ],
+   [
+    "narrator",
+    "Then Solomon sent Benaiah the son of Jehoiada, saying,"
+   ],
+   [
+    "Solomon, king",
+    "«Go, fall on him.»"
+   ]
+  ]
+ },
+ {
+  "ref": "1KI 18:43",
+  "notes": [
+   "merged: narrator kept with Elijah (the KJV speech runs on)"
+  ],
+  "kjv": "And said to his servant, Go up now, look toward the sea. And he went up, and looked, and said, There is nothing. And he said, Go again seven times.",
+  "lines": [
+   [
+    "narrator",
+    "And said to his servant,"
+   ],
+   [
+    "Elijah",
+    "Go up now, look toward the sea."
+   ],
+   [
+    "narrator",
+    "And he went up, and looked, and said,"
+   ],
+   [
+    "servant of Elijah",
+    "There is nothing."
+   ],
+   [
+    "narrator",
+    "And he said,"
+   ],
+   [
+    "Elijah",
+    "Go again seven times."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He said to his servant,"
+   ],
+   [
+    "Elijah",
+    "«Go up now, and look toward the sea.»"
+   ],
+   [
+    "narrator",
+    "He went up, and looked, and said,"
+   ],
+   [
+    "servant of Elijah",
+    "«There is nothing.»"
+   ],
+   [
+    "narrator",
+    "He said,"
+   ],
+   [
+    "Elijah",
+    "«Go again»"
+   ],
+   [
+    "narrator",
+    "seven times."
+   ]
+  ]
+ },
+ {
+  "ref": "1KI 20:34",
+  "notes": [
+   "merged: narrator kept with Ahab, king of Israel (the KJV speech runs on)"
+  ],
+  "kjv": "And Ben-hadad said unto him, The cities, which my father took from thy father, I will restore; and thou shalt make streets for thee in Damascus, as my father made in Samaria. Then said Ahab, I will send thee away with this covenant. So he made a covenant with him, and sent him away.",
+  "lines": [
+   [
+    "narrator",
+    "And Ben-hadad said unto him,"
+   ],
+   [
+    "Ben-Hadad, king of Aram",
+    "The cities, which my father took from thy father, I will restore; and thou shalt make streets for thee in Damascus, as my father made in Samaria."
+   ],
+   [
+    "Ahab, king of Israel",
+    "Then said Ahab, I will send thee away with this covenant."
+   ],
+   [
+    "narrator",
+    "So he made a covenant with him, and sent him away."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Ben Hadad said to him,"
+   ],
+   [
+    "Ben-Hadad, king of Aram",
+    "«The cities which my father took from your father I will restore. You shall make streets for yourself in Damascus, as my father made in Samaria.»"
+   ],
+   [
+    "Ahab, king of Israel",
+    "«I»,"
+   ],
+   [
+    "narrator",
+    "said Ahab,"
+   ],
+   [
+    "Ahab, king of Israel",
+    "«will let you go with this covenant.»"
+   ],
+   [
+    "narrator",
+    "So he made a covenant with him, and let him go."
+   ]
+  ]
+ },
+ {
+  "ref": "1CH 23:4",
+  "notes": [
+   "merged: David kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Of which, twenty and four thousand were to set forward the work of the house of the LORD; and six thousand were officers and judges:",
+  "lines": [
+   [
+    "narrator",
+    "Of which, twenty and four thousand were to set forward the work of the house of the LORD; and six thousand were officers and judges:"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "David said,"
+   ],
+   [
+    "David",
+    "«Of these, twenty-four thousand were to oversee the work of Yahweh’s house, six thousand were officers and judges,"
+   ]
+  ]
+ },
+ {
+  "ref": "2CH 22:9",
+  "notes": [
+   "merged: men, some kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he sought Ahaziah: and they caught him, (for he was hid in Samaria,) and brought him to Jehu: and when they had slain him, they buried him: Because, said they, he is the son of Jehoshaphat, who sought the LORD with all his heart. So the house of Ahaziah had no power to keep still the kingdom.",
+  "lines": [
+   [
+    "narrator",
+    "And he sought Ahaziah: and they caught him, (for he was hid in Samaria,) and brought him to Jehu: and when they had slain him, they buried him: Because, said they, he is the son of Jehoshaphat, who sought the LORD with all his heart. So the house of Ahaziah had no power to keep still the kingdom."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He sought Ahaziah, and they caught him (now he was hiding in Samaria), and they brought him to Jehu, and killed him; and they buried him, for they said,"
+   ],
+   [
+    "men, some",
+    "«He is the son of Jehoshaphat, who sought Yahweh with all his heart.»"
+   ],
+   [
+    "narrator",
+    "The house of Ahaziah had no power to hold the kingdom."
+   ]
+  ]
+ },
+ {
+  "ref": "2CH 29:31",
+  "notes": [
+   "merged: narrator kept with Hezekiah, king of Judah (the KJV speech runs on)"
+  ],
+  "kjv": "Then Hezekiah answered and said, Now ye have consecrated yourselves unto the LORD, come near and bring sacrifices and thank offerings into the house of the LORD. And the congregation brought in sacrifices and thank offerings; and as many as were of a free heart burnt offerings.",
+  "lines": [
+   [
+    "narrator",
+    "Then Hezekiah answered and said,"
+   ],
+   [
+    "Hezekiah, king of Judah",
+    "Now ye have consecrated yourselves unto the LORD, come near and bring sacrifices and thank offerings into the house of the LORD. And the congregation brought in sacrifices and thank offerings; and as many as were of a free heart burnt offerings."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Then Hezekiah answered,"
+   ],
+   [
+    "Hezekiah, king of Judah",
+    "«Now you have consecrated yourselves to Yahweh. Come near and bring sacrifices and thank offerings into Yahweh’s house.»"
+   ],
+   [
+    "narrator",
+    "The assembly brought in sacrifices and thank offerings, and as many as were of a willing heart brought burnt offerings."
+   ]
+  ]
+ },
+ {
+  "ref": "EZR 3:11",
+  "notes": [
+   "merged: priests/Levites kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they sang together by course in praising and giving thanks unto the LORD; because he is good, for his mercy endureth for ever toward Israel. And all the people shouted with a great shout, when they praised the LORD, because the foundation of the house of the LORD was laid.",
+  "lines": [
+   [
+    "narrator",
+    "And they sang together by course in praising and giving thanks unto the LORD; because he is good, for his mercy endureth for ever toward Israel. And all the people shouted with a great shout, when they praised the LORD, because the foundation of the house of the LORD was laid."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They sang to one another in praising and giving thanks to Yahweh,"
+   ],
+   [
+    "priests/Levites",
+    "«For he is good, for his loving kindness endures forever toward Israel.»"
+   ],
+   [
+    "narrator",
+    "All the people shouted with a great shout, when they praised Yahweh, because the foundation of Yahweh’s house had been laid."
+   ]
+  ]
+ },
+ {
+  "ref": "EZR 4:11",
+  "notes": [
+   "merged: Rehum, commanding officer/Shimshai, secretary kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "This is the copy of the letter that they sent unto him, even unto Artaxerxes the king; Thy servants the men on this side the river, and at such a time.",
+  "lines": [
+   [
+    "narrator",
+    "This is the copy of the letter that they sent unto him, even unto Artaxerxes the king; Thy servants the men on this side the river, and at such a time."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "This is the copy of the letter that they sent:"
+   ],
+   [
+    "Rehum, commanding officer/Shimshai, secretary",
+    "To King Artaxerxes, From your servants the men beyond the River."
+   ]
+  ]
+ },
+ {
+  "ref": "PSA 10:4",
+  "notes": [
+   "merged: man, wicked kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "The wicked, through the pride of his countenance, will not seek after God: God is not in all his thoughts.",
+  "lines": [
+   [
+    "narrator",
+    "The wicked, through the pride of his countenance, will not seek after God: God is not in all his thoughts."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The wicked, in the pride of his face, thinks,"
+   ],
+   [
+    "man, wicked",
+    "«I have no room for God.»"
+   ]
+  ]
+ },
+ {
+  "ref": "PSA 29:9",
+  "notes": [
+   "merged: all in temple kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "The voice of the LORD maketh the hinds to calve, and discovereth the forests: and in his temple doth every one speak of his glory.",
+  "lines": [
+   [
+    "narrator",
+    "The voice of the LORD maketh the hinds to calve, and discovereth the forests: and in his temple doth every one speak of his glory."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Yahweh’s voice makes the deer calve, and strips the forests bare. In his temple everything says"
+   ],
+   [
+    "all in temple",
+    "«Glory!»"
+   ]
+  ]
+ },
+ {
+  "ref": "PSA 41:8",
+  "notes": [
+   "merged: David's enemies kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "An evil disease, say they, cleaveth fast unto him: and now that he lieth he shall rise up no more.",
+  "lines": [
+   [
+    "narrator",
+    "An evil disease, say they, cleaveth fast unto him: and now that he lieth he shall rise up no more."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They say,"
+   ],
+   [
+    "David's enemies",
+    "«An evil disease has afflicted him. Now that he lies he shall rise up no more.»"
+   ]
+  ]
+ },
+ {
+  "ref": "PSA 59:7",
+  "notes": [
+   "merged: David's enemies kept with narrator (indirect speech in the KJV)",
+   "merged: David's enemies kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Behold, they belch out with their mouth: swords are in their lips: for who, say they, doth hear?",
+  "lines": [
+   [
+    "narrator",
+    "Behold, they belch out with their mouth: swords are in their lips: for who, say they, doth hear?"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Behold, they spew with their mouth. Swords are in their lips,"
+   ],
+   [
+    "David's enemies",
+    "«For»,"
+   ],
+   [
+    "narrator",
+    "they say,"
+   ],
+   [
+    "David's enemies",
+    "«who hears us?»"
+   ]
+  ]
+ },
+ {
+  "ref": "PSA 64:6",
+  "notes": [
+   "merged: David's enemies kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "They search out iniquities; they accomplish a diligent search: both the inward thought of every one of them, and the heart, is deep.",
+  "lines": [
+   [
+    "narrator",
+    "They search out iniquities; they accomplish a diligent search: both the inward thought of every one of them, and the heart, is deep."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They plot injustice, saying,"
+   ],
+   [
+    "David's enemies",
+    "«We have made a perfect plan!»"
+   ],
+   [
+    "narrator",
+    "Surely man’s mind and heart are cunning."
+   ]
+  ]
+ },
+ {
+  "ref": "PSA 87:6",
+  "notes": [
+   "merged: God kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "The LORD shall count, when he writeth up the people, that this man was born there. Selah.",
+  "lines": [
+   [
+    "narrator",
+    "The LORD shall count, when he writeth up the people, that this man was born there. Selah."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Yahweh will count, when he writes up the peoples,"
+   ],
+   [
+    "God",
+    "«This one was born there.»"
+   ],
+   [
+    "narrator",
+    "Selah."
+   ]
+  ]
+ },
+ {
+  "ref": "PSA 87:7",
+  "notes": [
+   "merged: musicians kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "As well the singers as the players on instruments shall be there: all my springs are in thee.",
+  "lines": [
+   [
+    "narrator",
+    "As well the singers as the players on instruments shall be there: all my springs are in thee."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Those who sing as well as those who dance say,"
+   ],
+   [
+    "musicians",
+    "«All my springs are in you.»"
+   ]
+  ]
+ },
+ {
+  "ref": "PSA 96:10",
+  "notes": [
+   "merged: all the earth kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Say among the heathen that the LORD reigneth: the world also shall be established that it shall not be moved: he shall judge the people righteously.",
+  "lines": [
+   [
+    "narrator",
+    "Say among the heathen that the LORD reigneth: the world also shall be established that it shall not be moved: he shall judge the people righteously."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Say among the nations,"
+   ],
+   [
+    "all the earth",
+    "«Yahweh reigns. The world is also established. It can’t be moved. He will judge the peoples with equity.»"
+   ]
+  ]
+ },
+ {
+  "ref": "PSA 118:2",
+  "notes": [
+   "merged: Israel kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Let Israel now say, that his mercy endureth for ever.",
+  "lines": [
+   [
+    "narrator",
+    "Let Israel now say, that his mercy endureth for ever."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Let Israel now say,"
+   ],
+   [
+    "Israel",
+    "«His loving kindness endures forever.»"
+   ]
+  ]
+ },
+ {
+  "ref": "PSA 118:3",
+  "notes": [
+   "merged: house of Aaron, the kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Let the house of Aaron now say, that his mercy endureth for ever.",
+  "lines": [
+   [
+    "narrator",
+    "Let the house of Aaron now say, that his mercy endureth for ever."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Let the house of Aaron now say,"
+   ],
+   [
+    "house of Aaron, the",
+    "«His loving kindness endures forever.»"
+   ]
+  ]
+ },
+ {
+  "ref": "PSA 118:4",
+  "notes": [
+   "merged: those who fear Yahweh kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Let them now that fear the LORD say, that his mercy endureth for ever.",
+  "lines": [
+   [
+    "narrator",
+    "Let them now that fear the LORD say, that his mercy endureth for ever."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Now let those who fear Yahweh say,"
+   ],
+   [
+    "those who fear Yahweh",
+    "«His loving kindness endures forever.»"
+   ]
+  ]
+ },
+ {
+  "ref": "PSA 118:15",
+  "notes": [
+   "merged: voice of rejoicing and salvation kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "The voice of rejoicing and salvation is in the tabernacles of the righteous: the right hand of the LORD doeth valiantly.",
+  "lines": [
+   [
+    "narrator",
+    "The voice of rejoicing and salvation is in the tabernacles of the righteous: the right hand of the LORD doeth valiantly."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The voice of rejoicing and salvation is in the tents of the righteous."
+   ],
+   [
+    "voice of rejoicing and salvation",
+    "«The right hand of Yahweh does valiantly."
+   ]
+  ]
+ },
+ {
+  "ref": "PRO 28:24",
+  "notes": [
+   "merged: narrator kept with one who robs his father or mother (the KJV speech runs on)"
+  ],
+  "kjv": "Whoso robbeth his father or his mother, and saith, It is no transgression; the same is the companion of a destroyer.",
+  "lines": [
+   [
+    "narrator",
+    "Whoso robbeth his father or his mother, and saith,"
+   ],
+   [
+    "one who robs his father or mother",
+    "It is no transgression; the same is the companion of a destroyer."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Whoever robs his father or his mother and says,"
+   ],
+   [
+    "one who robs his father or mother",
+    "«It’s not wrong,»"
+   ],
+   [
+    "narrator",
+    "is a partner with a destroyer."
+   ]
+  ]
+ },
+ {
+  "ref": "ISA 3:14",
+  "notes": [
+   "merged: God kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "The LORD will enter into judgment with the ancients of his people, and the princes thereof: for ye have eaten up the vineyard; the spoil of the poor is in your houses.",
+  "lines": [
+   [
+    "narrator",
+    "The LORD will enter into judgment with the ancients of his people, and the princes thereof: for ye have eaten up the vineyard; the spoil of the poor is in your houses."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Yahweh will enter into judgment with the elders of his people and their leaders:"
+   ],
+   [
+    "God",
+    "«It is you who have eaten up the vineyard. The plunder of the poor is in your houses."
+   ]
+  ]
+ },
+ {
+  "ref": "ISA 22:13",
+  "notes": [
+   "merged: someone in Jerusalem kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And behold joy and gladness, slaying oxen, and killing sheep, eating flesh, and drinking wine: let us eat and drink; for to morrow we shall die.",
+  "lines": [
+   [
+    "narrator",
+    "And behold joy and gladness, slaying oxen, and killing sheep, eating flesh, and drinking wine: let us eat and drink; for to morrow we shall die."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "and behold, joy and gladness, killing cattle and killing sheep, eating meat and drinking wine:"
+   ],
+   [
+    "someone in Jerusalem",
+    "«Let’s eat and drink, for tomorrow we will die.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ISA 24:16",
+  "notes": [
+   "merged: singers from the ends of the earth kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "From the uttermost part of the earth have we heard songs, even glory to the righteous. But I said, My leanness, my leanness, woe unto me! the treacherous dealers have dealt treacherously; yea, the treacherous dealers have dealt very treacherously.",
+  "lines": [
+   [
+    "narrator",
+    "From the uttermost part of the earth have we heard songs, even glory to the righteous. But I said, My leanness, my leanness, woe unto me! the treacherous dealers have dealt treacherously; yea, the treacherous dealers have dealt very treacherously."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "From the uttermost part of the earth have we heard songs."
+   ],
+   [
+    "singers from the ends of the earth",
+    "«Glory to the righteous!»"
+   ],
+   [
+    "narrator",
+    "But I said, «I pine away! I pine away! woe is me!» The treacherous have dealt treacherously. Yes, the treacherous have dealt very treacherously."
+   ]
+  ]
+ },
+ {
+  "ref": "ISA 30:6",
+  "notes": [
+   "merged: God kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "The burden of the beasts of the south: into the land of trouble and anguish, from whence come the young and old lion, the viper and fiery flying serpent, they will carry their riches upon the shoulders of young asses, and their treasures upon the bunches of camels, to a people that shall not profit them.",
+  "lines": [
+   [
+    "narrator",
+    "The burden of the beasts of the south: into the land of trouble and anguish, from whence come the young and old lion, the viper and fiery flying serpent, they will carry their riches upon the shoulders of young asses, and their treasures upon the bunches of camels, to a people that shall not profit them."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The burden of the animals of the South."
+   ],
+   [
+    "God",
+    "«Through the land of trouble and anguish, of the lioness and the lion, the viper and fiery flying serpent, they carry their riches on the shoulders of young donkeys, and their treasures on the humps of camels, to an unprofitable people."
+   ]
+  ]
+ },
+ {
+  "ref": "ISA 53:11",
+  "notes": [
+   "merged: God kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "He shall see of the travail of his soul, and shall be satisfied: by his knowledge shall my righteous servant justify many; for he shall bear their iniquities.",
+  "lines": [
+   [
+    "narrator",
+    "He shall see of the travail of his soul, and shall be satisfied: by his knowledge shall my righteous servant justify many; for he shall bear their iniquities."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "After the suffering of his soul, he will see the light and be satisfied."
+   ],
+   [
+    "God",
+    "«My righteous servant will justify many by the knowledge of himself; and he will bear their iniquities."
+   ]
+  ]
+ },
+ {
+  "ref": "ISA 56:4",
+  "notes": [
+   "merged: God kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "For thus saith the LORD unto the eunuchs that keep my sabbaths, and choose the things that please me, and take hold of my covenant;",
+  "lines": [
+   [
+    "narrator",
+    "For thus saith the LORD unto the eunuchs that keep my sabbaths, and choose the things that please me, and take hold of my covenant;"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "For Yahweh says,"
+   ],
+   [
+    "God",
+    "«To the eunuchs who keep my Sabbaths, choose the things that please me, and hold fast to my covenant,"
+   ]
+  ]
+ },
+ {
+  "ref": "JER 8:19",
+  "notes": [
+   "merged: people kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Behold the voice of the cry of the daughter of my people because of them that dwell in a far country: Is not the LORD in Zion? is not her king in her? Why have they provoked me to anger with their graven images, and with strange vanities?",
+  "lines": [
+   [
+    "narrator",
+    "Behold the voice of the cry of the daughter of my people because of them that dwell in a far country: Is not the LORD in Zion? is not her king in her?"
+   ],
+   [
+    "God",
+    "Why have they provoked me to anger with their graven images, and with strange vanities?"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Behold, the voice of the cry of the daughter of my people from a land that is very far off:"
+   ],
+   [
+    "people",
+    "«Isn’t Yahweh in Zion? Isn’t her King in her?»"
+   ],
+   [
+    "God",
+    "«Why have they provoked me to anger with their engraved images, and with foreign idols?»"
+   ]
+  ]
+ },
+ {
+  "ref": "JER 12:14",
+  "notes": [
+   "merged: God kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Thus saith the LORD against all mine evil neighbours, that touch the inheritance which I have caused my people Israel to inherit; Behold, I will pluck them out of their land, and pluck out the house of Judah from among them.",
+  "lines": [
+   [
+    "narrator",
+    "Thus saith the LORD against all mine evil neighbours, that touch the inheritance which I have caused my people Israel to inherit; Behold, I will pluck them out of their land, and pluck out the house of Judah from among them."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Yahweh says,"
+   ],
+   [
+    "God",
+    "«Concerning all my evil neighbors, who touch the inheritance which I have caused my people Israel to inherit: Behold, I will pluck them up from off their land, and will pluck up the house of Judah from among them."
+   ]
+  ]
+ },
+ {
+  "ref": "JER 23:11",
+  "notes": [
+   "merged: God kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "For both prophet and priest are profane; yea, in my house have I found their wickedness, saith the LORD.",
+  "lines": [
+   [
+    "narrator",
+    "For both prophet and priest are profane; yea, in my house have I found their wickedness, saith the LORD."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "for both prophet and priest are profane."
+   ],
+   [
+    "God",
+    "«Yes, in my house I have found their wickedness,»"
+   ],
+   [
+    "narrator",
+    "says Yahweh."
+   ]
+  ]
+ },
+ {
+  "ref": "JER 44:19",
+  "notes": [
+   "merged: idolaters from Judah (women) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And when we burned incense to the queen of heaven, and poured out drink offerings unto her, did we make her cakes to worship her, and pour out drink offerings unto her, without our men?",
+  "lines": [
+   [
+    "narrator",
+    "And when we burned incense to the queen of heaven, and poured out drink offerings unto her, did we make her cakes to worship her, and pour out drink offerings unto her, without our men?"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The women said,"
+   ],
+   [
+    "idolaters from Judah (women)",
+    "«When we burned incense to the queen of the sky, and poured out drink offerings to her, did we make her cakes to worship her, and pour out drink offerings to her, without our husbands?»"
+   ]
+  ]
+ },
+ {
+  "ref": "JER 51:35",
+  "notes": [
+   "merged: Jerusalem (personified) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "The violence done to me and to my flesh be upon Babylon, shall the inhabitant of Zion say; and my blood upon the inhabitants of Chaldea, shall Jerusalem say.",
+  "lines": [
+   [
+    "Jerusalem (personified)",
+    "The violence done to me and to my flesh be upon Babylon,"
+   ],
+   [
+    "narrator",
+    "shall the inhabitant of Zion say; and my blood upon the inhabitants of Chaldea, shall Jerusalem say."
+   ]
+  ],
+  "reference": [
+   [
+    "Jerusalem (personified)",
+    "May the violence done to me and to my flesh be on Babylon!»"
+   ],
+   [
+    "narrator",
+    "the inhabitant of Zion will say; and,"
+   ],
+   [
+    "Jerusalem (personified)",
+    "«May my blood be on the inhabitants of Chaldea!»"
+   ],
+   [
+    "narrator",
+    "will Jerusalem say."
+   ]
+  ]
+ },
+ {
+  "ref": "HOS 4:1",
+  "notes": [
+   "merged: God kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Hear the word of the LORD, ye children of Israel: for the LORD hath a controversy with the inhabitants of the land, because there is no truth, nor mercy, nor knowledge of God in the land.",
+  "lines": [
+   [
+    "narrator",
+    "Hear the word of the LORD, ye children of Israel: for the LORD hath a controversy with the inhabitants of the land, because there is no truth, nor mercy, nor knowledge of God in the land."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Hear Yahweh’s word, you children of Israel; for Yahweh has a charge against the inhabitants of the land:"
+   ],
+   [
+    "God",
+    "«Indeed there is no truth, nor goodness, nor knowledge of God in the land."
+   ]
+  ]
+ },
+ {
+  "ref": "AMO 4:2",
+  "notes": [
+   "merged: God kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "The Lord GOD hath sworn by his holiness, that, lo, the days shall come upon you, that he will take you away with hooks, and your posterity with fishhooks.",
+  "lines": [
+   [
+    "narrator",
+    "The Lord GOD hath sworn by his holiness, that, lo, the days shall come upon you, that he will take you away with hooks, and your posterity with fishhooks."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The Lord Yahweh has sworn by his holiness that behold,"
+   ],
+   [
+    "God",
+    "«The days shall come on you that they will take you away with hooks, and the last of you with fish hooks."
+   ]
+  ]
+ },
+ {
+  "ref": "MIC 6:9",
+  "notes": [
+   "merged: God kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "The LORD’s voice crieth unto the city, and the man of wisdom shall see thy name: hear ye the rod, and who hath appointed it.",
+  "lines": [
+   [
+    "narrator",
+    "The LORD’s voice crieth unto the city, and the man of wisdom shall see thy name: hear ye the rod, and who hath appointed it."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Yahweh’s voice calls to the city, and wisdom sees your name:"
+   ],
+   [
+    "God",
+    "«Listen to the rod, and he who appointed it."
+   ]
+  ]
+ },
+ {
+  "ref": "NAM 1:14",
+  "notes": [
+   "merged: God kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And the LORD hath given a commandment concerning thee, that no more of thy name be sown: out of the house of thy gods will I cut off the graven image and the molten image: I will make thy grave; for thou art vile.",
+  "lines": [
+   [
+    "narrator",
+    "And the LORD hath given a commandment concerning thee, that no more of thy name be sown: out of the house of thy gods will I cut off the graven image and the molten image: I will make thy grave; for thou art vile."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Yahweh has commanded concerning you:"
+   ],
+   [
+    "God",
+    "«No more descendants will bear your name. Out of the house of your gods, I will cut off the engraved image and the molten image. I will make your grave, for you are vile.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ZEP 1:2",
+  "notes": [
+   "merged: narrator kept with God (the KJV speech runs on)"
+  ],
+  "kjv": "I will utterly consume all things from off the land, saith the LORD.",
+  "lines": [
+   [
+    "God",
+    "I will utterly consume all things from off the land, saith the LORD."
+   ]
+  ],
+  "reference": [
+   [
+    "God",
+    "«I will utterly sweep away everything from the surface of the earth,»"
+   ],
+   [
+    "narrator",
+    "says Yahweh."
+   ]
+  ]
+ },
+ {
+  "ref": "ZEP 1:3",
+  "notes": [
+   "merged: narrator kept with God (the KJV speech runs on)"
+  ],
+  "kjv": "I will consume man and beast; I will consume the fowls of the heaven, and the fishes of the sea, and the stumblingblocks with the wicked; and I will cut off man from off the land, saith the LORD.",
+  "lines": [
+   [
+    "God",
+    "I will consume man and beast; I will consume the fowls of the heaven, and the fishes of the sea, and the stumblingblocks with the wicked; and I will cut off man from off the land, saith the LORD."
+   ]
+  ],
+  "reference": [
+   [
+    "God",
+    "«I will sweep away man and animal. I will sweep away the birds of the sky, the fish of the sea, and the heaps of rubble with the wicked. I will cut off man from the surface of the earth,»"
+   ],
+   [
+    "narrator",
+    "says Yahweh."
+   ]
+  ]
+ },
+ {
+  "ref": "ZEC 5:7",
+  "notes": [
+   "merged: angel who talked with Zechariah kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And, behold, there was lifted up a talent of lead: and this is a woman that sitteth in the midst of the ephah.",
+  "lines": [
+   [
+    "narrator",
+    "And, behold, there was lifted up a talent of lead: and this is a woman that sitteth in the midst of the ephah."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "(and behold, a talent of lead was lifted up);"
+   ],
+   [
+    "angel who talked with Zechariah",
+    "and this is a woman sitting in the middle of the ephah basket.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MAT 2:4",
+  "notes": [
+   "merged: Herod the Great kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And when he had gathered all the chief priests and scribes of the people together, he demanded of them where Christ should be born.",
+  "lines": [
+   [
+    "narrator",
+    "And when he had gathered all the chief priests and scribes of the people together, he demanded of them where Christ should be born."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Gathering together all the chief priests and scribes of the people, he asked them:"
+   ],
+   [
+    "Herod the Great",
+    "«Where is the Christ to be be born?»"
+   ]
+  ]
+ },
+ {
+  "ref": "MAT 2:7",
+  "notes": [
+   "merged: Herod the Great kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Then Herod, when he had privily called the wise men, enquired of them diligently what time the star appeared.",
+  "lines": [
+   [
+    "narrator",
+    "Then Herod, when he had privily called the wise men, enquired of them diligently what time the star appeared."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Then Herod secretly called the wise men, and asked them:"
+   ],
+   [
+    "Herod the Great",
+    "«What time did the star appear?»"
+   ]
+  ]
+ },
+ {
+  "ref": "MAT 8:34",
+  "notes": [
+   "merged: Gadarene (or Gerasenes) people kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And, behold, the whole city came out to meet Jesus: and when they saw him, they besought him that he would depart out of their coasts.",
+  "lines": [
+   [
+    "narrator",
+    "And, behold, the whole city came out to meet Jesus: and when they saw him, they besought him that he would depart out of their coasts."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Behold, all the city came out to meet Jesus. When they saw him, they begged him saying:"
+   ],
+   [
+    "Gadarene (or Gerasenes) people",
+    "«Depart from our borders.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MAT 9:24",
+  "notes": [
+   "merged: people at Jairus' house kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "He said unto them, Give place: for the maid is not dead, but sleepeth. And they laughed him to scorn.",
+  "lines": [
+   [
+    "narrator",
+    "He said unto them,"
+   ],
+   [
+    "Jesus",
+    "Give place: for the maid is not dead, but sleepeth."
+   ],
+   [
+    "narrator",
+    "And they laughed him to scorn."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "he said to them,"
+   ],
+   [
+    "Jesus",
+    "«Go away. The girl isn’t dead, but sleeping.»"
+   ],
+   [
+    "narrator",
+    "They mocked him, saying:"
+   ],
+   [
+    "people at Jairus' house",
+    "«The girl is dead!»"
+   ]
+  ]
+ },
+ {
+  "ref": "MAT 12:16",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And charged them that they should not make him known:",
+  "lines": [
+   [
+    "narrator",
+    "And charged them that they should not make him known:"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "and commanded them, saying:"
+   ],
+   [
+    "Jesus",
+    "«Do not make my presence known.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MAT 14:7",
+  "notes": [
+   "merged: Herod Antipas (the tetrarch) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Whereupon he promised with an oath to give her whatsoever she would ask.",
+  "lines": [
+   [
+    "narrator",
+    "Whereupon he promised with an oath to give her whatsoever she would ask."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Then he promised her with an oath:"
+   ],
+   [
+    "Herod Antipas (the tetrarch)",
+    "«I will give you whatever you ask for!»"
+   ]
+  ]
+ },
+ {
+  "ref": "MAT 15:35",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he commanded the multitude to sit down on the ground.",
+  "lines": [
+   [
+    "narrator",
+    "And he commanded the multitude to sit down on the ground."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He commanded the people, saying:"
+   ],
+   [
+    "Jesus",
+    "«Sit down on the ground.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MAT 16:1",
+  "notes": [
+   "merged: Pharisees/Sadducees kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "The Pharisees also with the Sadducees came, and tempting desired him that he would shew them a sign from heaven.",
+  "lines": [
+   [
+    "narrator",
+    "The Pharisees also with the Sadducees came, and tempting desired him that he would shew them a sign from heaven."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The Pharisees and Sadducees came to test him and said,"
+   ],
+   [
+    "Pharisees/Sadducees",
+    "«Show us a sign from Heaven.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MAT 21:46",
+  "notes": [
+   "merged: chief priests/Pharisees kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "But when they sought to lay hands on him, they feared the multitude, because they took him for a prophet.",
+  "lines": [
+   [
+    "narrator",
+    "But when they sought to lay hands on him, they feared the multitude, because they took him for a prophet."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "When they sought to seize him, they said:"
+   ],
+   [
+    "chief priests/Pharisees",
+    "«We fear the people because they think he is a prophet.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MAT 24:1",
+  "notes": [
+   "merged: Peter (Simon)/James, the disciple/John/Andrew kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And Jesus went out, and departed from the temple: and his disciples came to him for to shew him the buildings of the temple.",
+  "lines": [
+   [
+    "narrator",
+    "And Jesus went out, and departed from the temple: and his disciples came to him for to shew him the buildings of the temple."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Jesus went out from the temple, and was going on his way. His disciples came to him and said:"
+   ],
+   [
+    "Peter (Simon)/James, the disciple/John/Andrew",
+    "«Master, look at all these magnificent buildings.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MAT 27:7",
+  "notes": [
+   "merged: chief priests kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they took counsel, and bought with them the potter’s field, to bury strangers in.",
+  "lines": [
+   [
+    "narrator",
+    "And they took counsel, and bought with them the potter’s field, to bury strangers in."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They said:"
+   ],
+   [
+    "chief priests",
+    "«We shall use the money to buy the land called the Potter’s Field so that strangers can be buried there.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 1:4",
+  "notes": [
+   "merged: John the Baptist kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "John did baptize in the wilderness, and preach the baptism of repentance for the remission of sins.",
+  "lines": [
+   [
+    "narrator",
+    "John did baptize in the wilderness, and preach the baptism of repentance for the remission of sins."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "John came preaching in the wilderness, saying:"
+   ],
+   [
+    "John the Baptist",
+    "«Repent and be baptized for the forgiveness of sins.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 3:12",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he straitly charged them that they should not make him known.",
+  "lines": [
+   [
+    "narrator",
+    "And he straitly charged them that they should not make him known."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He sternly warned them, saying:"
+   ],
+   [
+    "Jesus",
+    "«Do not make my presence known.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 5:10",
+  "notes": [
+   "merged: demons (Legion)/man delivered from Legion of demons kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he besought him much that he would not send them away out of the country.",
+  "lines": [
+   [
+    "narrator",
+    "And he besought him much that he would not send them away out of the country."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He begged him much, saying:"
+   ],
+   [
+    "demons (Legion)/man delivered from Legion of demons",
+    "«Do not send us out of the region.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 5:17",
+  "notes": [
+   "merged: Gadarene (or Gerasenes) people kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they began to pray him to depart out of their coasts.",
+  "lines": [
+   [
+    "narrator",
+    "And they began to pray him to depart out of their coasts."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They began to beg him, saying:"
+   ],
+   [
+    "Gadarene (or Gerasenes) people",
+    "«Depart from our borders.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 5:18",
+  "notes": [
+   "merged: man delivered from Legion of demons kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And when he was come into the ship, he that had been possessed with the devil prayed him that he might be with him.",
+  "lines": [
+   [
+    "narrator",
+    "And when he was come into the ship, he that had been possessed with the devil prayed him that he might be with him."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "As Jesus was entering into the boat, the man who had been possessed by demons begged him, saying:"
+   ],
+   [
+    "man delivered from Legion of demons",
+    "«Let me go with you.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 5:43",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)",
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he charged them straitly that no man should know it; and commanded that something should be given her to eat.",
+  "lines": [
+   [
+    "narrator",
+    "And he charged them straitly that no man should know it; and commanded that something should be given her to eat."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He strictly ordered them, saying:"
+   ],
+   [
+    "Jesus",
+    "«Tell no one about this!»"
+   ],
+   [
+    "narrator",
+    "Then he said:"
+   ],
+   [
+    "Jesus",
+    "«Give her something to eat.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 6:7",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he called unto him the twelve, and began to send them forth by two and two; and gave them power over unclean spirits;",
+  "lines": [
+   [
+    "narrator",
+    "And he called unto him the twelve, and began to send them forth by two and two; and gave them power over unclean spirits;"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He called to himself the twelve, and said to them:"
+   ],
+   [
+    "Jesus",
+    "«I am sending you out two by two and I am giving you authority over the unclean spirits.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 6:8",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And commanded them that they should take nothing for their journey, save a staff only; no scrip, no bread, no money in their purse:",
+  "lines": [
+   [
+    "narrator",
+    "And commanded them that they should take nothing for their journey, save a staff only; no scrip, no bread, no money in their purse:"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Then he told them:"
+   ],
+   [
+    "Jesus",
+    "«Take nothing for your journey, except a staff: no bread, no wallet, no money in your purse."
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 6:9",
+  "notes": [
+   "no red letter in the KJV here: the projection's lines for Christ given to the narrator"
+  ],
+  "kjv": "But be shod with sandals; and not put on two coats.",
+  "lines": [
+   [
+    "narrator",
+    "But be shod with sandals; and not put on two coats."
+   ]
+  ],
+  "reference": [
+   [
+    "Jesus",
+    "Wear sandals, but only one tunic.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 6:39",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he commanded them to make all sit down by companies upon the green grass.",
+  "lines": [
+   [
+    "narrator",
+    "And he commanded them to make all sit down by companies upon the green grass."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He commanded his disciples, saying:"
+   ],
+   [
+    "Jesus",
+    "«Tell everyone to sit down in groups on the green grass.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 6:45",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And straightway he constrained his disciples to get into the ship, and to go to the other side before unto Bethsaida, while he sent away the people.",
+  "lines": [
+   [
+    "narrator",
+    "And straightway he constrained his disciples to get into the ship, and to go to the other side before unto Bethsaida, while he sent away the people."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Immediately he ordered his disciples:"
+   ],
+   [
+    "Jesus",
+    "«Get into the boat and go to the other side, to Bethsaida.»"
+   ],
+   [
+    "narrator",
+    "Jesus sent the multitude away."
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 6:49",
+  "notes": [
+   "merged: disciples kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "But when they saw him walking upon the sea, they supposed it had been a spirit, and cried out:",
+  "lines": [
+   [
+    "narrator",
+    "But when they saw him walking upon the sea, they supposed it had been a spirit, and cried out:"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "But when they saw him walking on the sea, they cried out:"
+   ],
+   [
+    "disciples",
+    "«It’s a ghost!»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 6:55",
+  "notes": [
+   "merged: crowd kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And ran through that whole region round about, and began to carry about in beds those that were sick, where they heard he was.",
+  "lines": [
+   [
+    "narrator",
+    "And ran through that whole region round about, and began to carry about in beds those that were sick, where they heard he was."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They ran around that whole region, and began to bring those who were sick, on their mats, to wherever they heard people say:"
+   ],
+   [
+    "crowd",
+    "«Jesus is here.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 6:56",
+  "notes": [
+   "merged: people at Gennesaret (sick) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And whithersoever he entered, into villages, or cities, or country, they laid the sick in the streets, and besought him that they might touch if it were but the border of his garment: and as many as touched him were made whole.",
+  "lines": [
+   [
+    "narrator",
+    "And whithersoever he entered, into villages, or cities, or country, they laid the sick in the streets, and besought him that they might touch if it were but the border of his garment: and as many as touched him were made whole."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Wherever he entered, into villages, or into cities, or into the country, they laid the sick in the marketplaces, and begged him, saying:"
+   ],
+   [
+    "people at Gennesaret (sick)",
+    "«Just let me touch the fringe of your garment!»"
+   ],
+   [
+    "narrator",
+    "And all those who touched him were healed."
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 7:19",
+  "notes": [
+   "merged: narrator kept with Jesus (the KJV speech runs on)"
+  ],
+  "kjv": "Because it entereth not into his heart, but into the belly, and goeth out into the draught, purging all meats?",
+  "lines": [
+   [
+    "Jesus",
+    "Because it entereth not into his heart, but into the belly, and goeth out into the draught, purging all meats?"
+   ]
+  ],
+  "reference": [
+   [
+    "Jesus",
+    "This is because it doesn’t go into his heart, but into his stomach, then into the latrine, thus purifying all foods.»"
+   ],
+   [
+    "narrator",
+    "Thus he declared all foods clean"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 7:26",
+  "notes": [
+   "merged: Canaanite (Syrophoenician) mother of possessed girl kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "The woman was a Greek, a Syrophenician by nation; and she besought him that he would cast forth the devil out of her daughter.",
+  "lines": [
+   [
+    "narrator",
+    "The woman was a Greek, a Syrophenician by nation; and she besought him that he would cast forth the devil out of her daughter."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The woman was a Greek, a Syrophoenician by race. She begged him, saying:"
+   ],
+   [
+    "Canaanite (Syrophoenician) mother of possessed girl",
+    "«Please cast the demon out of my daughter!»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 7:36",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he charged them that they should tell no man: but the more he charged them, so much the more a great deal they published it;",
+  "lines": [
+   [
+    "narrator",
+    "And he charged them that they should tell no man: but the more he charged them, so much the more a great deal they published it;"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He commanded them, saying:"
+   ],
+   [
+    "Jesus",
+    "«Tell no one of this.»"
+   ],
+   [
+    "narrator",
+    "But the more he told them not to proclaim it, the more widely they did proclaim it."
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 8:6",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he commanded the people to sit down on the ground: and he took the seven loaves, and gave thanks, and brake, and gave to his disciples to set before them; and they did set them before the people.",
+  "lines": [
+   [
+    "narrator",
+    "And he commanded the people to sit down on the ground: and he took the seven loaves, and gave thanks, and brake, and gave to his disciples to set before them; and they did set them before the people."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He commanded the multitude, saying:"
+   ],
+   [
+    "Jesus",
+    "«Sit down on the ground.»"
+   ],
+   [
+    "narrator",
+    "Then, taking the seven loaves, he gave thanks and then broke them and gave them to his disciples to give to the people, and they did so."
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 8:11",
+  "notes": [
+   "merged: Pharisees kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And the Pharisees came forth, and began to question with him, seeking of him a sign from heaven, tempting him.",
+  "lines": [
+   [
+    "narrator",
+    "And the Pharisees came forth, and began to question with him, seeking of him a sign from heaven, tempting him."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The Pharisees came and began to question him. To test him they said:"
+   ],
+   [
+    "Pharisees",
+    "«Show us a sign from Heaven!»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 8:23",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he took the blind man by the hand, and led him out of the town; and when he had spit on his eyes, and put his hands upon him, he asked him if he saw ought.",
+  "lines": [
+   [
+    "narrator",
+    "And he took the blind man by the hand, and led him out of the town; and when he had spit on his eyes, and put his hands upon him, he asked him if he saw ought."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He took hold of the blind man by the hand, and brought him out of the village. When he had spit on his eyes, and laid his hands on him,"
+   ],
+   [
+    "Jesus",
+    "«Do you see anything?»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 8:30",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he charged them that they should tell no man of him.",
+  "lines": [
+   [
+    "narrator",
+    "And he charged them that they should tell no man of him."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Jesus commanded them, saying:"
+   ],
+   [
+    "Jesus",
+    "«Tell no one about me.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 8:31",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he began to teach them, that the Son of man must suffer many things, and be rejected of the elders, and of the chief priests, and scribes, and be killed, and after three days rise again.",
+  "lines": [
+   [
+    "narrator",
+    "And he began to teach them, that the Son of man must suffer many things, and be rejected of the elders, and of the chief priests, and scribes, and be killed, and after three days rise again."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Jesus began to teach them, saying:"
+   ],
+   [
+    "Jesus",
+    "«The Son of Man must suffer many things, and be rejected by the elders, the chief priests, and the scribes, and be killed, and after three days rise again.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 9:9",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And as they came down from the mountain, he charged them that they should tell no man what things they had seen, till the Son of man were risen from the dead.",
+  "lines": [
+   [
+    "narrator",
+    "And as they came down from the mountain, he charged them that they should tell no man what things they had seen, till the Son of man were risen from the dead."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "As they were coming down from the mountain, he commanded them, saying:"
+   ],
+   [
+    "Jesus",
+    "«Tell no one what you have seen until after the Son of Man has risen from the dead.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 9:10",
+  "notes": [
+   "merged: Peter (Simon)/James, the disciple/John kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they kept that saying with themselves, questioning one with another what the rising from the dead should mean.",
+  "lines": [
+   [
+    "narrator",
+    "And they kept that saying with themselves, questioning one with another what the rising from the dead should mean."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They kept this saying to themselves, and asked each other:"
+   ],
+   [
+    "Peter (Simon)/James, the disciple/John",
+    "«What does ‹Rising from the dead› mean?»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 10:13",
+  "notes": [
+   "merged: disciples kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they brought young children to him, that he should touch them: and his disciples rebuked those that brought them.",
+  "lines": [
+   [
+    "narrator",
+    "And they brought young children to him, that he should touch them: and his disciples rebuked those that brought them."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They were bringing to him little children so that he would touch them, but the disciples rebuked those who were bringing them, saying:"
+   ],
+   [
+    "disciples",
+    "«Don’t bother the teacher!»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 10:48",
+  "notes": [
+   "merged: crowd, many in the kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And many charged him that he should hold his peace: but he cried the more a great deal, Thou Son of David, have mercy on me.",
+  "lines": [
+   [
+    "narrator",
+    "And many charged him that he should hold his peace: but he cried the more a great deal,"
+   ],
+   [
+    "Bartimaeus (a blind man)",
+    "Thou Son of David, have mercy on me."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Many rebuked him, saying:"
+   ],
+   [
+    "crowd, many in the",
+    "«Be quiet!»"
+   ],
+   [
+    "narrator",
+    "but he cried out even more,"
+   ],
+   [
+    "Bartimaeus (a blind man)",
+    "«Son of David, have mercy on me!»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 10:49",
+  "notes": [
+   "merged: narrator kept with Jesus (the KJV speech runs on)",
+   "no red letter in the KJV here: the projection's lines for Christ given to the narrator"
+  ],
+  "kjv": "And Jesus stood still, and commanded him to be called. And they call the blind man, saying unto him, Be of good comfort, rise; he calleth thee.",
+  "lines": [
+   [
+    "narrator",
+    "And Jesus stood still, and commanded him to be called. And they call the blind man, saying unto him,"
+   ],
+   [
+    "crowd at Jericho",
+    "Be of good comfort, rise; he calleth thee."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Jesus stood still, and said,"
+   ],
+   [
+    "Jesus",
+    "«Call him.»"
+   ],
+   [
+    "narrator",
+    "They called the blind man, saying to him,"
+   ],
+   [
+    "crowd at Jericho",
+    "«Cheer up! Get up. He is calling you!»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 14:10",
+  "notes": [
+   "merged: Judas Iscariot kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And Judas Iscariot, one of the twelve, went unto the chief priests, to betray him unto them.",
+  "lines": [
+   [
+    "narrator",
+    "And Judas Iscariot, one of the twelve, went unto the chief priests, to betray him unto them."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Judas Iscariot, who was one of the twelve, went to the chief priests and said:"
+   ],
+   [
+    "Judas Iscariot",
+    "«I will hand him over to you.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 14:11",
+  "notes": [
+   "merged: narrator kept with chief priests (the KJV speech runs on)"
+  ],
+  "kjv": "And when they heard it, they were glad, and promised to give him money. And he sought how he might conveniently betray him.",
+  "lines": [
+   [
+    "narrator",
+    "And when they heard it, they were glad, and promised to give him money."
+   ],
+   [
+    "chief priests",
+    "And he sought how he might conveniently betray him."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "When they heard this they rejoiced and said:"
+   ],
+   [
+    "chief priests",
+    "«We will pay you for this!»"
+   ],
+   [
+    "narrator",
+    "He began looking for a convenient time to betray Jesus."
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 14:64",
+  "notes": [
+   "merged: chief priests/Sanhedrin kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Ye have heard the blasphemy: what think ye? And they all condemned him to be guilty of death.",
+  "lines": [
+   [
+    "Caiaphas, the high priest",
+    "Ye have heard the blasphemy: what think ye?"
+   ],
+   [
+    "narrator",
+    "And they all condemned him to be guilty of death."
+   ]
+  ],
+  "reference": [
+   [
+    "Caiaphas, the high priest",
+    "You have heard the blasphemy! What do you think?»"
+   ],
+   [
+    "narrator",
+    "They all condemned him saying:"
+   ],
+   [
+    "chief priests/Sanhedrin",
+    "«He deserves to die!»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 14:70",
+  "notes": [
+   "merged: Peter (Simon) kept with narrator (indirect speech in the KJV)",
+   "merged: narrator kept with narrator (the KJV speech runs on)"
+  ],
+  "kjv": "And he denied it again. And a little after, they that stood by said again to Peter, Surely thou art one of them: for thou art a Galilaean, and thy speech agreeth thereto.",
+  "lines": [
+   [
+    "narrator",
+    "And he denied it again. And a little after, they that stood by said again to Peter,"
+   ],
+   [
+    "high priest's servant (relative of the man whose ear Peter cut off)/those standing near",
+    "Surely thou art one of them: for thou art a Galilaean, and thy speech agreeth thereto."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "But again Peter denied it, saying:"
+   ],
+   [
+    "Peter (Simon)",
+    "«I don’t know him!»"
+   ],
+   [
+    "narrator",
+    "Again, after a little while, those who stood by said to Peter:"
+   ],
+   [
+    "high priest's servant (relative of the man whose ear Peter cut off)/those standing near",
+    "«You truly are one of them, for you are a Galilean, and your speech shows it.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 15:8",
+  "notes": [
+   "merged: crowd before Pilate kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And the multitude crying aloud began to desire him to do as he had ever done unto them.",
+  "lines": [
+   [
+    "narrator",
+    "And the multitude crying aloud began to desire him to do as he had ever done unto them."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The multitude, crying aloud, said to Pilate:"
+   ],
+   [
+    "crowd before Pilate",
+    "«Do for us what you have always done for us in the past!»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 15:11",
+  "notes": [
+   "merged: crowd before Pilate kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "But the chief priests moved the people, that he should rather release Barabbas unto them.",
+  "lines": [
+   [
+    "narrator",
+    "But the chief priests moved the people, that he should rather release Barabbas unto them."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "But the chief priests stirred up the people to yell:"
+   ],
+   [
+    "crowd before Pilate",
+    "«Give us Barrabus!»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 15:43",
+  "notes": [
+   "merged: Joseph of Arimathaea kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Joseph of Arimathaea, an honourable counsellor, which also waited for the kingdom of God, came, and went in boldly unto Pilate, and craved the body of Jesus.",
+  "lines": [
+   [
+    "narrator",
+    "Joseph of Arimathaea, an honourable counsellor, which also waited for the kingdom of God, came, and went in boldly unto Pilate, and craved the body of Jesus."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Joseph of Arimathaea, a prominent council member who also himself was looking for the Kingdom of God, came. He boldly went in to Pilate, and said:"
+   ],
+   [
+    "Joseph of Arimathaea",
+    "«Give me the body of Jesus.»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 15:44",
+  "notes": [
+   "merged: Pilate kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And Pilate marvelled if he were already dead: and calling unto him the centurion, he asked him whether he had been any while dead.",
+  "lines": [
+   [
+    "narrator",
+    "And Pilate marvelled if he were already dead: and calling unto him the centurion, he asked him whether he had been any while dead."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Pilate was surprised to hear that Jesus might already be dead, so he summoned the centurion he asked him:"
+   ],
+   [
+    "Pilate",
+    "«Is he already dead?»"
+   ]
+  ]
+ },
+ {
+  "ref": "MRK 16:14",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Afterward he appeared unto the eleven as they sat at meat, and upbraided them with their unbelief and hardness of heart, because they believed not them which had seen him after he was risen.",
+  "lines": [
+   [
+    "narrator",
+    "Afterward he appeared unto the eleven as they sat at meat, and upbraided them with their unbelief and hardness of heart, because they believed not them which had seen him after he was risen."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Afterward he appeared to the eleven as they sat at the table, and he rebuked them saying:"
+   ],
+   [
+    "Jesus",
+    "«Your hearts are hard! Why did you not believe the others who had seen me?»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 1:22",
+  "notes": [
+   "merged: people kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And when he came out, he could not speak unto them: and they perceived that he had seen a vision in the temple: for he beckoned unto them, and remained speechless.",
+  "lines": [
+   [
+    "narrator",
+    "And when he came out, he could not speak unto them: and they perceived that he had seen a vision in the temple: for he beckoned unto them, and remained speechless."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "When he came out, he could not speak to them, and they said:"
+   ],
+   [
+    "people",
+    "«He has seen a vision in the temple!»"
+   ],
+   [
+    "narrator",
+    "He continued making hand signs to them, and remained mute."
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 1:64",
+  "notes": [
+   "merged: Zacharias (Zechariah) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And his mouth was opened immediately, and his tongue loosed, and he spake, and praised God.",
+  "lines": [
+   [
+    "narrator",
+    "And his mouth was opened immediately, and his tongue loosed, and he spake, and praised God."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "His mouth was opened immediately, and his tongue freed, and he spoke, saying:"
+   ],
+   [
+    "Zacharias (Zechariah)",
+    "«Praise God!»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 3:3",
+  "notes": [
+   "merged: John the Baptist kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he came into all the country about Jordan, preaching the baptism of repentance for the remission of sins;",
+  "lines": [
+   [
+    "narrator",
+    "And he came into all the country about Jordan, preaching the baptism of repentance for the remission of sins;"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He came into all the region around the Jordan, preaching and saying:"
+   ],
+   [
+    "John the Baptist",
+    "«Receive this baptism of repentence for the forgiveness of sins.»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 3:15",
+  "notes": [
+   "merged: people near Jordan River kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And as the people were in expectation, and all men mused in their hearts of John, whether he were the Christ, or not;",
+  "lines": [
+   [
+    "narrator",
+    "And as the people were in expectation, and all men mused in their hearts of John, whether he were the Christ, or not;"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "As the people were in expectation, and all men reasoned in their hearts concerning John,"
+   ],
+   [
+    "people near Jordan River",
+    "«Could John be the Messiah?»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 3:19",
+  "notes": [
+   "merged: John the Baptist kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "But Herod the tetrarch, being reproved by him for Herodias his brother Philip’s wife, and for all the evils which Herod had done,",
+  "lines": [
+   [
+    "narrator",
+    "But Herod the tetrarch, being reproved by him for Herodias his brother Philip’s wife, and for all the evils which Herod had done,"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He reproved Herod, saying to him:"
+   ],
+   [
+    "John the Baptist",
+    "«It is unlawful for you to have your brother’s wife!»"
+   ],
+   [
+    "narrator",
+    "And he reproved him for all the other evil things which Herod had done."
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 6:11",
+  "notes": [
+   "merged: Pharisees/teachers of religious law kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they were filled with madness; and communed one with another what they might do to Jesus.",
+  "lines": [
+   [
+    "narrator",
+    "And they were filled with madness; and communed one with another what they might do to Jesus."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "But they were filled with rage, and talked with one another, saying:"
+   ],
+   [
+    "Pharisees/teachers of religious law",
+    "«What can we do about Jesus?»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 7:15",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he that was dead sat up, and began to speak. And he delivered him to his mother.",
+  "lines": [
+   [
+    "narrator",
+    "And he that was dead sat up, and began to speak. And he delivered him to his mother."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The young man who was dead sat up, and began to speak. And Jesus returned him to his mother saying:"
+   ],
+   [
+    "Jesus",
+    "«Receive your son.»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 8:31",
+  "notes": [
+   "merged: demons (Legion)/man delivered from Legion of demons kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they besought him that he would not command them to go out into the deep.",
+  "lines": [
+   [
+    "narrator",
+    "And they besought him that he would not command them to go out into the deep."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They begged him, saying:"
+   ],
+   [
+    "demons (Legion)/man delivered from Legion of demons",
+    "«Do not send us into the abyss!»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 8:32",
+  "notes": [
+   "merged: demons (Legion)/man delivered from Legion of demons kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And there was there an herd of many swine feeding on the mountain: and they besought him that he would suffer them to enter into them. And he suffered them.",
+  "lines": [
+   [
+    "narrator",
+    "And there was there an herd of many swine feeding on the mountain: and they besought him that he would suffer them to enter into them. And he suffered them."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Now there was there a herd of many pigs feeding on the mountain. The Demons begged Jesus, saying:"
+   ],
+   [
+    "demons (Legion)/man delivered from Legion of demons",
+    "«Allow us to enter into the pigs!»"
+   ],
+   [
+    "narrator",
+    "He allowed them."
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 8:41",
+  "notes": [
+   "merged: Jairus (synagogue leader) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And, behold, there came a man named Jairus, and he was a ruler of the synagogue: and he fell down at Jesus’ feet, and besought him that he would come into his house:",
+  "lines": [
+   [
+    "narrator",
+    "And, behold, there came a man named Jairus, and he was a ruler of the synagogue: and he fell down at Jesus’ feet, and besought him that he would come into his house:"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "A ruler of the Synagogue named Jairus came and fell at Jesus’s feet, and begged him, saying:"
+   ],
+   [
+    "Jairus (synagogue leader)",
+    "«Come to my house!»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 8:45",
+  "notes": [
+   "merged: narrator kept with crowd (the KJV speech runs on)",
+   "red letter inside Peter (Simon)'s words: kept with them (quoting Christ)"
+  ],
+  "kjv": "And Jesus said, Who touched me? When all denied, Peter and they that were with him said, Master, the multitude throng thee and press thee, and sayest thou, Who touched me?",
+  "lines": [
+   [
+    "narrator",
+    "And Jesus said,"
+   ],
+   [
+    "Jesus",
+    "Who touched me?"
+   ],
+   [
+    "narrator",
+    "When all denied,"
+   ],
+   [
+    "crowd",
+    "Peter and they that were with him said,"
+   ],
+   [
+    "Peter (Simon)",
+    "Master, the multitude throng thee and press thee, and sayest thou, Who touched me?"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Jesus said,"
+   ],
+   [
+    "Jesus",
+    "«Who touched me?»"
+   ],
+   [
+    "narrator",
+    "They all denied it saying:"
+   ],
+   [
+    "crowd",
+    "«Not I!»"
+   ],
+   [
+    "narrator",
+    "Peter said:"
+   ],
+   [
+    "Peter (Simon)",
+    "«Master, the multitudes press and jostle you, and you say, ‹Who touched me?› »"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 8:55",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And her spirit came again, and she arose straightway: and he commanded to give her meat.",
+  "lines": [
+   [
+    "narrator",
+    "And her spirit came again, and she arose straightway: and he commanded to give her meat."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Her spirit returned and she rose up immediately. Jesus told them:"
+   ],
+   [
+    "Jesus",
+    "«Give her something to eat.»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 8:56",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And her parents were astonished: but he charged them that they should tell no man what was done.",
+  "lines": [
+   [
+    "narrator",
+    "And her parents were astonished: but he charged them that they should tell no man what was done."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Her parents were amazed, but he commanded them, saying:"
+   ],
+   [
+    "Jesus",
+    "«Tell no one what has been done.»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 9:7",
+  "notes": [
+   "merged: people kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Now Herod the tetrarch heard of all that was done by him: and he was perplexed, because that it was said of some, that John was risen from the dead;",
+  "lines": [
+   [
+    "narrator",
+    "Now Herod the tetrarch heard of all that was done by him: and he was perplexed, because that it was said of some, that John was risen from the dead;"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Now Herod the tetrarch heard of all that was done by him; and he was very perplexed, because some said:"
+   ],
+   [
+    "people",
+    "«John had risen from the dead!»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 9:8",
+  "notes": [
+   "merged: people, other kept with narrator (indirect speech in the KJV)",
+   "merged: people, still others kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And of some, that Elias had appeared; and of others, that one of the old prophets was risen again.",
+  "lines": [
+   [
+    "narrator",
+    "And of some, that Elias had appeared; and of others, that one of the old prophets was risen again."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "and others said,"
+   ],
+   [
+    "people, other",
+    "«Elijah has appeared,»"
+   ],
+   [
+    "narrator",
+    "and still others said,"
+   ],
+   [
+    "people, still others",
+    "«One of the old prophets had risen again.»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 9:21",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he straitly charged them, and commanded them to tell no man that thing;",
+  "lines": [
+   [
+    "narrator",
+    "And he straitly charged them, and commanded them to tell no man that thing;"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "But Jesus commanded them, saying:"
+   ],
+   [
+    "Jesus",
+    "«Tell this to no one!»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 9:43",
+  "notes": [
+   "merged: everyone who witnessed healing of boy kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they were all amazed at the mighty power of God. But while they wondered every one at all things which Jesus did, he said unto his disciples,",
+  "lines": [
+   [
+    "narrator",
+    "And they were all amazed at the mighty power of God. But while they wondered every one at all things which Jesus did, he said unto his disciples,"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They were all astonished and said:"
+   ],
+   [
+    "everyone who witnessed healing of boy",
+    "«Behold the majesty of God!»"
+   ],
+   [
+    "narrator",
+    "But while all were marveling at all the things that Jesus did, he said to his disciples,"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 10:1",
+  "notes": [
+   "merged: Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "After these things the Lord appointed other seventy also, and sent them two and two before his face into every city and place, whither he himself would come.",
+  "lines": [
+   [
+    "narrator",
+    "After these things the Lord appointed other seventy also, and sent them two and two before his face into every city and place, whither he himself would come."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Now after these things, the Lord appointed seventy-two others, and said:"
+   ],
+   [
+    "Jesus",
+    "«I am sending you out two by two into every city and place where I am about to go.»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 11:16",
+  "notes": [
+   "merged: others (testing Jesus) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And others, tempting him, sought of him a sign from heaven.",
+  "lines": [
+   [
+    "narrator",
+    "And others, tempting him, sought of him a sign from heaven."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Others, trying to trap him said:"
+   ],
+   [
+    "others (testing Jesus)",
+    "«Show us a sign from Heaven!»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 11:37",
+  "notes": [
+   "merged: Pharisees, other kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And as he spake, a certain Pharisee besought him to dine with him: and he went in, and sat down to meat.",
+  "lines": [
+   [
+    "narrator",
+    "And as he spake, a certain Pharisee besought him to dine with him: and he went in, and sat down to meat."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "When Jesus finished speaking, a Pharisee invited him to dinner at his house, saying:"
+   ],
+   [
+    "Pharisees, other",
+    "«Come dine with me.»"
+   ],
+   [
+    "narrator",
+    "He went in, and sat at the table."
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 13:13",
+  "notes": [
+   "merged: woman who could not straighten up kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he laid his hands on her: and immediately she was made straight, and glorified God.",
+  "lines": [
+   [
+    "narrator",
+    "And he laid his hands on her: and immediately she was made straight, and glorified God."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He laid his hands on her and immediately she stood up straight and exclaimed:"
+   ],
+   [
+    "woman who could not straighten up",
+    "«Glory be to God!»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 17:15",
+  "notes": [
+   "merged: leper, thankful Samaritan kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And one of them, when he saw that he was healed, turned back, and with a loud voice glorified God,",
+  "lines": [
+   [
+    "narrator",
+    "And one of them, when he saw that he was healed, turned back, and with a loud voice glorified God,"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "One of them, when he saw that he was healed, turned back. Glorifying God with a loud voice he said:"
+   ],
+   [
+    "leper, thankful Samaritan",
+    "«Glory be to God!»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 17:20",
+  "notes": [
+   "merged: Pharisees kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And when he was demanded of the Pharisees, when the kingdom of God should come, he answered them and said, The kingdom of God cometh not with observation:",
+  "lines": [
+   [
+    "narrator",
+    "And when he was demanded of the Pharisees, when the kingdom of God should come, he answered them and said,"
+   ],
+   [
+    "Jesus",
+    "The kingdom of God cometh not with observation:"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The Pharisees asked him,"
+   ],
+   [
+    "Pharisees",
+    "«When will the Kingdom of God come?»"
+   ],
+   [
+    "narrator",
+    "He answered them,"
+   ],
+   [
+    "Jesus",
+    "«The Kingdom of God doesn’t come with observation;"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 18:15",
+  "notes": [
+   "merged: disciples kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they brought unto him also infants, that he would touch them: but when his disciples saw it, they rebuked them.",
+  "lines": [
+   [
+    "narrator",
+    "And they brought unto him also infants, that he would touch them: but when his disciples saw it, they rebuked them."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They were also bringing their babies to him, that he might touch them. But when the disciples saw it, they said:"
+   ],
+   [
+    "disciples",
+    "«Do not bother the teacher!»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 18:36",
+  "notes": [
+   "merged: Bartimaeus (a blind man) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And hearing the multitude pass by, he asked what it meant.",
+  "lines": [
+   [
+    "narrator",
+    "And hearing the multitude pass by, he asked what it meant."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Hearing a multitude going by, he asked:"
+   ],
+   [
+    "Bartimaeus (a blind man)",
+    "«What is going on?»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 18:37",
+  "notes": [
+   "merged: crowd at Jericho kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they told him, that Jesus of Nazareth passeth by.",
+  "lines": [
+   [
+    "narrator",
+    "And they told him, that Jesus of Nazareth passeth by."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They told him:"
+   ],
+   [
+    "crowd at Jericho",
+    "«Jesus of Nazareth is passing by.»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 18:43",
+  "notes": [
+   "merged: Bartimaeus (a blind man) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And immediately he received his sight, and followed him, glorifying God: and all the people, when they saw it, gave praise unto God.",
+  "lines": [
+   [
+    "narrator",
+    "And immediately he received his sight, and followed him, glorifying God: and all the people, when they saw it, gave praise unto God."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Immediately he received his sight and followed him, glorifying God, saying:"
+   ],
+   [
+    "Bartimaeus (a blind man)",
+    "«Glory be to God!»"
+   ],
+   [
+    "narrator",
+    "All the people, when they saw it, praised God."
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 20:7",
+  "notes": [
+   "merged: chief priests/teachers of religious law/elders kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they answered, that they could not tell whence it was.",
+  "lines": [
+   [
+    "narrator",
+    "And they answered, that they could not tell whence it was."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They answered, saying:"
+   ],
+   [
+    "chief priests/teachers of religious law/elders",
+    "«We don’t know.»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 21:5",
+  "notes": [
+   "merged: disciples, some kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And as some spake of the temple, how it was adorned with goodly stones and gifts, he said,",
+  "lines": [
+   [
+    "narrator",
+    "And as some spake of the temple, how it was adorned with goodly stones and gifts, he said,"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Some were talking about the temple, saying:"
+   ],
+   [
+    "disciples, some",
+    "«Look at the precious stones and offerings to God that adorn the temple!»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 22:4",
+  "notes": [
+   "merged: Judas Iscariot kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he went his way, and communed with the chief priests and captains, how he might betray him unto them.",
+  "lines": [
+   [
+    "narrator",
+    "And he went his way, and communed with the chief priests and captains, how he might betray him unto them."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He went to talk with the chief priests and captains, saying:"
+   ],
+   [
+    "Judas Iscariot",
+    "«I will deliver him to you.»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 22:5",
+  "notes": [
+   "merged: chief priests/officers of temple guard kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they were glad, and covenanted to give him money.",
+  "lines": [
+   [
+    "narrator",
+    "And they were glad, and covenanted to give him money."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They were glad, and said:"
+   ],
+   [
+    "chief priests/officers of temple guard",
+    "«We will pay you for this.»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 22:23",
+  "notes": [
+   "merged: disciples kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they began to enquire among themselves, which of them it was that should do this thing.",
+  "lines": [
+   [
+    "narrator",
+    "And they began to enquire among themselves, which of them it was that should do this thing."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They began to question among themselves, saying:"
+   ],
+   [
+    "disciples",
+    "«Who among us would do such a terrible thing?»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 22:24",
+  "notes": [
+   "merged: disciples kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And there was also a strife among them, which of them should be accounted the greatest.",
+  "lines": [
+   [
+    "narrator",
+    "And there was also a strife among them, which of them should be accounted the greatest."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "There also arose a contention among them. They argued, saying:"
+   ],
+   [
+    "disciples",
+    "«Which one of us is the greatest?»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 23:6",
+  "notes": [
+   "merged: Pilate kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "When Pilate heard of Galilee, he asked whether the man were a Galilæan.",
+  "lines": [
+   [
+    "narrator",
+    "When Pilate heard of Galilee, he asked whether the man were a Galilæan."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "But when Pilate heard Galilee mentioned, he asked:"
+   ],
+   [
+    "Pilate",
+    "«Is this man a Galilean?»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 23:20",
+  "notes": [
+   "merged: Pilate kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Pilate therefore, willing to release Jesus, spake again to them.",
+  "lines": [
+   [
+    "narrator",
+    "Pilate therefore, willing to release Jesus, spake again to them."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Then Pilate spoke to them again, saying:"
+   ],
+   [
+    "Pilate",
+    "«Why not release Jesus?»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 23:23",
+  "notes": [
+   "merged: crowd kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they were instant with loud voices, requiring that he might be crucified. And the voices of them and of the chief priests prevailed.",
+  "lines": [
+   [
+    "narrator",
+    "And they were instant with loud voices, requiring that he might be crucified. And the voices of them and of the chief priests prevailed."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "But they shouted all the more, saying:"
+   ],
+   [
+    "crowd",
+    "«Crucify him! Crucify him!»"
+   ],
+   [
+    "narrator",
+    "Their voices and the voices of the chief priests prevailed."
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 23:24",
+  "notes": [
+   "merged: Pilate kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And Pilate gave sentence that it should be as they required.",
+  "lines": [
+   [
+    "narrator",
+    "And Pilate gave sentence that it should be as they required."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Pilate said:"
+   ],
+   [
+    "Pilate",
+    "«I will do what you ask.»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 23:25",
+  "notes": [
+   "merged: Pilate kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And he released unto them him that for sedition and murder was cast into prison, whom they had desired; but he delivered Jesus to their will.",
+  "lines": [
+   [
+    "narrator",
+    "And he released unto them him that for sedition and murder was cast into prison, whom they had desired; but he delivered Jesus to their will."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He released Barrabus, the prisoner they asked for. He had been thrown into prison for insurrection and murder. Then Pilate gave Jesus to them, saying:"
+   ],
+   [
+    "Pilate",
+    "«Do what you want with him.»"
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 24:4",
+  "notes": [
+   "merged: Mary Magdalene/Mary mother of James/Salome kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And it came to pass, as they were much perplexed thereabout, behold, two men stood by them in shining garments:",
+  "lines": [
+   [
+    "narrator",
+    "And it came to pass, as they were much perplexed thereabout, behold, two men stood by them in shining garments:"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They were greatly perplexed about this and said:"
+   ],
+   [
+    "Mary Magdalene/Mary mother of James/Salome",
+    "«Where is his body?»"
+   ],
+   [
+    "narrator",
+    "Suddenly, two men stood by them in dazzling clothing."
+   ]
+  ]
+ },
+ {
+  "ref": "LUK 24:8",
+  "notes": [
+   "merged: Mary Magdalene/Mary mother of James/Salome kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they remembered his words,",
+  "lines": [
+   [
+    "narrator",
+    "And they remembered his words,"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "After hearing these words, the women said to each other:"
+   ],
+   [
+    "Mary Magdalene/Mary mother of James/Salome",
+    "«Do you remember what he said?»"
+   ]
+  ]
+ },
+ {
+  "ref": "JHN 4:9",
+  "notes": [
+   "merged: narrator kept with woman, Samaritan (the KJV speech runs on)"
+  ],
+  "kjv": "Then saith the woman of Samaria unto him, How is it that thou, being a Jew, askest drink of me, which am a woman of Samaria? for the Jews have no dealings with the Samaritans.",
+  "lines": [
+   [
+    "narrator",
+    "Then saith the woman of Samaria unto him,"
+   ],
+   [
+    "woman, Samaritan",
+    "How is it that thou, being a Jew, askest drink of me, which am a woman of Samaria? for the Jews have no dealings with the Samaritans."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The Samaritan woman therefore said to him,"
+   ],
+   [
+    "woman, Samaritan",
+    "«How is it that you, being a Jew, ask for a drink from me, a Samaritan woman?»"
+   ],
+   [
+    "narrator",
+    "(For Jews have no dealings with Samaritans.)"
+   ]
+  ]
+ },
+ {
+  "ref": "JHN 4:47",
+  "notes": [
+   "merged: official, royal (father) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "When he heard that Jesus was come out of Judæa into Galilee, he went unto him, and besought him that he would come down, and heal his son: for he was at the point of death.",
+  "lines": [
+   [
+    "narrator",
+    "When he heard that Jesus was come out of Judæa into Galilee, he went unto him, and besought him that he would come down, and heal his son: for he was at the point of death."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "When he heard that Jesus had left Judea and had come to Galilee, he went to him, and begged him, saying:"
+   ],
+   [
+    "official, royal (father)",
+    "«Come and heal my son because he is at the point of death.»"
+   ]
+  ]
+ },
+ {
+  "ref": "JHN 4:52",
+  "notes": [
+   "merged: official, royal (father) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Then enquired he of them the hour when he began to amend. And they said unto him, Yesterday at the seventh hour the fever left him.",
+  "lines": [
+   [
+    "narrator",
+    "Then enquired he of them the hour when he began to amend. And they said unto him,"
+   ],
+   [
+    "servants of royal official (father)",
+    "Yesterday at the seventh hour the fever left him."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "So he asked them:"
+   ],
+   [
+    "official, royal (father)",
+    "«What time did he get better?»"
+   ],
+   [
+    "narrator",
+    "They said to him:"
+   ],
+   [
+    "servants of royal official (father)",
+    "«The fever left him yesterday, at the seventh hour.»"
+   ]
+  ]
+ },
+ {
+  "ref": "JHN 9:15",
+  "notes": [
+   "merged: Pharisees kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Then again the Pharisees also asked him how he had received his sight. He said unto them, He put clay upon mine eyes, and I washed, and do see.",
+  "lines": [
+   [
+    "narrator",
+    "Then again the Pharisees also asked him how he had received his sight. He said unto them,"
+   ],
+   [
+    "cured man, blind from birth",
+    "He put clay upon mine eyes, and I washed, and do see."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Therefore the Pharisees asked him:"
+   ],
+   [
+    "Pharisees",
+    "«How did you receive your sight?»"
+   ],
+   [
+    "narrator",
+    "He said to them,"
+   ],
+   [
+    "cured man, blind from birth",
+    "«He put mud on my eyes, I washed, and I see.»"
+   ]
+  ]
+ },
+ {
+  "ref": "JHN 11:17",
+  "notes": [
+   "merged: person near Lazarus' grave who informed Jesus kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Then when Jesus came, he found that he had lain in the grave four days already.",
+  "lines": [
+   [
+    "narrator",
+    "Then when Jesus came, he found that he had lain in the grave four days already."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "So when Jesus came, the people told him:"
+   ],
+   [
+    "person near Lazarus' grave who informed Jesus",
+    "«Lazarus has been in the tomb for four days.»"
+   ]
+  ]
+ },
+ {
+  "ref": "JHN 12:29",
+  "notes": [
+   "merged: crowd preparing for Passover Feast kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "The people therefore, that stood by, and heard it, said that it thundered: others said, An angel spake to him.",
+  "lines": [
+   [
+    "narrator",
+    "The people therefore, that stood by, and heard it, said that it thundered: others said,"
+   ],
+   [
+    "crowd preparing for Passover Feast, others",
+    "An angel spake to him."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The multitude therefore, who stood by and heard it, said:"
+   ],
+   [
+    "crowd preparing for Passover Feast",
+    "«It is thunder!»"
+   ],
+   [
+    "narrator",
+    "Others said,"
+   ],
+   [
+    "crowd preparing for Passover Feast, others",
+    "«An angel has spoken to him.»"
+   ]
+  ]
+ },
+ {
+  "ref": "JHN 13:24",
+  "notes": [
+   "merged: Peter (Simon) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Simon Peter therefore beckoned to him, that he should ask who it should be of whom he spake.",
+  "lines": [
+   [
+    "narrator",
+    "Simon Peter therefore beckoned to him, that he should ask who it should be of whom he spake."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Simon Peter therefore beckoned to him, and said to him,"
+   ],
+   [
+    "Peter (Simon)",
+    "«Tell us who it is of whom he speaks.»"
+   ]
+  ]
+ },
+ {
+  "ref": "JHN 19:38",
+  "notes": [
+   "merged: Joseph of Arimathaea kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And after this Joseph of Arimathaea, being a disciple of Jesus, but secretly for fear of the Jews, besought Pilate that he might take away the body of Jesus: and Pilate gave him leave. He came therefore, and took the body of Jesus.",
+  "lines": [
+   [
+    "narrator",
+    "And after this Joseph of Arimathaea, being a disciple of Jesus, but secretly for fear of the Jews, besought Pilate that he might take away the body of Jesus: and Pilate gave him leave. He came therefore, and took the body of Jesus."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "After these things, Joseph of Arimathaea, being a disciple of Jesus, but secretly for fear of the Jews, asked Pilate:"
+   ],
+   [
+    "Joseph of Arimathaea",
+    "«May I take Jesus’ body for burial?»"
+   ],
+   [
+    "narrator",
+    "Pilate gave him permission. He came therefore and took away his body."
+   ]
+  ]
+ },
+ {
+  "ref": "JHN 20:18",
+  "notes": [
+   "merged: Mary Magdalene kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Mary Magdalene came and told the disciples that she had seen the Lord, and that he had spoken these things unto her.",
+  "lines": [
+   [
+    "narrator",
+    "Mary Magdalene came and told the disciples that she had seen the Lord, and that he had spoken these things unto her."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Mary Magdalene came and told the disciples:"
+   ],
+   [
+    "Mary Magdalene",
+    "«I have seen the Lord!»"
+   ],
+   [
+    "narrator",
+    "And she told them what he had said to her."
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 3:10",
+  "notes": [
+   "merged: people in temple courts, all the kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they knew that it was he which sat for alms at the Beautiful gate of the temple: and they were filled with wonder and amazement at that which had happened unto him.",
+  "lines": [
+   [
+    "narrator",
+    "And they knew that it was he which sat for alms at the Beautiful gate of the temple: and they were filled with wonder and amazement at that which had happened unto him."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They recognized him. They knew that he was the crippled man who used to sit begging at the temple gate. They were filled with wonder, and they said:"
+   ],
+   [
+    "people in temple courts, all the",
+    "«What has happened to him is truly amazing!»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 4:13",
+  "notes": [
+   "merged: Ananias (Annas), the high priest (father-in-law of Caiaphas)/Caiaphas, the high priest/John, Alexander, and other men of the high priest's family/elders/teachers of religious law/Sanhedrin kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Now when they saw the boldness of Peter and John, and perceived that they were unlearned and ignorant men, they marvelled; and they took knowledge of them, that they had been with Jesus.",
+  "lines": [
+   [
+    "narrator",
+    "Now when they saw the boldness of Peter and John, and perceived that they were unlearned and ignorant men, they marvelled; and they took knowledge of them, that they had been with Jesus."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Now when they saw the boldness of Peter and John, and had perceived that they were unlearned and ignorant men, they marveled, saying:"
+   ],
+   [
+    "Ananias (Annas), the high priest (father-in-law of Caiaphas)/Caiaphas, the high priest/John, Alexander, and other men of the high priest's family/elders/teachers of religious law/Sanhedrin",
+    "«These men are disciples of Jesus!»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 4:18",
+  "notes": [
+   "merged: Ananias (Annas), the high priest (father-in-law of Caiaphas)/Caiaphas, the high priest/John, Alexander, and other men of the high priest's family/elders/teachers of religious law/Sanhedrin kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they called them, and commanded them not to speak at all nor teach in the name of Jesus.",
+  "lines": [
+   [
+    "narrator",
+    "And they called them, and commanded them not to speak at all nor teach in the name of Jesus."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They called them and commanded them, saying:"
+   ],
+   [
+    "Ananias (Annas), the high priest (father-in-law of Caiaphas)/Caiaphas, the high priest/John, Alexander, and other men of the high priest's family/elders/teachers of religious law/Sanhedrin",
+    "«Do not preach in the name of Jesus any more!»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 5:24",
+  "notes": [
+   "merged: Ananias (Annas), the high priest (father-in-law of Caiaphas)/captain of the temple guard/chief priests kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Now when the high priest and the captain of the temple and the chief priests heard these things, they doubted of them whereunto this would grow.",
+  "lines": [
+   [
+    "narrator",
+    "Now when the high priest and the captain of the temple and the chief priests heard these things, they doubted of them whereunto this would grow."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Now when the high priest, the captain of the temple, and the chief priests heard these words, they were very perplexed about them and wondered:"
+   ],
+   [
+    "Ananias (Annas), the high priest (father-in-law of Caiaphas)/captain of the temple guard/chief priests",
+    "«What will happen now?»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 9:27",
+  "notes": [
+   "merged: Barnabas kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "But Barnabas took him, and brought him to the apostles, and declared unto them how he had seen the Lord in the way, and that he had spoken to him, and how he had preached boldly at Damascus in the name of Jesus.",
+  "lines": [
+   [
+    "narrator",
+    "But Barnabas took him, and brought him to the apostles, and declared unto them how he had seen the Lord in the way, and that he had spoken to him, and how he had preached boldly at Damascus in the name of Jesus."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "But Barnabas took him and brought him to the apostles and declared to them:"
+   ],
+   [
+    "Barnabas",
+    "«He saw and spoke to the Lord while he was on the road, and he preached boldly at Damascas in the Name of the Lord.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 9:34",
+  "notes": [
+   "merged: narrator kept with Peter (Simon) (the KJV speech runs on)"
+  ],
+  "kjv": "And Peter said unto him, Æneas, Jesus Christ maketh thee whole: arise, and make thy bed. And he arose immediately.",
+  "lines": [
+   [
+    "narrator",
+    "And Peter said unto him,"
+   ],
+   [
+    "Peter (Simon)",
+    "Æneas, Jesus Christ maketh thee whole: arise, and make thy bed. And he arose immediately."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Peter said to him,"
+   ],
+   [
+    "Peter (Simon)",
+    "«Aeneas, Jesus Christ heals you. Take up your mat and get up.!»"
+   ],
+   [
+    "narrator",
+    "Immediately he arose."
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 9:38",
+  "notes": [
+   "merged: disciples, two men (from Joppa) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And forasmuch as Lydda was nigh to Joppa, and the disciples had heard that Peter was there, they sent unto him two men, desiring him that he would not delay to come to them.",
+  "lines": [
+   [
+    "narrator",
+    "And forasmuch as Lydda was nigh to Joppa, and the disciples had heard that Peter was there, they sent unto him two men, desiring him that he would not delay to come to them."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "As Lydda was near Joppa, the disciples, hearing that Peter was there, sent two men to him, imploring him,"
+   ],
+   [
+    "disciples, two men (from Joppa)",
+    "«Do not delay in coming.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 10:17",
+  "notes": [
+   "merged: Peter (Simon) kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Now while Peter doubted in himself what this vision which he had seen should mean, behold, the men which were sent from Cornelius had made enquiry for Simon’s house, and stood before the gate,",
+  "lines": [
+   [
+    "narrator",
+    "Now while Peter doubted in himself what this vision which he had seen should mean, behold, the men which were sent from Cornelius had made enquiry for Simon’s house, and stood before the gate,"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Now Peter was very perplexed and he wondered:"
+   ],
+   [
+    "Peter (Simon)",
+    "«What does this vision mean?»"
+   ],
+   [
+    "narrator",
+    "Meanwhile, the men who were sent by Cornelius, were looking for Simon’s house, and were now standing at the gate."
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 10:18",
+  "notes": [
+   "merged: men from Cornelius kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And called, and asked whether Simon, which was surnamed Peter, were lodged there.",
+  "lines": [
+   [
+    "narrator",
+    "And called, and asked whether Simon, which was surnamed Peter, were lodged there."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They called out and asked:"
+   ],
+   [
+    "men from Cornelius",
+    "«Is Simon, who is surnamed Peter lodging here?»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 11:16",
+  "notes": [
+   "red letter inside Peter (Simon)'s words: kept with them (quoting Christ)"
+  ],
+  "kjv": "Then remembered I the word of the Lord, how that he said, John indeed baptized with water; but ye shall be baptized with the Holy Ghost.",
+  "lines": [
+   [
+    "Peter (Simon)",
+    "Then remembered I the word of the Lord, how that he said, John indeed baptized with water; but ye shall be baptized with the Holy Ghost."
+   ]
+  ],
+  "reference": [
+   [
+    "Peter (Simon)",
+    "I remembered the word of the Lord, how he said, ‹John indeed baptized in water, but you will be baptized in the Holy Spirit.›"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 11:28",
+  "notes": [
+   "merged: Agabus the prophet kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And there stood up one of them named Agabus, and signified by the Spirit that there should be great dearth throughout all the world: which came to pass in the days of Claudius Cæsar.",
+  "lines": [
+   [
+    "narrator",
+    "And there stood up one of them named Agabus, and signified by the Spirit that there should be great dearth throughout all the world: which came to pass in the days of Claudius Cæsar."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "One of them named Agabus stood up. Being prompted by the Holy Spirit, he said:"
+   ],
+   [
+    "Agabus the prophet",
+    "«There will be a large famine all over the world.»"
+   ],
+   [
+    "narrator",
+    "(This famine happened in the days of Claudius.)"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 12:15",
+  "notes": [
+   "merged: Rhoda kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they said unto her, Thou art mad. But she constantly affirmed that it was even so. Then said they, It is his angel.",
+  "lines": [
+   [
+    "narrator",
+    "And they said unto her,"
+   ],
+   [
+    "people praying at John Mark's mother's house",
+    "Thou art mad."
+   ],
+   [
+    "narrator",
+    "But she constantly affirmed that it was even so. Then said they,"
+   ],
+   [
+    "people praying at John Mark's mother's house",
+    "It is his angel."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They said to her,"
+   ],
+   [
+    "people praying at John Mark's mother's house",
+    "«You are crazy!»"
+   ],
+   [
+    "narrator",
+    "But she insisted:"
+   ],
+   [
+    "Rhoda",
+    "«It is true… he is at the door!»"
+   ],
+   [
+    "narrator",
+    "They said,"
+   ],
+   [
+    "people praying at John Mark's mother's house",
+    "«It is his angel.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 13:42",
+  "notes": [
+   "merged: people in Pisidian Antioch synagogue kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And when the Jews were gone out of the synagogue, the Gentiles besought that these words might be preached to them the next sabbath.",
+  "lines": [
+   [
+    "narrator",
+    "And when the Jews were gone out of the synagogue, the Gentiles besought that these words might be preached to them the next sabbath."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "So when the Jews went out of the synagogue, the Gentiles begged him, saying:"
+   ],
+   [
+    "people in Pisidian Antioch synagogue",
+    "«Preach these words to us on the next Sabbath.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 14:22",
+  "notes": [
+   "merged: Barnabas/Paul kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Confirming the souls of the disciples, and exhorting them to continue in the faith, and that we must through much tribulation enter into the kingdom of God.",
+  "lines": [
+   [
+    "narrator",
+    "Confirming the souls of the disciples, and exhorting them to continue in the faith, and that we must through much tribulation enter into the kingdom of God."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They strengthened the disciples and encouraged them to continue in the faith, and said:"
+   ],
+   [
+    "Barnabas/Paul",
+    "«Through many afflictions we will enter into the Kingdom of God.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 15:37",
+  "notes": [
+   "merged: Barnabas kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And Barnabas determined to take with them John, whose surname was Mark.",
+  "lines": [
+   [
+    "narrator",
+    "And Barnabas determined to take with them John, whose surname was Mark."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Barnabas said:"
+   ],
+   [
+    "Barnabas",
+    "«Let’s take John who is also called Mark with us.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 15:38",
+  "notes": [
+   "merged: Paul kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "But Paul thought not good to take him with them, who departed from them from Pamphylia, and went not with them to the work.",
+  "lines": [
+   [
+    "narrator",
+    "But Paul thought not good to take him with them, who departed from them from Pamphylia, and went not with them to the work."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "But Paul said:"
+   ],
+   [
+    "Paul",
+    "«It is not a good idea to take someone who deserted us in Pamphylia, and did not continue with us in the work.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 16:39",
+  "notes": [
+   "merged: magistrates, chief kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And they came and besought them, and brought them out, and desired them to depart out of the city.",
+  "lines": [
+   [
+    "narrator",
+    "And they came and besought them, and brought them out, and desired them to depart out of the city."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They came to appease them, escorted them from the prison, and requested them, saying:"
+   ],
+   [
+    "magistrates, chief",
+    "«Please, leave our city.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 17:3",
+  "notes": [
+   "merged: Paul kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Opening and alleging, that Christ must needs have suffered, and risen again from the dead; and that this Jesus, whom I preach unto you, is Christ.",
+  "lines": [
+   [
+    "narrator",
+    "Opening and alleging, that Christ must needs have suffered, and risen again from the dead; and that this Jesus, whom I preach unto you, is Christ."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He explained and demonstrated that the Christ had to suffer and rise again from the dead, and said,"
+   ],
+   [
+    "Paul",
+    "«This Jesus, whom I proclaim to you, is the Christ.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 20:35",
+  "notes": [
+   "red letter inside Paul's words: kept with them (quoting Christ)"
+  ],
+  "kjv": "I have shewed you all things, how that so labouring ye ought to support the weak, and to remember the words of the Lord Jesus, how he said, It is more blessed to give than to receive.",
+  "lines": [
+   [
+    "Paul",
+    "I have shewed you all things, how that so labouring ye ought to support the weak, and to remember the words of the Lord Jesus, how he said, It is more blessed to give than to receive."
+   ]
+  ],
+  "reference": [
+   [
+    "Paul",
+    "In all things I gave you an example, that so laboring you ought to help the weak. We must remember the words that the Lord Jesus said, ‹It is more blessed to give than to receive.› »"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 22:7",
+  "notes": [
+   "red letter inside Paul's words: kept with them (quoting Christ)"
+  ],
+  "kjv": "And I fell unto the ground, and heard a voice saying unto me, Saul, Saul, why persecutest thou me?",
+  "lines": [
+   [
+    "Paul",
+    "And I fell unto the ground, and heard a voice saying unto me, Saul, Saul, why persecutest thou me?"
+   ]
+  ],
+  "reference": [
+   [
+    "Paul",
+    "I fell to the ground, and heard a voice saying to me, ‹Saul, Saul, why are you persecuting me?›"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 22:8",
+  "notes": [
+   "red letter inside Paul's words: kept with them (quoting Christ)"
+  ],
+  "kjv": "And I answered, Who art thou, Lord? And he said unto me, I am Jesus of Nazareth, whom thou persecutest.",
+  "lines": [
+   [
+    "Paul",
+    "And I answered, Who art thou, Lord? And he said unto me, I am Jesus of Nazareth, whom thou persecutest."
+   ]
+  ],
+  "reference": [
+   [
+    "Paul",
+    "I answered, ‹Who are you, Lord?› He said to me, ‹I am Jesus of Nazareth, whom you persecute.›"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 22:10",
+  "notes": [
+   "red letter inside Paul's words: kept with them (quoting Christ)"
+  ],
+  "kjv": "And I said, What shall I do, Lord? And the Lord said unto me, Arise, and go into Damascus; and there it shall be told thee of all things which are appointed for thee to do.",
+  "lines": [
+   [
+    "Paul",
+    "And I said, What shall I do, Lord? And the Lord said unto me, Arise, and go into Damascus; and there it shall be told thee of all things which are appointed for thee to do."
+   ]
+  ],
+  "reference": [
+   [
+    "Paul",
+    "I said, ‹What shall I do, Lord?› The Lord said to me, ‹Arise, and go into Damascus. There you will be told about all things which are appointed for you to do.›"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 22:18",
+  "notes": [
+   "red letter inside Paul's words: kept with them (quoting Christ)"
+  ],
+  "kjv": "And saw him saying unto me, Make haste, and get thee quickly out of Jerusalem: for they will not receive thy testimony concerning me.",
+  "lines": [
+   [
+    "Paul",
+    "And saw him saying unto me, Make haste, and get thee quickly out of Jerusalem: for they will not receive thy testimony concerning me."
+   ]
+  ],
+  "reference": [
+   [
+    "Paul",
+    "I saw him saying to me, ‹Hurry and get out of Jerusalem quickly, because they will not receive testimony concerning me from you.›"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 22:21",
+  "notes": [
+   "red letter inside Paul's words: kept with them (quoting Christ)"
+  ],
+  "kjv": "And he said unto me, Depart: for I will send thee far hence unto the Gentiles.",
+  "lines": [
+   [
+    "Paul",
+    "And he said unto me, Depart: for I will send thee far hence unto the Gentiles."
+   ]
+  ],
+  "reference": [
+   [
+    "Paul",
+    "He said to me, ‹Depart, for I will send you out far from here to the Gentiles.› »"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 23:34",
+  "notes": [
+   "merged: Felix, governor of Judea kept with narrator (indirect speech in the KJV)",
+   "merged: Paul kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And when the governor had read the letter, he asked of what province he was. And when he understood that he was of Cilicia;",
+  "lines": [
+   [
+    "narrator",
+    "And when the governor had read the letter, he asked of what province he was. And when he understood that he was of Cilicia;"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "After the governor had read the letter, he asked Paul:"
+   ],
+   [
+    "Felix, governor of Judea",
+    "«What province are you from?»"
+   ],
+   [
+    "narrator",
+    "Paul replied:"
+   ],
+   [
+    "Paul",
+    "«I am from Cilicia.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 23:35",
+  "notes": [
+   "merged: Felix, governor of Judea kept with narrator (indirect speech in the KJV)",
+   "merged: Felix, governor of Judea kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "I will hear thee, said he, when thine accusers are also come. And he commanded him to be kept in Herod’s judgment hall.",
+  "lines": [
+   [
+    "narrator",
+    "I will hear thee, said he, when thine accusers are also come. And he commanded him to be kept in Herod’s judgment hall."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The governor said:"
+   ],
+   [
+    "Felix, governor of Judea",
+    "«I will hear you fully when your accusers also arrive.»"
+   ],
+   [
+    "narrator",
+    "Then Felix commanded, saying:"
+   ],
+   [
+    "Felix, governor of Judea",
+    "«Keep him in Herod’s palace.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 25:4",
+  "notes": [
+   "merged: Festus, governor of Judea kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "But Festus answered, that Paul should be kept at Cæsarea, and that he himself would depart shortly thither.",
+  "lines": [
+   [
+    "narrator",
+    "But Festus answered, that Paul should be kept at Cæsarea, and that he himself would depart shortly thither."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "However Festus answered saying:"
+   ],
+   [
+    "Festus, governor of Judea",
+    "«Paul is being held at Caesarea, and I myself am going there soon."
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 26:14",
+  "notes": [
+   "red letter inside Paul's words: kept with them (quoting Christ)"
+  ],
+  "kjv": "And when we were all fallen to the earth, I heard a voice speaking unto me, and saying in the Hebrew tongue, Saul, Saul, why persecutest thou me? it is hard for thee to kick against the pricks.",
+  "lines": [
+   [
+    "Paul",
+    "And when we were all fallen to the earth, I heard a voice speaking unto me, and saying in the Hebrew tongue, Saul, Saul, why persecutest thou me? it is hard for thee to kick against the pricks."
+   ]
+  ],
+  "reference": [
+   [
+    "Paul",
+    "When we had all fallen to the earth, I heard a voice saying to me in the Hebrew language, ‹Saul, Saul, why are you persecuting me? It is hard for you to kick against the goads.›"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 26:15",
+  "notes": [
+   "red letter inside Paul's words: kept with them (quoting Christ)"
+  ],
+  "kjv": "And I said, Who art thou, Lord? And he said, I am Jesus whom thou persecutest.",
+  "lines": [
+   [
+    "Paul",
+    "And I said, Who art thou, Lord? And he said, I am Jesus whom thou persecutest."
+   ]
+  ],
+  "reference": [
+   [
+    "Paul",
+    "I said, ‹Who are you, Lord?› He said, ‹I am Jesus, whom you are persecuting."
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 26:16",
+  "notes": [
+   "red letter inside Paul's words: kept with them (quoting Christ)"
+  ],
+  "kjv": "But rise, and stand upon thy feet: for I have appeared unto thee for this purpose, to make thee a minister and a witness both of these things which thou hast seen, and of those things in the which I will appear unto thee;",
+  "lines": [
+   [
+    "Paul",
+    "But rise, and stand upon thy feet: for I have appeared unto thee for this purpose, to make thee a minister and a witness both of these things which thou hast seen, and of those things in the which I will appear unto thee;"
+   ]
+  ],
+  "reference": [
+   [
+    "Paul",
+    "But arise, and stand on your feet, for I have appeared to you for this purpose: to appoint you a servant and a witness both of the things which you have seen, and of the things which I will reveal to you."
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 26:17",
+  "notes": [
+   "red letter inside Paul's words: kept with them (quoting Christ)"
+  ],
+  "kjv": "Delivering thee from the people, and from the Gentiles, unto whom now I send thee,",
+  "lines": [
+   [
+    "Paul",
+    "Delivering thee from the people, and from the Gentiles, unto whom now I send thee,"
+   ]
+  ],
+  "reference": [
+   [
+    "Paul",
+    "I will keep you safe from the jews and from the Gentiles, to whom I send you."
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 26:18",
+  "notes": [
+   "red letter inside Paul's words: kept with them (quoting Christ)"
+  ],
+  "kjv": "To open their eyes, and to turn them from darkness to light, and from the power of Satan unto God, that they may receive forgiveness of sins, and inheritance among them which are sanctified by faith that is in me.",
+  "lines": [
+   [
+    "Paul",
+    "To open their eyes, and to turn them from darkness to light, and from the power of Satan unto God, that they may receive forgiveness of sins, and inheritance among them which are sanctified by faith that is in me."
+   ]
+  ],
+  "reference": [
+   [
+    "Paul",
+    "You are to open their eyes, that they may turn from darkness to light and from the power of Satan to God. In this way they may receive remission of sins and an inheritance among those who are sanctified by faith in me.›"
+   ]
+  ]
+ },
+ {
+  "ref": "ACT 28:6",
+  "notes": [
+   "merged: Malta islanders kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Howbeit they looked when he should have swollen, or fallen down dead suddenly: but after they had looked a great while, and saw no harm come to him, they changed their minds, and said that he was a god.",
+  "lines": [
+   [
+    "narrator",
+    "Howbeit they looked when he should have swollen, or fallen down dead suddenly: but after they had looked a great while, and saw no harm come to him, they changed their minds, and said that he was a god."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "But they expected that he would have swollen or fallen down dead suddenly. But when they watched for a long time and saw nothing bad happen to him, they changed their minds, and said,"
+   ],
+   [
+    "Malta islanders",
+    "«He is a god!»"
+   ]
+  ]
+ },
+ {
+  "ref": "ROM 2:24",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "For the name of God is blasphemed among the Gentiles through you, as it is written.",
+  "lines": [
+   [
+    "narrator",
+    "For the name of God is blasphemed among the Gentiles through you, as it is written."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "For just as it is written:"
+   ],
+   [
+    "scripture",
+    "«the name of God is blasphemed among the Gentiles because of you,»"
+   ]
+  ]
+ },
+ {
+  "ref": "ROM 10:13",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "For whosoever shall call upon the name of the Lord shall be saved.",
+  "lines": [
+   [
+    "narrator",
+    "For whosoever shall call upon the name of the Lord shall be saved."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "For,"
+   ],
+   [
+    "scripture",
+    "«Whoever will call on the name of the Lord will be saved.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ROM 10:18",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "But I say, Have they not heard? Yes verily, their sound went into all the earth, and their words unto the ends of the world.",
+  "lines": [
+   [
+    "narrator",
+    "But I say, Have they not heard? Yes verily, their sound went into all the earth, and their words unto the ends of the world."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "But I ask, didn’t they hear? Yes, most certainly,"
+   ],
+   [
+    "scripture",
+    "«Their sound went out into all the earth, their words to the ends of the world.»"
+   ]
+  ]
+ },
+ {
+  "ref": "ROM 12:20",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Therefore if thine enemy hunger, feed him; if he thirst, give him drink: for in so doing thou shalt heap coals of fire on his head.",
+  "lines": [
+   [
+    "narrator",
+    "Therefore if thine enemy hunger, feed him; if he thirst, give him drink: for in so doing thou shalt heap coals of fire on his head."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Therefore"
+   ],
+   [
+    "scripture",
+    "«If your enemy is hungry, feed him. If he is thirsty, give him a drink; for in doing so, you will heap coals of fire on his head.»"
+   ]
+  ]
+ },
+ {
+  "ref": "1CO 6:16",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "What? know ye not that he which is joined to an harlot is one body? for two, saith he, shall be one flesh.",
+  "lines": [
+   [
+    "narrator",
+    "What? know ye not that he which is joined to an harlot is one body? for two, saith he, shall be one flesh."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Or don’t you know that he who is joined to a prostitute is one body? For he says,"
+   ],
+   [
+    "scripture",
+    "The two will become one flesh."
+   ]
+  ]
+ },
+ {
+  "ref": "1CO 10:26",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "For the earth is the Lord’s, and the fulness thereof.",
+  "lines": [
+   [
+    "narrator",
+    "For the earth is the Lord’s, and the fulness thereof."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "The scriptures say, for"
+   ],
+   [
+    "scripture",
+    "«the earth is the Lord’s, and its fullness.»"
+   ]
+  ]
+ },
+ {
+  "ref": "1CO 15:27",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "For he hath put all things under his feet. But when he saith all things are put under him, it is manifest that he is excepted, which did put all things under him.",
+  "lines": [
+   [
+    "narrator",
+    "For he hath put all things under his feet. But when he saith all things are put under him, it is manifest that he is excepted, which did put all things under him."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "For,"
+   ],
+   [
+    "scripture",
+    "«He put all things in subjection under his feet.»"
+   ],
+   [
+    "narrator",
+    "But when he says, «All things are put in subjection,» it is evident that he is excepted who subjected all things to him."
+   ]
+  ]
+ },
+ {
+  "ref": "1CO 15:32",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "If after the manner of men I have fought with beasts at Ephesus, what advantageth it me, if the dead rise not? let us eat and drink; for to morrow we die.",
+  "lines": [
+   [
+    "narrator",
+    "If after the manner of men I have fought with beasts at Ephesus, what advantageth it me, if the dead rise not? let us eat and drink; for to morrow we die."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "If I fought with animals at Ephesus for human purposes, what does it profit me? If the dead are not raised, then"
+   ],
+   [
+    "scripture",
+    "«let us eat and drink, for tomorrow we die.»"
+   ]
+  ]
+ },
+ {
+  "ref": "GAL 3:6",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Even as Abraham believed God, and it was accounted to him for righteousness.",
+  "lines": [
+   [
+    "narrator",
+    "Even as Abraham believed God, and it was accounted to him for righteousness."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Even as Abraham"
+   ],
+   [
+    "scripture",
+    "«believed God, and it was counted to him for righteousness.»"
+   ]
+  ]
+ },
+ {
+  "ref": "HEB 8:5",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Who serve unto the example and shadow of heavenly things, as Moses was admonished of God when he was about to make the tabernacle: for, See, saith he, that thou make all things according to the pattern shewed to thee in the mount.",
+  "lines": [
+   [
+    "narrator",
+    "Who serve unto the example and shadow of heavenly things, as Moses was admonished of God when he was about to make the tabernacle: for, See, saith he, that thou make all things according to the pattern shewed to thee in the mount."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They serve a copy and shadow of the heavenly things, even as Moses was warned by God when he was about to make the tabernacle, for he said,"
+   ],
+   [
+    "scripture",
+    "«See, you shall make everything according to the pattern that was shown to you on the mountain.»"
+   ]
+  ]
+ },
+ {
+  "ref": "HEB 10:17",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And their sins and iniquities will I remember no more.",
+  "lines": [
+   [
+    "narrator",
+    "And their sins and iniquities will I remember no more."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "then he says,"
+   ],
+   [
+    "scripture",
+    "«I will remember their sins and their iniquities no more.»"
+   ]
+  ]
+ },
+ {
+  "ref": "HEB 10:37",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "For yet a little while, and he that shall come will come, and will not tarry.",
+  "lines": [
+   [
+    "narrator",
+    "For yet a little while, and he that shall come will come, and will not tarry."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Because,"
+   ],
+   [
+    "scripture",
+    "«In a very little while, he who comes will come, and will not wait."
+   ]
+  ]
+ },
+ {
+  "ref": "1PE 1:24",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "For all flesh is as grass, and all the glory of man as the flower of grass. The grass withereth, and the flower thereof falleth away:",
+  "lines": [
+   [
+    "narrator",
+    "For all flesh is as grass, and all the glory of man as the flower of grass. The grass withereth, and the flower thereof falleth away:"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "For,"
+   ],
+   [
+    "scripture",
+    "«All flesh is like grass, and all of man’s glory like the flower in the grass. The grass withers, and its flower falls;"
+   ]
+  ]
+ },
+ {
+  "ref": "1PE 2:7",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Unto you therefore which believe he is precious: but unto them which be disobedient, the stone which the builders disallowed, the same is made the head of the corner,",
+  "lines": [
+   [
+    "narrator",
+    "Unto you therefore which believe he is precious: but unto them which be disobedient, the stone which the builders disallowed, the same is made the head of the corner,"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "For you who believe therefore is the honor, but for those who are disobedient,"
+   ],
+   [
+    "scripture",
+    "«The stone which the builders rejected, has become the chief cornerstone,»"
+   ]
+  ]
+ },
+ {
+  "ref": "1PE 2:8",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And a stone of stumbling, and a rock of offence, even to them which stumble at the word, being disobedient: whereunto also they were appointed.",
+  "lines": [
+   [
+    "narrator",
+    "And a stone of stumbling, and a rock of offence, even to them which stumble at the word, being disobedient: whereunto also they were appointed."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "and,"
+   ],
+   [
+    "scripture",
+    "«a stone of stumbling, and a rock of offense.»"
+   ],
+   [
+    "narrator",
+    "For they stumble at the word, being disobedient, to which also they were appointed."
+   ]
+  ]
+ },
+ {
+  "ref": "1PE 3:10",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "For he that will love life, and see good days, let him refrain his tongue from evil, and his lips that they speak no guile:",
+  "lines": [
+   [
+    "narrator",
+    "For he that will love life, and see good days, let him refrain his tongue from evil, and his lips that they speak no guile:"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "For,"
+   ],
+   [
+    "scripture",
+    "«He who would love life, and see good days, let him keep his tongue from evil, and his lips from speaking deceit."
+   ]
+  ]
+ },
+ {
+  "ref": "1PE 5:5",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "Likewise, ye younger, submit yourselves unto the elder. Yea, all of you be subject one to another, and be clothed with humility: for God resisteth the proud, and giveth grace to the humble.",
+  "lines": [
+   [
+    "narrator",
+    "Likewise, ye younger, submit yourselves unto the elder. Yea, all of you be subject one to another, and be clothed with humility: for God resisteth the proud, and giveth grace to the humble."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "Likewise, you younger ones, be subject to the elder. Yes, all of you clothe yourselves with humility, to subject yourselves to one another; for"
+   ],
+   [
+    "scripture",
+    "«God resists the proud, but gives grace to the humble.»"
+   ]
+  ]
+ },
+ {
+  "ref": "2PE 2:22",
+  "notes": [
+   "merged: scripture kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "But it is happened unto them according to the true proverb, The dog is turned to his own vomit again; and the sow that was washed to her wallowing in the mire.",
+  "lines": [
+   [
+    "narrator",
+    "But it is happened unto them according to the true proverb,"
+   ],
+   [
+    "scripture",
+    "The dog is turned to his own vomit again;"
+   ],
+   [
+    "narrator",
+    "and the sow that was washed to her wallowing in the mire."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "But it has happened to them according to the true proverb,"
+   ],
+   [
+    "scripture",
+    "«The dog turns to his own vomit again,»"
+   ],
+   [
+    "narrator",
+    "and"
+   ],
+   [
+    "scripture",
+    "«the sow that has washed to wallowing in the mire.»"
+   ]
+  ]
+ },
+ {
+  "ref": "REV 4:1",
+  "notes": [
+   "no red letter in the KJV here: the projection's lines for Christ given to the narrator"
+  ],
+  "kjv": "After this I looked, and, behold, a door was opened in heaven: and the first voice which I heard was as it were of a trumpet talking with me; which said, Come up hither, and I will shew thee things which must be hereafter.",
+  "lines": [
+   [
+    "narrator",
+    "After this I looked, and, behold, a door was opened in heaven: and the first voice which I heard was as it were of a trumpet talking with me; which said, Come up hither, and I will shew thee things which must be hereafter."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "After these things I looked and saw a door opened in heaven, and the first voice that I heard, like a trumpet speaking with me, was one saying,"
+   ],
+   [
+    "Jesus",
+    "«Come up here, and I will show you the things which must happen after this.»"
+   ]
+  ]
+ },
+ {
+  "ref": "REV 10:6",
+  "notes": [
+   "merged: angel standing on sea and land kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And sware by him that liveth for ever and ever, who created heaven, and the things that therein are, and the earth, and the things that therein are, and the sea, and the things which are therein, that there should be time no longer:",
+  "lines": [
+   [
+    "narrator",
+    "And sware by him that liveth for ever and ever, who created heaven, and the things that therein are, and the earth, and the things that therein are, and the sea, and the things which are therein, that there should be time no longer:"
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "and swore by him who lives forever and ever, who created heaven and the things that are in it, the earth and the things that are in it, and the sea and the things that are in it, saying:"
+   ],
+   [
+    "angel standing on sea and land",
+    "«There will be no more delay."
+   ]
+  ]
+ },
+ {
+  "ref": "REV 13:14",
+  "notes": [
+   "merged: beast from out of the earth kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And deceiveth them that dwell on the earth by the means of those miracles which he had power to do in the sight of the beast; saying to them that dwell on the earth, that they should make an image to the beast, which had the wound by a sword, and did live.",
+  "lines": [
+   [
+    "narrator",
+    "And deceiveth them that dwell on the earth by the means of those miracles which he had power to do in the sight of the beast; saying to them that dwell on the earth, that they should make an image to the beast, which had the wound by a sword, and did live."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "He deceives my own people who dwell on the earth because of the signs he was granted to do in front of the beast; saying to those who dwell on the earth:"
+   ],
+   [
+    "beast from out of the earth",
+    "«Make an image to the beast who was wounded by the sword and lived.»"
+   ]
+  ]
+ },
+ {
+  "ref": "REV 16:15",
+  "notes": [
+   "no red letter in the KJV here: the projection's lines for Christ given to the narrator"
+  ],
+  "kjv": "Behold, I come as a thief. Blessed is he that watcheth, and keepeth his garments, lest he walk naked, and they see his shame.",
+  "lines": [
+   [
+    "narrator",
+    "Behold, I come as a thief. Blessed is he that watcheth, and keepeth his garments, lest he walk naked, and they see his shame."
+   ]
+  ],
+  "reference": [
+   [
+    "Jesus",
+    "«Behold, I come like a thief. Blessed is he who watches, and keeps his clothes, so that he doesn’t walk naked, and they see his shame.»"
+   ]
+  ]
+ },
+ {
+  "ref": "REV 18:14",
+  "notes": [
+   "merged: merchants of the earth kept with narrator (indirect speech in the KJV)"
+  ],
+  "kjv": "And the fruits that thy soul lusted after are departed from thee, and all things which were dainty and goodly are departed from thee, and thou shalt find them no more at all.",
+  "lines": [
+   [
+    "narrator",
+    "And the fruits that thy soul lusted after are departed from thee, and all things which were dainty and goodly are departed from thee, and thou shalt find them no more at all."
+   ]
+  ],
+  "reference": [
+   [
+    "narrator",
+    "They cried out to the city:"
+   ],
+   [
+    "merchants of the earth",
+    "«The fruits which your soul lusted after have been lost to you. All things that were dainty and sumptuous have perished from you, and you will find them no more at all.»"
+   ]
+  ]
+ },
+ {
+  "ref": "REV 22:14",
+  "notes": [
+   "no red letter in the KJV here: the projection's lines for Christ given to the narrator"
+  ],
+  "kjv": "Blessed are they that do his commandments, that they may have right to the tree of life, and may enter in through the gates into the city.",
+  "lines": [
+   [
+    "narrator",
+    "Blessed are they that do his commandments, that they may have right to the tree of life, and may enter in through the gates into the city."
+   ]
+  ],
+  "reference": [
+   [
+    "Jesus",
+    "Blessed are those who do his commandments, that they may have the right to the tree of life, and may enter in by the gates into the city."
+   ]
+  ]
+ },
+ {
+  "ref": "REV 22:15",
+  "notes": [
+   "no red letter in the KJV here: the projection's lines for Christ given to the narrator"
+  ],
+  "kjv": "For without are dogs, and sorcerers, and whoremongers, and murderers, and idolaters, and whosoever loveth and maketh a lie.",
+  "lines": [
+   [
+    "narrator",
+    "For without are dogs, and sorcerers, and whoremongers, and murderers, and idolaters, and whosoever loveth and maketh a lie."
+   ]
+  ],
+  "reference": [
+   [
+    "Jesus",
+    "Outside are the dogs, the sorcerers, the sexually immoral, the murderers, the idolaters, and everyone who loves and practices falsehood."
+   ]
+  ]
+ }
+]

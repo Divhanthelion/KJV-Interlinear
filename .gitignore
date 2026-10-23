@@ -24,3 +24,6 @@ app/gen/schemas/
 *.p12
 *.msix
 screens/
+
+# Audio Bible: sources, voices and renders are rebuilt or fetched, never committed
+audio/.cache/

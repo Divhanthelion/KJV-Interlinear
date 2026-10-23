@@ -1,0 +1,672 @@
+{
+ "about": "Speaker decisions a person made where the projection or Glyssen could not (SOP 2C). Each verse's lines must rejoin to the verse exactly; tests check it. Settled 2026-10-07 from Glyssen's own candidates, the surrounding text, and the speakers of the neighbouring verses.",
+ "verses": {
+  "2KI 5:4": {
+   "lines": [
+    [
+     "narrator",
+     "And one went in, and told his lord, saying,"
+    ],
+    [
+     "Naaman",
+     "Thus and thus said the maid that is of the land of Israel."
+    ]
+   ],
+   "reason": "Glyssen's first candidate: Naaman reports the girl's words to his king (5:5 answers him)."
+  },
+  "PSA 68:26": {
+   "lines": [
+    [
+     "narrator",
+     "Bless ye God in the congregations, even the Lord, from the fountain of Israel."
+    ]
+   ],
+   "reason": "The Psalms are read by the narrator; Glyssen's other candidates are only hypothetical."
+  },
+  "SNG 1:4": {
+   "lines": [
+    [
+     "narrator",
+     "Draw me, we will run after thee: the king hath brought me into his chambers: we will be glad and rejoice in thee, we will remember thy love more than wine: the upright love thee."
+    ]
+   ],
+   "reason": "Glyssen leaves the Song's speakers open; our script reads the Song with the narrator except where Glyssen names a speaker, so these verses match their neighbours (see decisions: the Song)."
+  },
+  "SNG 1:8": {
+   "lines": [
+    [
+     "narrator",
+     "If thou know not, O thou fairest among women, go thy way forth by the footsteps of the flock, and feed thy kids beside the shepherds’ tents."
+    ]
+   ],
+   "reason": "As SNG 1:4."
+  },
+  "SNG 1:11": {
+   "lines": [
+    [
+     "narrator",
+     "We will make thee borders of gold with studs of silver."
+    ]
+   ],
+   "reason": "As SNG 1:4."
+  },
+  "SNG 1:17": {
+   "lines": [
+    [
+     "narrator",
+     "The beams of our house are cedar, and our rafters of fir."
+    ]
+   ],
+   "reason": "As SNG 1:4."
+  },
+  "SNG 2:15": {
+   "lines": [
+    [
+     "narrator",
+     "Take us the foxes, the little foxes, that spoil the vines: for our vines have tender grapes."
+    ]
+   ],
+   "reason": "As SNG 1:4."
+  },
+  "SNG 5:1": {
+   "lines": [
+    [
+     "Solomon, king",
+     "I am come into my garden, my sister, my spouse: I have gathered my myrrh with my spice; I have eaten my honeycomb with my honey; I have drunk my wine with my milk:"
+    ],
+    [
+     "maidens",
+     "eat, O friends; drink, yea, drink abundantly, O beloved."
+    ]
+   ],
+   "reason": "Glyssen's reference script names both speakers here; the projection found no capital where the friends begin (poetry, no verb of speaking)."
+  },
+  "SNG 6:10": {
+   "lines": [
+    [
+     "narrator",
+     "Who is she that looketh forth as the morning, fair as the moon, clear as the sun, and terrible as an army with banners?"
+    ]
+   ],
+   "reason": "As SNG 1:4."
+  },
+  "SNG 6:11": {
+   "lines": [
+    [
+     "narrator",
+     "I went down into the garden of nuts to see the fruits of the valley, and to see whether the vine flourished, and the pomegranates budded."
+    ]
+   ],
+   "reason": "As SNG 1:4."
+  },
+  "SNG 6:12": {
+   "lines": [
+    [
+     "narrator",
+     "Or ever I was aware, my soul made me like the chariots of Amminadib."
+    ]
+   ],
+   "reason": "As SNG 1:4."
+  },
+  "SNG 7:9": {
+   "lines": [
+    [
+     "narrator",
+     "And the roof of thy mouth like the best wine for my beloved, that goeth down sweetly, causing the lips of those that are asleep to speak."
+    ]
+   ],
+   "reason": "As SNG 1:4."
+  },
+  "SNG 8:8": {
+   "lines": [
+    [
+     "narrator",
+     "We have a little sister, and she hath no breasts: what shall we do for our sister in the day when she shall be spoken for?"
+    ]
+   ],
+   "reason": "As SNG 1:4."
+  },
+  "SNG 8:9": {
+   "lines": [
+    [
+     "narrator",
+     "If she be a wall, we will build upon her a palace of silver: and if she be a door, we will inclose her with boards of cedar."
+    ]
+   ],
+   "reason": "As SNG 1:4."
+  },
+  "ISA 40:6": {
+   "lines": [
+    [
+     "narrator",
+     "The voice said,"
+    ],
+    [
+     "God",
+     "Cry."
+    ],
+    [
+     "narrator",
+     "And he said,"
+    ],
+    [
+     "Isaiah",
+     "What shall I cry?"
+    ],
+    [
+     "God",
+     "All flesh is grass, and all the goodliness thereof is as the flower of the field:"
+    ]
+   ],
+   "reason": "Glyssen's candidates: the commissioning voice (God, its alternate), the prophet's reply (Isaiah), and the voice's answer, which runs on through 40:8."
+  },
+  "ISA 40:7": {
+   "lines": [
+    [
+     "God",
+     "The grass withereth, the flower fadeth: because the spirit of the LORD bloweth upon it: surely the people is grass."
+    ]
+   ],
+   "reason": "The voice's answer, continued from 40:6."
+  },
+  "ISA 40:8": {
+   "lines": [
+    [
+     "God",
+     "The grass withereth, the flower fadeth: but the word of our God shall stand for ever."
+    ]
+   ],
+   "reason": "The voice's answer, continued from 40:6."
+  },
+  "ISA 41:7": {
+   "lines": [
+    [
+     "narrator",
+     "So the carpenter encouraged the goldsmith, and he that smootheth with the hammer him that smote the anvil, saying,"
+    ],
+    [
+     "craftsman",
+     "It is ready for the sodering:"
+    ],
+    [
+     "narrator",
+     "and he fastened it with nails, that it should not be moved."
+    ]
+   ],
+   "reason": "As the reference script, which the projection could not place; matches 41:5-6, where the narrator tells and the islanders speak."
+  },
+  "ISA 41:26": {
+   "lines": [
+    [
+     "God",
+     "Who hath declared from the beginning, that we may know? and beforetime, that we may say, He is righteous? yea, there is none that sheweth, yea, there is none that declareth, yea, there is none that heareth your words."
+    ]
+   ],
+   "reason": "Within God's challenge to the idols (41:21 'saith the LORD' through 41:29); Glyssen's alternate."
+  },
+  "JER 3:22": {
+   "lines": [
+    [
+     "God",
+     "Return, ye backsliding children, and I will heal your backslidings."
+    ],
+    [
+     "Israel",
+     "Behold, we come unto thee; for thou art the LORD our God."
+    ]
+   ],
+   "reason": "Glyssen names Israel (Normal) for the people's answer, which runs on through 3:25."
+  },
+  "JER 3:23": {
+   "lines": [
+    [
+     "Israel",
+     "Truly in vain is salvation hoped for from the hills, and from the multitude of mountains: truly in the LORD our God is the salvation of Israel."
+    ]
+   ],
+   "reason": "Israel's answer, continued from 3:22."
+  },
+  "JER 3:24": {
+   "lines": [
+    [
+     "Israel",
+     "For shame hath devoured the labour of our fathers from our youth; their flocks and their herds, their sons and their daughters."
+    ]
+   ],
+   "reason": "Israel's answer, continued from 3:22."
+  },
+  "JER 3:25": {
+   "lines": [
+    [
+     "Israel",
+     "We lie down in our shame, and our confusion covereth us: for we have sinned against the LORD our God, we and our fathers, from our youth even unto this day, and have not obeyed the voice of the LORD our God."
+    ]
+   ],
+   "reason": "Israel's answer, continued from 3:22."
+  },
+  "JER 14:7": {
+   "lines": [
+    [
+     "Jeremiah",
+     "O LORD, though our iniquities testify against us, do thou it for thy name’s sake: for our backslidings are many; we have sinned against thee."
+    ]
+   ],
+   "reason": "Jeremiah's prayer for the people: the LORD answers him in 14:11, 'Pray not for this people'."
+  },
+  "JER 14:8": {
+   "lines": [
+    [
+     "Jeremiah",
+     "O the hope of Israel, the saviour thereof in time of trouble, why shouldest thou be as a stranger in the land, and as a wayfaring man that turneth aside to tarry for a night?"
+    ]
+   ],
+   "reason": "As JER 14:7."
+  },
+  "JER 14:9": {
+   "lines": [
+    [
+     "Jeremiah",
+     "Why shouldest thou be as a man astonied, as a mighty man that cannot save? yet thou, O LORD, art in the midst of us, and we are called by thy name; leave us not."
+    ]
+   ],
+   "reason": "As JER 14:7."
+  },
+  "JER 20:10": {
+   "lines": [
+    [
+     "narrator",
+     "For I heard the defaming of many, fear on every side. Report, say they, and we will report it. All my familiars watched for my halting, saying, Peradventure he will be enticed, and we shall prevail against him, and we shall take our revenge on him."
+    ]
+   ],
+   "reason": "Jeremiah's lament (20:7-18) is read by the narrator in our script; the quoted enemies stay with whoever quotes them (SOP 2A.3)."
+  },
+  "JHN 1:48": {
+   "lines": [
+    [
+     "narrator",
+     "Nathanael saith unto him,"
+    ],
+    [
+     "Nathanael",
+     "Whence knowest thou me?",
+     "puzzled"
+    ],
+    [
+     "narrator",
+     "Jesus answered and said unto him,"
+    ],
+    [
+     "Jesus",
+     "Before that Philip called thee, when thou wast under the fig tree, I saw thee."
+    ]
+   ],
+   "reason": "Glyssen: Nathanael (puzzled) and Jesus; the projection failed on the first boundary and the red letter fixed only Christ's line."
+  },
+  "MRK 11:6": {
+   "lines": [
+    [
+     "narrator",
+     "And they said unto them even as Jesus had commanded: and they let them go."
+    ]
+   ],
+   "reason": "Indirect speech in the KJV (Glyssen marks it Indirect)."
+  },
+  "MRK 12:37": {
+   "lines": [
+    [
+     "Jesus",
+     "David therefore himself calleth him Lord; and whence is he then his son?"
+    ],
+    [
+     "narrator",
+     "And the common people heard him gladly."
+    ]
+   ],
+   "reason": "eBible's red letter wraps the whole verse, but its last sentence is narration (a source error; the app's red letter has the same mistake)."
+  },
+  "MRK 15:45": {
+   "lines": [
+    [
+     "narrator",
+     "And when he knew it of the centurion, he gave the body to Joseph."
+    ]
+   ],
+   "reason": "Indirect speech in the KJV (Glyssen marks it Indirect)."
+  },
+  "NUM 22:35": {
+   "lines": [
+    [
+     "narrator",
+     "And the angel of the LORD said unto Balaam,"
+    ],
+    [
+     "Yahweh's angel",
+     "Go with the men: but only the word that I shall speak unto thee, that thou shalt speak."
+    ],
+    [
+     "narrator",
+     "So Balaam went with the princes of Balak."
+    ]
+   ],
+   "reason": "The angel's words run to 'that thou shalt speak.'; the projection cut them a clause early."
+  },
+  "JDG 19:8": {
+   "lines": [
+    [
+     "narrator",
+     "And he arose early in the morning on the fifth day to depart: and the damsel’s father said,"
+    ],
+    [
+     "father of concubine",
+     "Comfort thine heart, I pray thee."
+    ],
+    [
+     "narrator",
+     "And they tarried until afternoon, and they did eat both of them."
+    ]
+   ],
+   "reason": "'I pray thee' belongs to the father's words; the projection cut them early."
+  },
+  "1SA 20:38": {
+   "lines": [
+    [
+     "narrator",
+     "And Jonathan cried after the lad,"
+    ],
+    [
+     "Jonathan",
+     "Make speed, haste, stay not."
+    ],
+    [
+     "narrator",
+     "And Jonathan’s lad gathered up the arrows, and came to his master."
+    ]
+   ],
+   "reason": "'Make speed, haste, stay not.' is all Jonathan's cry."
+  },
+  "1KI 20:5": {
+   "lines": [
+    [
+     "narrator",
+     "And the messengers came again, and said,"
+    ],
+    [
+     "messengers of Ben-Hadad, king of Aram",
+     "Thus speaketh Ben-hadad, saying, Although I have sent unto thee, saying, Thou shalt deliver me thy silver, and thy gold, and thy wives, and thy children;"
+    ]
+   ],
+   "reason": "The messengers speak from 'Thus speaketh Ben-hadad'; the projection began their words a clause late."
+  },
+  "1KI 22:28": {
+   "lines": [
+    [
+     "narrator",
+     "And Micaiah said,"
+    ],
+    [
+     "Micaiah, son of Imlah",
+     "If thou return at all in peace, the LORD hath not spoken by me."
+    ],
+    [
+     "narrator",
+     "And he said,"
+    ],
+    [
+     "Micaiah, son of Imlah",
+     "Hearken, O people, every one of you."
+    ]
+   ],
+   "reason": "'And he said,' is the narrator's; Micaiah's second line is 'Hearken, O people, every one of you.'"
+  },
+  "2CH 18:27": {
+   "lines": [
+    [
+     "narrator",
+     "And Micaiah said,"
+    ],
+    [
+     "Micaiah, son of Imlah",
+     "If thou certainly return in peace, then hath not the LORD spoken by me."
+    ],
+    [
+     "narrator",
+     "And he said,"
+    ],
+    [
+     "Micaiah, son of Imlah",
+     "Hearken, all ye people."
+    ]
+   ],
+   "reason": "As 1 Kings 22:28."
+  },
+  "PRO 20:14": {
+   "lines": [
+    [
+     "buyer",
+     "It is naught, it is naught,"
+    ],
+    [
+     "narrator",
+     "saith the buyer: but when he is gone his way, then he boasteth."
+    ]
+   ],
+   "reason": "The buyer's words are 'It is naught, it is naught'; 'saith the buyer' is narration."
+  },
+  "ISA 29:11": {
+   "lines": [
+    [
+     "narrator",
+     "And the vision of all is become unto you as the words of a book that is sealed, which men deliver to one that is learned, saying,"
+    ],
+    [
+     "person asking someone to read a sealed book",
+     "Read this, I pray thee:"
+    ],
+    [
+     "narrator",
+     "and he saith,"
+    ],
+    [
+     "reader",
+     "I cannot; for it is sealed:"
+    ]
+   ],
+   "reason": "'I pray thee' belongs to the request."
+  },
+  "ISA 29:12": {
+   "lines": [
+    [
+     "narrator",
+     "And the book is delivered to him that is not learned, saying,"
+    ],
+    [
+     "person asking someone to read a sealed book",
+     "Read this, I pray thee:"
+    ],
+    [
+     "narrator",
+     "and he saith,"
+    ],
+    [
+     "non-reader",
+     "I am not learned."
+    ]
+   ],
+   "reason": "As ISA 29:11."
+  },
+  "JER 46:5": {
+   "lines": [
+    [
+     "God",
+     "Wherefore have I seen them dismayed and turned away back? and their mighty ones are beaten down, and are fled apace, and look not back: for fear was round about,"
+    ],
+    [
+     "narrator",
+     "saith the LORD."
+    ]
+   ],
+   "reason": "Only 'saith the LORD.' is narration; 'for fear was round about' is the LORD's."
+  },
+  "LAM 4:15": {
+   "lines": [
+    [
+     "narrator",
+     "They cried unto them,"
+    ],
+    [
+     "men",
+     "Depart ye; it is unclean; depart, depart, touch not:"
+    ],
+    [
+     "narrator",
+     "when they fled away and wandered, they said among the heathen,"
+    ],
+    [
+     "nations",
+     "They shall no more sojourn there."
+    ]
+   ],
+   "reason": "'They cried unto them,' introduces the cry (the merge kept the introduction with the speakers)."
+  },
+  "NAM 2:8": {
+   "lines": [
+    [
+     "narrator",
+     "But Nineveh is of old like a pool of water: yet they shall flee away."
+    ],
+    [
+     "slave girls",
+     "Stand, stand,"
+    ],
+    [
+     "narrator",
+     "shall they cry; but none shall look back."
+    ]
+   ],
+   "reason": "The cry is 'Stand, stand'; 'shall they cry' is narration."
+  },
+  "MAT 26:49": {
+   "lines": [
+    [
+     "narrator",
+     "And forthwith he came to Jesus, and said,"
+    ],
+    [
+     "Judas Iscariot",
+     "Hail, master;"
+    ],
+    [
+     "narrator",
+     "and kissed him."
+    ]
+   ],
+   "reason": "Judas's greeting is 'Hail, master;'."
+  },
+  "MRK 14:45": {
+   "lines": [
+    [
+     "narrator",
+     "And as soon as he was come, he goeth straightway to him, and saith,"
+    ],
+    [
+     "Judas Iscariot",
+     "Master, master;"
+    ],
+    [
+     "narrator",
+     "and kissed him."
+    ]
+   ],
+   "reason": "Judas's greeting is 'Master, master;'."
+  },
+  "LUK 11:2": {
+   "lines": [
+    [
+     "narrator",
+     "And he said unto them,"
+    ],
+    [
+     "Jesus",
+     "When ye pray, say, Our Father which art in heaven, Hallowed be thy name. Thy kingdom come. Thy will be done, as in heaven, so in earth."
+    ]
+   ],
+   "reason": "Christ's words begin at 'When ye pray, say,'; eBible's red letter starts at 'Our Father' (a source omission)."
+  },
+  "REV 1:8": {
+   "lines": [
+    [
+     "Jesus",
+     "I am Alpha and Omega, the beginning and the ending,"
+    ],
+    [
+     "narrator",
+     "saith the Lord,"
+    ],
+    [
+     "Jesus",
+     "which is, and which was, and which is to come, the Almighty."
+    ]
+   ],
+   "reason": "After 'saith the Lord,' the Lord's words resume; eBible's red letter marks only the first clause."
+  },
+  "REV 19:8": {
+   "lines": [
+    [
+     "voice of great crowd, like roar of many waters, loud thunderclaps",
+     "And to her was granted that she should be arrayed in fine linen, clean and white:"
+    ],
+    [
+     "narrator",
+     "for the fine linen is the righteousness of saints."
+    ]
+   ],
+   "reason": "'clean and white:' completes the voice's words; the explanation that follows is narration (Glyssen's reference script)."
+  },
+  "PSA 83:4": {
+   "lines": [
+    [
+     "narrator",
+     "They have said,"
+    ],
+    [
+     "enemies of Israel",
+     "Come, and let us cut them off from being a nation; that the name of Israel may be no more in remembrance."
+    ]
+   ],
+   "reason": "The enemies' words begin at 'Come,' and run to the end; the projection cut them after 'Come,'."
+  },
+  "JHN 1:21": {
+   "lines": [
+    [
+     "narrator",
+     "And they asked him,"
+    ],
+    [
+     "priests/Levites",
+     "What then? Art thou Elias?"
+    ],
+    [
+     "narrator",
+     "And he saith,"
+    ],
+    [
+     "John the Baptist",
+     "I am not."
+    ],
+    [
+     "priests/Levites",
+     "Art thou that prophet?"
+    ],
+    [
+     "narrator",
+     "And he answered,"
+    ],
+    [
+     "John the Baptist",
+     "No."
+    ]
+   ],
+   "reason": "'Art thou that prophet?' is the questioners' (no introduction in the KJV); the projection left it with the narrator."
+  }
+ }
+}

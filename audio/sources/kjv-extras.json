@@ -1,0 +1,131 @@
+{
+ "source": "eBible.org eng-kjv USFM (1769 KJV, public domain); see sources.json for its SHA-256",
+ "psalm119_headings": [
+  {
+   "chapter": 119,
+   "before_verse": 1,
+   "text": "Aleph."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 9,
+   "text": "Beth."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 17,
+   "text": "Gimel."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 25,
+   "text": "Daleth."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 33,
+   "text": "He."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 41,
+   "text": "Vau."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 49,
+   "text": "Zain."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 57,
+   "text": "Cheth."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 65,
+   "text": "Teth."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 73,
+   "text": "Jod."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 81,
+   "text": "Caph."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 89,
+   "text": "Lamed."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 97,
+   "text": "Mem."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 105,
+   "text": "Nun."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 113,
+   "text": "Samech."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 121,
+   "text": "Ain."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 129,
+   "text": "Pe."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 137,
+   "text": "Tzaddi."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 145,
+   "text": "Koph."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 153,
+   "text": "Resh."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 161,
+   "text": "Schin."
+  },
+  {
+   "chapter": 119,
+   "before_verse": 169,
+   "text": "Tau."
+  }
+ ],
+ "colophons": {
+  "ROM": "Written to the Romans from Corinthus, and sent by Phebe servant of the church at Cenchrea.",
+  "1CO": "The first epistle to the Corinthians was written from Philippi by Stephanas, and Fortunatus, and Achaicus, and Timotheus.",
+  "2CO": "The second epistle to the Corinthians was written from Philippi, a city of Macedonia, by Titus and Lucas.",
+  "GAL": "Unto the Galatians written from Rome.",
+  "EPH": "Written from Rome unto the Ephesians by Tychicus.",
+  "PHP": "It was written to the Philippians from Rome by Epaphroditus.",
+  "COL": "Written from Rome to the Colossians by Tychicus and Onesimus.",
+  "1TH": "The first epistle unto the Thessalonians was written from Athens.",
+  "2TH": "The second epistle to the Thessalonians was written from Athens.",
+  "1TI": "The first to Timothy was written from Laodicea, which is the chiefest city of Phrygia Pacatiana.",
+  "2TI": "The second epistle unto Timotheus, ordained the first bishop of the church of the Ephesians, was written from Rome, when Paul was brought before Nero the second time.",
+  "TIT": "It was written to Titus, ordained the first bishop of the church of the Cretians, from Nicopolis of Macedonia.",
+  "PHM": "Written from Rome to Philemon, by Onesimus, a servant.",
+  "HEB": "Written to the Hebrews from Italy by Timothy."
+ }
+}
