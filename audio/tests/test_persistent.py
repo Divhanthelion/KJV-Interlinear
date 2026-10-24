@@ -240,6 +240,49 @@ def test_chapters_do_not_share_what_they_heard():
         assert s.files(SECOND, 0) == {"mp3": False, "unheard": True}
 
 
+def test_a_take_turned_down_for_its_voice_stays_down():
+    # a take the chapter's voice check turned down (redo._turn_down) is weighed again with
+    # the same fault in `seen`, and a wrong voice is not a persistent kind: it stays down
+    plan = [(SECOND, [[]])]
+    with studio(plan, attempts=1) as s:
+        key = render.render_scene(SECOND, VOICES)[0]
+        assert s.files(SECOND, 0) == {"mp3": True, "unheard": False}
+        wrong = {"verse": 37, "who": "narrator"}
+        redo._turn_down(key, [wrong])
+        assert s.files(SECOND, 0) == {"mp3": False, "unheard": True}
+        fault = s.verdict(SECOND, 0)["faults"][0]
+        assert fault["fault"] == "wrong voice"
+        s.fish_open = False  # no new take may be asked for
+        heard = len(s.heard)
+        try:
+            render.render_scene(SECOND, VOICES, seen={render._fault_id(fault)})
+        except render.Incomplete:
+            pass
+        else:
+            raise AssertionError("a take with a wrong voice was accepted as persistent")
+        assert s.files(SECOND, 0) == {"mp3": False, "unheard": True}
+        assert "persistent" not in s.verdict(SECOND, 0)
+        assert len(s.heard) == heard
+
+
+def test_evidence_reaches_the_quarters():
+    # the whole scene and its second half both fail; a quarter's first take has only a
+    # fault the whole's takes heard, two halvings up: accepted as persistent
+    Q1, Q2 = SECOND[:1], SECOND[1:]
+    assert render.split_scene(SECOND) == [Q1, Q2]
+    plan = [(SCENE, [[SHIPHI(3)], [SOCHO(3)]]),
+            (FIRST, [[]]),
+            (SECOND, [[ASAIAH(1)], [ISRAEL(1)]]),
+            (Q1, [[]]),
+            (Q2, [[SHIPHI(0)]])]
+    with studio(plan) as s:
+        done = render.render_scenes(SCENE, VOICES)
+        assert keys(done) == [s.key(FIRST, 0), s.key(Q1, 0), s.key(Q2, 0)]
+        assert s.files(SECOND, 1) == {"mp3": False, "unheard": True}
+        assert s.files(Q2, 0) == {"mp3": True, "unheard": False}
+        assert s.verdict(Q2, 0)["persistent"] == [SHIPHI(0)]
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
