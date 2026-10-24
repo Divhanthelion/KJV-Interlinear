@@ -194,8 +194,10 @@ MIN_COVERAGE = 0.97  # a stream can end early with no error: once, 50 words of a
 # recognizer can. Words heard as the same other words in two takes are no slip a new take
 # would mend (the recognizer's blind spot, "every whit whole" -> "white hole", or Fish's
 # own reading of a word: a lexicon matter): they don't turn a take down, and stay in its
-# verdict as "persistent" for a person to hear. A verdict made by other checks than the
-# current ones is no verdict: the take, accepted or turned down, is heard again.
+# verdict as "persistent" for a person to hear. The two takes may be of the scene a halved
+# scene came from: a half keeps that evidence (render_scenes). A verdict made by other
+# checks than the current ones is no verdict: the take, accepted or turned down, is heard
+# again.
 HEARING = None
 CHECKS_VERSION = None
 ATTEMPTS = 2
@@ -242,11 +244,15 @@ def _acceptable(verdict: dict, seen: set) -> list | None:
     return persistent if len(persistent) == len(faults) else None
 
 
-def render_scene(lines, voices, deliveries=True, attempts=None):
+def render_scene(lines, voices, deliveries=True, attempts=None, seen=None):
+    """A take of these lines that passes the hearing gate: (cache key, mp3, words).
+    `seen` holds the faults of the takes turned down before (this scene's, and those of
+    the scene it was halved from); the faults of every take turned down here are added to
+    it, so the caller can hand them on to the halves (render_scenes)."""
     text, ids = request_text(lines, voices, deliveries)
     body = body_for(text, ids)
     paths.ensure(paths.RENDERS)
-    seen = set()  # "changed" faults of the takes turned down before this one
+    seen = set() if seen is None else seen
     for attempt in range(attempts or ATTEMPTS):
         key = cache_key(body, attempt)
         mp3, meta = paths.RENDERS / f"{key}.mp3", paths.RENDERS / f"{key}.json"
@@ -258,16 +264,17 @@ def render_scene(lines, voices, deliveries=True, attempts=None):
         if unheard.exists():
             if HEARING is None:
                 continue
-            verdict = _verdict(verdict_path)
-            if verdict is None:  # turned down by other checks: hear it again with these
-                words = collapse_phonemes(json.loads(meta.read_text(encoding="utf-8"))["words"])
-                verdict = _hear(lines, unheard, words, voices, verdict_path)
-                persistent = _acceptable(verdict, seen)
-                if persistent is not None:  # the same rule as a take heard the first time
-                    if persistent:
-                        _write_json(verdict_path, verdict | {"persistent": persistent})
-                    unheard.rename(mp3)
-                    return key, mp3, words
+            words = collapse_phonemes(json.loads(meta.read_text(encoding="utf-8"))["words"])
+            # turned down by other checks: hear it again with these. Turned down by these,
+            # it is weighed again all the same: the takes before it may now hold the same
+            # faults (the scene it was halved from), which make them persistent
+            verdict = _verdict(verdict_path) or _hear(lines, unheard, words, voices, verdict_path)
+            persistent = _acceptable(verdict, seen)
+            if persistent is not None:  # the same rule as a take heard the first time
+                if persistent and verdict.get("persistent") != persistent:
+                    _write_json(verdict_path, verdict | {"persistent": persistent})
+                unheard.rename(mp3)
+                return key, mp3, words
             seen.update(_fault_id(f) for f in verdict["faults"])
             continue
         if not mp3.exists():
@@ -401,13 +408,22 @@ def split_scene(scene: list) -> list:
 MAX_HALVINGS = 2  # then the fault is the voice's or the text's, not the take's (Revelation 16:7's altar)
 
 
-def render_scenes(scene, voices, deliveries=True, depth=0):
+def render_scenes(scene, voices, deliveries=True, depth=0, seen=frozenset()):
     """Render a scene; when Fish refuses its references as too long, or keeps
     stopping early (both seen with library voices, whose real reference audio
     is longer than it looks), or no take passes the hearing gate, halve it and
-    try each half, at most MAX_HALVINGS times."""
+    try each half, at most MAX_HALVINGS times.
+
+    Each half starts from the faults heard in the takes of the scene it came from
+    (`seen`, which has no line numbers, so a fault is the same in a half): a word heard
+    the same other way in a take of the whole and again in a take of the half is as
+    persistent as one heard so in two takes of the half. 1 Chronicles 4:10-43 (some 60
+    rare names) failed for want of it: "Shiphi" heard as "shippi" in all four takes of
+    the scene and in the first take of its half, which was that take's only fault. Each
+    half gets its own copy: what one half's takes heard is no evidence for the other."""
+    own = set(seen)
     try:
-        return [(scene, render_scene(scene, voices, deliveries=deliveries))]
+        return [(scene, render_scene(scene, voices, deliveries=deliveries, seen=own))]
     except fish.FishError as e:
         if "Reference audio too long" not in str(e) and not isinstance(e, Incomplete):
             raise
@@ -415,7 +431,7 @@ def render_scenes(scene, voices, deliveries=True, depth=0):
             raise Unsplittable(f"still failing after {depth} halvings: {e}") from e
         out = []
         for half in split_scene(scene):
-            out += render_scenes(half, voices, deliveries, depth + 1)
+            out += render_scenes(half, voices, deliveries, depth + 1, frozenset(own))
         return out
 
 

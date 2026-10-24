@@ -214,8 +214,11 @@ def guide_page() -> str:
               for k in keys for kind in ("missing", "changed", "added") for o in words[k].get(kind, [])]
     faults += [f'<div class="cand"><b>wrong voice</b> {html.escape(w["who"] or "")}{player(k, w.get("v"))}</div>'
                for k in sorted(voices, key=sort_key) for w in voices[k].get("wrong", [])]
-    persistent = [f'<div class="cand"><b>“{html.escape(p["script"])}”</b> heard as “{html.escape(p.get("heard_in_place", ""))}”'
-                  f'{player(k, p.get("verse"))}</div>' for k in keys for p in words[k].get("persistent", [])]
+    # a persistent "added" item has no script words, only what was heard besides them
+    persistent = [(f'<div class="cand"><b>“{html.escape(p["script"])}”</b> heard as “{html.escape(p.get("heard_in_place", ""))}”'
+                   if p.get("script") else
+                   f'<div class="cand"><b>added</b> “{html.escape(p.get("heard_extra", ""))}” heard twice')
+                  + f'{player(k, p.get("verse"))}</div>' for k in keys for p in words[k].get("persistent", [])]
     primed = [f'<div class="cand"><b>“{html.escape(x.get("script") or x.get("heard_extra", ""))}”</b> '
               f'{html.escape(x.get("why", ""))}{player(k, x.get("verse"))}</div>'
               for k in keys for x in words[k].get("listen", [])]

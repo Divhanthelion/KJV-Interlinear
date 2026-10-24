@@ -379,6 +379,14 @@ the QA environment); nothing is accepted on Fish's word alone.
    heard, in two takes are no slip a new take would mend (the recognizer's
    blind spot or habit, or the voice's own reading: a lexicon matter): they
    don't turn a take down and are listed as "persistent" for a person to hear.
+   A "missing" word is never persistent: it always turns the take down. The
+   two takes may be of the scene a half came from: each half starts with the
+   faults heard in the whole scene's takes (its own copy), and a take kept
+   from an earlier run is weighed again against them like a new one.
+   **(KJV lesson)** Without that, 1 Chronicles 4:10-43 (some 60 rare names)
+   failed: "Shiphi" heard as "shippi" in all four takes of the scene, then
+   again as the only fault of the first take of its half, which was turned
+   down because the half had forgotten the whole's takes.
    A wrong voice found only by the whole chapter's check turns its take down
    too, and the chapter is rendered again, 3 renders at most (`redo.ROUNDS`);
    a chapter with one still left isn't done (`redo.state`), so the next run
